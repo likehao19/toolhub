@@ -1,0 +1,845 @@
+<template>
+  <div id="app" @contextmenu.prevent="handleContextMenu">
+    <!-- 独立窗口模式 (桌面悬浮球、AI助手窗口) -->
+    <router-view v-if="isStandaloneWindow" />
+    
+    <!-- 主应用模式 -->
+    <template v-else>
+      <!-- 启动画面 -->
+      <div v-if="isLoading" class="splash-screen">
+        <div class="splash-content">
+          <div class="splash-logo">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 7H4C2.9 7 2 7.9 2 9V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V9C22 7.9 21.1 7 20 7Z" fill="white" opacity="0.9"/>
+              <path d="M20 4H4C3.45 4 3 4.45 3 5C3 5.55 3.45 6 4 6H20C20.55 6 21 5.55 21 5C21 4.45 20.55 4 20 4Z" fill="white" opacity="0.8"/>
+              <circle cx="8" cy="13.5" r="1.5" fill="#667eea"/>
+              <circle cx="12" cy="13.5" r="1.5" fill="#667eea"/>
+              <circle cx="16" cy="13.5" r="1.5" fill="#667eea"/>
+            </svg>
+          </div>
+          <div class="splash-title">ToolHub</div>
+          <div class="splash-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" :style="{ width: loadingProgress + '%' }"></div>
+            </div>
+            <div class="progress-text">{{ loadingStatus }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 主应用界面 -->
+      <div v-else class="app-container">
+        <HeaderBar />
+        <div class="app-body">
+          <ProductivitySidebar />
+          <div class="app-content">
+            <router-view v-slot="{ Component }">
+              <transition name="fade" mode="out-in">
+                <component :is="Component" />
+              </transition>
+            </router-view>
+          </div>
+        </div>
+        <CloseConfirmDialog ref="closeDialogRef" @confirm="handleCloseConfirm" />
+        <ContextMenu
+          :visible="contextMenuVisible"
+          :position="contextMenuPosition"
+          @close="contextMenuVisible = false"
+          @item-click="handleMenuItemClick"
+        />
+        
+        <!-- 全局AI助手 (对话框模式) -->
+        <AIAssistant v-model="showAIAssistant" />
+        
+        <!-- AI助手悬浮球 (应用内) -->
+        <AIFloatingBall 
+          v-if="floatingBallConfig.enabled && floatingBallConfig.mode === 'inApp'"
+          :visible="true"
+          :mode="floatingBallConfig.mode"
+          :style="floatingBallConfig.style"
+          :size="floatingBallConfig.size"
+          @click="openAIAssistantWindow"
+        />
+      </div>
+    </template>
+  </div>
+</template>
+
+<script setup>
+import { onMounted, ref, onUnmounted, computed, watch } from 'vue'
+import { listen } from '@tauri-apps/api/event'
+import { invoke } from '@tauri-apps/api/core'
+import { ElMessage } from 'element-plus'
+import { useAppStore } from '@/store'
+import CloseConfirmDialog from '@/components/CloseConfirmDialog.vue'
+import HeaderBar from '@/components/HeaderBar.vue'
+import ProductivitySidebar from '@/components/ProductivitySidebar.vue'
+import ContextMenu from '@/components/ContextMenu.vue'
+import AIAssistant from '@/components/AIAssistant.vue'
+import AIFloatingBall from '@/components/AIFloatingBall.vue'
+import { loadConfig } from '@/utils/tauri/store'
+import { initDatabase, checkDatabaseInitialized } from '@/utils/database'
+import { initNotificationService } from '@/services/notificationService'
+import { useRouter, useRoute } from 'vue-router'
+import { handleError } from '@/utils/errorHandler'
+import { recordLoadTime, createTimer } from '@/utils/performance'
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+
+// 🔥 立即同步检查窗口类型 - 必须在 setup 最顶层
+let windowLabel = 'main'
+try {
+  const currentWindow = getCurrentWebviewWindow()
+  windowLabel = currentWindow.label
+} catch (error) {
+}
+
+// 判断是否为独立窗口（包括所有便签窗口：sticky-notes, sticky-notes-1 ~ sticky-notes-9）
+const standaloneLabels = ['floating-ball', 'ai-assistant', 'sticky-notes']
+const isStickyNotesWindow = windowLabel === 'sticky-notes' || /^sticky-notes-\d+$/.test(windowLabel)
+const isStandaloneWindow = ref(
+  standaloneLabels.includes(windowLabel) || isStickyNotesWindow
+)
+const appStore = useAppStore()
+const router = useRouter()
+const route = useRoute()
+const closeDialogRef = ref(null)
+const contextMenuVisible = ref(false)
+const contextMenuPosition = ref({ x: 0, y: 0 })
+const isLoading = ref(true)
+const loadingProgress = ref(0)
+const loadingStatus = ref('正在启动...')
+const showAIAssistant = ref(false)
+
+// AI 助手悬浮球设置
+const aiFloatingBallSettings = ref({
+  enableFloatingBall: false,
+  floatingBallMode: 'inApp',
+  floatingBallStyle: 'circle',
+  floatingBallSize: 60
+})
+
+// 计算属性：简化访问
+const floatingBallConfig = computed(() => ({
+  enabled: aiFloatingBallSettings.value.enableFloatingBall,
+  mode: aiFloatingBallSettings.value.floatingBallMode,
+  style: aiFloatingBallSettings.value.floatingBallStyle,
+  size: aiFloatingBallSettings.value.floatingBallSize
+}))
+
+// 监听悬浮球配置变化
+watch(floatingBallConfig, (newConfig) => {
+  console.log('[悬浮球] 应显示:', newConfig.enabled ? `是 (${newConfig.mode})` : '否')
+}, { deep: true })
+
+// 打开 AI 助手窗口
+const openAIAssistantWindow = async () => {
+  try {
+    const { WebviewWindow, getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
+    
+    // 检查窗口是否已存在
+    const allWindows = await getAllWebviewWindows()
+    const existingWindow = allWindows.find(w => w.label === 'ai-assistant')
+    
+    if (existingWindow) {
+      try {
+        await existingWindow.show()
+        await existingWindow.setFocus()
+      } catch (err) {
+        // ignore
+      }
+      return
+    }
+    
+    // 创建新窗口
+    const assistantUrl = `${window.location.origin}/ai-assistant-window`
+    new WebviewWindow('ai-assistant', {
+      url: assistantUrl,
+      title: 'AI 智能助手',
+      width: 450,
+      height: 650,
+      resizable: true,
+      center: true,
+      decorations: false,
+      alwaysOnTop: aiFloatingBallSettings.value.floatingBallMode === 'desktop',
+      skipTaskbar: aiFloatingBallSettings.value.floatingBallMode === 'desktop',
+      focus: true
+    })
+  } catch (error) {
+    ElMessage.error('打开AI助手失败')
+  }
+}
+
+// 监听悬浮球设置变化
+const handleFloatingBallToggle = async (event) => {
+  const { enabled, mode, style, size } = event.detail
+  // 先关闭旧的桌面悬浮球窗口
+  await closeDesktopFloatingBall()
+  
+  // 更新配置
+  aiFloatingBallSettings.value = {
+    enableFloatingBall: enabled,
+    floatingBallMode: mode,
+    floatingBallStyle: style,
+    floatingBallSize: size
+  }
+  // 如果启用了桌面模式，延迟创建桌面悬浮球窗口
+  if (enabled && mode === 'desktop') {
+    setTimeout(async () => {
+      await createDesktopFloatingBall()
+    }, 300)
+  } else if (enabled && mode === 'inApp') {
+  } else {
+  }
+}
+
+// 显示桌面悬浮球窗口
+const createDesktopFloatingBall = async () => {
+  try {
+    const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
+    const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window')
+    
+    // 获取所有窗口，找到悬浮球窗口
+    const allWindows = await getAllWebviewWindows()
+    const ballWindow = allWindows.find(w => w.label === 'floating-ball')
+    
+    if (!ballWindow) {
+      return
+    }
+    // 获取屏幕尺寸，设置窗口位置到右下角
+    const { availWidth, availHeight } = window.screen
+    await ballWindow.setPosition(new LogicalPosition(availWidth - 100, availHeight - 100))
+    
+    // 确保窗口大小正确
+    await ballWindow.setSize(new LogicalSize(60, 60))
+    
+    // 显示窗口
+    await ballWindow.show()
+  } catch (error) {
+    // ignore
+  }
+}
+
+// 关闭桌面悬浮球窗口
+const closeDesktopFloatingBall = async () => {
+  try {
+    const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
+    
+    // 获取所有窗口，找到悬浮球窗口
+    const allWindows = await getAllWebviewWindows()
+    const ballWindow = allWindows.find(w => w.label === 'floating-ball')
+    
+    if (ballWindow) {
+      await ballWindow.hide()
+    }
+  } catch (error) {
+    // ignore
+  }
+}
+
+// 处理右键菜单
+const handleContextMenu = (event) => {
+  if (window.__TAURI_RELOADING__) return
+  
+  event.preventDefault()
+  event.stopPropagation()
+  
+  contextMenuPosition.value = {
+    x: event.clientX,
+    y: event.clientY
+  }
+  contextMenuVisible.value = true
+}
+
+// 处理菜单项点击
+const handleMenuItemClick = (item) => {
+  // 菜单项点击逻辑在 ContextMenu 组件中处理
+}
+
+// 全局错误处理：静默处理 Tauri callback 相关的错误
+if (typeof window !== 'undefined') {
+  // 初始化刷新标志
+  window.__TAURI_RELOADING__ = false
+  
+  // 捕获未处理的 Promise 拒绝
+  window.addEventListener('unhandledrejection', (event) => {
+    const reason = event.reason
+    const errorMessage = reason?.message || reason?.toString() || ''
+    
+    // 如果是 callback 相关的错误，静默处理
+    if (errorMessage.includes('callback') || 
+        errorMessage.includes('Couldn\'t find callback') ||
+        errorMessage.includes('callback id')) {
+      event.preventDefault()
+      // 不输出到控制台，完全静默
+      return false
+    }
+  })
+  
+  // 捕获控制台错误和警告（Tauri 的错误会通过 console.error/warn 输出）
+  const originalConsoleError = console.error
+  const originalConsoleWarn = console.warn
+  const originalConsoleLog = console.log
+  
+  // 统一的过滤函数
+  const shouldFilterMessage = (message) => {
+    // 检查是否是 callback 相关的 TAURI 错误/警告
+    if (message.includes('[TAURI]') && message.includes('callback')) {
+      return true
+    }
+    if (message.includes('Couldn\'t find callback')) {
+      return true
+    }
+    if (message.includes('callback id') && message.includes('TAURI')) {
+      return true
+    }
+    // 过滤 KaTeX 相关的 Unicode 警告
+    if (message.includes('LaTeX-incompatible input') && message.includes('unicodeTextInMathMode')) {
+      return true
+    }
+    if (message.includes('Unicode text character') && message.includes('used in math mode')) {
+      return true
+    }
+    return false
+  }
+  
+  console.error = function(...args) {
+    const message = args.join(' ')
+    // 如果是 callback 相关的错误，不输出
+    if (shouldFilterMessage(message)) {
+      return
+    }
+    // 其他错误正常输出
+    originalConsoleError.apply(console, args)
+  }
+  
+  console.warn = function(...args) {
+    const message = args.join(' ')
+    // 如果是 callback 相关的警告，不输出
+    if (shouldFilterMessage(message)) {
+      return
+    }
+    // 其他警告正常输出
+    originalConsoleWarn.apply(console, args)
+  }
+  
+  // 也拦截 console.log，因为某些情况下错误可能通过 log 输出
+  console.log = function(...args) {
+    const message = args.join(' ')
+    // 如果是 callback 相关的日志，不输出
+    if (shouldFilterMessage(message)) {
+      return
+    }
+    // 其他日志正常输出
+    originalConsoleLog.apply(console, args)
+  }
+  
+  // 监听页面卸载事件，标记正在刷新
+  window.addEventListener('beforeunload', () => {
+    window.__TAURI_RELOADING__ = true
+  })
+  
+  // 监听页面隐藏事件
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      // 页面隐藏时，可能是刷新或关闭
+      setTimeout(() => {
+        window.__TAURI_RELOADING__ = true
+      }, 500)
+    }
+  })
+  
+  // 全局键盘快捷键：Ctrl+K 唤起AI助手
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault()
+      if (aiFloatingBallSettings.value.enableFloatingBall) {
+        openAIAssistantWindow()
+      } else {
+        showAIAssistant.value = true
+      }
+    }
+  })
+  
+  // 监听悬浮球设置变化
+  window.addEventListener('ai-floating-ball-toggle', handleFloatingBallToggle)
+}
+
+onMounted(async () => {
+  // 🔥 如果是独立窗口，导航到对应路由
+  if (isStandaloneWindow.value) {
+    isLoading.value = false
+    
+    // 根据窗口标签导航到对应路由
+    const currentWindow = getCurrentWebviewWindow()
+    const label = currentWindow.label
+    if (label === 'floating-ball') {
+      if (route.path !== '/desktop-floating-ball') {
+        try {
+          await router.push('/desktop-floating-ball')
+        } catch (err) {
+        }
+      } else {
+      }
+    } else if (label === 'ai-assistant') {
+      if (route.path !== '/ai-assistant-window') {
+        try {
+          await router.push('/ai-assistant-window')
+        } catch (err) {
+        }
+      } else {
+      }
+    } else if (label === 'sticky-notes' || /^sticky-notes-\d+$/.test(label)) {
+      if (route.path !== '/sticky-notes') {
+        try {
+          await router.push('/sticky-notes')
+        } catch (err) {
+        }
+      } else {
+      }
+    }
+    
+    return
+  }
+  const isDev = import.meta.env.DEV
+  const appStartTimer = createTimer('应用启动')
+  
+  // 启动加载流程
+  try {
+    // 步骤 1: 加载配置
+    loadingStatus.value = '正在加载配置...'
+    loadingProgress.value = 20
+    const configTimer = createTimer('加载配置')
+    
+    try {
+      const config = await loadConfig()
+      configTimer.end()
+      if (config.theme) {
+        document.documentElement.setAttribute('data-theme', config.theme)
+      }
+      
+      // 加载 AI 助手悬浮球设置
+      if (config.aiAssistantSettings) {
+        aiFloatingBallSettings.value = config.aiAssistantSettings
+      } else {
+      }
+      
+      // 同步窗口关闭行为到 store
+      if (config.closeAction) {
+        appStore.setCloseAction(config.closeAction)
+      } else {
+      }
+    } catch (error) {
+      configTimer.end()
+      handleError(error, '加载配置')
+    }
+    
+    // 步骤 2: 初始化数据库
+    loadingStatus.value = '正在初始化数据库...'
+    loadingProgress.value = 40
+    const dbTimer = createTimer('初始化数据库')
+    
+    const dbInitialized = await checkDatabaseInitialized()
+    if (!dbInitialized) {
+      await initDatabase()
+    } else {
+      // 即使数据库已存在，也要运行迁移以确保所有表和列都存在
+      try {
+        const { runMigrations } = await import('@/utils/database')
+        await runMigrations()
+      } catch (error) {
+      }
+    }
+    dbTimer.end()
+    
+    // 步骤 3: 加载数据
+    loadingStatus.value = '正在加载数据...'
+    loadingProgress.value = 70
+    const dataTimer = createTimer('加载数据')
+    
+    // 这里可以预加载一些数据
+    // 例如：待办、日程等
+    dataTimer.end()
+    
+    // 步骤 4: 初始化通知服务
+    loadingStatus.value = '正在初始化通知服务...'
+    loadingProgress.value = 85
+    const notificationTimer = createTimer('初始化通知服务')
+    try {
+      await initNotificationService()
+      notificationTimer.end()
+    } catch (error) {
+      notificationTimer.end()
+      handleError(error, '初始化通知服务')
+    }
+    
+    // 步骤 5: 完成加载
+    loadingStatus.value = '启动完成'
+    loadingProgress.value = 100
+    
+    // 确保最小加载时间（至少 500ms，提供良好的视觉体验）
+    const totalTime = appStartTimer.end()
+    const minLoadTime = 500
+    if (totalTime < minLoadTime) {
+      await new Promise(resolve => setTimeout(resolve, minLoadTime - totalTime))
+    }
+    
+    recordLoadTime('应用启动总时间', totalTime)
+    
+    // 关闭启动画面
+    isLoading.value = false
+    
+    // 关闭启动窗口
+    if (!window.__TAURI_RELOADING__) {
+      try {
+        await invoke('close_splashscreen')
+      } catch (error) {
+        // 静默处理错误
+      }
+    }
+    
+    // 启动桌面悬浮球（如果配置已启用）
+    if (aiFloatingBallSettings.value.enableFloatingBall && aiFloatingBallSettings.value.floatingBallMode === 'desktop') {
+      setTimeout(() => {
+        createDesktopFloatingBall()
+      }, 500)
+    }
+    
+    // 开发模式下默认打开控制台
+    if (isDev) {
+      try {
+        await invoke('toggle_devtools')
+      } catch (error) {
+        // 静默处理错误
+      }
+    }
+  } catch (error) {
+    handleError(error, '应用启动')
+    // 即使出错也显示主界面
+    isLoading.value = false
+  }
+
+  // 注册通知点击事件监听器
+  await listen('notification-clicked', async (event) => {
+    const payload = event.payload
+    if (payload.type === 'todo') {
+      router.push(`/todos?id=${payload.id}`)
+    } else if (payload.type === 'event') {
+      router.push(`/calendar?id=${payload.id}`)
+    }
+  })
+
+  // 注册窗口关闭事件监听器
+  await listen('window-close-requested', async () => {
+    if (appStore.closeAction === 'ask') {
+      closeDialogRef.value?.show()
+    } else {
+      await invoke('handle_close_action', {
+        action: appStore.closeAction
+      })
+    }
+  })
+
+  // 注册便签保存事件监听器
+  await listen('sticky-notes-save', async (event) => {
+    const { noteName, content } = event.payload
+    try {
+      const notesAPI = await import('@/utils/notes')
+      const versionAPI = await import('@/utils/noteVersion')
+      const Database = (await import('@tauri-apps/plugin-sql')).default
+      const { exists, mkdir } = await import('@tauri-apps/plugin-fs')
+      const { join } = await import('@tauri-apps/api/path')
+      
+      // 默认文件夹名称
+      const DEFAULT_FOLDER = '便签'
+      
+      // 确保默认文件夹存在
+      const notesDir = await notesAPI.getNotesDir()
+      const folderPath = await join(notesDir, DEFAULT_FOLDER)
+      if (!(await exists(folderPath))) {
+        await mkdir(folderPath, { recursive: true })
+      }
+      
+      // 保存到默认文件夹
+      await notesAPI.saveNote(noteName, content, DEFAULT_FOLDER)
+      await versionAPI.saveNoteVersion(noteName, content, '便签保存')
+      
+      // 更新数据库
+      const db = await Database.load('sqlite:productivity.db')
+      const now = new Date().toISOString()
+      const existing = await db.select('SELECT note_name FROM note_metadata WHERE note_name = ?', [noteName])
+      if (existing && existing.length > 0) {
+        await db.execute('UPDATE note_metadata SET updated_at = ? WHERE note_name = ?', [now, noteName])
+      } else {
+        await db.execute(
+          'INSERT INTO note_metadata (note_name, title, created_at, updated_at) VALUES (?, ?, ?, ?)',
+          [noteName, '便签', now, now]
+        )
+      }
+    } catch (error) {
+      // 忽略数据库错误，不影响便签保存功能
+    }
+  })
+  
+  // 注册全局快捷键：Ctrl+Alt+N 创建新的便签窗口
+  let stickyShortcutProcessing = false
+  let stickyWindowCounter = 0
+  const maxStickyWindows = 10 // 最多支持10个并发便签窗口
+  try {
+    const { register } = await import('@tauri-apps/plugin-global-shortcut')
+    await register('CommandOrControl+Alt+N', async () => {
+      // 防止重复触发
+      if (stickyShortcutProcessing) return
+      stickyShortcutProcessing = true
+      
+      try {
+        const { WebviewWindow, getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
+        
+        // 查找可用的窗口标签（sticky-notes, sticky-notes-1 ... sticky-notes-9）
+        const allWindows = await getAllWebviewWindows()
+        const existingLabels = allWindows.map(w => w.label)
+        
+        let label = null
+        // 先尝试使用基础标签
+        if (!existingLabels.includes('sticky-notes')) {
+          label = 'sticky-notes'
+        } else {
+          // 查找可用的编号标签
+          for (let i = 1; i < maxStickyWindows; i++) {
+            const testLabel = `sticky-notes-${i}`
+            if (!existingLabels.includes(testLabel)) {
+              label = testLabel
+              break
+            }
+          }
+        }
+        
+        if (!label) {
+          return
+        }
+        
+        // 创建新的独立便签窗口
+        const timestamp = Date.now()
+        
+        // 计算窗口位置偏移（每个窗口偏移 30px）
+        const existingStickyCount = allWindows.filter(w => 
+          w.label === 'sticky-notes' || /^sticky-notes-\d+$/.test(w.label)
+        ).length
+        const offset = existingStickyCount * 30
+        
+        const stickyWindow = new WebviewWindow(label, {
+          url: `sticky-notes?id=${timestamp}`,
+          title: '便签',
+          width: 350,
+          height: 400,
+          minWidth: 300,
+          minHeight: 350,
+          resizable: true,
+          decorations: false,
+          transparent: true,
+          shadow: false,
+          // 不使用 center，而是手动设置位置
+          center: false,
+          alwaysOnTop: true,
+          skipTaskbar: false,
+          visible: false, // 先不显示，设置位置后再显示
+          focus: true
+        })
+        
+        // 等待窗口创建完成后设置位置
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
+        // 获取屏幕尺寸，设置窗口位置（屏幕中心偏移）
+        const { LogicalPosition } = await import('@tauri-apps/api/window')
+        const screenWidth = window.screen.availWidth
+        const screenHeight = window.screen.availHeight
+        const x = Math.floor((screenWidth - 350) / 2) + offset
+        const y = Math.floor((screenHeight - 400) / 2) + offset
+        
+        await stickyWindow.setPosition(new LogicalPosition(x, y))
+        await stickyWindow.show()
+        await stickyWindow.setFocus()
+      } catch (error) {
+        // ignore
+      }
+      
+      // 延迟重置标志，防止快速重复触发
+      setTimeout(() => {
+        stickyShortcutProcessing = false
+      }, 500)
+    })
+  } catch (error) {
+    // ignore
+  }
+})
+
+// 全局错误处理：静默处理 Tauri callback 相关的错误
+// 注意：这个处理已经在 onMounted 之前添加了
+
+// 处理用户确认
+const handleCloseConfirm = async ({ action, remember }) => {
+  // 检查是否正在刷新
+  if (window.__TAURI_RELOADING__) {
+    return
+  }
+  
+  // 如果用户选择记住，保存偏好
+  if (remember) {
+    appStore.setCloseAction(action)
+    appStore.setRememberCloseChoice(true)
+  }
+
+  // 执行关闭操作
+  try {
+    await invoke('handle_close_action', {
+      action
+    })
+  } catch (error) {
+    // 如果是刷新导致的错误，静默处理
+    if (window.__TAURI_RELOADING__ || error.message?.includes('callback')) {
+      return
+    }
+  }
+}
+</script>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+#app {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 启动画面 */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.splash-content {
+  text-align: center;
+  color: #ffffff;
+}
+
+.splash-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.splash-logo svg {
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+}
+
+.splash-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.splash-progress {
+  width: 300px;
+  margin: 0 auto;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* 主应用容器 */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: 32px; /* HeaderBar 高度 */
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1;
+  overflow: hidden;
+  background: #f5f7fa;
+}
+
+/* 过渡动画 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* Element Plus 自定义主题变量 */
+:root {
+  --el-color-primary: #409eff;
+}
+
+/* 支持明暗主题 */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1a1a1a;
+    color: #ffffff;
+  }
+}
+
+</style>

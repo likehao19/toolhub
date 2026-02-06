@@ -1,0 +1,5 @@
+export { default as MarkdownEditor } from './MarkdownEditor.vue'
+export { default as TxtEditor } from './TxtEditor.vue'
+export { default as ExcelEditor } from './ExcelEditor.vue'
+export { default as SpreadsheetEditor } from './SpreadsheetEditor.vue'
+export { default as WordEditor } from './WordEditor.vue'

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "identifier": "sticky-notes-window",
+  "description": "Sticky Notes 便签窗口权限配置（支持最多10个并发窗口）",
+  "windows": ["sticky-notes", "sticky-notes-1", "sticky-notes-2", "sticky-notes-3", "sticky-notes-4", "sticky-notes-5", "sticky-notes-6", "sticky-notes-7", "sticky-notes-8", "sticky-notes-9"],
+  "permissions": [
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-close",
+    "core:window:allow-set-focus",
+    "core:window:allow-center",
+    "core:window:allow-set-title",
+    "core:window:allow-inner-size",
+    "core:window:allow-outer-size",
+    "core:window:allow-outer-position",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-start-dragging",
+    "core:window:allow-is-visible",
+    "core:window:allow-get-all-windows",
+    "core:webview:allow-create-webview-window",
+    "core:webview:default",
+    "core:event:default",
+    "core:app:default",
+    "core:path:allow-resolve-directory",
+    "store:allow-load",
+    "store:allow-save",
+    "sql:allow-load",
+    "sql:allow-select",
+    "sql:allow-execute",
+    "sql:allow-close",
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [{ "path": "**" }]
+    },
+    "shell:allow-open"
+  ]
+}

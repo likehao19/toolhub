@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "custom-notification-window",
+  "description": "Capability for custom notification windows",
+  "windows": ["custom-notification-*"],
+  "permissions": [
+    "core:window:default",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-is-visible",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:event:default",
+    "core:webview:default",
+    "core:app:default"
+  ]
+}
+

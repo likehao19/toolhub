@@ -1,0 +1,65 @@
+{
+  "animations": [
+    {
+      "id": "default",
+      "name": "默认动画",
+      "description": "经典渐变背景 + 浮动粒子",
+      "file": "index.html"
+    },
+    {
+      "id": "minimal",
+      "name": "极简风格",
+      "description": "简洁的线条动画",
+      "file": "minimal.html"
+    },
+    {
+      "id": "wave",
+      "name": "波浪动画",
+      "description": "流动的波浪效果",
+      "file": "wave.html"
+    },
+    {
+      "id": "matrix",
+      "name": "矩阵风格",
+      "description": "数字雨效果",
+      "file": "matrix.html"
+    },
+    {
+      "id": "geometric",
+      "name": "几何图形",
+      "description": "动态几何图形",
+      "file": "geometric.html"
+    },
+    {
+      "id": "gradient",
+      "name": "渐变流动",
+      "description": "流动的渐变色",
+      "file": "gradient.html"
+    },
+    {
+      "id": "particles",
+      "name": "粒子系统",
+      "description": "丰富的粒子效果",
+      "file": "particles.html"
+    },
+    {
+      "id": "neon",
+      "name": "霓虹风格",
+      "description": "霓虹灯效果",
+      "file": "neon.html"
+    },
+    {
+      "id": "space",
+      "name": "太空主题",
+      "description": "星空背景动画",
+      "file": "space.html"
+    },
+    {
+      "id": "custom",
+      "name": "自定义",
+      "description": "用户自定义动画",
+      "file": "custom.html"
+    }
+  ]
+}
+

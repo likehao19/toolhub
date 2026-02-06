@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义通知</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: transparent !important;
+      overflow: hidden;
+    }
+    .notification {
+      width: 380px;
+      min-height: 100px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      margin: 0;
+      backdrop-filter: blur(10px);
+      border: none;
+      position: relative;
+      overflow: hidden;
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+    .notification.slide-out {
+      animation: slideOut 0.3s ease-in;
+    }
+    .notification-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .notification-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .notification-icon {
+      font-size: 24px;
+    }
+    .notification-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    .notification-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .notification-content {
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .notification-progress {
+      height: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .notification-progress-bar {
+      height: 100%;
+      background: white;
+      border-radius: 2px;
+      transition: width 0.1s linear;
+      animation: progress 10s linear;
+    }
+    @keyframes progress {
+      from { width: 100%; }
+      to { width: 0%; }
+    }
+    /* 不同类型通知的样式 */
+    .notification.success {
+      background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    .notification.error {
+      background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    }
+    .notification.warning {
+      background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+    }
+    .notification.info {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+  </style>
+</head>
+<body style="background: transparent; padding: 0; margin: 0;">
+  <div class="notification" id="notification">
+    <div class="notification-header">
+      <div class="notification-title">
+        <span class="notification-icon" id="icon">📢</span>
+        <span id="title">通知标题</span>
+      </div>
+      <button class="notification-close" id="closeBtn" title="关闭">×</button>
+    </div>
+    <div class="notification-content" id="content">
+      通知内容
+    </div>
+    <div class="notification-progress">
+      <div class="notification-progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+  <script>
+    (async () => {
+      // 获取 URL 参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const type = urlParams.get('type') || 'info';
+      const title = decodeURIComponent(urlParams.get('title') || '通知');
+      const message = decodeURIComponent(urlParams.get('message') || '这是一条通知消息');
+      const duration = parseInt(urlParams.get('duration') || '10000');
+
+      // 设置通知内容
+      document.getElementById('title').textContent = title;
+      document.getElementById('content').textContent = message;
+
+      // 设置图标和样式
+      const notification = document.getElementById('notification');
+      const icon = document.getElementById('icon');
+      const progressBar = document.getElementById('progressBar');
+
+      const typeConfig = {
+        success: { icon: '✅', class: 'success' },
+        error: { icon: '❌', class: 'error' },
+        warning: { icon: '⚠️', class: 'warning' },
+        info: { icon: '📢', class: 'info' }
+      };
+
+      const config = typeConfig[type] || typeConfig.info;
+      icon.textContent = config.icon;
+      notification.className = `notification ${config.class}`;
+
+      // 设置进度条动画时长
+      progressBar.style.animationDuration = `${duration / 1000}s`;
+
+      // 获取窗口标签
+      let windowLabel = '';
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        windowLabel = urlParams.get('label') || 'custom-notification-1';
+      } catch (error) {
+        windowLabel = 'custom-notification-1';
+      }
+
+      // 获取 invoke 函数
+      let invoke;
+      try {
+        if (window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke) {
+          invoke = window.__TAURI__.core.invoke;
+        } else {
+          // 等待 Tauri API 加载
+          await new Promise((resolve) => {
+            const checkInterval = setInterval(() => {
+              if (window.__TAURI__ && window.__TAURI__.core && window.__TAURI__.core.invoke) {
+                clearInterval(checkInterval);
+                invoke = window.__TAURI__.core.invoke;
+                resolve();
+              }
+            }, 100);
+            setTimeout(() => {
+              clearInterval(checkInterval);
+              resolve();
+            }, 5000);
+          });
+        }
+      } catch (error) {
+        console.error('无法加载 Tauri API:', error);
+      }
+
+      // 关闭窗口函数
+      const closeWindow = async () => {
+        notification.classList.add('slide-out');
+        await new Promise(resolve => setTimeout(resolve, 300));
+        if (invoke) {
+          try {
+            await invoke('close_window', { windowLabel });
+          } catch (error) {
+            console.error('关闭窗口失败:', error);
+          }
+        }
+      };
+
+      // 关闭按钮事件
+      document.getElementById('closeBtn').addEventListener('click', closeWindow);
+
+      // 自动关闭
+      setTimeout(closeWindow, duration);
+    })();
+  </script>
+</body>
+</html>
+

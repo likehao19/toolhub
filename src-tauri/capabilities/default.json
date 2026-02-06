@@ -1,0 +1,321 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": ["main"],
+  "opener": {
+    "scope": [
+      {
+        "url": "https://*"
+      },
+      {
+        "url": "http://*"
+      },
+      {
+        "path": "*"
+      }
+    ]
+  },
+  "permissions": [
+    "core:default",
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-unmaximize",
+    "core:window:allow-toggle-maximize",
+    "core:window:allow-close",
+    "core:window:allow-start-dragging",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:window:allow-is-visible",
+    "core:window:allow-set-focus",
+    "core:window:allow-set-always-on-top",
+    "core:window:allow-set-fullscreen",
+    "core:window:allow-set-size",
+    "core:window:allow-set-position",
+    "core:window:allow-center",
+    "core:window:allow-set-title",
+    "core:window:allow-set-resizable",
+    "core:window:allow-is-maximized",
+    "core:window:allow-is-fullscreen",
+    "core:window:allow-inner-size",
+    "core:window:allow-outer-size",
+    "core:window:allow-outer-position",
+    "core:window:allow-set-decorations",
+    "core:window:allow-set-skip-taskbar",
+    "core:window:allow-set-always-on-top",
+    "core:webview:allow-create-webview",
+    "core:webview:allow-create-webview-window",
+    "core:webview:allow-webview-position",
+    "core:webview:allow-webview-size",
+    "core:webview:allow-internal-toggle-devtools",
+    "core:tray:allow-new",
+    "core:tray:allow-set-icon",
+    "core:tray:allow-set-menu",
+    "core:tray:allow-set-tooltip",
+    "core:menu:default",
+    "core:menu:allow-new",
+    "core:menu:allow-append",
+    "core:menu:allow-prepend",
+    "core:menu:allow-insert",
+    "core:menu:allow-set-as-app-menu",
+    "core:menu:allow-set-as-window-menu",
+    "autostart:default",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled",
+    "core:event:default",
+    "core:path:default",
+    "opener:allow-open-url",
+    "opener:allow-open-path",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "dialog:allow-message",
+    "dialog:allow-ask",
+    "dialog:allow-confirm",
+    {
+      "identifier": "fs:allow-read-text-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-text-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-write-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-read-dir",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-mkdir",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-remove",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-rename",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-stat",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:allow-copy-file",
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
+    },
+    "notification:default",
+    "clipboard-manager:allow-read-text",
+    "clipboard-manager:allow-write-text",
+    "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "cmd",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "powershell",
+          "cmd": "powershell.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "dir",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "ls",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "date",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "time",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "ver",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "cd",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "whoami",
+          "cmd": "whoami.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "hostname",
+          "cmd": "hostname.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "ipconfig",
+          "cmd": "ipconfig.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "ping",
+          "cmd": "ping.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "systeminfo",
+          "cmd": "systeminfo.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "tasklist",
+          "cmd": "tasklist.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "netstat",
+          "cmd": "netstat.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "wmic",
+          "cmd": "wmic.exe",
+          "args": true,
+          "sidecar": false
+        }
+      ]
+    },
+    "process:allow-exit",
+    "process:allow-restart",
+    "os:allow-platform",
+    "os:allow-arch",
+    "os:allow-version",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-has",
+    "store:allow-delete",
+    "store:allow-clear",
+    "store:allow-reset",
+    "store:allow-keys",
+    "store:allow-values",
+    "store:allow-entries",
+    "store:allow-length",
+    "store:allow-load",
+    "store:allow-save",
+    {
+      "identifier": "http:allow-fetch",
+      "allow": [
+        {
+          "url": "https://*"
+        },
+        {
+          "url": "http://*"
+        },
+        {
+          "url": "http://127.0.0.1:*"
+        },
+        {
+          "url": "http://localhost:*"
+        }
+      ]
+    },
+    "http:allow-fetch-send",
+    "http:allow-fetch-read-body",
+    "http:allow-fetch-cancel",
+    "sql:allow-load",
+    "sql:allow-select",
+    "sql:allow-execute",
+    "sql:allow-close",
+    "websocket:default",
+    "upload:default",
+    "global-shortcut:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
+    "global-shortcut:allow-unregister-all",
+    "global-shortcut:allow-is-registered",
+    "cli:default",
+    "positioner:default",
+    "log:default",
+    "updater:default"
+  ]
+}

@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoteMaster Pro - 笔记管理原型</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ==================== 
+           CSS 变量 (保持一致)
+           ==================== */
+        :root {
+            --bg-body: #f7f9fb;
+            --bg-sidebar: #fcfcfc;
+            --bg-content: #ffffff;
+            --border-color: #e1e4e8;
+            --text-primary: #2c3e50;
+            --text-secondary: #606f7b;
+            --accent-color: #3498db;
+            --hover-bg: #edf2f7;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+            
+            /* 图标颜色 */
+            --icon-folder: #f1c40f;
+            --icon-md: #3498db;
+            --icon-word: #2980b9;
+            --icon-excel: #27ae60;
+            --icon-txt: #95a5a6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--text-primary);
+            background-color: var(--bg-body);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* 顶部导航 */
+        .header {
+            height: 50px;
+            background-color: var(--bg-content);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .app-title { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); }
+        .breadcrumb { font-size: 0.85rem; color: var(--text-secondary); background: #f0f2f5; padding: 4px 10px; border-radius: 4px; }
+        
+        .header-actions .btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .header-actions .btn:hover { background: var(--hover-bg); color: var(--accent-color); }
+
+        /* 主布局 */
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ==================== 
+           左侧：文件夹树 (增强版)
+           ==================== */
+        .sidebar-left {
+            width: 260px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+        
+        .sidebar-toolbar {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-title { font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+        .sidebar-btn { cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; }
+        .sidebar-btn:hover { color: var(--accent-color); }
+
+        .file-tree { list-style: none; overflow-y: auto; flex: 1; padding-bottom: 20px; }
+        
+        /* 文件夹节点样式 */
+        .tree-item-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            border-left: 3px solid transparent;
+        }
+        .tree-item-wrapper:hover { background-color: var(--hover-bg); }
+        .tree-item-wrapper.active { background-color: #e1f0fa; color: var(--accent-color); border-left-color: var(--accent-color); }
+        
+        .tree-info { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
+        .tree-info span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tree-info i.fa-folder { color: var(--icon-folder); }
+        
+        .arrow { font-size: 0.7rem; color: #ccc; transition: transform 0.2s; width: 12px; text-align: center; cursor: pointer; }
+        .arrow.expanded { transform: rotate(90deg); }
+        .arrow:hover { color: var(--accent-color); }
+
+        /* 文件夹悬停操作栏 (新增) */
+        .folder-actions {
+            display: none; /* 默认隐藏 */
+            gap: 8px;
+            margin-left: 5px;
+        }
+        .tree-item-wrapper:hover .folder-actions { display: flex; }
+        .folder-actions i { font-size: 0.75rem; color: var(--text-secondary); transition: 0.2s; }
+        .folder-actions i:hover { color: var(--accent-color); transform: scale(1.1); }
+        .folder-actions i.del:hover { color: var(--danger-color); }
+
+        /* 子树缩进 */
+        .sub-tree { display: none; list-style: none; padding-left: 18px; }
+        .sub-tree.open { display: block; }
+
+        /* ==================== 
+           中间：内容区域 (增强版)
+           ==================== */
+        .content-area {
+            flex: 1;
+            background-color: var(--bg-content);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 顶部工具条 (导入导出) */
+        .content-toolbar {
+            height: 45px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+            background: #fff;
+        }
+        .toolbar-group { display: flex; align-items: center; gap: 10px; border-right: 1px solid #eee; padding-right: 15px; }
+        .toolbar-group:last-child { border: none; }
+        .tool-btn {
+            border: none; background: none; cursor: pointer; 
+            font-size: 0.85rem; color: var(--text-secondary); display: flex; align-items: center; gap: 5px;
+        }
+        .tool-btn:hover { color: var(--accent-color); }
+        
+        /* 文件列表视图 */
+        .file-list-view {
+            padding: 20px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            grid-auto-rows: min-content;
+            gap: 20px;
+        }
+
+        .file-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fff;
+        }
+        .file-card:hover { background-color: var(--hover-bg); border-color: var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        
+        .file-icon { font-size: 2.5rem; margin-bottom: 10px; pointer-events: none; }
+        .file-name { font-size: 0.9rem; text-align: center; word-break: break-all; line-height: 1.4; margin-bottom: 4px; pointer-events: none;}
+        .file-meta { font-size: 0.75rem; color: var(--text-secondary); pointer-events: none; }
+        
+        /* 文件卡片右上角菜单 (新增) */
+        .card-menu-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: none; /* 悬停显示 */
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        .card-menu-btn:hover { background: #dcdcdc; color: #333; }
+        .file-card:hover .card-menu-btn { display: flex; }
+
+        /* 类型颜色 */
+        .type-md { color: var(--icon-md); }
+        .type-docx { color: var(--icon-word); }
+        .type-xlsx { color: var(--icon-excel); }
+        .type-txt { color: var(--icon-txt); }
+
+        /* Markdown 编辑器 (默认隐藏) */
+        .editor-container {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        .editor-toolbar {
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fafbfc;
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+        .editor-toolbar i { color: var(--text-secondary); cursor: pointer; padding: 5px; border-radius: 4px; }
+        .editor-toolbar i:hover { background: #e1e4e8; color: #333; }
+        
+        .markdown-body {
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* 简单的 Markdown 样式 */
+        .markdown-body h1, .markdown-body h2 { border-bottom: 1px solid #eaecef; padding-bottom: .3em; }
+        .markdown-body code { background: rgba(27,31,35,.05); border-radius: 3px; font-size: 85%; margin: 0; padding: .2em .4em; }
+
+        /* ==================== 
+           右侧：大纲 (TOC) - 逻辑修改
+           ==================== */
+        .sidebar-right {
+            width: 0; /* 默认隐藏 */
+            background-color: var(--bg-sidebar);
+            border-left: 0 solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            overflow: hidden;
+            opacity: 0;
+        }
+        /* 当处于 MD 编辑模式时激活此状态 */
+        .sidebar-right.active {
+            width: 240px;
+            border-left-width: 1px;
+            opacity: 1;
+        }
+        
+        .toc-header {
+            padding: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .toc-list { list-style: none; padding: 15px; overflow-y: auto; }
+        .toc-item {
+            padding: 4px 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            padding-left: 10px;
+            margin-bottom: 4px;
+            transition: color 0.2s;
+        }
+        .toc-item:hover { color: var(--accent-color); }
+        .toc-item.current { color: var(--accent-color); border-left-color: var(--accent-color); font-weight: 500; }
+        
+        .toc-h1 { margin-left: 0; }
+        .toc-h2 { margin-left: 15px; }
+        .toc-h3 { margin-left: 30px; }
+
+        /* 状态栏 */
+        .status-bar {
+            height: 25px;
+            background: #f8f9fa;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-left">
+            <div class="app-title"><i class="fa-solid fa-feather-pointed"></i> NoteMaster Pro</div>
+            <div class="breadcrumb" id="breadcrumb">知识库 / 默认文件夹</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-primary" onclick="createNewNote()"><i class="fa-solid fa-plus"></i> 新建笔记</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <aside class="sidebar-left">
+            <div class="sidebar-toolbar">
+                <span class="sidebar-title">文件夹</span>
+                <div class="actions">
+                    <span class="sidebar-btn" title="在当前文件夹下新建子文件夹" onclick="createFolder(null)"><i class="fa-solid fa-folder-plus"></i></span>
+                </div>
+            </div>
+            <ul class="file-tree" id="folder-root">
+                <li class="folder-node">
+                    <div class="tree-item-wrapper active" onclick="selectFolder(this, '知识库')">
+                        <span class="arrow expanded" onclick="toggleFolder(this); event.stopPropagation();" style="cursor: pointer;"><i class="fa-solid fa-caret-right"></i></span>
+                        <div class="tree-info" style="cursor: pointer; flex: 1;"><i class="fa-solid fa-folder"></i> <span>知识库</span></div>
+                        <div class="folder-actions" onclick="event.stopPropagation()">
+                            <i class="fa-solid fa-plus" title="新建子文件夹" onclick="createFolder(this)"></i>
+                            <i class="fa-solid fa-pen" title="重命名" onclick="renameFolder(this)"></i>
+                            <i class="del fa-solid fa-trash" title="删除" onclick="deleteFolder(this)"></i>
+                        </div>
+                    </div>
+                    <ul class="sub-tree open">
+                        <li class="folder-node">
+                            <div class="tree-item-wrapper" onclick="selectFolder(this, '前端技术')">
+                                <span class="arrow" onclick="toggleFolder(this); event.stopPropagation();" style="cursor: pointer;"><i class="fa-solid fa-caret-right"></i></span>
+                                <div class="tree-info" style="cursor: pointer; flex: 1;"><i class="fa-solid fa-folder"></i> <span>前端技术</span></div>
+                                <div class="folder-actions" onclick="event.stopPropagation()">
+                                    <i class="fa-solid fa-plus" onclick="createFolder(this)"></i>
+                                    <i class="fa-solid fa-pen" onclick="renameFolder(this)"></i>
+                                    <i class="del fa-solid fa-trash" onclick="deleteFolder(this)"></i>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="content-area">
+            
+            <div id="view-list" style="display: flex; flex-direction: column; height: 100%;">
+                <div class="content-toolbar">
+                    <div class="toolbar-group">
+                        <button class="tool-btn" onclick="triggerImport()"><i class="fa-solid fa-file-import"></i> 导入</button>
+                        <button class="tool-btn" onclick="triggerExport()"><i class="fa-solid fa-file-export"></i> 导出</button>
+                    </div>
+                    <div class="toolbar-group">
+                        <button class="tool-btn"><i class="fa-solid fa-arrow-down-a-z"></i> 排序</button>
+                        <button class="tool-btn"><i class="fa-solid fa-border-all"></i> 视图</button>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileImport(this)">
+                </div>
+
+                <div class="file-list-view" id="file-grid">
+                    <!-- 文件列表将通过 JavaScript 动态渲染 -->
+                </div>
+            </div>
+
+            <div id="view-editor" class="editor-container">
+                <div class="editor-toolbar">
+                    <button class="btn" style="border:none; background:transparent" onclick="backToList()" title="返回列表">
+                        <i class="fa-solid fa-arrow-left"></i> 返回
+                    </button>
+                    <div style="width: 1px; height: 20px; background: #ddd; margin: 0 10px;"></div>
+                    <i class="fa-solid fa-bold" title="加粗"></i>
+                    <i class="fa-solid fa-italic" title="斜体"></i>
+                    <i class="fa-solid fa-heading" title="标题"></i>
+                    <i class="fa-solid fa-image" title="插入图片"></i>
+                    <i class="fa-solid fa-table" title="表格"></i>
+                    <div style="flex:1"></div>
+                    <button class="btn" onclick="toggleTOC()" title="切换大纲视图">
+                        <i class="fa-solid fa-list-ul"></i>
+                    </button>
+                </div>
+                <div class="markdown-body" contenteditable="true" id="md-content">
+                    <h1>Vue3 学习笔记</h1>
+                    <p>这是一个模拟的 Markdown 内容区域。在实际应用中，这里会集成 Milkdown 或 Editor.js。</p>
+                    <h2>1. 组合式 API (Composition API)</h2>
+                    <p>相比于 Vue2 的 Options API，组合式 API 提供了更好的逻辑复用能力。</p>
+                    <h3>1.1 setup() 函数</h3>
+                    <p>setup 函数是组件逻辑的入口。</p>
+                    <h2>2. 响应式系统</h2>
+                    <p>Vue3 使用 Proxy 替代了 Object.defineProperty。</p>
+                    <h3>2.1 ref vs reactive</h3>
+                    <pre>const count = ref(0);</pre>
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="sidebar-right" id="toc-sidebar">
+            <div class="toc-header">
+                <span><i class="fa-solid fa-list-ol"></i> 大纲</span>
+                <i class="fa-solid fa-xmark" style="cursor:pointer; color:#999" onclick="toggleTOC()"></i>
+            </div>
+            <ul class="toc-list">
+                <li class="toc-item toc-h1 current">Vue3 学习笔记</li>
+                <li class="toc-item toc-h2">1. 组合式 API</li>
+                <li class="toc-item toc-h3">1.1 setup() 函数</li>
+                <li class="toc-item toc-h2">2. 响应式系统</li>
+                <li class="toc-item toc-h3">2.1 ref vs reactive</li>
+            </ul>
+        </aside>
+
+    </div>
+
+    <footer class="status-bar">
+        <div id="status-text">就绪</div>
+        <div>UTF-8</div>
+    </footer>
+
+    <script>
+        // ================= 文件夹 CRUD =================
+        
+        // 当前选中的文件夹元素（用于工具栏新建文件夹）
+        let currentSelectedFolderElement = null;
+        
+        // 文件夹文件数据（模拟数据）
+        const folderFiles = {
+            '知识库': [
+                { name: 'Vue3学习笔记.md', type: 'md', date: '2023-10-12' },
+                { name: '需求文档.docx', type: 'docx', date: '2023-09-08' },
+                { name: '待办事项.txt', type: 'txt', date: '2023-11-01' }
+            ],
+            '前端技术': [
+                { name: 'React基础.md', type: 'md', date: '2023-10-15' },
+                { name: 'TypeScript进阶.md', type: 'md', date: '2023-10-20' },
+                { name: 'Vue组件设计.docx', type: 'docx', date: '2023-10-25' }
+            ]
+        };
+        
+        // 获取文件夹名称（从元素中提取）
+        function getFolderName(element) {
+            const nameSpan = element.querySelector('.tree-info span');
+            return nameSpan ? nameSpan.innerText : '';
+        }
+        
+        // 渲染文件列表
+        function renderFileList(folderName) {
+            const fileGrid = document.getElementById('file-grid');
+            const files = folderFiles[folderName] || [];
+            
+            // 清空现有文件
+            fileGrid.innerHTML = '';
+            
+            if (files.length === 0) {
+                fileGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">该文件夹暂无文件</div>';
+                return;
+            }
+            
+            // 渲染文件卡片
+            files.forEach(file => {
+                const fileCard = document.createElement('div');
+                fileCard.className = 'file-card';
+                
+                // 根据文件类型设置图标和双击事件
+                let iconClass = '';
+                let ondblclickAttr = '';
+                
+                if (file.type === 'md') {
+                    iconClass = 'fa-brands fa-markdown file-icon type-md';
+                    ondblclickAttr = `ondblclick="openFile('md', '${file.name}')"`;
+                } else if (file.type === 'docx') {
+                    iconClass = 'fa-solid fa-file-word file-icon type-docx';
+                    ondblclickAttr = `ondblclick="openFile('docx', '${file.name}')"`;
+                } else if (file.type === 'xlsx') {
+                    iconClass = 'fa-solid fa-file-excel file-icon type-xlsx';
+                    ondblclickAttr = `ondblclick="openFile('xlsx', '${file.name}')"`;
+                } else if (file.type === 'txt') {
+                    iconClass = 'fa-solid fa-file-lines file-icon type-txt';
+                    ondblclickAttr = `ondblclick="openFile('txt', '${file.name}')"`;
+                }
+                
+                fileCard.setAttribute('ondblclick', `openFile('${file.type}', '${file.name}')`);
+                fileCard.innerHTML = `
+                    <div class="card-menu-btn" onclick="showFileMenu(event, '${file.name}')"><i class="fa-solid fa-ellipsis"></i></div>
+                    <i class="${iconClass}"></i>
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-meta">${file.date}</div>
+                `;
+                
+                fileGrid.appendChild(fileCard);
+            });
+        }
+
+        // 0. 展开/折叠文件夹
+        function toggleFolder(arrowElement) {
+            // 阻止事件冒泡，避免触发选中
+            event.stopPropagation();
+            
+            // 找到当前文件夹节点
+            const folderNode = arrowElement.closest('li.folder-node');
+            if (!folderNode) return;
+            
+            // 找到子文件夹列表
+            const subTree = folderNode.querySelector('.sub-tree');
+            if (!subTree) return; // 如果没有子文件夹，不处理
+            
+            // 切换展开状态
+            const isExpanded = subTree.classList.contains('open');
+            
+            if (isExpanded) {
+                // 折叠
+                subTree.classList.remove('open');
+                arrowElement.classList.remove('expanded');
+            } else {
+                // 展开
+                subTree.classList.add('open');
+                arrowElement.classList.add('expanded');
+            }
+        }
+
+        // 1. 选中文件夹
+        function selectFolder(element, name) {
+            // UI 选中态切换
+            document.querySelectorAll('.tree-item-wrapper').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            // 保存当前选中的文件夹元素
+            currentSelectedFolderElement = element.closest('li.folder-node');
+            
+            // 更新面包屑
+            document.getElementById('breadcrumb').innerText = `知识库 / ${name}`;
+            
+            // 更新文件列表 - 显示当前文件夹下的文件
+            renderFileList(name);
+            
+            // 强制切回列表模式
+            backToList();
+            
+            updateStatus(`已切换到文件夹: ${name}`);
+        }
+
+        // 2. 创建文件夹 (模拟)
+        function createFolder(btnElement) {
+            const name = prompt("请输入新文件夹名称:", "新建文件夹");
+            if (!name) return;
+
+            let targetUl;
+            let parentLi;
+            
+            if (btnElement === null) {
+                // 从工具栏按钮点击 - 在当前选中的文件夹下创建，如果没有选中则在根目录创建
+                if (currentSelectedFolderElement) {
+                    // 在选中的文件夹下创建
+                    parentLi = currentSelectedFolderElement;
+                    targetUl = parentLi.querySelector('.sub-tree');
+                    if (!targetUl) {
+                        targetUl = document.createElement('ul');
+                        targetUl.className = 'sub-tree open';
+                        parentLi.appendChild(targetUl);
+                        
+                        // 确保父级箭头展开
+                        const arrow = parentLi.querySelector('.arrow');
+                        if(arrow) arrow.classList.add('expanded');
+                    } else {
+                        targetUl.classList.add('open');
+                    }
+                } else {
+                    // 根目录创建
+                    targetUl = document.getElementById('folder-root');
+                }
+            } else {
+                // 从文件夹的"+"按钮点击 - 在该文件夹下创建
+                parentLi = btnElement.closest('li.folder-node');
+                if (!parentLi) {
+                    // 如果找不到，尝试找最近的 li
+                    parentLi = btnElement.closest('li');
+                }
+                
+                if (parentLi) {
+                    // 查找该 li 下面是否已有 ul.sub-tree，没有则创建
+                    targetUl = parentLi.querySelector('.sub-tree');
+                    if (!targetUl) {
+                        targetUl = document.createElement('ul');
+                        targetUl.className = 'sub-tree open';
+                        parentLi.appendChild(targetUl);
+                        
+                        // 确保父级箭头展开
+                        const arrow = parentLi.querySelector('.arrow');
+                        if(arrow) arrow.classList.add('expanded');
+                    } else {
+                        targetUl.classList.add('open');
+                    }
+                } else {
+                    // 如果还是找不到，在根目录创建
+                    targetUl = document.getElementById('folder-root');
+                }
+            }
+
+            // 添加 DOM
+            const newLi = document.createElement('li');
+            newLi.className = 'folder-node';
+            newLi.innerHTML = `
+                <div class="tree-item-wrapper">
+                    <span class="arrow" onclick="toggleFolder(this)" style="cursor: pointer;"><i class="fa-solid fa-caret-right"></i></span>
+                    <div class="tree-info" onclick="selectFolder(this.closest('.tree-item-wrapper'), '${name}')" style="cursor: pointer; flex: 1;"><i class="fa-solid fa-folder"></i> <span>${name}</span></div>
+                    <div class="folder-actions" onclick="event.stopPropagation()">
+                        <i class="fa-solid fa-plus" onclick="createFolder(this)"></i>
+                        <i class="fa-solid fa-pen" onclick="renameFolder(this)"></i>
+                        <i class="del fa-solid fa-trash" onclick="deleteFolder(this)"></i>
+                    </div>
+                </div>
+            `;
+            targetUl.appendChild(newLi);
+            
+            // 为新文件夹初始化空文件列表
+            if (!folderFiles[name]) {
+                folderFiles[name] = [];
+            }
+            
+            updateStatus("文件夹创建成功");
+        }
+
+        // 3. 重命名文件夹
+        function renameFolder(btnElement) {
+            const wrapper = btnElement.closest('.tree-item-wrapper');
+            const nameSpan = wrapper.querySelector('.tree-info span');
+            const oldName = nameSpan.innerText;
+            
+            const newName = prompt("重命名文件夹:", oldName);
+            if (newName && newName !== oldName) {
+                // 更新文件数据中的键名
+                if (folderFiles[oldName]) {
+                    folderFiles[newName] = folderFiles[oldName];
+                    delete folderFiles[oldName];
+                }
+                
+                // 更新 UI
+                nameSpan.innerText = newName;
+                
+                // 如果当前选中的是这个文件夹，更新文件列表
+                if (currentSelectedFolderElement === wrapper.closest('li.folder-node')) {
+                    renderFileList(newName);
+                    document.getElementById('breadcrumb').innerText = `知识库 / ${newName}`;
+                }
+                
+                updateStatus("重命名成功");
+            }
+        }
+
+        // 4. 删除文件夹
+        function deleteFolder(btnElement) {
+            if (confirm("确定要删除此文件夹及其内容吗？")) {
+                const li = btnElement.closest('li');
+                const folderName = getFolderName(li);
+                
+                // 删除文件数据
+                if (folderFiles[folderName]) {
+                    delete folderFiles[folderName];
+                }
+                
+                // 如果删除的是当前选中的文件夹，切换到根目录
+                if (currentSelectedFolderElement === li) {
+                    currentSelectedFolderElement = null;
+                    document.getElementById('breadcrumb').innerText = '知识库';
+                    renderFileList('知识库');
+                }
+                
+                li.remove();
+                updateStatus("文件夹已删除");
+            }
+        }
+
+        // ================= 文件操作 (列表) =================
+
+        // 1. 打开文件 (进入编辑器模式)
+        function openFile(type, fileName) {
+            if (type === 'md') {
+                document.getElementById('view-list').style.display = 'none';
+                document.getElementById('view-editor').style.display = 'flex';
+                
+                // 自动打开大纲
+                document.getElementById('toc-sidebar').classList.add('active');
+                
+                updateStatus(`正在编辑: ${fileName}`);
+            } else {
+                alert(`模拟: 正在打开系统默认程序预览 ${fileName}`);
+            }
+        }
+
+        // 2. 返回列表
+        function backToList() {
+            document.getElementById('view-list').style.display = 'flex';
+            document.getElementById('view-editor').style.display = 'none';
+            
+            // 自动关闭大纲 (因为大纲只属于 MD 编辑器)
+            document.getElementById('toc-sidebar').classList.remove('active');
+            
+            updateStatus("返回文件列表");
+        }
+
+        // 3. 文件菜单 (模拟右键/点击菜单)
+        function showFileMenu(e, fileName) {
+            e.stopPropagation(); // 防止触发卡片点击
+            // 这里简单使用 prompt/confirm 模拟，实际项目应使用自定义下拉菜单 Div
+            const action = prompt(`对文件 "${fileName}" 执行操作:\n输入 1: 重命名\n输入 2: 删除`, "1");
+            
+            if (action === "1") {
+                const newName = prompt("新文件名:", fileName);
+                if (newName) alert(`文件名已修改为: ${newName}`);
+            } else if (action === "2") {
+                if(confirm(`确定删除 ${fileName} 吗?`)) {
+                    // 移除 DOM (模拟)
+                    e.target.closest('.file-card').remove();
+                }
+            }
+        }
+
+        // 4. 导入导出
+        function triggerImport() {
+            document.getElementById('fileInput').click();
+        }
+        
+        function handleFileImport(input) {
+            if (input.files.length > 0) {
+                alert(`模拟导入: 已读取文件 ${input.files[0].name}`);
+                // 实际逻辑：读取文件流 -> 写入本地/数据库 -> 刷新列表
+            }
+        }
+
+        function triggerExport() {
+            alert("模拟导出: 正在打包当前文件夹内容为 ZIP...");
+        }
+
+        // ================= 视图与辅助 =================
+
+        function toggleTOC() {
+            const toc = document.getElementById('toc-sidebar');
+            toc.classList.toggle('active');
+        }
+
+        function updateStatus(msg) {
+            const statusText = document.getElementById('status-text');
+            statusText.innerText = msg;
+            // 3秒后恢复
+            setTimeout(() => {
+                if (statusText.innerText === msg) statusText.innerText = '就绪';
+            }, 3000);
+        }
+
+        function createNewNote() {
+            const name = prompt("请输入笔记名称 (无需后缀):", "未命名笔记");
+            if(name) {
+                openFile('md', name + '.md');
+            }
+        }
+
+        // ================= 页面初始化 =================
+        // 页面加载时初始化显示"知识库"文件夹的文件
+        window.addEventListener('DOMContentLoaded', function() {
+            // 初始化选中"知识库"文件夹
+            const knowledgeBaseFolder = document.querySelector('.tree-item-wrapper.active');
+            if (knowledgeBaseFolder) {
+                currentSelectedFolderElement = knowledgeBaseFolder.closest('li.folder-node');
+                renderFileList('知识库');
+            }
+        });
+
+    </script>
+</body>
+</html>

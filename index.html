@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- 尝试放宽当前页面的 CSP 策略（仅对本页面有效） -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;
+      script-src * 'unsafe-inline' 'unsafe-eval';
+      style-src * 'unsafe-inline';
+      img-src * data: blob:;
+      font-src * data:;
+      connect-src *;
+      frame-src *;
+      child-src *;
+    ">
+    
+    <!-- 允许跨域资源访问 -->
+    <meta http-equiv="X-Frame-Options" content="ALLOWALL" />
+    
+    <title>Tauri + Vue 3 App</title>
+    
+    <script>
+      // 全局错误过滤器 - 必须在所有脚本加载前设置
+      (function() {
+        'use strict';
+        
+        // 保存原始 console 方法
+        const _error = console.error;
+        const _warn = console.warn;
+        const _log = console.log;
+        
+        // 检查是否应该过滤这条消息
+        const shouldFilter = function(args) {
+          if (!args || args.length === 0) return false;
+          
+          // 将所有参数转换为字符串
+          let message = '';
+          try {
+            message = Array.from(args).map(arg => {
+              if (arg === null) return 'null';
+              if (arg === undefined) return 'undefined';
+              if (typeof arg === 'object') {
+                if (arg instanceof Error) return arg.message || arg.toString();
+                try { return JSON.stringify(arg); } catch { return String(arg); }
+              }
+              return String(arg);
+            }).join(' ').toLowerCase();
+          } catch {
+            return false;
+          }
+          
+          // Tauri callback 错误
+          if (message.includes('tauri') && message.includes('callback')) return true;
+          if (message.includes('couldn\'t find callback')) return true;
+          
+          // KaTeX 数学公式错误
+          if (message.includes('latex') || message.includes('katex')) return true;
+          if (message.includes('unicode') && message.includes('math')) return true;
+          
+          // Mermaid/SVG 渲染错误 - 核心过滤
+          if (message.includes('expected length')) return true;
+          if (message.includes('nan')) return true;
+          if (message.includes('attribute x') || message.includes('attribute y')) return true;
+          if (message.includes('<line>') || message.includes('<path>') || message.includes('<rect>')) return true;
+          if (message.includes('mermaid') && message.includes('error')) return true;
+          
+          // CSP 和 iframe 相关错误 - 这些是预期的，必须过滤
+          if (message.includes('frame-ancestors')) return true;
+          if (message.includes('content security policy')) return true;
+          if (message.includes('csp')) return true;
+          if (message.includes('blocked a frame')) return true;
+          if (message.includes('cross-origin frame')) return true;
+          if (message.includes('iframe') && message.includes('blocked')) return true;
+          if (message.includes('cannot read properties of undefined') && message.includes('plugins')) return true;
+          if (message.includes('cannot read properties') && message.includes('plugins')) return true;
+          if (message.includes('cannot read property') && message.includes('plugins')) return true;
+          if (message.includes('tracking prevention')) return true;
+          if (message.includes('blocked access to storage')) return true;
+          if (message.includes('violates the following')) return true;
+          if (message.includes('refused to display')) return true;
+          if (message.includes('x-frame-options')) return true;
+          if (message.includes('framing')) return true;
+          
+          return false;
+        };
+
+        // 重写 console 方法
+        console.error = function() {
+          if (shouldFilter(arguments)) return;
+          _error.apply(console, arguments);
+        };
+
+        console.warn = function() {
+          if (shouldFilter(arguments)) return;
+          _warn.apply(console, arguments);
+        };
+
+        console.log = function() {
+          if (shouldFilter(arguments)) return;
+          _log.apply(console, arguments);
+        };
+
+        // 全局错误拦截
+        const originalOnError = window.onerror;
+        window.onerror = function(message, source, lineno, colno, error) {
+          const msg = String(message || '').toLowerCase();
+          if (
+            msg.includes('frame-ancestors') ||
+            msg.includes('plugins') ||
+            msg.includes('violates') ||
+            msg.includes('refused to display') ||
+            msg.includes('framing')
+          ) {
+            return true; // 阻止错误传播
+          }
+          if (originalOnError) {
+            return originalOnError.apply(this, arguments);
+          }
+          return false;
+        };
+        
+        // 拦截 addEventListener('error')
+        window.addEventListener('error', function(event) {
+          const msg = (event.message || '').toLowerCase();
+          if (
+            msg.includes('frame-ancestors') ||
+            msg.includes('plugins') ||
+            msg.includes('violates') ||
+            msg.includes('refused') ||
+            msg.includes('framing')
+          ) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            return false;
+          }
+        }, true);
+        
+        window.addEventListener('error', function(e) {
+          if (shouldFilter([e.message, e.error?.message])) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            return false;
+          }
+        }, true);
+
+        // Promise 错误拦截
+        window.addEventListener('unhandledrejection', function(e) {
+          const msg = e.reason?.message || String(e.reason || '');
+          if (shouldFilter([msg])) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+          }
+        }, true);
+        
+        // SVG 属性拦截 - 阻止 NaN 值设置
+        if (typeof SVGElement !== 'undefined') {
+          const originalSetAttribute = SVGElement.prototype.setAttribute;
+          SVGElement.prototype.setAttribute = function(name, value) {
+            // 如果是长度属性且值为 NaN，直接返回不设置
+            if ((name === 'x1' || name === 'x2' || name === 'y1' || name === 'y2' || 
+                 name === 'x' || name === 'y' || name === 'width' || name === 'height') && 
+                (value === 'NaN' || String(value).toLowerCase() === 'nan' || isNaN(value))) {
+              return; // 静默忽略
+            }
+            try {
+              return originalSetAttribute.call(this, name, value);
+            } catch (e) {
+              // 捕获并过滤 SVG 相关错误
+              const msg = String(e.message || e).toLowerCase();
+              if (!shouldFilter([msg])) {
+                throw e;
+              }
+            }
+          };
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
