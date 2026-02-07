@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, onActivated } from 'vue'
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
 
@@ -183,6 +183,10 @@ const load = async () => {
 onMounted(() => {
   load()
   window.addEventListener('sticky-notes-save-schedule', save)
+})
+
+onActivated(() => {
+  updateContent()
 })
 
 onUnmounted(() => {

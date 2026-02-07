@@ -126,8 +126,6 @@ const onAIClick = () => {
 // 切换页签
 const switchTab = (tabId) => {
   activeTab.value = tabId
-  // 切换页签时清空内容（等待新页面发送内容更新）
-  currentContent.value = ''
   saveWindowState()
 }
 
@@ -146,15 +144,21 @@ const toggleAlwaysOnTop = async () => {
 // 关闭窗口
 const closeWindow = async () => {
   try {
-    // 关闭前触发所有页面的保存事件
-    window.dispatchEvent(new CustomEvent('sticky-notes-save-documents'))
-    window.dispatchEvent(new CustomEvent('sticky-notes-save-bookmarks'))
-    window.dispatchEvent(new CustomEvent('sticky-notes-save-schedule'))
-    window.dispatchEvent(new CustomEvent('sticky-notes-save-tasks'))
-    
-    // 等待保存完成
-    await new Promise(resolve => setTimeout(resolve, 200))
-    
+    // 只保存当前激活的页签，其余页签无需保存
+    const eventMap = {
+      'documents': 'sticky-notes-save-documents',
+      'bookmarks': 'sticky-notes-save-bookmarks',
+      'schedule': 'sticky-notes-save-schedule',
+      'tasks': 'sticky-notes-save-tasks'
+    }
+    const eventName = eventMap[activeTab.value]
+    if (eventName) {
+      window.dispatchEvent(new CustomEvent(eventName))
+    }
+
+    // 给保存事件一帧的时间触发 emit，不需要硬等 200ms
+    await new Promise(resolve => requestAnimationFrame(resolve))
+
     const webviewWindow = getCurrentWebviewWindow()
     await webviewWindow.close()
   } catch (error) {
@@ -214,10 +218,10 @@ const restoreWindowState = async () => {
     const saved = localStorage.getItem(`sticky-notes-state-${webviewWindow.label}`)
     if (saved) {
       const state = JSON.parse(saved)
-      activeTab.value = state.activeTab || 'documents'
-      // 如果没有保存的状态，默认为 true（置顶）
+      // 新窗口始终默认显示笔记页签
       alwaysOnTop.value = state.alwaysOnTop !== undefined ? state.alwaysOnTop : true
     }
+    activeTab.value = 'documents'
     
     // 设置置顶状态
     await webviewWindow.setAlwaysOnTop(alwaysOnTop.value)
