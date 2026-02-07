@@ -222,6 +222,12 @@ const routes = [
     name: 'stickyNotes',
     component: () => import('@/views/StickyNotes.vue'),
     meta: { title: '便签' }
+  },
+  {
+    path: '/toolbox',
+    name: 'toolbox',
+    component: () => import('@/views/Toolbox.vue'),
+    meta: { title: '工具箱' }
   }
 ]
 
