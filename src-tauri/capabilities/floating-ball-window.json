@@ -54,6 +54,27 @@
     {
       "identifier": "fs:allow-mkdir",
       "allow": [{ "path": "**" }]
-    }
+    },
+    {
+      "identifier": "http:allow-fetch",
+      "allow": [
+        { "url": "https://*" },
+        { "url": "http://*" },
+        { "url": "http://127.0.0.1:*" },
+        { "url": "http://localhost:*" }
+      ]
+    },
+    "http:allow-fetch-send",
+    "http:allow-fetch-read-body",
+    "http:allow-fetch-cancel",
+    "store:allow-get",
+    "store:allow-load",
+    "store:allow-set",
+    "store:allow-save",
+    "store:allow-entries",
+    "store:allow-keys",
+    "store:allow-values",
+    "store:allow-has",
+    "store:allow-length"
   ]
 }

@@ -110,6 +110,7 @@ import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
 import { recognizeIntent } from '@/utils/ai/intent'
 import { extractParams } from '@/utils/ai/parser'
 import { executeOperation } from '@/utils/ai/operations'
+import { chatWithAI } from '@/services/aiService'
 
 const messages = ref([])
 const userInput = ref('')
@@ -140,38 +141,63 @@ const sendMessage = async (content) => {
   try {
     // 1. 识别意图
     const intent = await recognizeIntent(content, messages.value)
-    // 2. 提取参数
-    const params = await extractParams(content, intent.type)
-    // 3. 构建回复消息
-    const assistantMessage = {
-      role: 'assistant',
-      content: `我理解了，您想${intent.description}`,
-      result: null
-    }
-    
-    messages.value.push(assistantMessage)
-    await nextTick()
-    scrollToBottom()
-    
-    // 4. 执行操作
-    try {
-      const result = await executeOperation(intent.type, params)
-      assistantMessage.result = {
-        status: 'success',
-        message: result.message
+
+    if (!intent || intent.type === 'unknown' || intent.type === 'query') {
+      // 无法识别意图或为查询类型，使用通用 AI 对话
+      try {
+        const conversationMessages = messages.value
+          .filter(m => m.role === 'user' || m.role === 'assistant')
+          .map(m => ({ role: m.role, content: m.content }))
+        const response = await chatWithAI(conversationMessages)
+        messages.value.push({
+          role: 'assistant',
+          content: response,
+          result: null
+        })
+      } catch (aiError) {
+        messages.value.push({
+          role: 'assistant',
+          content: '抱歉，AI 服务暂时不可用。请在设置中检查 AI 配置。',
+          result: {
+            status: 'error',
+            message: aiError.message || 'AI 服务调用失败'
+          }
+        })
       }
-      ElMessage.success(result.message)
-      
-      // 通知主窗口刷新数据
-      window.dispatchEvent(new CustomEvent('ai-operation-complete', {
-        detail: { intent: intent.type, result }
-      }))
-    } catch (error) {
-      assistantMessage.result = {
-        status: 'error',
-        message: error.message || '操作失败'
+    } else {
+      // 2. 提取参数
+      const params = await extractParams(content, intent.type)
+      // 3. 构建回复消息
+      const assistantMessage = {
+        role: 'assistant',
+        content: `我理解了，您想${intent.description}`,
+        result: null
       }
-      ElMessage.error(error.message || '操作失败')
+
+      messages.value.push(assistantMessage)
+      await nextTick()
+      scrollToBottom()
+
+      // 4. 执行操作
+      try {
+        const result = await executeOperation(intent.type, params)
+        assistantMessage.result = {
+          status: 'success',
+          message: result.message
+        }
+        ElMessage.success(result.message)
+
+        // 通知主窗口刷新数据
+        window.dispatchEvent(new CustomEvent('ai-operation-complete', {
+          detail: { intent: intent.type, result }
+        }))
+      } catch (error) {
+        assistantMessage.result = {
+          status: 'error',
+          message: error.message || '操作失败'
+        }
+        ElMessage.error(error.message || '操作失败')
+      }
     }
   } catch (error) {
     messages.value.push({

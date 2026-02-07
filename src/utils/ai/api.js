@@ -4,6 +4,7 @@
  */
 
 import OpenAI from 'openai'
+import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 
 let openaiClient = null
 
@@ -23,7 +24,8 @@ const initClient = () => {
   openaiClient = new OpenAI({
     apiKey: aiConfig.apiKey,
     baseURL: aiConfig.baseURL || 'https://api.openai.com/v1',
-    dangerouslyAllowBrowser: true
+    dangerouslyAllowBrowser: true,
+    fetch: tauriFetch
   })
 
   return openaiClient

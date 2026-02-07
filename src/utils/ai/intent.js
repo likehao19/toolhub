@@ -3,7 +3,7 @@
  * 根据用户输入识别操作意图
  */
 
-import { callAI } from './api'
+import { chatWithAI } from '@/services/aiService'
 
 // 意图类型定义
 export const IntentTypes = {
@@ -71,7 +71,7 @@ const recognizeByAI = async (text, context = []) => {
 
 只返回操作类型，不要其他内容。`
 
-    const response = await callAI([
+    const response = await chatWithAI([
       ...context.slice(-4), // 保留最近4轮对话上下文
       { role: 'user', content: prompt }
     ])
