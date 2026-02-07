@@ -30,7 +30,7 @@
             />
           </template>
         </div>
-        
+
         <!-- 预览模式：显示编辑和删除按钮 -->
         <template v-if="!isEditing && selectedFile">
           <el-button size="small" circle @click="startEdit" title="编辑">
@@ -40,7 +40,7 @@
             <el-icon><Delete /></el-icon>
           </el-button>
         </template>
-        
+
         <!-- 编辑模式：显示所有操作按钮 -->
         <template v-if="isEditing">
           <el-button size="small" circle @click="showVersionHistory" title="版本历史" v-if="currentFileType !== 'xlsx'">
@@ -53,7 +53,7 @@
             <el-icon><Delete /></el-icon>
           </el-button>
         </template>
-        
+
         <!-- 未选择文件时显示模版管理按钮 -->
         <el-button v-if="!selectedFile" size="small" type="primary" @click="openTemplateManager">
           <el-icon><Tickets /></el-icon>
@@ -78,9 +78,9 @@
           <li v-if="creatingFolderParent === 'root'" class="root-new-folder-wrapper">
             <div class="new-folder-input-wrapper">
               <i class="fa-solid fa-folder" style="color: #f1c40f; margin-right: 8px;"></i>
-              <input 
+              <input
                 ref="newFolderInputRef"
-                type="text" 
+                type="text"
                 class="new-folder-input"
                 :value="newFolderName"
                 placeholder="输入文件夹名称"
@@ -91,10 +91,10 @@
               />
             </div>
           </li>
-          
+
           <!-- 根文件夹 - 使用递归组件 -->
           <FolderTreeItem
-            v-for="folder in rootFolders" 
+            v-for="folder in rootFolders"
               :key="getFolderKey(folder)"
               :folder="folder"
             :expandedFolders="expandedFolders"
@@ -129,11 +129,11 @@
           />
         </ul>
       </aside>
-      
+
       <!-- 拖拽手柄 -->
-      <div 
+      <div
         v-show="!hideSidebar"
-        class="resize-handle" 
+        class="resize-handle"
         @mousedown="startResize"
         :class="{ resizing: isResizing }"
       ></div>
@@ -218,7 +218,7 @@
             </el-empty>
           </div>
         </div>
-        
+
         <!-- 空状态 -->
         <div v-else class="empty-state">
           <div class="cursor-welcome">
@@ -240,8 +240,8 @@
                 <h3>最近编辑</h3>
               </div>
               <div class="recent-items">
-                <div 
-                  v-for="file in recentFiles" 
+                <div
+                  v-for="file in recentFiles"
                   :key="file.path"
                   class="recent-row"
                   @click="openFile(file)"
@@ -409,11 +409,11 @@
     </el-dialog>
 
     <!-- 隐藏的文件输入用于导入 -->
-    <input 
-      ref="importFileInput" 
-      type="file" 
-      accept=".md,.txt,.docx,.xlsx" 
-      style="display: none;" 
+    <input
+      ref="importFileInput"
+      type="file"
+      accept=".md,.txt,.docx,.xlsx"
+      style="display: none;"
       @change="handleImportFile"
     />
   </div>
@@ -468,14 +468,14 @@ const convertImagePathsToAssetUrls = (content, filePath) => {
     (match, alt, relativePath) => {
       try {
         const separator = filePath.includes('\\') ? '\\' : '/'
-        
+
         // 找到 notes 根目录
         const notesIndex = filePath.indexOf(`${separator}notes${separator}`)
         if (notesIndex === -1) {
 
           return match
         }
-        
+
         const notesRoot = filePath.substring(0, notesIndex + 6)
         const imagePath = relativePath.substring(2).replace(/\//g, separator)
         const absolutePath = `${notesRoot}${separator}${imagePath}`
@@ -505,17 +505,17 @@ function handleSave(v, html) {
 const onUploadImg = async (files, callback) => {
   try {
     const urls = []
-    
+
     // 确保 images 文件夹存在
     const appDir = await appDataDir()
     const notesDir = await join(appDir, 'notes')
     const imagesDir = await join(notesDir, 'images')
-    
+
     // 创建 images 文件夹（如果不存在）
     if (!(await exists(imagesDir))) {
       await mkdir(imagesDir, { recursive: true })
     }
-    
+
     // 保存每个图片文件
     for (const file of files) {
       try {
@@ -525,15 +525,15 @@ const onUploadImg = async (files, callback) => {
         const ext = file.name.split('.').pop()
         const fileName = `img_${timestamp}_${randomStr}.${ext}`
         const filePath = await join(imagesDir, fileName)
-        
+
         // 读取文件内容
         const arrayBuffer = await file.arrayBuffer()
         const uint8Array = new Uint8Array(arrayBuffer)
-        
+
         // 保存文件
         const { writeFile } = await import('@tauri-apps/plugin-fs')
         await writeFile(filePath, uint8Array)
-        
+
         // 返回相对路径
         urls.push(`./images/${fileName}`)
       } catch (error) {
@@ -541,7 +541,7 @@ const onUploadImg = async (files, callback) => {
         ElMessage.error(`保存图片 ${file.name} 失败`)
       }
     }
-    
+
     callback(urls)
   } catch (error) {
 
@@ -583,11 +583,11 @@ const startResize = (e) => {
 
 const doResize = (e) => {
   if (!isResizing.value) return
-  
+
   // 计算鼠标移动的距离
   const delta = e.clientX - resizeStartX.value
   const newWidth = resizeStartWidth.value + delta
-  
+
   // 限制最小和最大宽度
   if (newWidth >= 260 && newWidth <= 600) {
     sidebarWidth.value = newWidth
@@ -603,23 +603,23 @@ onMounted(async () => {
   Object.entries(cssVars).forEach(([key, value]) => {
     root.style.setProperty(key, value)
   })
-  
+
   // 添加鼠标事件监听器用于调整侧边栏宽度
   document.addEventListener('mousemove', doResize)
   document.addEventListener('mouseup', stopResize)
-  
+
   // 加载主题设置
   await loadThemeSettings()
-  
+
   await loadNotesTree()
   await loadRecentFiles()
 
   // 监听页面关闭事件，自动保存
   window.addEventListener('beforeunload', handleBeforeUnload)
-  
+
   // 监听笔记路径更改事件
   window.addEventListener('notes-path-changed', handleNotesPathChanged)
-  
+
   // 监听文件拖拽事件
   setupFileDrop()
 })
@@ -630,14 +630,14 @@ const handleNotesPathChanged = async (event) => {
   // 重置笔记目录缓存
   const { resetNotesDir } = await import('@/utils/notes')
   resetNotesDir()
-  
+
   // 关闭当前文件
   selectedFile.value = null
   isEditing.value = false
-  
+
   // 重新加载笔记树
   await loadNotesTree()
-  
+
   ElMessage.success('笔记路径已更新，已重新加载笔记列表')
 }
 
@@ -665,7 +665,7 @@ onBeforeUnmount(async () => {
   window.removeEventListener('notes-path-changed', handleNotesPathChanged)
   document.removeEventListener('mousemove', doResize)
   document.removeEventListener('mouseup', stopResize)
-  
+
   if (selectedFile.value && isEditing.value) {
     await autoSaveCurrentFile()
   }
@@ -982,7 +982,7 @@ const loadFolderFiles = async (folder) => {
                 // 尝试直接转换
                 modifiedTime = new Date(fileStats.mtime).getTime()
               }
-              
+
               // 如果还是 NaN，使用当前时间
               if (isNaN(modifiedTime)) {
 
@@ -1070,7 +1070,7 @@ const startCreateFolder = (folder) => {
   const folderKey = getFolderKey(folder)
   creatingFolderParent.value = folderKey
   newFolderName.value = ''
-  
+
   if (!expandedFolders.value.has(folderKey)) {
     expandedFolders.value.add(folderKey)
   }
@@ -1135,7 +1135,7 @@ const confirmCreateFolder = async () => {
     }
 
     ElMessage.success('文件夹创建成功')
-    
+
     // 清除创建状态
     cancelCreateFolder()
   } catch (error) {
@@ -1185,12 +1185,12 @@ const startCreateFile = async (folder, fileType) => {
   } else {
     baseName = '未命名文档'
   }
-  
+
   // 检查文件是否存在，如果存在则添加数字后缀
   const folderFiles = getFolderFiles(folder)
   let counter = 1
   let fileName = baseName
-  
+
   while (folderFiles.some(f => f.name === fileName)) {
     counter++
     fileName = `${baseName}${counter}`
@@ -1226,7 +1226,7 @@ const startCreateFile = async (folder, fileType) => {
 
     // 刷新文件列表
     await loadFolderFiles(folder)
-    
+
     // 更新最近文件列表
     await loadRecentFiles()
 
@@ -1272,7 +1272,7 @@ const confirmRenameFolder = async (folder) => {
   try {
     const oldPath = folder.path
     const oldFolderKey = getFolderKey(folder)
-    
+
     // 确定使用的路径分隔符
     const separator = oldPath.includes('\\') ? '\\' : '/'
     const pathParts = oldPath.split(/[/\\]/)
@@ -1298,17 +1298,17 @@ const confirmRenameFolder = async (folder) => {
     // 更新文件夹对象
     folder.name = renamingFolderName.value.trim()
     folder.path = newPath
-    
+
     // 更新缓存中的文件夹键
     const newFolderKey = getFolderKey(folder)
-    
+
     // 更新文件缓存
     if (folderFilesCache.value.has(oldFolderKey)) {
       const files = folderFilesCache.value.get(oldFolderKey)
       folderFilesCache.value.delete(oldFolderKey)
       folderFilesCache.value.set(newFolderKey, files)
     }
-    
+
     // 更新展开状态
     if (expandedFolders.value.has(oldFolderKey)) {
       expandedFolders.value.delete(oldFolderKey)
@@ -1320,7 +1320,7 @@ const confirmRenameFolder = async (folder) => {
       currentFolderName.value = renamingFolderName.value.trim()
       selectedFolderKey.value = newFolderKey
     }
-    
+
     // 更新所有子文件夹的路径
     notesTree.value.folders.forEach(f => {
       if (f.path.startsWith(oldPath + separator)) {
@@ -1382,39 +1382,39 @@ const deleteFolder = async (folder) => {
 // 展开左侧树并定位到文件
 const expandToFile = async (file) => {
   if (!file || !file.path) return
-  
+
   try {
     const separator = file.path.includes('\\') ? '\\' : '/'
     const pathParts = file.path.split(separator)
-    
+
     // 找到 notes 根目录的位置
     const notesIndex = pathParts.indexOf('notes')
     if (notesIndex === -1) return
-    
+
     // 获取从 notes 到文件的所有文件夹路径
     const folderPaths = []
     for (let i = notesIndex; i < pathParts.length - 1; i++) {
       const folderPath = pathParts.slice(0, i + 2).join(separator)
       folderPaths.push(folderPath)
     }
-    
+
     // 递归展开所有父文件夹
     for (const folderPath of folderPaths) {
       // 找到对应的文件夹对象
       const folder = notesTree.value.folders.find(f => f.path === folderPath)
       if (folder) {
         const folderKey = getFolderKey(folder)
-        
+
         // 展开文件夹
         if (!expandedFolders.value.has(folderKey)) {
           expandedFolders.value.add(folderKey)
         }
-        
+
         // 加载文件夹内容
         await loadFolderFiles(folder)
       }
     }
-    
+
     // 滚动到文件位置（可选）
     await nextTick()
     // 可以在这里添加滚动到文件的逻辑
@@ -1432,10 +1432,10 @@ const openFile = async (file, shouldEdit = false) => {
 
     // 清除文件夹选中状态
     selectedFolderKey.value = null
-    
+
     // 展开左侧树并定位到文件
     await expandToFile(file)
-    
+
     // 根据文件路径更新面包屑（显示文件所在的文件夹）
     if (file.path) {
       const separator = file.path.includes('\\') ? '\\' : '/'
@@ -1449,7 +1449,7 @@ const openFile = async (file, shouldEdit = false) => {
         }
       }
     }
-    
+
     // 加载新文件
     selectedFile.value = file
     const ext = file.extension || 'md'
@@ -1457,12 +1457,12 @@ const openFile = async (file, shouldEdit = false) => {
 
     if (ext === 'md' || ext === 'txt') {
       let content = await readTextFile(file.path)
-      
+
       // 如果是 MD 文件，转换图片路径为 asset URL（用于显示）
       if (ext === 'md') {
         content = convertImagePathsToAssetUrls(content, file.path)
       }
-      
+
       noteContent.value = content
     } else if (ext === 'xlsx') {
       await loadExcelFile(file)
@@ -1479,7 +1479,7 @@ const openFile = async (file, shouldEdit = false) => {
       // 新建文件：直接进入编辑模式
       isEditing.value = true
       hideSidebar.value = true
-      
+
       // Markdown 编辑模式：设置目录和关闭预览
       if (ext === 'md') {
         await nextTick()
@@ -1541,12 +1541,12 @@ const loadWordFile = async (file) => {
   try {
     const { readFile } = await import('@tauri-apps/plugin-fs')
     const fileData = await readFile(file.path)
-    
+
     if (!fileData || fileData.length === 0) {
       wordContent.value = '<p></p>'
       return
     }
-    
+
     let arrayBuffer
     if (fileData instanceof Uint8Array) {
       arrayBuffer = fileData.buffer
@@ -1555,7 +1555,7 @@ const loadWordFile = async (file) => {
     } else {
       arrayBuffer = new Uint8Array(fileData).buffer
     }
-    
+
     const result = await mammoth.convertToHtml({ arrayBuffer })
     wordContent.value = result.value || '<p></p>'
   } catch (error) {
@@ -1568,7 +1568,7 @@ const loadWordFile = async (file) => {
 const startEdit = async () => {
   isEditing.value = true
   hideSidebar.value = true  // 自动折叠左侧树
-  
+
   // 等待 DOM 更新后，默认开启目录并关闭预览
   await nextTick()
 
@@ -1586,10 +1586,10 @@ const cancelEdit = async () => {
     let content = await readTextFile(selectedFile.value.path)
     noteContent.value = convertImagePathsToAssetUrls(content, selectedFile.value.path)
   }
-  
+
   isEditing.value = false
   hideSidebar.value = false  // 退出编辑时恢复左侧树
-  
+
   // 如果是 Markdown 文件，设置预览模式
   if (currentFileType.value === 'md') {
     await nextTick()
@@ -1630,13 +1630,13 @@ const confirmEditFileName = async () => {
     cancelEditFileName()
     return
   }
-  
+
   const newName = editingFileName.value.trim()
   if (newName === selectedFile.value.name) {
     cancelEditFileName()
     return
   }
-  
+
   try {
     const oldPath = selectedFile.value.path
     const separator = oldPath.includes('\\') ? '\\' : '/'
@@ -1644,37 +1644,37 @@ const confirmEditFileName = async () => {
     const folderPath = oldPath.substring(0, lastSepIndex)
     const ext = selectedFile.value.extension
     const newPath = await join(folderPath, `${newName}.${ext}`)
-    
+
     // 检查新文件名是否已存在
     if (await exists(newPath)) {
       ElMessage.error('文件名已存在')
       return
     }
-    
+
     // 重命名文件
     await rename(oldPath, newPath)
-    
+
     // 更新文件对象
     selectedFile.value.name = newName
     selectedFile.value.path = newPath
-    
+
     // 找到文件所在的文件夹并重新加载
     const folder = notesTree.value.folders.find(f => f.path === folderPath)
     if (folder) {
       const folderKey = getFolderKey(folder)
-      
+
       // 重新加载文件夹以获取最新的文件列表
       await loadFolderFiles(folder)
-      
+
       // 确保文件夹是展开的
       if (!expandedFolders.value.has(folderKey)) {
         expandedFolders.value.add(folderKey)
       }
     }
-    
+
     // 更新最近文件列表
     await loadRecentFiles()
-    
+
     ElMessage.success('重命名成功')
     isEditingFileName.value = false
     editingFileName.value = ''
@@ -1686,14 +1686,14 @@ const confirmEditFileName = async () => {
 
 const deleteCurrentNote = async () => {
   if (!selectedFile.value) return
-  
+
   try {
     await ElMessageBox.confirm(`确定删除 ${selectedFile.value.name || selectedFile.value.title} 吗?`, '确认删除', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     })
-    
+
     const filePath = selectedFile.value.path
     await remove(filePath)
 
@@ -1701,12 +1701,12 @@ const deleteCurrentNote = async () => {
     const separator = filePath.includes('\\') ? '\\' : '/'
     const lastSepIndex = filePath.lastIndexOf(separator)
     const folderPath = filePath.substring(0, lastSepIndex)
-    
+
     // 找到对应的文件夹对象
     const folder = notesTree.value.folders.find(f => f.path === folderPath)
     if (folder) {
       const folderKey = getFolderKey(folder)
-      
+
       // 从缓存中删除文件
       const files = folderFilesCache.value.get(folderKey) || []
       const index = files.findIndex(f => f.path === filePath)
@@ -1714,7 +1714,7 @@ const deleteCurrentNote = async () => {
         files.splice(index, 1)
         folderFilesCache.value.set(folderKey, files)
       }
-      
+
       // 如果文件夹已展开，重新加载以刷新显示
       if (expandedFolders.value.has(folderKey)) {
         await loadFolderFiles(folder)
@@ -1724,7 +1724,7 @@ const deleteCurrentNote = async () => {
     selectedFile.value = null
     isEditing.value = false
     ElMessage.success('文件已删除')
-    
+
     // 更新最近文件列表
     await loadRecentFiles()
   } catch (error) {
@@ -1742,7 +1742,7 @@ const saveNote = async () => {
 
     if (ext === 'md' || ext === 'txt') {
       let contentToSave = noteContent.value
-      
+
       // 如果是 MD 文件，将 asset URL 转换回相对路径（用于保存）
       if (ext === 'md') {
         contentToSave = contentToSave.replace(
@@ -1760,10 +1760,10 @@ const saveNote = async () => {
           }
         )
       }
-      
+
       // 保存文本文件
       await writeTextFile(selectedFile.value.path, contentToSave)
-      
+
       // 保存版本历史（MD 和 TXT 文件）
       try {
         await versionAPI.saveNoteVersion(selectedFile.value.name, contentToSave, '手动保存')
@@ -1780,7 +1780,7 @@ const saveNote = async () => {
     }
 
     ElMessage.success('保存成功')
-    
+
     // 获取文件的真实修改时间
     try {
       const fileStats = await stat(selectedFile.value.path)
@@ -1796,7 +1796,7 @@ const saveNote = async () => {
         } else {
           realModifiedTime = new Date(fileStats.mtime).getTime()
         }
-        
+
         if (!isNaN(realModifiedTime)) {
           selectedFile.value.modified = realModifiedTime
         } else {
@@ -1809,17 +1809,17 @@ const saveNote = async () => {
 
       selectedFile.value.modified = Date.now()
     }
-    
+
     // 如果是 Markdown 文件，重新加载以转换图片路径
     if (ext === 'md') {
       let content = await readTextFile(selectedFile.value.path)
       noteContent.value = convertImagePathsToAssetUrls(content, selectedFile.value.path)
     }
-    
+
     // 保存后切换到预览模式
     isEditing.value = false
     hideSidebar.value = false
-    
+
     // 如果是 Markdown 文件，设置预览模式
     if (ext === 'md') {
       await nextTick()
@@ -1830,11 +1830,11 @@ const saveNote = async () => {
         }
       }, 100)
     }
-    
+
     const currentFolder = notesTree.value.folders.find(f => getFolderKey(f) === selectedFolderKey.value)
     if (currentFolder) {
       await loadFolderFiles(currentFolder)
-      
+
       // 更新缓存中的文件修改时间（使用真实时间）
       const folderKey = getFolderKey(currentFolder)
       const files = folderFilesCache.value.get(folderKey) || []
@@ -1844,7 +1844,7 @@ const saveNote = async () => {
         folderFilesCache.value.set(folderKey, files)
       }
     }
-    
+
     // 更新最近文件列表（因为修改时间变了）
     await loadRecentFiles()
   } catch (error) {
@@ -1886,26 +1886,26 @@ const createExcelFile = async (filePath, fileName) => {
   try {
     // 创建一个新的工作簿
     const workbook = XLSX.utils.book_new()
-    
+
     // 创建一个空的工作表（100行x26列，与编辑器默认尺寸一致）
     const worksheet = XLSX.utils.aoa_to_sheet(
       Array(100).fill(0).map(() => Array(26).fill(''))
     )
-    
+
     // 设置工作表属性，确保兼容性
     worksheet['!ref'] = 'A1:Z100'
-    
+
     // 添加工作表到工作簿
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1')
-    
+
     // 生成 Excel 文件，使用 xlsx 格式确保 WPS/Office 兼容
-    const excelBuffer = XLSX.write(workbook, { 
-      type: 'array', 
+    const excelBuffer = XLSX.write(workbook, {
+      type: 'array',
       bookType: 'xlsx',
       bookSST: false, // 不使用共享字符串表，提高兼容性
       compression: true // 启用压缩
     })
-    
+
     // 保存文件
     const { writeFile } = await import('@tauri-apps/plugin-fs')
     await writeFile(filePath, new Uint8Array(excelBuffer))
@@ -1919,7 +1919,7 @@ const createExcelFile = async (filePath, fileName) => {
 const createWordFile = async (filePath, fileName) => {
   try {
     const { Document, Packer, Paragraph, TextRun } = await import('docx')
-    
+
     // 创建一个新的 Word 文档
     const doc = new Document({
       sections: [{
@@ -1944,12 +1944,12 @@ const createWordFile = async (filePath, fileName) => {
         ],
       }],
     })
-    
+
     // 在浏览器环境中使用 toBlob 而不是 toBuffer
     const blob = await Packer.toBlob(doc)
     const arrayBuffer = await blob.arrayBuffer()
     const buffer = new Uint8Array(arrayBuffer)
-    
+
     // 保存文件
     const { writeFile } = await import('@tauri-apps/plugin-fs')
     await writeFile(filePath, buffer)
@@ -1966,16 +1966,16 @@ const saveWordFile = async () => {
       ElMessage.error('Word编辑器未加载')
       return
     }
-    
+
     const { Document, Packer, Paragraph, TextRun, HeadingLevel } = await import('docx')
     const { writeFile } = await import('@tauri-apps/plugin-fs')
-    
+
     // 获取编辑器内容
     const htmlContent = wordEditorRef.value.getContent()
-    
+
     // 将 HTML 转换为 docx 段落
     const paragraphs = htmlToDocxParagraphs(htmlContent)
-    
+
     // 创建文档
     const doc = new Document({
       sections: [{
@@ -1983,12 +1983,12 @@ const saveWordFile = async () => {
         children: paragraphs,
       }],
     })
-    
+
     // 在浏览器环境中使用 toBlob
     const blob = await Packer.toBlob(doc)
     const arrayBuffer = await blob.arrayBuffer()
     const buffer = new Uint8Array(arrayBuffer)
-    
+
     // 保存文件
     await writeFile(selectedFile.value.path, buffer)
   } catch (error) {
@@ -2001,19 +2001,19 @@ const saveWordFile = async () => {
 const htmlToDocxParagraphs = (html) => {
   const { Paragraph, TextRun, HeadingLevel } = require('docx')
   const paragraphs = []
-  
+
   // 移除 HTML 标签并按行分割
   const tempDiv = document.createElement('div')
   tempDiv.innerHTML = html
-  
+
   const elements = tempDiv.querySelectorAll('p, h1, h2, h3, h4, h5, h6, ul, ol, li')
-  
+
   elements.forEach(el => {
     const text = el.textContent.trim()
     if (!text) return
-    
+
     const tagName = el.tagName.toLowerCase()
-    
+
     if (tagName.startsWith('h')) {
       // 标题
       const level = parseInt(tagName.charAt(1))
@@ -2034,14 +2034,14 @@ const htmlToDocxParagraphs = (html) => {
       }))
     }
   })
-  
+
   // 如果没有内容，添加一个空段落
   if (paragraphs.length === 0) {
     paragraphs.push(new Paragraph({
       children: [new TextRun('')],
     }))
   }
-  
+
   return paragraphs
 }
 
@@ -2072,20 +2072,20 @@ const restoreVersion = async (version) => {
 
     // 获取版本内容
     const content = await versionAPI.getVersionContent(selectedFile.value.name, version.version_number)
-    
+
     // 直接替换当前编辑器的内容
     noteContent.value = content
-    
+
     // 保存到文件
     await writeTextFile(selectedFile.value.path, content)
-    
+
     // 保存为新版本（作为恢复记录）
     await versionAPI.saveNoteVersion(
       selectedFile.value.name,
       content,
       `恢复到版本 ${version.version_number}`
     )
-    
+
     ElMessage.success('版本恢复成功')
     showVersionDialog.value = false
   } catch (error) {
@@ -2108,11 +2108,11 @@ const formatTime = (timestamp) => {
   if (!timestamp) return ''
   const now = Date.now()
   const diff = now - timestamp
-  
+
   const minute = 60 * 1000
   const hour = 60 * minute
   const day = 24 * hour
-  
+
   if (diff < minute) {
     return '刚刚'
   } else if (diff < hour) {
@@ -2130,17 +2130,17 @@ const formatTime = (timestamp) => {
 const loadRecentFiles = async () => {
   try {
     const allFiles = []
-    
+
     // 递归加载并收集所有文件
     const collectFilesFromFolder = async (folder) => {
       try {
         // 加载当前文件夹的文件
         await loadFolderFiles(folder)
-        
+
         const folderKey = getFolderKey(folder)
         const files = folderFilesCache.value.get(folderKey) || []
         allFiles.push(...files)
-        
+
         // 递归处理子文件夹
         const subFolders = getSubFolders(folder)
         for (const subFolder of subFolders) {
@@ -2148,12 +2148,12 @@ const loadRecentFiles = async () => {
         }
       } catch (e) { /* ignore */ }
     }
-    
+
     // 遍历所有根文件夹
     for (const folder of rootFolders.value) {
       await collectFilesFromFolder(folder)
     }
-    
+
     // 过滤有效文件
     const validFiles = allFiles.filter(file => file.modified && !isNaN(file.modified))
 
@@ -2175,14 +2175,14 @@ const loadTemplates = async () => {
   try {
     const dataDir = await appDataDir()
     const templatesDir = await join(dataDir, 'templates')
-    
+
     // 确保模版目录存在
     if (!await exists(templatesDir)) {
       await mkdir(templatesDir, { recursive: true })
       templates.value = []
       return
     }
-    
+
     // 读取模版文件（这里简化处理，实际应该读取目录）
     // 暂时使用本地存储模拟
     const stored = localStorage.getItem('note_templates')
@@ -2202,9 +2202,9 @@ const createTemplate = async () => {
       inputPattern: /.+/,
       inputErrorMessage: '模版名称不能为空'
     })
-    
+
     if (!name) return
-    
+
     const { value: type } = await ElMessageBox.prompt('请选择模版类型（md/txt/docx/xlsx）', '选择类型', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -2212,7 +2212,7 @@ const createTemplate = async () => {
       inputErrorMessage: '请输入有效的类型',
       inputValue: 'md'
     })
-    
+
     const template = {
       id: Date.now().toString(),
       name: name.trim(),
@@ -2220,7 +2220,7 @@ const createTemplate = async () => {
       content: '',
       created: Date.now()
     }
-    
+
     templates.value.push(template)
     localStorage.setItem('note_templates', JSON.stringify(templates.value))
     ElMessage.success('模版创建成功')
@@ -2258,7 +2258,7 @@ const deleteTemplate = async (template) => {
         type: 'warning'
       }
     )
-    
+
     templates.value = templates.value.filter(t => t.id !== template.id)
     localStorage.setItem('note_templates', JSON.stringify(templates.value))
     ElMessage.success('模版已删除')
@@ -2274,23 +2274,23 @@ const importNote = async () => {
     ElMessage.warning('请先创建一个文件夹')
     return
   }
-  
+
   // 构建树形数据
   folderTreeData.value = buildFolderTree()
-  
+
   // 展开第一层
   expandedTreeKeys.value = rootFolders.value.map(f => f.path)
-  
+
   // 如果只有一个文件夹，默认选中
   if (rootFolders.value.length === 1) {
     selectedImportFolder.value = rootFolders.value[0].path
   } else {
     selectedImportFolder.value = null
   }
-  
+
   // 清空待导入文件
   pendingDropFiles.value = []
-  
+
   // 显示文件夹选择对话框
   showFolderSelectDialog.value = true
 }
@@ -2299,7 +2299,7 @@ const importNote = async () => {
 const buildFolderTree = () => {
   const tree = []
   const folderMap = new Map()
-  
+
   // 第一遍：创建所有节点
   notesTree.value.folders.forEach(folder => {
     const node = {
@@ -2311,7 +2311,7 @@ const buildFolderTree = () => {
     }
     folderMap.set(getFolderKey(folder), node)
   })
-  
+
   // 第二遍：构建树形结构
   folderMap.forEach((node, key) => {
     if (!node.parent) {
@@ -2325,7 +2325,7 @@ const buildFolderTree = () => {
       }
     }
   })
-  
+
   return tree
 }
 
@@ -2340,21 +2340,21 @@ const confirmFolderSelect = async () => {
     ElMessage.warning('请选择一个文件夹')
     return
   }
-  
+
   // 找到选中的文件夹对象
   const findFolder = (path) => {
     return notesTree.value.folders.find(f => f.path === path)
   }
-  
+
   const folder = findFolder(selectedImportFolder.value)
   if (!folder) {
     ElMessage.error('找不到选中的文件夹')
     return
   }
-  
+
   importTargetFolder.value = folder
   showFolderSelectDialog.value = false
-  
+
   // 如果有待导入的拖拽文件，直接处理
   if (pendingDropFiles.value.length > 0) {
     await handleDroppedFiles(pendingDropFiles.value, true) // 自动打开
@@ -2370,28 +2370,28 @@ const setupFileDrop = async () => {
   try {
     const { listen } = await import('@tauri-apps/api/event')
     const { getCurrentWindow } = await import('@tauri-apps/api/window')
-    
+
     // 保存拖拽悬浮的目标文件夹
     let dropTargetFolder = null
     let isDragging = false
     let hoverTimer = null
     let lastHoverFolder = null
     let currentHighlightElement = null // 缓存当前高亮的元素
-    
+
     // 监听 Tauri 拖拽悬浮事件
     await listen('tauri://drag-over', async (event) => {
       isDragging = true
       const position = event.payload?.position
       if (!position) return
-      
+
       // 获取窗口信息用于坐标转换
       const window = getCurrentWindow()
       const scaleFactor = await window.scaleFactor()
-      
+
       // 转换坐标（考虑 DPI 缩放）
       const x = position.x / scaleFactor
       const y = position.y / scaleFactor
-      
+
       // 获取鼠标位置对应的元素
       const element = document.elementFromPoint(x, y)
       if (!element) {
@@ -2408,10 +2408,10 @@ const setupFileDrop = async () => {
         }
         return
       }
-      
+
       // 向上查找最近的 tree-item-wrapper
       const folderItem = element.closest('.tree-item-wrapper[data-folder-path]')
-      
+
       if (folderItem) {
         // 只在元素改变时才更新 DOM
         if (currentHighlightElement !== folderItem) {
@@ -2423,19 +2423,19 @@ const setupFileDrop = async () => {
           folderItem.classList.add('drop-target')
           currentHighlightElement = folderItem
         }
-        
+
         const folderPath = folderItem.getAttribute('data-folder-path')
         const folder = notesTree.value.folders.find(f => f.path === folderPath)
         if (folder) {
           dropTargetFolder = folder
-          
+
           // 如果悬停在新的文件夹上，重置计时器
           if (lastHoverFolder !== folder) {
             if (hoverTimer) {
               clearTimeout(hoverTimer)
             }
             lastHoverFolder = folder
-            
+
             // 设置自动展开计时器（悬停 800ms 后自动展开）
             const folderKey = getFolderKey(folder)
             if (!expandedFolders.value.has(folderKey)) {
@@ -2461,7 +2461,7 @@ const setupFileDrop = async () => {
         }
       }
     })
-    
+
     // 监听拖拽离开
     await listen('tauri://drag-leave', async () => {
       isDragging = false
@@ -2477,24 +2477,24 @@ const setupFileDrop = async () => {
         currentHighlightElement = null
       }
     })
-    
+
     // 监听文件拖拽释放事件
     await listen('tauri://drag-drop', async (event) => {
       isDragging = false
-      
+
       // 清除计时器
       if (hoverTimer) {
         clearTimeout(hoverTimer)
         hoverTimer = null
       }
       lastHoverFolder = null
-      
+
       // 清除视觉反馈
       if (currentHighlightElement) {
         currentHighlightElement.classList.remove('drop-target')
         currentHighlightElement = null
       }
-      
+
       const paths = event.payload.paths || event.payload
       if (!paths || paths.length === 0) return
 
@@ -2504,7 +2504,7 @@ const setupFileDrop = async () => {
         dropTargetFolder = null
         return
       }
-      
+
       // 如果拖拽到了文件夹节点上，直接导入
       if (dropTargetFolder) {
         importTargetFolder.value = dropTargetFolder
@@ -2513,23 +2513,23 @@ const setupFileDrop = async () => {
         await handleDroppedFiles(paths, true) // 传入 true 表示自动打开
         return
       }
-      
+
       // 否则保存待导入的文件，弹窗让用户选择
       pendingDropFiles.value = paths
-      
+
       // 构建树形数据
       folderTreeData.value = buildFolderTree()
-      
+
       // 展开第一层
       expandedTreeKeys.value = rootFolders.value.map(f => f.path)
-      
+
       // 如果只有一个文件夹，默认选中
       if (rootFolders.value.length === 1) {
         selectedImportFolder.value = rootFolders.value[0].path
       } else {
         selectedImportFolder.value = null
       }
-      
+
       // 显示文件夹选择对话框
       showFolderSelectDialog.value = true
     })
@@ -2542,9 +2542,9 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
     ElMessage.error('未选择目标文件夹')
     return
   }
-  
+
   const importedFiles = [] // 记录成功导入的文件路径
-  
+
   for (const filePath of paths) {
     try {
       // 检查文件是否存在
@@ -2553,20 +2553,20 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
         ElMessage.warning(`文件不存在: ${filePath}`)
         continue
       }
-      
+
       // 获取文件名
       const fileName = filePath.split(/[/\\]/).pop()
       const ext = fileName.substring(fileName.lastIndexOf('.')).toLowerCase()
-      
+
       // 验证文件类型
       if (!['.md', '.txt', '.docx', '.xlsx'].includes(ext)) {
         ElMessage.warning(`不支持的文件类型: ${fileName}`)
         continue
       }
-      
+
       // 目标路径
       const targetPath = await join(importTargetFolder.value.path, fileName)
-      
+
       // 检查目标文件是否已存在
       if (await exists(targetPath)) {
         try {
@@ -2584,7 +2584,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
           continue
         }
       }
-      
+
       // 读取并复制文件
       if (ext === '.md' || ext === '.txt') {
         const content = await readTextFile(filePath)
@@ -2593,7 +2593,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
         const fileData = await readFile(filePath)
         await writeFile(targetPath, fileData)
       }
-      
+
       ElMessage.success(`导入成功: ${fileName}`)
       importedFiles.push(targetPath)
     } catch (error) {
@@ -2602,7 +2602,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
       ElMessage.error(`导入失败: ${fileName}`)
     }
   }
-  
+
   // 刷新目标文件夹
   const folderKey = getFolderKey(importTargetFolder.value)
   if (!expandedFolders.value.has(folderKey)) {
@@ -2610,7 +2610,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
   }
   await loadFolderFiles(importTargetFolder.value)
   await loadRecentFiles()
-  
+
   // 如果需要自动打开且有导入成功的文件，打开第一个
   if (autoOpen && importedFiles.length > 0) {
     const files = folderFilesCache.value.get(folderKey) || []
@@ -2619,7 +2619,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
       await openFile(firstImportedFile)
     }
   }
-  
+
   // 清空目标文件夹引用
   importTargetFolder.value = null
 }
@@ -2637,29 +2637,29 @@ const moveFolder = async (sourceFolder, targetFolder) => {
         type: 'warning'
       }
     )
-    
+
     const sourcePath = sourceFolder.path
     const separator = sourcePath.includes('\\') ? '\\' : '/'
-    
+
     // 构建新路径
     const newPath = await join(targetFolder.path, sourceFolder.name)
-    
+
     // 检查目标是否已存在
     if (await exists(newPath)) {
       ElMessage.error('目标文件夹中已存在同名文件夹')
       return
     }
-    
+
     // 执行移动（重命名）
     await rename(sourcePath, newPath)
-    
+
     // 更新文件夹对象
     const oldFolderKey = getFolderKey(sourceFolder)
     const oldParent = sourceFolder.parent
-    
+
     sourceFolder.path = newPath
     sourceFolder.parent = getFolderKey(targetFolder)
-    
+
     // 递归更新所有子文件夹的路径
     const updateChildrenPaths = (oldBasePath, newBasePath) => {
       notesTree.value.folders.forEach(f => {
@@ -2669,7 +2669,7 @@ const moveFolder = async (sourceFolder, targetFolder) => {
       })
     }
     updateChildrenPaths(sourcePath, newPath)
-    
+
     // 更新文件缓存中的路径
     const newFolderKey = getFolderKey(sourceFolder)
     if (folderFilesCache.value.has(oldFolderKey)) {
@@ -2677,20 +2677,20 @@ const moveFolder = async (sourceFolder, targetFolder) => {
       folderFilesCache.value.delete(oldFolderKey)
       folderFilesCache.value.set(newFolderKey, files)
     }
-    
+
     // 更新展开状态
     if (expandedFolders.value.has(oldFolderKey)) {
       expandedFolders.value.delete(oldFolderKey)
       expandedFolders.value.add(newFolderKey)
     }
-    
+
     // 确保目标文件夹展开
     const targetKey = getFolderKey(targetFolder)
     if (!expandedFolders.value.has(targetKey)) {
       expandedFolders.value.add(targetKey)
     }
     await loadFolderFiles(targetFolder)
-    
+
     ElMessage.success('移动成功')
   } catch (error) {
     if (error !== 'cancel') {
@@ -2747,7 +2747,7 @@ const moveFile = async (sourceFile, targetFolder) => {
 
       }
     }
-    
+
     // 刷新目标文件夹
     const targetKey = getFolderKey(targetFolder)
 
@@ -2755,7 +2755,7 @@ const moveFile = async (sourceFile, targetFolder) => {
       expandedFolders.value.add(targetKey)
     }
     await loadFolderFiles(targetFolder)
-    
+
     const targetFiles = folderFilesCache.value.get(targetKey) || []
 
     // 如果移动的是当前打开的文件，关闭它
@@ -2764,7 +2764,7 @@ const moveFile = async (sourceFile, targetFolder) => {
       isEditing.value = false
 
     }
-    
+
     ElMessage.success('移动成功')
 
   } catch (error) {
@@ -2778,32 +2778,32 @@ const moveFile = async (sourceFile, targetFolder) => {
 const handleImportFile = async (event) => {
   const file = event.target.files?.[0]
   if (!file) return
-  
+
   // 检查是否选择了目标文件夹
   if (!importTargetFolder.value) {
     ElMessage.error('请先选择目标文件夹')
     event.target.value = ''
     return
   }
-  
+
   try {
     const fileName = file.name
     const ext = fileName.substring(fileName.lastIndexOf('.'))
-    
+
     // 验证文件类型
     if (!['.md', '.txt', '.docx', '.xlsx'].includes(ext)) {
       ElMessage.error('不支持的文件类型')
       event.target.value = ''
       return
     }
-    
+
     // 读取文件内容
     const reader = new FileReader()
-    
+
     reader.onload = async (e) => {
       try {
         const targetPath = await join(importTargetFolder.value.path, fileName)
-        
+
         // 检查文件是否已存在
         if (await exists(targetPath)) {
           await ElMessageBox.confirm(
@@ -2816,7 +2816,7 @@ const handleImportFile = async (event) => {
             }
           )
         }
-        
+
         // 保存文件
         if (ext === '.md' || ext === '.txt') {
           await writeTextFile(targetPath, e.target.result)
@@ -2826,26 +2826,26 @@ const handleImportFile = async (event) => {
           const uint8Array = new Uint8Array(arrayBuffer)
           await writeFile(targetPath, uint8Array)
         }
-        
+
         ElMessage.success('导入成功')
-        
+
         // 确保目标文件夹展开
         const folderKey = getFolderKey(importTargetFolder.value)
         if (!expandedFolders.value.has(folderKey)) {
           expandedFolders.value.add(folderKey)
         }
-        
+
         // 刷新目标文件夹的文件列表
         await loadFolderFiles(importTargetFolder.value)
         await loadRecentFiles()
-        
+
         // 打开导入的文件
         const files = folderFilesCache.value.get(folderKey) || []
         const importedFile = files.find(f => f.path === targetPath)
         if (importedFile) {
           await openFile(importedFile)
         }
-        
+
         // 清空文件输入和目标文件夹
         event.target.value = ''
         importTargetFolder.value = null
@@ -2858,13 +2858,13 @@ const handleImportFile = async (event) => {
         importTargetFolder.value = null
       }
     }
-    
+
     reader.onerror = () => {
       ElMessage.error('读取文件失败')
       event.target.value = ''
       importTargetFolder.value = null
     }
-    
+
     // 根据文件类型选择读取方式
     if (ext === '.md' || ext === '.txt') {
       reader.readAsText(file)
@@ -2895,7 +2895,7 @@ const compareWithVersion = async (version) => {
 // 从对比对话框恢复版本
 const restoreCompareVersion = async () => {
   if (!compareVersion.value) return
-  
+
   try {
     await ElMessageBox.confirm(
       `确定要恢复到版本 ${compareVersion.value.version_number} 吗？当前内容将被覆盖。`,
@@ -2905,20 +2905,20 @@ const restoreCompareVersion = async () => {
 
     // 直接使用已经加载的对比内容
     const content = compareContent.value
-    
+
     // 替换当前编辑器的内容
     noteContent.value = content
-    
+
     // 保存到文件
     await writeTextFile(selectedFile.value.path, content)
-    
+
     // 保存为新版本（作为恢复记录）
     await versionAPI.saveNoteVersion(
       selectedFile.value.name,
       content,
       `恢复到版本 ${compareVersion.value.version_number}`
     )
-    
+
     ElMessage.success('版本恢复成功')
     showCompareDialog.value = false
     showVersionDialog.value = false
@@ -2933,12 +2933,12 @@ const restoreCompareVersion = async () => {
 // 自动保存当前文件
 const autoSaveCurrentFile = async () => {
   if (!selectedFile.value) return
-  
+
   try {
     if (currentFileType.value === 'md' || currentFileType.value === 'txt') {
       // 保存文件内容
       await writeTextFile(selectedFile.value.path, noteContent.value)
-      
+
       // 保存到版本历史
       try {
         await versionAPI.saveNoteVersion(
@@ -3014,16 +3014,16 @@ const triggerExport = () => {
 const createNewNote = async () => {
   // 如果没有选中文件夹，默认在根目录创建
   let targetFolder = null
-  
+
   if (selectedFolderKey.value) {
     targetFolder = notesTree.value.folders.find(f => getFolderKey(f) === selectedFolderKey.value)
   }
-  
+
   // 如果没有选中文件夹或找不到，使用第一个根目录文件夹
   if (!targetFolder && notesTree.value.folders.length > 0) {
     targetFolder = notesTree.value.folders[0]
   }
-  
+
   if (!targetFolder) {
     ElMessage.warning('请先创建一个文件夹')
     return

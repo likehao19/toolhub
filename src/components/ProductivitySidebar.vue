@@ -67,8 +67,27 @@
       <!-- 设置分割线 - 仅折叠时显示 -->
       <div v-if="isCollapsed" class="section-divider"></div>
       
-      <!-- 设置 -->
+      <!-- 工具箱 -->
       <div class="menu-section menu-section-bottom">
+        <el-tooltip
+          :content="'工具箱'"
+          placement="right"
+          :disabled="!isCollapsed"
+        >
+          <div
+            class="menu-item toolbox-btn"
+            :class="{ active: currentPath === '/toolbox' }"
+            @click="navigateTo('/toolbox')"
+          >
+            <el-icon style="color: #ff9800;"><Briefcase /></el-icon>
+            <span v-show="!isCollapsed">工具箱</span>
+            <el-badge v-show="!isCollapsed" :value="enabledToolsCount" class="tools-badge" />
+          </div>
+        </el-tooltip>
+      </div>
+      
+      <!-- 设置 -->
+      <div class="menu-section">
         <el-tooltip
           :content="'系统设置'"
           placement="right"
@@ -93,7 +112,7 @@ import { ref, computed, watch, markRaw } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   Menu, Fold, HomeFilled, Setting, ArrowRight, ArrowDown,
-  Document, Lock, Link, List, Calendar, ChatDotRound, ChatLineRound, Memo
+  Document, Lock, Link, List, Calendar, ChatDotRound, ChatLineRound, Briefcase
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -101,6 +120,12 @@ const route = useRoute()
 
 const isCollapsed = ref(false)
 const currentPath = computed(() => route.path)
+
+// 启用的工具数量（从配置读取）
+const enabledToolsCount = computed(() => {
+  // TODO: 从配置文件读取启用的工具数量
+  return 5
+})
 
 // 菜单结构 - 使用 ref 以支持深度响应式，图标用 markRaw 避免不必要的响应式转换
 const menuSections = ref([
@@ -126,8 +151,7 @@ const menuSections = ref([
     expanded: true,
     items: [
       { title: '任务清单', path: '/todos', icon: markRaw(List), color: '#9c27b0' },
-      { title: '日程规划', path: '/calendar', icon: markRaw(Calendar), color: '#ff9800' },
-      { title: '便签', path: 'sticky-notes', icon: markRaw(Memo), color: '#00bcd4', isWindow: true }
+      { title: '日程规划', path: '/calendar', icon: markRaw(Calendar), color: '#ff9800' }
     ]
   }
 ])
@@ -213,6 +237,8 @@ watch(currentPath, (newPath) => {
   flex: 1;
   overflow-y: auto;
   padding: 8px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .menu-section {
@@ -222,6 +248,7 @@ watch(currentPath, (newPath) => {
 .menu-section-bottom {
   margin-top: auto;
   margin-bottom: 0;
+  padding-bottom: 4px;
 }
 
 .section-header {
@@ -334,6 +361,26 @@ watch(currentPath, (newPath) => {
 /* 折叠状态下的首页菜单项 */
 .productivity-sidebar.collapsed .menu-section:first-child .menu-item {
   margin-top: 4px;
+}
+
+/* 工具箱按钮 */
+.toolbox-btn {
+  position: relative;
+}
+
+.tools-badge {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tools-badge :deep(.el-badge__content) {
+  background-color: #ff9800;
+  font-size: 11px;
+  height: 16px;
+  line-height: 16px;
+  padding: 0 5px;
 }
 
 /* 滚动条样式 */
