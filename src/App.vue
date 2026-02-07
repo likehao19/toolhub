@@ -263,7 +263,7 @@ if (typeof window !== 'undefined') {
   // 捕获未处理的 Promise 拒绝
   window.addEventListener('unhandledrejection', (event) => {
     const reason = event.reason
-    const errorMessage = reason?.message || reason?.toString() || ''
+    const errorMessage = typeof reason === 'string' ? reason : (reason?.message || '')
     
     // 如果是 callback 相关的错误，静默处理
     if (errorMessage.includes('callback') || 
@@ -302,8 +302,11 @@ if (typeof window !== 'undefined') {
     return false
   }
   
+  // 只取字符串参数拼接（Vue warn 会传不可转换的对象，全部跳过即可）
+  const safeJoin = (args) => args.filter(a => typeof a === 'string').join(' ')
+
   console.error = function(...args) {
-    const message = args.join(' ')
+    const message = safeJoin(args)
     // 如果是 callback 相关的错误，不输出
     if (shouldFilterMessage(message)) {
       return
@@ -313,7 +316,7 @@ if (typeof window !== 'undefined') {
   }
   
   console.warn = function(...args) {
-    const message = args.join(' ')
+    const message = safeJoin(args)
     // 如果是 callback 相关的警告，不输出
     if (shouldFilterMessage(message)) {
       return
@@ -324,7 +327,7 @@ if (typeof window !== 'undefined') {
   
   // 也拦截 console.log，因为某些情况下错误可能通过 log 输出
   console.log = function(...args) {
-    const message = args.join(' ')
+    const message = safeJoin(args)
     // 如果是 callback 相关的日志，不输出
     if (shouldFilterMessage(message)) {
       return
@@ -542,6 +545,8 @@ onMounted(async () => {
   // 注册便签保存事件监听器
   await listen('sticky-notes-save', async (event) => {
     const { noteName, content } = event.payload
+    // 内容为空时不保存，避免生成空文件
+    if (!content || !content.trim()) return
     try {
       const notesAPI = await import('@/utils/notes')
       const versionAPI = await import('@/utils/noteVersion')
@@ -549,8 +554,9 @@ onMounted(async () => {
       const { exists, mkdir } = await import('@tauri-apps/plugin-fs')
       const { join } = await import('@tauri-apps/api/path')
       
-      // 默认文件夹名称
-      const DEFAULT_FOLDER = '便签'
+      // 默认文件夹名称（从配置读取）
+      const stickyConfig = JSON.parse(localStorage.getItem('sticky_notes_config') || '{}')
+      const DEFAULT_FOLDER = stickyConfig.noteFolder || '便签'
       
       // 确保默认文件夹存在
       const notesDir = await notesAPI.getNotesDir()
@@ -580,94 +586,144 @@ onMounted(async () => {
     }
   })
   
-  // 注册全局快捷键：Ctrl+Alt+N 创建新的便签窗口
+  // 注册全局快捷键：创建新的便签窗口
   let stickyShortcutProcessing = false
-  let stickyWindowCounter = 0
-  const maxStickyWindows = 10 // 最多支持10个并发便签窗口
-  try {
-    const { register } = await import('@tauri-apps/plugin-global-shortcut')
-    await register('CommandOrControl+Alt+N', async () => {
-      // 防止重复触发
-      if (stickyShortcutProcessing) return
-      stickyShortcutProcessing = true
-      
-      try {
-        const { WebviewWindow, getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
-        
-        // 查找可用的窗口标签（sticky-notes, sticky-notes-1 ... sticky-notes-9）
-        const allWindows = await getAllWebviewWindows()
-        const existingLabels = allWindows.map(w => w.label)
-        
-        let label = null
-        // 先尝试使用基础标签
-        if (!existingLabels.includes('sticky-notes')) {
-          label = 'sticky-notes'
-        } else {
-          // 查找可用的编号标签
-          for (let i = 1; i < maxStickyWindows; i++) {
-            const testLabel = `sticky-notes-${i}`
-            if (!existingLabels.includes(testLabel)) {
-              label = testLabel
-              break
-            }
-          }
-        }
-        
-        if (!label) {
+  let currentStickyShortcut = null
+
+  // 预加载模块，避免快捷键触发时的动态 import 延迟
+  const webviewMod = await import('@tauri-apps/api/webviewWindow')
+  const windowMod = await import('@tauri-apps/api/window')
+
+  // 快捷键处理函数：每次触发时实时读取最新配置
+  const handleStickyShortcut = async () => {
+    if (stickyShortcutProcessing) return
+    stickyShortcutProcessing = true
+
+    try {
+      const cfg = JSON.parse(localStorage.getItem('sticky_notes_config') || '{}')
+      const maxWindows = cfg.maxWindows || 10
+      const cfgWidth = cfg.defaultWidth || 350
+      const cfgHeight = cfg.defaultHeight || 400
+      const cfgAlwaysOnTop = cfg.alwaysOnTop !== false
+
+      const { WebviewWindow, getAllWebviewWindows } = webviewMod
+      const allWindows = await getAllWebviewWindows()
+
+      // 优先检查预配置的 sticky-notes 窗口（tauri.conf.json 中定义，启动时隐藏）
+      const preConfigured = allWindows.find(w => w.label === 'sticky-notes')
+      if (preConfigured) {
+        const visible = await preConfigured.isVisible()
+        if (!visible) {
+          await preConfigured.show()
+          preConfigured.setFocus()
           return
         }
-        
-        // 创建新的独立便签窗口
-        const timestamp = Date.now()
-        
-        // 计算窗口位置偏移（每个窗口偏移 30px）
-        const existingStickyCount = allWindows.filter(w => 
-          w.label === 'sticky-notes' || /^sticky-notes-\d+$/.test(w.label)
-        ).length
-        const offset = existingStickyCount * 30
-        
-        const stickyWindow = new WebviewWindow(label, {
-          url: `sticky-notes?id=${timestamp}`,
-          title: '便签',
-          width: 350,
-          height: 400,
-          minWidth: 300,
-          minHeight: 350,
-          resizable: true,
-          decorations: false,
-          transparent: true,
-          shadow: false,
-          // 不使用 center，而是手动设置位置
-          center: false,
-          alwaysOnTop: true,
-          skipTaskbar: false,
-          visible: false, // 先不显示，设置位置后再显示
-          focus: true
-        })
-        
-        // 等待窗口创建完成后设置位置
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
-        // 获取屏幕尺寸，设置窗口位置（屏幕中心偏移）
-        const { LogicalPosition } = await import('@tauri-apps/api/window')
-        const screenWidth = window.screen.availWidth
-        const screenHeight = window.screen.availHeight
-        const x = Math.floor((screenWidth - 350) / 2) + offset
-        const y = Math.floor((screenHeight - 400) / 2) + offset
-        
-        await stickyWindow.setPosition(new LogicalPosition(x, y))
-        await stickyWindow.show()
-        await stickyWindow.setFocus()
-      } catch (error) {
-        // ignore
       }
-      
-      // 延迟重置标志，防止快速重复触发
+
+      // 预配置窗口已显示或不存在，创建新的动态窗口
+      const existingLabels = allWindows.map(w => w.label)
+      let label = null
+      if (!existingLabels.includes('sticky-notes')) {
+        label = 'sticky-notes'
+      } else {
+        for (let i = 1; i < maxWindows; i++) {
+          const testLabel = `sticky-notes-${i}`
+          if (!existingLabels.includes(testLabel)) {
+            label = testLabel
+            break
+          }
+        }
+      }
+
+      if (!label) {
+        console.warn('[便签] 已达到最大窗口数')
+        return
+      }
+
+      const existingStickyCount = allWindows.filter(w =>
+        w.label === 'sticky-notes' || /^sticky-notes-\d+$/.test(w.label)
+      ).length
+      const offset = existingStickyCount * 30
+
+      // 预计算窗口位置
+      const screenWidth = window.screen.availWidth
+      const screenHeight = window.screen.availHeight
+      const x = Math.floor((screenWidth - cfgWidth) / 2) + offset
+      const y = Math.floor((screenHeight - cfgHeight) / 2) + offset
+
+      const timestamp = Date.now()
+      const stickyUrl = `${window.location.origin}/sticky-notes?id=${timestamp}`
+      const stickyWindow = new WebviewWindow(label, {
+        url: stickyUrl,
+        title: '便签',
+        x, y,
+        width: cfgWidth,
+        height: cfgHeight,
+        minWidth: 300,
+        minHeight: 350,
+        resizable: true,
+        decorations: false,
+        transparent: true,
+        shadow: false,
+        center: false,
+        alwaysOnTop: cfgAlwaysOnTop,
+        skipTaskbar: false,
+        visible: true,
+        focus: true
+      })
+
+      stickyWindow.once('tauri://error', (e) => {
+        console.error('[便签] 窗口创建失败:', e)
+      })
+    } catch (error) {
+      console.error('[便签] 快捷键处理失败:', error)
+    } finally {
       setTimeout(() => {
         stickyShortcutProcessing = false
       }, 500)
+    }
+  }
+
+  // 注册/重新注册快捷键
+  const registerStickyShortcut = async () => {
+    try {
+      const { register, isRegistered, unregister } = await import('@tauri-apps/plugin-global-shortcut')
+      const cfg = JSON.parse(localStorage.getItem('sticky_notes_config') || '{}')
+      const newShortcut = (cfg.shortcut || 'Ctrl+Alt+N').replace('Ctrl', 'CommandOrControl')
+
+      // 反注册旧快捷键
+      if (currentStickyShortcut && currentStickyShortcut !== newShortcut) {
+        try {
+          if (await isRegistered(currentStickyShortcut)) {
+            await unregister(currentStickyShortcut)
+          }
+        } catch {
+          // 旧快捷键可能已失效
+        }
+      }
+
+      // 反注册新快捷键（防止热重载重复注册）
+      if (await isRegistered(newShortcut)) {
+        await unregister(newShortcut)
+      }
+
+      await register(newShortcut, handleStickyShortcut)
+      currentStickyShortcut = newShortcut
+    } catch (error) {
+      console.error('[便签] 快捷键注册失败:', error)
+    }
+  }
+
+  // 初始注册
+  await registerStickyShortcut()
+
+  // 监听配置变更事件，保存后立即重新注册快捷键
+  try {
+    const { listen } = await import('@tauri-apps/api/event')
+    await listen('sticky-notes-config-changed', () => {
+      registerStickyShortcut()
     })
-  } catch (error) {
+  } catch {
     // ignore
   }
 })
