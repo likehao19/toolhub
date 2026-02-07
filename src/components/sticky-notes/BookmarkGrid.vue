@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, onActivated } from 'vue'
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
 
@@ -154,6 +154,10 @@ const load = async () => {
 onMounted(() => {
   load()
   window.addEventListener('sticky-notes-save-bookmarks', save)
+})
+
+onActivated(() => {
+  updateContent()
 })
 
 onUnmounted(() => {

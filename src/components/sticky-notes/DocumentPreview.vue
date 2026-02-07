@@ -16,7 +16,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, onActivated } from 'vue'
 import { ElMessage } from 'element-plus'
 import { emit } from '@tauri-apps/api/event'
 import { improveNote } from '@/services/aiService'
@@ -40,6 +40,10 @@ const generateNoteName = () => {
 }
 
 const save = async () => {
+  // 内容为空时不保存，避免生成空文件
+  if (!content.value.trim()) {
+    return
+  }
   // 如果已保存，跳过
   if (isSaved.value) {
     return
@@ -92,12 +96,16 @@ const onAIOrganize = async () => {
 }
 
 onMounted(() => {
-  // 生成基于时间戳的文件名
   noteName.value = generateNoteName()
   window.addEventListener('sticky-notes-save-documents', save)
   window.addEventListener('sticky-notes-ai-organize', onAIOrganize)
-  
-  // 初始化时发送内容（空内容）
+  window.dispatchEvent(new CustomEvent('sticky-notes-content-update', {
+    detail: { content: content.value }
+  }))
+})
+
+// keep-alive 切回时重新通知父组件当前内容
+onActivated(() => {
   window.dispatchEvent(new CustomEvent('sticky-notes-content-update', {
     detail: { content: content.value }
   }))
