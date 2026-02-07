@@ -228,6 +228,12 @@ const routes = [
     name: 'toolbox',
     component: () => import('@/views/Toolbox.vue'),
     meta: { title: '工具箱' }
+  },
+  {
+    path: '/toolbox/sticky-notes',
+    name: 'toolboxStickyNotes',
+    component: () => import('@/views/ToolboxStickyNotes.vue'),
+    meta: { title: '便签管理' }
   }
 ]
 

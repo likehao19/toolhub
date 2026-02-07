@@ -1181,20 +1181,8 @@ const openTool = async (tool) => {
 
   // 已启用的工具
   if (tool.id === 'sticky-notes') {
-    // 打开便签窗口
-    try {
-      const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
-      const allWindows = await getAllWebviewWindows()
-      const stickyWindow = allWindows.find(w => w.label === 'sticky-notes')
-      
-      if (stickyWindow) {
-        await stickyWindow.show()
-        await stickyWindow.setFocus()
-      }
-      emit('close')
-    } catch (error) {
-      // ignore
-    }
+    router.push('/toolbox/sticky-notes')
+    return
   }
   
   // TODO: 其他工具的打开逻辑
