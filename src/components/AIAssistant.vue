@@ -113,7 +113,7 @@ import { MagicStick, User, Warning, CircleCheck, CircleClose, Promotion, Clock }
 import { ElMessage } from 'element-plus'
 import { recognizeIntent } from '@/utils/ai/intent'
 import { extractParams } from '@/utils/ai/parser'
-import { callAI } from '@/utils/ai/api'
+import { chatWithAI } from '@/services/aiService'
 import { executeOperation } from '@/utils/ai/operations'
 
 const props = defineProps({
@@ -186,7 +186,7 @@ const sendMessage = async () => {
     
     if (!intent || intent.type === 'unknown') {
       // 无法识别意图，使用通用对话
-      const response = await callAI(conversationContext.value)
+      const response = await chatWithAI(conversationContext.value)
       messages.value.push({
         role: 'assistant',
         content: response

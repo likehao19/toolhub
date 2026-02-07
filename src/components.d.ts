@@ -22,6 +22,7 @@ declare module 'vue' {
     DocPage: typeof import('./components/DocPage.vue')['default']
     DocumentPreview: typeof import('./components/sticky-notes/DocumentPreview.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
+    ElBadge: typeof import('element-plus/es')['ElBadge']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -87,6 +88,7 @@ declare module 'vue' {
     ThemeSettingCard: typeof import('./components/ThemeSettingCard.vue')['default']
     TitleBar: typeof import('./components/TitleBar.vue')['default']
     TodoDependencyGraph: typeof import('./components/TodoDependencyGraph.vue')['default']
+    ToolboxPanel: typeof import('./components/ToolboxPanel.vue')['default']
     TraySettingCard: typeof import('./components/TraySettingCard.vue')['default']
     WindowManagementCard: typeof import('./components/WindowManagementCard.vue')['default']
   }

@@ -3,7 +3,7 @@
  * 从用户输入中提取结构化参数
  */
 
-import { callAI } from './api'
+import { chatWithAI } from '@/services/aiService'
 import { IntentTypes } from './intent'
 
 /**
@@ -80,7 +80,7 @@ const extractByAI = async (text, intentType) => {
   }
 
   try {
-    const response = await callAI([{ role: 'user', content: prompt }])
+    const response = await chatWithAI([{ role: 'user', content: prompt }])
     
     // 提取JSON（移除可能的markdown代码块标记）
     let jsonStr = response.trim()

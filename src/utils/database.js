@@ -191,6 +191,20 @@ export async function initDatabase() {
         order_index INTEGER DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         FOREIGN KEY (parent_id) REFERENCES bookmark_groups(id) ON DELETE CASCADE
+      )`,
+      `CREATE TABLE IF NOT EXISTS ai_conversations (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        model TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )`,
+      `CREATE TABLE IF NOT EXISTS ai_messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        conversation_id TEXT NOT NULL,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        timestamp TEXT NOT NULL
       )`
     ]
     

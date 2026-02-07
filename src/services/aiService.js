@@ -1,9 +1,10 @@
 /**
  * AI 服务
- * 封装 AI API 调用，支持 OpenAI、Claude 等
+ * 封装 AI API 调用，使用 OpenAI 兼容接口
  */
 
 import { loadConfig } from '@/utils/tauri/store'
+import { fetch } from '@tauri-apps/plugin-http'
 
 let aiConfig = null
 
@@ -14,64 +15,38 @@ async function loadAIConfig() {
   if (!aiConfig) {
     const config = await loadConfig()
     aiConfig = config?.aiSettings || {
-      provider: 'openai',
       apiKey: '',
-      model: 'gpt-3.5-turbo',
-      customEndpoint: ''
+      baseUrl: 'https://api.openai.com/v1',
+      model: 'gpt-3.5-turbo'
     }
   }
   return aiConfig
 }
 
 /**
- * 调用 AI API
+ * 调用 AI API（OpenAI 兼容接口）
  */
 async function callAIAPI(messages, options = {}) {
   const config = await loadAIConfig()
-  
+
   if (!config.apiKey) {
     throw new Error('请先在设置中配置 AI API Key')
   }
 
-  let url = ''
-  let headers = {}
-  let body = {}
+  let baseUrl = (config.baseUrl || 'https://api.openai.com/v1').trim()
+  if (baseUrl.endsWith('/')) {
+    baseUrl = baseUrl.slice(0, -1)
+  }
 
-  if (config.provider === 'openai') {
-    url = 'https://api.openai.com/v1/chat/completions'
-    headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${config.apiKey}`
-    }
-    body = {
-      model: config.model || 'gpt-3.5-turbo',
-      messages: messages,
-      ...options
-    }
-  } else if (config.provider === 'claude') {
-    url = 'https://api.anthropic.com/v1/messages'
-    headers = {
-      'Content-Type': 'application/json',
-      'x-api-key': config.apiKey,
-      'anthropic-version': '2023-06-01'
-    }
-    body = {
-      model: config.model || 'claude-3-sonnet-20240229',
-      max_tokens: options.max_tokens || 1024,
-      messages: messages
-    }
-  } else if (config.provider === 'custom') {
-    url = config.customEndpoint
-    headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${config.apiKey}`
-    }
-    body = {
-      messages: messages,
-      ...options
-    }
-  } else {
-    throw new Error(`不支持的 AI 提供商: ${config.provider}`)
+  const url = `${baseUrl}/chat/completions`
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${config.apiKey}`
+  }
+  const body = {
+    model: config.model || 'gpt-3.5-turbo',
+    messages: messages,
+    ...options
   }
 
   try {
@@ -87,14 +62,7 @@ async function callAIAPI(messages, options = {}) {
     }
 
     const data = await response.json()
-
-    if (config.provider === 'openai' || config.provider === 'custom') {
-      return data.choices[0]?.message?.content || ''
-    } else if (config.provider === 'claude') {
-      return data.content[0]?.text || ''
-    }
-
-    return ''
+    return data.choices[0]?.message?.content || ''
   } catch (error) {
     throw error
   }
@@ -205,6 +173,20 @@ export async function answerQuestion(noteContent, question) {
 }
 
 /**
+ * 通用 AI 对话
+ * @param {Array} messages - 对话消息数组
+ * @param {Object} options - 额外选项
+ * @returns {Promise<string>} AI 响应内容
+ */
+export async function chatWithAI(messages, options = {}) {
+  return await callAIAPI(messages, {
+    temperature: 0.7,
+    max_tokens: 2000,
+    ...options
+  })
+}
+
+/**
  * 刷新 AI 配置
  */
 export async function refreshConfig() {
@@ -213,6 +195,7 @@ export async function refreshConfig() {
 }
 
 export default {
+  chatWithAI,
   analyzeNote,
   generateNoteSummary,
   improveNote,

@@ -428,33 +428,18 @@
               <div class="card-header">AI 助手配置</div>
             </template>
             <el-form :model="aiSettings" label-width="140px" label-position="left">
-              <el-form-item label="AI 提供商">
-                <el-select v-model="aiSettings.provider" style="width: 300px">
-                  <el-option label="OpenAI" value="openai" />
-                  <el-option label="Claude (Anthropic)" value="claude" />
-                  <el-option label="自定义" value="custom" />
-                </el-select>
-              </el-form-item>
-
-              <el-form-item label="API Key" v-if="aiSettings.provider !== 'custom'">
+              <el-form-item label="API 地址">
                 <el-input
-                  v-model="aiSettings.apiKey"
-                  type="password"
-                  show-password
-                  placeholder="输入 API Key"
+                  v-model="aiSettings.baseUrl"
+                  placeholder="https://api.openai.com/v1"
                   style="width: 400px;"
                 />
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  OpenAI 兼容接口地址，支持第三方服务（如 DeepSeek、通义千问等）
+                </div>
               </el-form-item>
 
-              <el-form-item label="API 端点" v-if="aiSettings.provider === 'custom'">
-                <el-input
-                  v-model="aiSettings.customEndpoint"
-                  placeholder="https://api.example.com/v1"
-                  style="width: 400px;"
-                />
-              </el-form-item>
-
-              <el-form-item label="API Key" v-if="aiSettings.provider === 'custom'">
+              <el-form-item label="API Key">
                 <el-input
                   v-model="aiSettings.apiKey"
                   type="password"
@@ -465,33 +450,14 @@
               </el-form-item>
 
               <el-form-item label="模型">
-                <el-select v-model="aiSettings.model" style="width: 300px">
-                  <el-option
-                    v-if="aiSettings.provider === 'openai'"
-                    label="GPT-4"
-                    value="gpt-4"
-                  />
-                  <el-option
-                    v-if="aiSettings.provider === 'openai'"
-                    label="GPT-3.5 Turbo"
-                    value="gpt-3.5-turbo"
-                  />
-                  <el-option
-                    v-if="aiSettings.provider === 'claude'"
-                    label="Claude 3 Opus"
-                    value="claude-3-opus-20240229"
-                  />
-                  <el-option
-                    v-if="aiSettings.provider === 'claude'"
-                    label="Claude 3 Sonnet"
-                    value="claude-3-sonnet-20240229"
-                  />
-                  <el-option
-                    v-if="aiSettings.provider === 'custom'"
-                    label="自定义模型"
-                    value="custom"
-                  />
-                </el-select>
+                <el-input
+                  v-model="aiSettings.model"
+                  placeholder="例如：gpt-4、deepseek-chat、qwen-turbo"
+                  style="width: 400px;"
+                />
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  输入模型名称，需与 API 服务支持的模型一致
+                </div>
               </el-form-item>
 
               <el-form-item>
@@ -653,6 +619,7 @@ import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, Refresh, Setting, Brush, Folder, MagicStick, Lock, Bell } from '@element-plus/icons-vue'
 import { loadConfig, saveConfig, resetConfig } from '@/utils/tauri/store'
+import { fetch } from '@tauri-apps/plugin-http'
 import { openPath } from '@tauri-apps/plugin-opener'
 import { appDataDir, join } from '@tauri-apps/api/path'
 import { open as openDialog } from '@tauri-apps/plugin-dialog'
@@ -717,10 +684,9 @@ const settings = reactive({
 
 // AI 设置
 const aiSettings = reactive({
-  provider: 'openai',
   apiKey: '',
-  model: 'gpt-3.5-turbo',
-  customEndpoint: ''
+  baseUrl: 'https://api.openai.com/v1',
+  model: 'gpt-3.5-turbo'
 })
 
 // AI 助手悬浮球设置
@@ -883,6 +849,13 @@ const handleSave = async () => {
     
     // 同步 AI 助手设置到 localStorage（供桌面悬浮球使用）
     localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
+
+    // 同步 AI 配置到 localStorage（供 api.js 使用）
+    localStorage.setItem('ai_config', JSON.stringify({
+      apiKey: aiSettings.apiKey,
+      baseURL: aiSettings.baseUrl,
+      model: aiSettings.model
+    }))
     
     // 触发全局事件通知 AI 助手悬浮球设置已更改
     window.dispatchEvent(new CustomEvent('ai-floating-ball-settings-changed', {
@@ -1179,55 +1152,58 @@ const testAIConnection = async () => {
     return
   }
 
+  if (!aiSettings.baseUrl) {
+    ElMessage.warning('请先输入 API 地址')
+    return
+  }
+
+  if (!aiSettings.model) {
+    ElMessage.warning('请先输入模型名称')
+    return
+  }
+
   testingAI.value = true
   aiTestResult.value = null
 
   try {
-    let testUrl = ''
-    let testBody = {}
-
-    if (aiSettings.provider === 'openai') {
-      testUrl = 'https://api.openai.com/v1/chat/completions'
-      testBody = {
-        model: aiSettings.model,
-        messages: [{ role: 'user', content: 'Hello' }],
-        max_tokens: 10
-      }
-    } else if (aiSettings.provider === 'claude') {
-      testUrl = 'https://api.anthropic.com/v1/messages'
-      testBody = {
-        model: aiSettings.model,
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'Hello' }]
-      }
-    } else if (aiSettings.provider === 'custom') {
-      testUrl = aiSettings.customEndpoint
-      testBody = { test: true }
+    let baseUrl = aiSettings.baseUrl.trim()
+    if (baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.slice(0, -1)
     }
 
-    const response = await fetch(testUrl, {
+    const response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${aiSettings.apiKey}`,
-        ...(aiSettings.provider === 'claude' ? { 'anthropic-version': '2023-06-01' } : {})
+        'Authorization': `Bearer ${aiSettings.apiKey}`
       },
-      body: JSON.stringify(testBody)
+      body: JSON.stringify({
+        model: aiSettings.model,
+        messages: [{ role: 'user', content: 'Hello' }],
+        max_tokens: 10
+      })
     })
 
     if (response.ok) {
-      aiTestResult.value = {
-        success: true,
-        message: 'AI 服务连接成功'
+      const text = await response.text()
+      const data = JSON.parse(text)
+      if (data?.choices && Array.isArray(data.choices) && data.choices.length > 0) {
+        aiTestResult.value = {
+          success: true,
+          message: `AI 服务连接成功，模型 ${aiSettings.model} 可正常使用`
+        }
+        ElMessage.success('连接成功')
+      } else {
+        throw new Error('API 返回格式不正确，请确认是否为 OpenAI 兼容接口。返回内容: ' + text.substring(0, 200))
       }
-      ElMessage.success('连接成功')
     } else {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`)
     }
   } catch (error) {
     aiTestResult.value = {
       success: false,
-      message: error.message || '连接失败，请检查 API Key 和网络连接'
+      message: error.message || '连接失败，请检查 API 地址、API Key 和模型名称'
     }
     ElMessage.error('连接失败')
   } finally {
