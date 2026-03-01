@@ -250,7 +250,7 @@ const goBack = () => {
   padding: 8px;
   background: #f5f7fa;
   border-radius: 4px;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: "PingFang SC";
   font-size: 12px;
   white-space: pre-wrap;
   word-break: break-all;

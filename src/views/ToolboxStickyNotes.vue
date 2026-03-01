@@ -671,7 +671,7 @@ const openStickyNotes = async () => {
   height: 22px;
   padding: 0 6px;
   font-size: 11px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: "PingFang SC";
   font-weight: 500;
   color: #303133;
   background: linear-gradient(180deg, #f5f7fa 0%, #e8eaed 100%);

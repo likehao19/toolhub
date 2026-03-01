@@ -19,7 +19,7 @@
             :class="{ active: currentPath === '/' }"
             @click="navigateTo('/')"
           >
-            <el-icon style="color: #ff6b6b;"><HomeFilled /></el-icon>
+            <el-icon><HomeFilled /></el-icon>
             <span v-show="!isCollapsed">工作台</span>
           </div>
         </el-tooltip>
@@ -32,7 +32,7 @@
       <div class="menu-section" v-for="(section, index) in menuSections" :key="section.name">
         <!-- 分割线 - 仅折叠时显示 -->
         <div v-if="isCollapsed && index > 0" class="section-divider"></div>
-        
+
         <div
           v-show="!isCollapsed"
           class="section-header"
@@ -57,7 +57,7 @@
               :class="{ active: currentPath === item.path && !item.isWindow }"
               @click="navigateTo(item.path, item)"
             >
-              <el-icon :style="{ color: item.color }"><component :is="item.icon" /></el-icon>
+              <el-icon><component :is="item.icon" /></el-icon>
               <span v-show="!isCollapsed">{{ item.title }}</span>
             </div>
           </el-tooltip>
@@ -66,7 +66,7 @@
 
       <!-- 设置分割线 - 仅折叠时显示 -->
       <div v-if="isCollapsed" class="section-divider"></div>
-      
+
       <!-- 工具箱 -->
       <div class="menu-section menu-section-bottom">
         <el-tooltip
@@ -79,13 +79,13 @@
             :class="{ active: currentPath === '/toolbox' }"
             @click="navigateTo('/toolbox')"
           >
-            <el-icon style="color: #ff9800;"><Briefcase /></el-icon>
+            <el-icon><Briefcase /></el-icon>
             <span v-show="!isCollapsed">工具箱</span>
             <el-badge v-show="!isCollapsed" :value="enabledToolsCount" class="tools-badge" />
           </div>
         </el-tooltip>
       </div>
-      
+
       <!-- 设置 -->
       <div class="menu-section">
         <el-tooltip
@@ -98,7 +98,7 @@
             :class="{ active: currentPath === '/settings' }"
             @click="navigateTo('/settings')"
           >
-            <el-icon style="color: #606266;"><Setting /></el-icon>
+            <el-icon><Setting /></el-icon>
             <span v-show="!isCollapsed">系统设置</span>
           </div>
         </el-tooltip>
@@ -133,25 +133,25 @@ const menuSections = ref([
     name: '知识管理',
     expanded: true,
     items: [
-      { title: '文档中心', path: '/notes', icon: markRaw(Document), color: '#409eff' },
-      { title: '凭据管理', path: '/passwords', icon: markRaw(Lock), color: '#f56c6c' },
-      { title: '资源收藏', path: '/bookmarks', icon: markRaw(Link), color: '#e6a23c' }
+      { title: '文档中心', path: '/notes', icon: markRaw(Document) },
+      { title: '凭据管理', path: '/passwords', icon: markRaw(Lock) },
+      { title: '资源收藏', path: '/bookmarks', icon: markRaw(Link) }
     ]
   },
   {
     name: '智能助理',
     expanded: true,
     items: [
-      { title: '智能对话', path: '/ai-conversation', icon: markRaw(ChatLineRound), color: '#909399' },
-      { title: 'AI 问答', path: '/ai-chat', icon: markRaw(ChatDotRound), color: '#67c23a' }
+      { title: '智能对话', path: '/ai-conversation', icon: markRaw(ChatLineRound) },
+      { title: 'AI 问答', path: '/ai-chat', icon: markRaw(ChatDotRound) }
     ]
   },
   {
     name: '协作效率',
     expanded: true,
     items: [
-      { title: '任务清单', path: '/todos', icon: markRaw(List), color: '#9c27b0' },
-      { title: '日程规划', path: '/calendar', icon: markRaw(Calendar), color: '#ff9800' }
+      { title: '任务清单', path: '/todos', icon: markRaw(List) },
+      { title: '日程规划', path: '/calendar', icon: markRaw(Calendar) }
     ]
   }
 ])
@@ -172,15 +172,15 @@ const toggleSection = (sectionName) => {
 // 导航
 const navigateTo = async (path, item) => {
   if (!path) return
-  
+
   // 如果是独立窗口（如便签）
   if (item?.isWindow) {
     try {
       const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
-      
+
       const allWindows = await getAllWebviewWindows()
       const stickyWindow = allWindows.find(w => w.label === 'sticky-notes')
-      
+
       if (stickyWindow) {
         await stickyWindow.show()
         await stickyWindow.setFocus()
@@ -207,25 +207,24 @@ watch(currentPath, (newPath) => {
 
 <style scoped>
 .productivity-sidebar {
-  width: 240px;
-  background: #ffffff;
-  border-right: 1px solid #e4e7ed;
+  width: var(--sidebar-width);
+  background: var(--bg-primary);
+  border-right: 0.5px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  transition: width 0.3s ease;
+  transition: width var(--transition-smooth);
   flex-shrink: 0;
 }
 
 .productivity-sidebar.collapsed {
-  width: 60px;
+  width: var(--sidebar-collapsed);
 }
 
 .sidebar-header {
-  height: 48px;
+  height: 44px;
   display: flex;
   align-items: center;
-  padding: 0 12px;
-  border-bottom: 1px solid #e4e7ed;
+  padding: 0 var(--space-md);
 }
 
 .collapse-btn {
@@ -236,94 +235,113 @@ watch(currentPath, (newPath) => {
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: var(--space-sm) 0;
   display: flex;
   flex-direction: column;
 }
 
-.menu-section {
-  margin-bottom: 8px;
+/* 滚动条 — 隐藏式 */
+.sidebar-content::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+}
+.sidebar-content:hover::-webkit-scrollbar-thumb {
+  background: var(--text-quaternary);
 }
 
+.menu-section {
+  margin-bottom: var(--space-sm);
+}
+
+/* 底部固定区域 */
 .menu-section-bottom {
   margin-top: auto;
   margin-bottom: 0;
-  padding-bottom: 4px;
+  padding-top: var(--space-sm);
+  border-top: 0.5px solid var(--border-color);
 }
 
+/* 分组标题 — macOS Settings 风格 */
 .section-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #909399;
+  gap: var(--space-sm);
+  padding: 18px 16px 6px 16px;
+  font-size: var(--font-size-caption2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s;
-}
-
-.section-header:hover {
-  background: #f5f7fa;
 }
 
 .section-header .el-icon {
   font-size: 12px;
-  transition: transform 0.2s;
 }
 
 .section-items {
-  padding: 4px 0;
+  padding: 2px 0;
 }
 
 .section-divider {
-  height: 1px;
-  background: #e4e7ed;
-  margin: 8px 12px;
+  height: 0.5px;
+  background: var(--border-color);
+  margin: var(--space-sm) var(--space-md);
 }
 
 .productivity-sidebar.collapsed .section-divider {
-  margin: 8px 8px;
+  margin: var(--space-sm);
 }
 
+/* 菜单项 */
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 16px 10px 40px;
-  font-size: 14px;
-  color: #606266;
+  gap: 10px;
+  padding: 7px 12px 7px 20px;
+  margin: 1px 8px;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--transition-fast);
   position: relative;
-  border-radius: 6px;
-  margin: 2px 8px;
 }
 
-.menu-item:hover {
-  background: #edf2f7;
-  color: #409eff;
-}
-
-.menu-item.active {
-  background: #e6f4ff !important;
-  color: #3498db !important;
-  font-weight: 600;
-}
-
+/* 图标统一单色 */
 .menu-item .el-icon {
-  font-size: 18px;
+  font-size: 16px;
+  color: var(--text-secondary);
   flex-shrink: 0;
-  transition: transform 0.2s;
+  transition: color var(--transition-fast);
+}
+
+/* Hover 态 */
+.menu-item:hover {
+  background: var(--bg-tertiary);
 }
 
 .menu-item:hover .el-icon {
-  transform: scale(1.1);
+  color: var(--text-primary);
+}
+
+/* 选中态 — 系统蓝 */
+.menu-item.active {
+  background: var(--accent-blue-bg);
+  color: var(--accent-blue);
+  font-weight: var(--font-weight-medium);
 }
 
 .menu-item.active .el-icon {
-  transform: scale(1.15);
+  color: var(--accent-blue);
 }
 
 .menu-item span {
@@ -333,6 +351,7 @@ watch(currentPath, (newPath) => {
   text-overflow: ellipsis;
 }
 
+/* 折叠状态 */
 .productivity-sidebar.collapsed .menu-item span,
 .productivity-sidebar.collapsed .section-header span {
   display: none;
@@ -358,9 +377,8 @@ watch(currentPath, (newPath) => {
   padding: 0;
 }
 
-/* 折叠状态下的首页菜单项 */
 .productivity-sidebar.collapsed .menu-section:first-child .menu-item {
-  margin-top: 4px;
+  margin-top: var(--space-xs);
 }
 
 /* 工具箱按钮 */
@@ -376,29 +394,12 @@ watch(currentPath, (newPath) => {
 }
 
 .tools-badge :deep(.el-badge__content) {
-  background-color: #ff9800;
-  font-size: 11px;
+  background-color: var(--text-tertiary);
+  font-size: 10px;
   height: 16px;
   line-height: 16px;
   padding: 0 5px;
-}
-
-/* 滚动条样式 */
-.sidebar-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-  background: #f5f7fa;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-  background: #c0c4cc;
-  border-radius: 3px;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-  background: #a8abb2;
+  border-radius: 8px;
 }
 </style>
 

@@ -187,7 +187,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   position: relative;
-  font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, sans-serif;
+  font-family: "PingFang SC";
   display: flex;
   align-items: center;
   justify-content: center;
@@ -439,7 +439,7 @@ onUnmounted(() => {
 }
 
 .animation-matrix .particles {
-  font-family: 'Courier New', monospace;
+  font-family: "PingFang SC";
   font-size: 12px;
   color: #0f0;
 }

@@ -15,7 +15,7 @@
           v-model="searchKeyword"
           placeholder="搜索密码..."
           clearable
-          style="width: 250px;"
+          class="header-search"
           size="small"
         >
           <template #prefix>
@@ -27,8 +27,8 @@
         <el-button size="small" circle @click="openRecycleBin" title="回收站">
           <el-icon><Delete /></el-icon>
         </el-button>
-        <el-button size="small" circle @click="performSecurityAudit" title="安全审计">
-          <el-icon style="color: #67C23A;"><Trophy /></el-icon>
+        <el-button size="small" circle @click="performSecurityAudit" title="安全审计" class="header-btn">
+          <el-icon class="icon-audit"><Trophy /></el-icon>
         </el-button>
         <el-button size="small" circle @click="openImportDialog" title="导入密码">
           <el-icon><Upload /></el-icon>
@@ -93,7 +93,7 @@
             </el-icon>
             <span class="category-name">{{ category.name }}</span>
             <span class="category-count">{{ getCategoryCount(category.id) }}</span>
-            <div class="category-actions" v-if="!category.is_default">
+            <div class="category-actions">
               <i class="fa-solid fa-pen action-icon" @click.stop="editCategory(category)" title="编辑"></i>
               <i class="fa-solid fa-trash action-icon del" @click.stop="deleteCategory(category)" title="删除"></i>
             </div>
@@ -224,14 +224,14 @@
     >
       <el-form :model="passwordForm" label-width="80px">
         <el-form-item label="分类" required>
-          <el-select v-model="passwordForm.category_id" placeholder="请选择分类" style="width: 100%">
+          <el-select v-model="passwordForm.category_id" placeholder="请选择分类" class="full-width">
             <el-option
               v-for="category in categories"
               :key="category.id"
               :label="category.name"
               :value="category.id"
             >
-              <el-icon style="margin-right: 8px;">
+              <el-icon class="icon-opt">
                 <component :is="getCategoryIcon(category.icon)" />
               </el-icon>
               {{ category.name }}
@@ -308,88 +308,88 @@
         <el-form-item label="图标">
           <el-select v-model="categoryForm.icon" placeholder="选择图标">
             <el-option value="Monitor" label="网站">
-              <el-icon style="color: #409EFF;"><Monitor /></el-icon> 网站
+              <el-icon class="icon-opt" style="color: #409EFF;"><Monitor /></el-icon> 网站
             </el-option>
             <el-option value="Download" label="软件">
-              <el-icon style="color: #67C23A;"><Download /></el-icon> 软件
+              <el-icon class="icon-opt" style="color: #67C23A;"><Download /></el-icon> 软件
             </el-option>
             <el-option value="CreditCard" label="银行卡">
-              <el-icon style="color: #F56C6C;"><CreditCard /></el-icon> 银行卡
+              <el-icon class="icon-opt" style="color: #F56C6C;"><CreditCard /></el-icon> 银行卡
             </el-option>
             <el-option value="Key" label="密钥">
-              <el-icon style="color: #E6A23C;"><Key /></el-icon> 密钥
+              <el-icon class="icon-opt" style="color: #E6A23C;"><Key /></el-icon> 密钥
             </el-option>
             <el-option value="Folder" label="文件夹">
-              <el-icon style="color: #909399;"><Folder /></el-icon> 文件夹
+              <el-icon class="icon-opt" style="color: #909399;"><Folder /></el-icon> 文件夹
             </el-option>
             <el-option value="ShoppingCart" label="购物">
-              <el-icon style="color: #FF6B9D;"><ShoppingCart /></el-icon> 购物
+              <el-icon class="icon-opt" style="color: #FF6B9D;"><ShoppingCart /></el-icon> 购物
             </el-option>
             <el-option value="House" label="房屋">
-              <el-icon style="color: #8E44AD;"><House /></el-icon> 房屋
+              <el-icon class="icon-opt" style="color: #8E44AD;"><House /></el-icon> 房屋
             </el-option>
             <el-option value="Phone" label="电话">
-              <el-icon style="color: #3498DB;"><Phone /></el-icon> 电话
+              <el-icon class="icon-opt" style="color: #3498DB;"><Phone /></el-icon> 电话
             </el-option>
             <el-option value="Camera" label="相机">
-              <el-icon style="color: #E74C3C;"><Camera /></el-icon> 相机
+              <el-icon class="icon-opt" style="color: #E74C3C;"><Camera /></el-icon> 相机
             </el-option>
             <el-option value="Printer" label="打印机">
-              <el-icon style="color: #95A5A6;"><Printer /></el-icon> 打印机
+              <el-icon class="icon-opt" style="color: #95A5A6;"><Printer /></el-icon> 打印机
             </el-option>
             <el-option value="VideoCamera" label="视频">
-              <el-icon style="color: #E67E22;"><VideoCamera /></el-icon> 视频
+              <el-icon class="icon-opt" style="color: #E67E22;"><VideoCamera /></el-icon> 视频
             </el-option>
             <el-option value="Headset" label="耳机">
-              <el-icon style="color: #9B59B6;"><Headset /></el-icon> 耳机
+              <el-icon class="icon-opt" style="color: #9B59B6;"><Headset /></el-icon> 耳机
             </el-option>
             <el-option value="Briefcase" label="公文包">
-              <el-icon style="color: #34495E;"><Briefcase /></el-icon> 公文包
+              <el-icon class="icon-opt" style="color: #34495E;"><Briefcase /></el-icon> 公文包
             </el-option>
             <el-option value="Guide" label="指南">
-              <el-icon style="color: #16A085;"><Guide /></el-icon> 指南
+              <el-icon class="icon-opt" style="color: #16A085;"><Guide /></el-icon> 指南
             </el-option>
             <el-option value="Present" label="礼物">
-              <el-icon style="color: #F39C12;"><Present /></el-icon> 礼物
+              <el-icon class="icon-opt" style="color: #F39C12;"><Present /></el-icon> 礼物
             </el-option>
             <el-option value="Trophy" label="奖杯">
-              <el-icon style="color: #F1C40F;"><Trophy /></el-icon> 奖杯
+              <el-icon class="icon-opt" style="color: #F1C40F;"><Trophy /></el-icon> 奖杯
             </el-option>
             <el-option value="MessageBox" label="消息">
-              <el-icon style="color: #1ABC9C;"><MessageBox /></el-icon> 消息
+              <el-icon class="icon-opt" style="color: #1ABC9C;"><MessageBox /></el-icon> 消息
             </el-option>
             <el-option value="Bell" label="铃铛">
-              <el-icon style="color: #E91E63;"><Bell /></el-icon> 铃铛
+              <el-icon class="icon-opt" style="color: #E91E63;"><Bell /></el-icon> 铃铛
             </el-option>
             <el-option value="User" label="用户">
-              <el-icon style="color: #2C3E50;"><User /></el-icon> 用户
+              <el-icon class="icon-opt" style="color: #2C3E50;"><User /></el-icon> 用户
             </el-option>
             <el-option value="Lock" label="锁">
-              <el-icon style="color: #C0392B;"><Lock /></el-icon> 锁
+              <el-icon class="icon-opt" style="color: #C0392B;"><Lock /></el-icon> 锁
             </el-option>
             <el-option value="ChromeFilled" label="Chrome">
-              <el-icon style="color: #4285F4;"><ChromeFilled /></el-icon> Chrome
+              <el-icon class="icon-opt" style="color: #4285F4;"><ChromeFilled /></el-icon> Chrome
             </el-option>
             <el-option value="ShoppingBag" label="购物袋">
-              <el-icon style="color: #FF9800;"><ShoppingBag /></el-icon> 购物袋
+              <el-icon class="icon-opt" style="color: #FF9800;"><ShoppingBag /></el-icon> 购物袋
             </el-option>
             <el-option value="GoodsFilled" label="商品">
-              <el-icon style="color: #FF5722;"><GoodsFilled /></el-icon> 商品
+              <el-icon class="icon-opt" style="color: #FF5722;"><GoodsFilled /></el-icon> 商品
             </el-option>
             <el-option value="LocationFilled" label="位置">
-              <el-icon style="color: #F44336;"><LocationFilled /></el-icon> 位置
+              <el-icon class="icon-opt" style="color: #F44336;"><LocationFilled /></el-icon> 位置
             </el-option>
             <el-option value="CollectionTag" label="标签">
-              <el-icon style="color: #673AB7;"><CollectionTag /></el-icon> 标签
+              <el-icon class="icon-opt" style="color: #673AB7;"><CollectionTag /></el-icon> 标签
             </el-option>
             <el-option value="Picture" label="图片">
-              <el-icon style="color: #00BCD4;"><Picture /></el-icon> 图片
+              <el-icon class="icon-opt" style="color: #00BCD4;"><Picture /></el-icon> 图片
             </el-option>
             <el-option value="Tickets" label="票务">
-              <el-icon style="color: #009688;"><Tickets /></el-icon> 票务
+              <el-icon class="icon-opt" style="color: #009688;"><Tickets /></el-icon> 票务
             </el-option>
             <el-option value="Files" label="文件">
-              <el-icon style="color: #607D8B;"><Files /></el-icon> 文件
+              <el-icon class="icon-opt" style="color: #607D8B;"><Files /></el-icon> 文件
             </el-option>
           </el-select>
         </el-form-item>
@@ -410,7 +410,7 @@
         <el-descriptions-item label="分类">{{ getCategoryName(viewingPassword?.category_id) }}</el-descriptions-item>
         <el-descriptions-item label="标题">{{ viewingPassword?.title }}</el-descriptions-item>
         <el-descriptions-item label="用户名">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="desc-inline">
             <span>{{ viewingPassword?.username || '未设置' }}</span>
             <el-button 
               v-if="viewingPassword?.username" 
@@ -422,7 +422,7 @@
           </div>
         </el-descriptions-item>
         <el-descriptions-item label="密码">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="desc-inline">
             <span v-if="showPassword">{{ decryptPassword(viewingPassword?.password || '') }}</span>
             <span v-else>••••••••</span>
             <el-button text @click="showPassword = !showPassword">
@@ -467,7 +467,7 @@
         <el-descriptions-item label="分类">{{ getCategoryName(viewingPassword?.category_id) }}</el-descriptions-item>
         <el-descriptions-item label="标题">{{ viewingPassword?.title }}</el-descriptions-item>
         <el-descriptions-item label="用户名">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="desc-inline">
             <span>{{ viewingPassword?.username || '未设置' }}</span>
             <el-button 
               v-if="viewingPassword?.username" 
@@ -479,7 +479,7 @@
           </div>
         </el-descriptions-item>
         <el-descriptions-item label="密码">
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="desc-inline">
             <span v-if="showPassword">{{ decryptPassword(viewingPassword?.password || '') }}</span>
             <span v-else>••••••••</span>
             <el-button text @click="showPassword = !showPassword">
@@ -557,9 +557,9 @@
           title="支持的格式"
           type="info"
           :closable="false"
-          style="margin-bottom: 16px;"
+          class="import-alert"
         >
-          <ul style="margin: 8px 0 0 20px; padding: 0;">
+          <ul class="import-format-list">
             <li>Google Chrome 密码导出文件（CSV）</li>
             <li>Microsoft Edge 密码导出文件（CSV）</li>
             <li>1Password 导出文件（CSV）</li>
@@ -568,7 +568,7 @@
             <li>JSON 格式（普通或加密）</li>
           </ul>
         </el-alert>
-        <el-button type="primary" @click="handleFileSelect" style="width: 100%;">
+        <el-button type="primary" @click="handleFileSelect" class="import-select-btn">
           <el-icon><Upload /></el-icon>
           选择文件
         </el-button>
@@ -579,10 +579,10 @@
           :title="`已选择文件：${importFile.name}`"
           type="success"
           :closable="false"
-          style="margin-bottom: 16px;"
+          class="import-alert"
         />
-        
-        <el-button @click="handleFileSelect" style="margin-bottom: 16px;">
+
+        <el-button @click="handleFileSelect" class="import-reselect-btn">
           重新选择
         </el-button>
         
@@ -608,7 +608,7 @@
               </div>
             </div>
             
-            <el-collapse v-if="importResult.errors.length > 0 || importResult.warnings.length > 0" style="margin-top: 16px;">
+            <el-collapse v-if="importResult.errors.length > 0 || importResult.warnings.length > 0" class="import-collapse">
               <el-collapse-item v-if="importResult.errors.length > 0" title="错误列表" name="errors">
                 <div v-for="(error, index) in importResult.errors" :key="index" class="error-item">
                   {{ error }}
@@ -638,11 +638,11 @@
 
     <!-- 导出菜单（下拉） -->
     <el-dialog v-model="showExportMenu" title="导出密码" width="400px">
-      <el-button @click="exportPasswordsToCSV" style="width: 100%; margin-bottom: 12px;">
+      <el-button @click="exportPasswordsToCSV" class="export-btn">
         <el-icon><Document /></el-icon>
         导出为 CSV
       </el-button>
-      <el-button @click="exportPasswordsToJSON" style="width: 100%;">
+      <el-button @click="exportPasswordsToJSON" class="export-btn">
         <el-icon><Lock /></el-icon>
         导出为 JSON（加密）
       </el-button>
@@ -651,13 +651,13 @@
     <!-- 锁定遮罩层 -->
     <div v-if="isLocked" class="lock-overlay">
       <div class="lock-content">
-        <el-icon class="lock-icon" style="font-size: 80px; color: #409EFF;">
-          <Lock />
-        </el-icon>
-        <h2>密码管理器已锁定</h2>
-        <p style="margin-bottom: 24px;">请输入主密码解锁</p>
-        
-        <el-form style="width: 300px; margin: 0 auto;">
+        <div class="lock-icon-wrapper">
+          <el-icon class="lock-icon-main"><Lock /></el-icon>
+        </div>
+        <h2 class="lock-title">密码管理器已锁定</h2>
+        <p class="lock-desc">请输入主密码解锁</p>
+
+        <el-form class="lock-form">
           <el-form-item>
             <el-input
               v-model="masterPasswordInput"
@@ -670,10 +670,10 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button 
-              type="primary" 
+            <el-button
+              type="primary"
               size="large"
-              style="width: 100%;"
+              class="lock-btn"
               @click="verifyMasterPassword"
             >
               解锁
@@ -696,10 +696,10 @@
         title="首次使用需要设置主密码"
         type="info"
         :closable="false"
-        style="margin-bottom: 20px;"
+        class="master-pw-alert"
       >
         <p>主密码用于保护您的密码库，请务必记住！</p>
-        <p style="color: #E6A23C; margin-top: 8px;">⚠️ 忘记主密码将无法恢复数据</p>
+        <p class="master-pw-warning">忘记主密码将无法恢复数据</p>
       </el-alert>
       
       <el-form label-width="100px">
@@ -742,18 +742,18 @@
             placement="top"
           >
             <el-card>
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="flex: 1;">
+              <div class="history-card-row">
+                <div class="history-card-info">
                   <h4>{{ history.title }}</h4>
-                  <p style="margin: 4px 0; color: #909399; font-size: 13px;">
+                  <p class="history-meta">
                     用户名: {{ history.username || '未设置' }}
                   </p>
-                  <p style="margin: 4px 0; color: #909399; font-size: 13px;">
+                  <p class="history-meta">
                     密码强度: <span :class="getStrengthClass(history.password_strength)">{{ getStrengthText(history.password_strength) }}</span>
                   </p>
                 </div>
-                <el-button 
-                  type="primary" 
+                <el-button
+                  type="primary"
                   size="small"
                   @click="restoreFromHistory(history)"
                 >
@@ -768,8 +768,8 @@
 
     <!-- 回收站对话框 -->
     <el-dialog v-model="showRecycleBin" title="回收站" width="900px">
-      <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-        <span style="color: #909399; font-size: 14px;">
+      <div class="recycle-bin-header">
+        <span class="recycle-bin-count">
           共 {{ recycleBinPasswords.length }} 项
         </span>
         <el-button 
@@ -784,7 +784,7 @@
       
       <el-empty v-if="recycleBinPasswords.length === 0" description="回收站为空" />
       
-      <el-table v-else :data="recycleBinPasswords" stripe style="width: 100%">
+      <el-table v-else :data="recycleBinPasswords" stripe class="full-width">
         <el-table-column prop="title" label="标题" width="180" />
         <el-table-column prop="username" label="用户名" width="150" />
         <el-table-column label="网站" width="200">
@@ -831,7 +831,7 @@
           </div>
           <div class="score-info">
             <h3>{{ auditResult.scoreLevel === 'good' ? '✅ 安全性良好' : auditResult.scoreLevel === 'medium' ? '⚠️ 安全性中等' : '❌ 安全性较差' }}</h3>
-            <p style="color: #909399; margin-top: 8px;">共检查 {{ auditResult.totalPasswords }} 个密码</p>
+            <p class="audit-total-info">共检查 {{ auditResult.totalPasswords }} 个密码</p>
           </div>
         </div>
 
@@ -844,7 +844,7 @@
           :title="suggestion"
           type="warning"
           :closable="false"
-          style="margin-bottom: 12px;"
+          class="audit-suggestion"
         />
 
         <!-- 详细问题列表 -->
@@ -854,12 +854,12 @@
             <div v-if="auditResult.duplicatePasswords.length === 0">
               <el-empty description="未发现重复密码" />
             </div>
-            <el-card v-else v-for="(dup, index) in auditResult.duplicatePasswords" :key="index" style="margin-bottom: 12px;">
-              <p style="margin-bottom: 8px; color: #F56C6C;">
+            <el-card v-else v-for="(dup, index) in auditResult.duplicatePasswords" :key="index" class="audit-detail-card">
+              <p class="audit-dup-text">
                 <strong>{{ dup.count }} 个账号</strong> 使用相同密码
               </p>
-              <ul style="margin: 0; padding-left: 20px;">
-                <li v-for="item in dup.items" :key="item.id" style="margin-bottom: 4px;">
+              <ul class="audit-list">
+                <li v-for="item in dup.items" :key="item.id">
                   {{ item.title }}
                 </li>
               </ul>
@@ -886,11 +886,11 @@
             <div v-if="auditResult.similarPasswords.length === 0">
               <el-empty description="未发现相似密码" />
             </div>
-            <el-card v-else v-for="(sim, index) in auditResult.similarPasswords" :key="index" style="margin-bottom: 12px;">
-              <p style="margin-bottom: 8px; color: #E6A23C;">
+            <el-card v-else v-for="(sim, index) in auditResult.similarPasswords" :key="index" class="audit-detail-card">
+              <p class="audit-sim-text">
                 相似度: <strong>{{ sim.similarity }}%</strong>
               </p>
-              <ul style="margin: 0; padding-left: 20px;">
+              <ul class="audit-list">
                 <li>{{ sim.password1.title }}</li>
                 <li>{{ sim.password2.title }}</li>
               </ul>
@@ -2351,43 +2351,27 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ignore */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 .passwords-page-wrapper {
-  /* ignore */
-  --bg-body: #f7f9fb;
-  --bg-sidebar: #fcfcfc;
-  --bg-content: #ffffff;
-  --border-color: #e1e4e8;
-  --text-primary: #2c3e50;
-  --text-secondary: #606f7b;
-  --accent-color: #3498db;
-  --hover-bg: #edf2f7;
-  --active-bg: #e6f4ff;
-  --danger-color: #e74c3c;
-  --success-color: #2ecc71;
-  
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--text-primary);
-  background-color: var(--bg-body);
+  background-color: var(--bg-secondary);
   height: 100%;
   width: 100%;
-  position: relative; /* ignore */
+  position: relative;
 }
 
-/* ignore */
+/* ========== Header ========== */
 .header {
-  height: 50px;
-  background-color: var(--bg-content);
-  border-bottom: 1px solid var(--border-color);
+  height: 48px;
+  background-color: var(--bg-primary);
+  border-bottom: 0.5px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 15px;
+  padding: 0 var(--space-lg);
   flex-shrink: 0;
   z-index: 2;
   position: relative;
@@ -2396,25 +2380,39 @@ onMounted(async () => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .breadcrumb {
-  font-size: 0.9rem;
+  font-size: var(--font-size-body);
   color: var(--text-secondary);
-  background: #f0f2f5;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-weight: 500;
+  font-weight: var(--font-weight-regular);
+  letter-spacing: 0.01em;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
-/* ignore */
+.header-search {
+  width: 250px;
+}
+
+.header-actions .el-button.is-circle {
+  transition: all var(--transition-normal);
+}
+
+.header-actions .el-button.is-circle:hover {
+  background: var(--bg-tertiary);
+}
+
+.icon-audit {
+  color: var(--color-green);
+}
+
+/* ========== Layout ========== */
 .main-container {
   display: flex;
   flex: 1;
@@ -2422,13 +2420,13 @@ onMounted(async () => {
   min-height: 0;
 }
 
-/* ignore */
+/* ========== Sidebar ========== */
 .sidebar-left {
-  width: 260px;
-  min-width: 260px;
+  width: 220px;
+  min-width: 220px;
   flex-shrink: 0;
-  background-color: var(--bg-sidebar);
-  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  border-right: 0.5px solid var(--border-color);
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -2439,35 +2437,39 @@ onMounted(async () => {
 }
 
 .sidebar-toolbar {
-  padding: 10px 15px;
-  border-bottom: 1px solid var(--border-color);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 0.5px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .sidebar-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .sidebar-btn {
   cursor: pointer;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-body);
+  transition: color var(--transition-fast);
+  padding: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .sidebar-btn:hover {
-  color: var(--accent-color);
+  color: var(--accent-blue);
 }
 
 .category-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 5px 10px 20px 10px;
+  padding: var(--space-xs) var(--space-sm) var(--space-xl) var(--space-sm);
   margin: 0;
   min-height: 0;
 }
@@ -2475,86 +2477,89 @@ onMounted(async () => {
 .category-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  margin: 2px 0;
-  border-radius: 6px;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  margin: 1px 0;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.85rem;
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-body);
   color: var(--text-primary);
   position: relative;
 }
 
 .category-item:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--bg-tertiary);
 }
 
 .category-item.active {
-  background-color: var(--active-bg);
-  color: var(--accent-color);
-  font-weight: 600;
+  background-color: var(--accent-blue-bg);
+  color: var(--accent-blue);
+  font-weight: var(--font-weight-medium);
 }
 
 .category-icon {
   font-size: 16px;
   flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.category-item:hover .category-icon {
+  transform: none;
 }
 
 .category-name {
   flex: 1;
-  font-size: 0.85rem;
+  font-size: var(--font-size-body);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .category-count {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  background: var(--hover-bg);
-  padding: 2px 6px;
-  border-radius: 10px;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
   min-width: 20px;
-  text-align: center;
+  text-align: right;
+  font-weight: var(--font-weight-regular);
+  font-variant-numeric: tabular-nums;
 }
 
-/* ignore */
+/* ========== Category Favorite ========== */
 .category-favorite .favorite-icon {
-  color: #f1c40f;
+  color: var(--color-orange);
 }
 
 .category-favorite.active .favorite-icon {
-  color: #f39c12;
+  color: var(--color-orange);
 }
 
-/* ignore */
+/* ========== Favorite Star ========== */
 .favorite-star {
-  font-size: 18px;
-  color: #dcdfe6;
+  font-size: 14px;
+  color: var(--text-quaternary);
   cursor: pointer;
-  transition: all 0.2s;
-  margin-left: 8px;
+  transition: all var(--transition-fast);
+  margin-left: var(--space-xs);
   flex-shrink: 0;
 }
 
 .favorite-star:hover {
-  color: #f1c40f;
-  transform: scale(1.2);
+  color: var(--color-orange);
 }
 
 .favorite-star.is-favorite {
-  color: #f1c40f;
+  color: var(--color-orange);
 }
 
 .favorite-star.is-favorite:hover {
-  color: #dcdfe6;
+  color: var(--text-quaternary);
 }
 
 .category-actions {
   display: none;
-  margin-left: 8px;
-  gap: 8px;
+  margin-left: var(--space-xs);
+  gap: var(--space-xs);
 }
 
 .category-item:hover .category-actions {
@@ -2562,25 +2567,26 @@ onMounted(async () => {
 }
 
 .action-icon {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  transition: 0.2s;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  transition: all var(--transition-fast);
   cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .action-icon:hover {
-  color: var(--accent-color);
-  transform: scale(1.1);
+  color: var(--accent-blue);
 }
 
 .action-icon.del:hover {
-  color: var(--danger-color);
+  color: var(--color-red);
 }
 
-/* ignore */
+/* ========== Content Area ========== */
 .content-area {
   flex: 1;
-  background-color: var(--bg-content);
+  background-color: var(--bg-secondary);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -2589,297 +2595,393 @@ onMounted(async () => {
   z-index: 0;
 }
 
-/* ignore */
+/* ========== Password List (Apple Grouped) ========== */
 .password-list {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: var(--space-xl) var(--space-2xl);
+}
+
+.password-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.password-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.password-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.password-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .password-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 0.5px solid var(--border-color);
+  box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
 }
 
 .password-card {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 14px 18px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e4e7ed;
-  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 2px;
+  padding: 10px var(--space-lg);
+  position: relative;
+  transition: background var(--transition-fast);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.password-card:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 60px;
+  right: var(--space-lg);
+  height: 0.5px;
+  background: var(--border-color);
 }
 
 .password-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  border-color: var(--accent-color);
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: none;
+  border-color: transparent;
+  transform: none;
 }
 
-/* ignore */
 .card-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
-/* ignore */
 .card-header-row {
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f0f2f5;
+  padding-bottom: 0;
 }
 
 .card-title-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   flex: 1;
   min-width: 0;
 }
 
 .card-icon {
-  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
   flex-shrink: 0;
+}
+
+.password-card:hover .card-icon {
+  transform: none;
 }
 
 .card-title {
   margin: 0;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
   min-width: 0;
+  letter-spacing: -0.008em;
 }
 
-/* ignore */
 .strength-badge {
   font-size: 11px;
-  padding: 2px 8px;
+  padding: 1px 7px;
   border-radius: 10px;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   flex-shrink: 0;
+  letter-spacing: 0.01em;
+  line-height: 1.5;
 }
 
 .strength-badge.strength-weak {
-  background: #fef0f0;
-  color: #f56c6c;
+  background: rgba(255, 59, 48, 0.06);
+  color: var(--color-red);
 }
 
 .strength-badge.strength-medium {
-  background: #fdf6ec;
-  color: #e6a23c;
+  background: rgba(255, 149, 0, 0.06);
+  color: var(--color-orange);
 }
 
 .strength-badge.strength-strong {
-  background: #f0f9ff;
-  color: #67c23a;
+  background: rgba(52, 199, 89, 0.06);
+  color: var(--color-green);
 }
 
-/* ignore */
+/* ========== Card Actions ========== */
 .card-actions {
   display: flex;
-  gap: 4px;
+  gap: 0;
   flex-shrink: 0;
 }
 
 .card-actions .el-button {
-  padding: 6px;
+  padding: 5px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  color: var(--text-tertiary);
 }
 
-/* ignore */
+.card-actions .el-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+  transform: none;
+}
+
+/* ========== Card Info Row ========== */
 .card-info-row {
   display: flex;
   align-items: center;
-  gap: 20px;
-  flex-wrap: wrap;
+  gap: 0;
+  padding-left: 44px;
+  flex-wrap: nowrap;
+  overflow: hidden;
 }
 
 .info-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  gap: 0;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.info-label {
-  color: var(--text-secondary);
-  font-weight: 500;
+.info-item:not(:first-child)::before {
+  content: '·';
+  margin: 0 6px;
+  color: var(--text-quaternary);
   flex-shrink: 0;
 }
 
+.info-label {
+  display: none;
+}
+
 .info-value {
-  color: var(--text-primary);
+  color: var(--text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .info-time {
-  color: #909399;
-  font-size: 12px;
+  color: var(--text-quaternary);
+  font-size: var(--font-size-caption);
+  font-variant-numeric: tabular-nums;
 }
 
 .info-link {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 300px;
-  color: var(--accent-color);
+  max-width: 260px;
+  color: var(--text-tertiary);
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: color var(--transition-fast);
 }
 
 .info-link:hover {
-  text-decoration: underline;
-  color: #2980b9;
+  color: var(--accent-blue);
 }
 
-/* ignore */
+/* ========== Website Link ========== */
 .website-link {
-  color: var(--accent-color);
+  color: var(--accent-blue);
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .website-link:hover {
   text-decoration: underline;
-  color: #2980b9;
+  opacity: 0.85;
 }
 
 .password-table {
-  background: #ffffff;
-  border-radius: 8px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-card);
 }
 
-/* ignore */
+/* ========== Password Strength ========== */
 .password-strength {
-  margin-top: 8px;
+  margin-top: var(--space-sm);
 }
 
 .strength-indicator {
   height: 4px;
-  background: #ebeef5;
+  background: var(--bg-tertiary);
   border-radius: 2px;
   overflow: hidden;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
 }
 
 .strength-bar {
   height: 100%;
-  transition: all 0.3s;
+  transition: width var(--transition-smooth);
   border-radius: 2px;
 }
 
 .strength-bar.weak {
-  background: #f56c6c;
+  background: var(--color-red);
 }
 
 .strength-bar.medium {
-  background: #e6a23c;
+  background: var(--color-orange);
 }
 
 .strength-bar.strong {
-  background: #67c23a;
+  background: var(--color-green);
 }
 
 .strength-info {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: var(--space-xs);
+  font-size: var(--font-size-caption);
 }
 
 .strength-text.weak {
-  color: #f56c6c;
+  color: var(--color-red);
 }
 
 .strength-text.medium {
-  color: #e6a23c;
+  color: var(--color-orange);
 }
 
 .strength-text.strong {
-  color: #67c23a;
+  color: var(--color-green);
 }
 
-/* ignore */
+/* ========== Import ========== */
 .import-result {
   max-height: 400px;
   overflow-y: auto;
 }
 
+.import-alert {
+  margin-bottom: var(--space-lg);
+}
+
+.import-format-list {
+  margin: var(--space-sm) 0 0 var(--space-xl);
+  padding: 0;
+  line-height: 1.8;
+}
+
+.import-select-btn {
+  width: 100%;
+}
+
+.import-reselect-btn {
+  margin-bottom: var(--space-lg);
+}
+
+.import-collapse {
+  margin-top: var(--space-lg);
+}
+
 .result-stat {
   display: flex;
-  gap: 24px;
+  gap: var(--space-2xl);
   flex-wrap: wrap;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #606266;
+  font-size: var(--font-size-body);
+  color: var(--text-secondary);
 }
 
 .stat-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
+  font-size: var(--font-size-headline);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-value.success {
-  color: #67c23a;
+  color: var(--color-green);
 }
 
 .stat-value.error {
-  color: #f56c6c;
+  color: var(--color-red);
 }
 
 .stat-value.warning {
-  color: #e6a23c;
+  color: var(--color-orange);
 }
 
 .error-item,
 .warning-item {
-  padding: 8px;
-  margin-bottom: 4px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: var(--space-sm);
+  margin-bottom: var(--space-xs);
+  border-radius: var(--radius-xs);
+  font-size: var(--font-size-caption);
 }
 
 .error-item {
-  background: #fef0f0;
-  color: #f56c6c;
+  background: rgba(255, 59, 48, 0.06);
+  color: var(--color-red);
 }
 
 .warning-item {
-  background: #fdf6ec;
-  color: #e6a23c;
+  background: rgba(255, 149, 0, 0.06);
+  color: var(--color-orange);
 }
 
-/* ignore */
+/* ========== Export ========== */
+.export-btn {
+  width: 100%;
+}
+
+.export-btn + .export-btn {
+  margin-top: var(--space-md);
+  margin-left: 0;
+}
+
+/* ========== Lock Overlay ========== */
 .lock-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(44, 62, 80, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(28, 28, 30, 0.72);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   z-index: 999;
   display: flex;
   align-items: center;
@@ -2891,17 +2993,94 @@ onMounted(async () => {
   color: #ffffff;
 }
 
-.lock-content h2 {
-  margin: 20px 0 10px;
-  font-size: 28px;
+.lock-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-xl);
+  backdrop-filter: blur(8px);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
 }
 
-.lock-content p {
-  font-size: 16px;
-  color: #bdc3c7;
+.lock-icon-main {
+  font-size: 36px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
-/* ignore */
+.lock-title {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--font-size-title2);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+}
+
+.lock-desc {
+  font-size: var(--font-size-callout);
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 var(--space-2xl);
+}
+
+.lock-form {
+  width: 300px;
+  margin: 0 auto;
+}
+
+.lock-btn {
+  width: 100%;
+}
+
+/* ========== Master Password Dialog ========== */
+.master-pw-alert {
+  margin-bottom: var(--space-xl);
+}
+
+.master-pw-warning {
+  color: var(--color-orange);
+  margin-top: var(--space-sm);
+}
+
+/* ========== History Dialog ========== */
+.history-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-card-info {
+  flex: 1;
+}
+
+.history-card-info h4 {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+}
+
+.history-meta {
+  margin: 2px 0;
+  color: var(--text-tertiary);
+  font-size: var(--font-size-footnote);
+}
+
+/* ========== Recycle Bin ========== */
+.recycle-bin-header {
+  margin-bottom: var(--space-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recycle-bin-count {
+  color: var(--text-tertiary);
+  font-size: var(--font-size-body);
+}
+
+/* ========== Audit ========== */
 .audit-container {
   max-height: 500px;
   overflow-y: auto;
@@ -2910,55 +3089,103 @@ onMounted(async () => {
 .audit-score {
   display: flex;
   align-items: center;
-  gap: 32px;
-  padding: 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
-  color: #ffffff;
+  gap: var(--space-3xl);
+  padding: var(--space-2xl);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
 }
 
 .score-circle {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
-  border: 4px solid rgba(255, 255, 255, 0.3);
+  background: var(--bg-primary);
+  border: 3px solid var(--border-color-strong);
+  flex-shrink: 0;
 }
 
 .score-circle.score-good {
-  border-color: #67c23a;
-  background: rgba(103, 194, 58, 0.2);
+  border-color: var(--color-green);
 }
 
 .score-circle.score-medium {
-  border-color: #e6a23c;
-  background: rgba(230, 162, 60, 0.2);
+  border-color: var(--color-orange);
 }
 
 .score-circle.score-poor {
-  border-color: #f56c6c;
-  background: rgba(245, 108, 108, 0.2);
+  border-color: var(--color-red);
 }
 
 .score-number {
-  font-size: 48px;
-  font-weight: bold;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 
 .score-label {
-  font-size: 14px;
-  margin-top: 8px;
-  opacity: 0.9;
+  font-size: var(--font-size-caption);
+  margin-top: var(--space-xs);
+  color: var(--text-tertiary);
 }
 
 .score-info h3 {
-  margin: 0 0 8px;
-  font-size: 24px;
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-semibold);
 }
-</style>
+
+.audit-total-info {
+  color: var(--text-tertiary);
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-footnote);
+}
+
+.audit-suggestion {
+  margin-bottom: var(--space-md);
+}
+
+.audit-detail-card {
+  margin-bottom: var(--space-md);
+}
+
+.audit-dup-text {
+  margin-bottom: var(--space-sm);
+  color: var(--color-red);
+  font-size: var(--font-size-body);
+}
+
+.audit-sim-text {
+  margin-bottom: var(--space-sm);
+  color: var(--color-orange);
+  font-size: var(--font-size-body);
+}
+
+.audit-list {
+  margin: 0;
+  padding-left: var(--space-xl);
+  line-height: 1.8;
+  font-size: var(--font-size-footnote);
+  color: var(--text-secondary);
+}
+
+/* ========== Utility Classes ========== */
+.full-width {
+  width: 100%;
+}
+
+.desc-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.icon-opt {
+  margin-right: var(--space-sm);
+}</style>
 

@@ -2007,7 +2007,7 @@ onMounted(async () => {
   resize: none;
   font-size: 15px;
   line-height: 24px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: "PingFang SC";
   background: transparent;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -2107,7 +2107,7 @@ onMounted(async () => {
   background: rgba(0, 0, 0, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
-  font-family: 'Courier New', Consolas, monospace;
+  font-family: "PingFang SC";
   font-size: 0.9em;
 }
 
@@ -2165,7 +2165,7 @@ onMounted(async () => {
   color: #c9d1d9;
   line-height: 1.6;
   font-size: 14px;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "PingFang SC";
 }
 
 .message-text :deep(pre code)::-webkit-scrollbar {

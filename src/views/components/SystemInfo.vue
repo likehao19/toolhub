@@ -21,7 +21,7 @@
                   </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="系统版本">
-                  <span style="font-family: 'Consolas', monospace;">{{ systemInfo.version || '加载中...' }}</span>
+                  <span style="font-family: 'PingFang SC';">{{ systemInfo.version || '加载中...' }}</span>
                 </el-descriptions-item>
                 <el-descriptions-item label="CPU 架构">
                   <el-tag type="info" size="large">{{ systemInfo.arch || '加载中...' }}</el-tag>
@@ -69,7 +69,7 @@
                     <el-tag type="info">{{ separateInfo.arch }}</el-tag>
                   </el-descriptions-item>
                   <el-descriptions-item label="版本">
-                    <span style="font-family: 'Consolas', monospace;">{{ separateInfo.version }}</span>
+                    <span style="font-family: 'PingFang SC';">{{ separateInfo.version }}</span>
                   </el-descriptions-item>
                 </el-descriptions>
               </div>

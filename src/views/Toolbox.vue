@@ -1201,16 +1201,16 @@ const goToSettings = () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #f7f9fb;
+  background-color: var(--bg-secondary);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e4e7ed;
+  padding: var(--space-md) var(--space-xl);
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
   height: 50px;
   box-sizing: border-box;
 }
@@ -1218,32 +1218,32 @@ const goToSettings = () => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--space-xl);
 }
 
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #303133;
+  gap: var(--space-sm);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .breadcrumb .el-icon {
   font-size: 18px;
-  color: #ff9800;
+  color: var(--text-secondary);
 }
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .content-area {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: var(--space-2xl);
   scrollbar-gutter: stable;
 }
 
@@ -1258,12 +1258,12 @@ const goToSettings = () => {
 }
 
 .content-area::-webkit-scrollbar-thumb {
-  background: #dcdfe6;
+  background: var(--text-quaternary);
   border-radius: 3px;
 }
 
 .content-area::-webkit-scrollbar-thumb:hover {
-  background: #c0c4cc;
+  background: var(--text-tertiary);
 }
 
 .tool-category {
@@ -1279,17 +1279,17 @@ const goToSettings = () => {
   align-items: center;
   gap: 6px;
   padding: 0 0 10px 0;
-  font-size: 13px;
-  font-weight: 600;
-  color: #606266;
+  font-size: var(--font-size-footnote);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-secondary);
   user-select: none;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-lg);
 }
 
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
-  gap: 12px;
+  gap: var(--space-lg);
 }
 
 .tool-card {
@@ -1298,64 +1298,56 @@ const goToSettings = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 8px;
-  background: #fff;
-  border: 1px solid #e8eaed;
-  border-radius: 8px;
+  padding: var(--space-lg) var(--space-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-normal);
   user-select: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .tool-card:hover {
-  border-color: #409eff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
+  border-color: transparent;
+  background: var(--bg-tertiary);
 }
 
 .tool-card.disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .tool-card.disabled:hover {
-  border-color: #e8eaed;
-  transform: none;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-color: transparent;
+  background: transparent;
 }
 
 .tool-icon {
   font-size: 28px;
   margin-bottom: 6px;
-  transition: transform 0.2s;
-}
-
-.tool-card:hover .tool-icon {
-  transform: scale(1.1);
 }
 
 .tool-name {
-  font-size: 12px;
-  color: #606266;
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
   text-align: center;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   line-height: 1.3;
-  transition: color 0.2s;
+  transition: color var(--transition-fast);
 }
 
 .tool-card:hover .tool-name {
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .tool-card.disabled .tool-name {
-  color: #909399;
+  color: var(--text-tertiary);
 }
 
 .dev-tag {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: var(--radius-xs);
+  right: var(--radius-xs);
   font-size: 9px;
   padding: 1px 4px;
   height: 16px;

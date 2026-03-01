@@ -68,7 +68,7 @@ defineExpose({
   padding: 40px 60px;
   border: none;
   outline: none;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.8;
   resize: none;

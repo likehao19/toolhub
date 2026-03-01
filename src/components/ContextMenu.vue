@@ -238,7 +238,7 @@ onUnmounted(() => {
   color: #9ca3af;
   font-size: 12px;
   white-space: nowrap;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "PingFang SC";
 }
 </style>
 

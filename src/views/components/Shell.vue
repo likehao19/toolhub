@@ -41,10 +41,10 @@
                 </el-tag>
               </el-descriptions-item>
               <el-descriptions-item label="标准输出">
-                <pre style="margin: 0; white-space: pre-wrap; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px;">{{ commandResult.stdout || '(无输出)' }}</pre>
+                <pre style="margin: 0; white-space: pre-wrap; font-family: 'PingFang SC'; font-size: 12px;">{{ commandResult.stdout || '(无输出)' }}</pre>
               </el-descriptions-item>
               <el-descriptions-item label="错误输出">
-                <pre v-if="commandResult.stderr" style="margin: 0; white-space: pre-wrap; color: #f56c6c; font-family: 'Consolas', 'Monaco', monospace; font-size: 12px;">{{ commandResult.stderr }}</pre>
+                <pre v-if="commandResult.stderr" style="margin: 0; white-space: pre-wrap; color: #f56c6c; font-family: 'PingFang SC'; font-size: 12px;">{{ commandResult.stderr }}</pre>
                 <span v-else>(无错误)</span>
               </el-descriptions-item>
             </el-descriptions>

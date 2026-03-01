@@ -128,7 +128,7 @@ const copyCode = async () => {
   padding: 24px;
   background: #fafbfc;
   overflow-x: auto;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "PingFang SC";
   font-size: 13px;
   line-height: 1.8;
   color: #303133;

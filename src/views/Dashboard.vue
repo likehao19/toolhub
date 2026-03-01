@@ -146,8 +146,8 @@
         <div class="card-content">
           <el-empty v-if="frequentBookmarks.length === 0" description="还没有书签" :image-size="80" />
           <div v-else class="bookmark-grid">
-            <div v-for="bookmark in frequentBookmarks.slice(0, 8)" :key="bookmark.id" 
-                 class="bookmark-item" 
+            <div v-for="bookmark in frequentBookmarks.slice(0, 8)" :key="bookmark.id"
+                 class="bookmark-item"
                  @click="openBookmark(bookmark)"
                  :title="bookmark.name">
               <div class="bookmark-icon">
@@ -204,13 +204,13 @@ const lunarDate = ref('')
 // 初始化今日日期
 const initTodayDate = () => {
   const now = new Date()
-  todayDate.value = now.toLocaleDateString('zh-CN', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  todayDate.value = now.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
   todayWeekday.value = now.toLocaleDateString('zh-CN', { weekday: 'long' })
-  
+
   // 简单的农历显示（可以后续集成农历库）
   lunarDate.value = `农历${now.getMonth() + 1}月${now.getDate()}日`
 }
@@ -220,26 +220,26 @@ const loadTodayTodos = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const today = new Date().toISOString().split('T')[0]
-    
+
     // 获取今日待办或未完成的待办（status=0表示未完成）
     const todos = await db.select(
-      `SELECT * FROM todos 
-       WHERE (due_date = ? OR due_date IS NULL) 
-       AND status = 0 
-       ORDER BY priority DESC, created_at DESC 
+      `SELECT * FROM todos
+       WHERE (due_date = ? OR due_date IS NULL)
+       AND status = 0
+       ORDER BY priority DESC, created_at DESC
        LIMIT 10`,
       [today]
     )
     // 添加completed字段以兼容UI
     todayTodos.value = todos.map(t => ({ ...t, completed: t.status === 1 }))
-    
+
     // 获取待办总数和完成数
     const totalResult = await db.select('SELECT COUNT(*) as count FROM todos WHERE status = 0')
     totalTodos.value = totalResult[0]?.count || 0
-    
+
     const completedResult = await db.select('SELECT COUNT(*) as count FROM todos WHERE status = 1')
     completedTodos.value = completedResult[0]?.count || 0
-    
+
     // 计算完成率
     const total = totalTodos.value + completedTodos.value
     todoCompletionRate.value = total > 0 ? Math.round((completedTodos.value / total) * 100) : 0
@@ -257,23 +257,23 @@ const loadTodayEvents = async () => {
     const db = await Database.load('sqlite:productivity.db')
     const today = new Date().toISOString().split('T')[0]
     const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
-    
+
     const events = await db.select(
-      `SELECT * FROM calendar_events 
-       WHERE DATE(start_time) >= ? AND DATE(start_time) < ? 
+      `SELECT * FROM calendar_events
+       WHERE DATE(start_time) >= ? AND DATE(start_time) < ?
        ORDER BY start_time ASC`,
       [today, tomorrow]
     )
     todayEvents.value = events || []
-    
+
     // 获取本周日程数量
     const weekStart = new Date()
     weekStart.setDate(weekStart.getDate() - weekStart.getDay())
     const weekEnd = new Date(weekStart)
     weekEnd.setDate(weekEnd.getDate() + 7)
-    
+
     const weekResult = await db.select(
-      `SELECT COUNT(*) as count FROM calendar_events 
+      `SELECT COUNT(*) as count FROM calendar_events
        WHERE DATE(start_time) >= ? AND DATE(start_time) < ?`,
       [weekStart.toISOString().split('T')[0], weekEnd.toISOString().split('T')[0]]
     )
@@ -289,13 +289,13 @@ const loadRecentNotes = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const notes = await db.select(
-      `SELECT note_name as name, title, updated_at 
-       FROM note_metadata 
-       ORDER BY updated_at DESC 
+      `SELECT note_name as name, title, updated_at
+       FROM note_metadata
+       ORDER BY updated_at DESC
        LIMIT 5`
     )
     recentNotes.value = notes || []
-    
+
     // 获取笔记总数
     const totalResult = await db.select('SELECT COUNT(*) as count FROM note_metadata')
     totalNotes.value = totalResult[0]?.count || 0
@@ -310,14 +310,14 @@ const loadFrequentBookmarks = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const bookmarks = await db.select(
-      `SELECT id, title as name, url, favicon_url as icon_url, access_count as visit_count 
-       FROM bookmarks 
+      `SELECT id, title as name, url, favicon_url as icon_url, access_count as visit_count
+       FROM bookmarks
        WHERE access_count > 5 OR read_later = 1
-       ORDER BY access_count DESC 
+       ORDER BY access_count DESC
        LIMIT 6`
     )
     frequentBookmarks.value = bookmarks || []
-    
+
     // 获取书签总数
     const totalResult = await db.select('SELECT COUNT(*) as count FROM bookmarks')
     totalBookmarks.value = totalResult[0]?.count || 0
@@ -333,7 +333,7 @@ const loadPasswordStats = async () => {
     const db = await Database.load('sqlite:productivity.db')
     const stats = await db.select('SELECT COUNT(*) as total FROM passwords')
     passwordStats.value.total = stats[0]?.total || 0
-    
+
     // 根据password_strength字段统计（如果存在）
     try {
       const strongStats = await db.select('SELECT COUNT(*) as count FROM passwords WHERE password_strength >= 3')
@@ -396,7 +396,7 @@ const formatDate = (dateStr) => {
   const now = new Date()
   const diff = now - date
   const days = Math.floor(diff / 86400000)
-  
+
   if (days === 0) return '今天'
   if (days === 1) return '昨天'
   if (days < 7) return `${days}天前`
@@ -448,72 +448,72 @@ onUnmounted(() => {
 .dashboard-wrapper {
   width: 100%;
   height: 100%;
-  padding: 24px;
-  background: #ffffff;
+  padding: var(--space-2xl);
+  background: var(--bg-secondary);
   overflow-y: auto;
 }
 
-/* ignore */
+/* 页面头部 */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--space-2xl);
 }
 
 .dashboard-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1f2937;
+  font-size: var(--font-size-title1);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
   margin: 0;
 }
 
 .dashboard-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
-/* ignore */
-
-/* ignore */
+/* 卡片网格 */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-xl);
   max-width: 1600px;
 }
 
-/* ignore */
+/* 通用卡片 */
 .dashboard-card {
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background: #ffffff;
-  border: 1px solid #e8ecef;
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--transition-normal);
 }
 
 .dashboard-card:hover {
-  border-color: #d0d7de;
+  box-shadow: var(--shadow-card-hover);
 }
 
-/* ignore */
+/* 卡片头部 */
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  border-bottom: 1px solid #f0f2f5;
+  padding: var(--space-xl);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
+/* 卡片头部图标 — 浅色圆底 + 单色图标 */
 .header-icon-wrapper {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -521,159 +521,170 @@ onUnmounted(() => {
 }
 
 .header-icon-large {
-  font-size: 22px;
-  color: white;
+  font-size: 16px;
 }
 
-.todos-bg { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.events-bg { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.notes-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.bookmarks-bg { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.todos-bg {
+  background: rgba(0,122,255,0.10);
+  color: var(--accent-blue);
+}
+.events-bg {
+  background: rgba(255,149,0,0.10);
+  color: var(--color-orange);
+}
+.notes-bg {
+  background: rgba(52,199,89,0.10);
+  color: var(--color-green);
+}
+.bookmarks-bg {
+  background: rgba(175,82,222,0.10);
+  color: var(--color-purple);
+}
 
 .header-text {
   flex: 1;
 }
 
 .header-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2937;
+  font-size: var(--font-size-callout);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
   margin: 0 0 2px 0;
 }
 
 .header-subtitle {
-  font-size: 13px;
-  color: #6b7280;
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
   margin: 0;
 }
 
-/* ignore */
+/* 卡片内容 */
 .card-content {
-  padding: 16px 20px 20px;
+  padding: var(--space-lg) var(--space-xl) var(--space-xl);
   min-height: 140px;
 }
 
-/* ignore */
+/* 今日概览卡片 — 不使用渐变，保持白色 */
 .today-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
+  background: var(--bg-primary);
 }
 
 .today-header {
-  padding: 24px 20px;
+  padding: var(--space-2xl) var(--space-xl);
 }
 
 .today-date-main {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-lg);
 }
 
 .today-day {
-  font-size: 64px;
-  font-weight: 800;
-  color: white;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
   line-height: 1;
-  letter-spacing: -3px;
 }
 
 .today-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .today-month-year {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
+  font-size: var(--font-size-callout);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .today-weekday {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
 }
 
+/* 摘要统计 */
 .today-summary {
   display: flex;
-  padding: 16px 20px 20px;
-  gap: 16px;
+  padding: var(--space-lg) var(--space-xl) var(--space-xl);
+  gap: var(--space-lg);
 }
 
 .summary-item {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-xs);
 }
 
 .summary-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
 }
 
 .summary-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: white;
+  font-size: var(--font-size-headline);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .summary-divider {
   width: 1px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 24px;
+  background: var(--border-color);
+  align-self: center;
 }
 
-/* ignore */
+/* 待办列表 */
 .todo-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .todo-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  background: #f9fafb;
-  border-radius: 8px;
-  cursor: pointer;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+  border-bottom: 0.5px solid var(--divider);
+}
+
+.todo-item:last-child {
+  border-bottom: none;
 }
 
 .todo-item:hover {
-  background: #f3f4f6;
+  background: transparent;
 }
 
 .todo-text {
   flex: 1;
-  font-size: 14px;
-  color: #374151;
+  font-size: var(--font-size-body);
+  color: var(--text-primary);
   line-height: 1.5;
 }
 
 .todo-text.completed {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: var(--text-tertiary);
 }
 
-/* ignore */
+/* 日程列表 */
 .event-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .event-item {
   display: flex;
-  gap: 12px;
-  padding: 12px;
-  background: #f9fafb;
-  border-radius: 8px;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-bottom: 0.5px solid var(--divider);
   cursor: pointer;
 }
 
-.event-item:hover {
-  background: #f3f4f6;
+.event-item:last-child {
+  border-bottom: none;
 }
 
 .event-time {
@@ -681,12 +692,10 @@ onUnmounted(() => {
 }
 
 .time-badge {
-  padding: 4px 10px;
-  background: #e0e7ff;
-  color: #4f46e5;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  color: var(--accent-blue);
+  min-width: 48px;
 }
 
 .event-info {
@@ -694,51 +703,55 @@ onUnmounted(() => {
 }
 
 .event-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 4px;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  margin-bottom: 2px;
 }
 
 .event-desc {
-  font-size: 12px;
-  color: #6b7280;
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ignore */
+/* 笔记列表 */
 .note-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .note-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #f9fafb;
-  border-radius: 8px;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-bottom: 0.5px solid var(--divider);
   cursor: pointer;
+  transition: background var(--transition-fast);
+  border-radius: var(--radius-xs);
+}
+
+.note-item:last-child {
+  border-bottom: none;
 }
 
 .note-item:hover {
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
 }
 
 .note-icon {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e7ff;
-  color: #667eea;
-  border-radius: 8px;
-  font-size: 18px;
+  background: rgba(52,199,89,0.10);
+  color: var(--color-green);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
   flex-shrink: 0;
 }
 
@@ -748,9 +761,9 @@ onUnmounted(() => {
 }
 
 .note-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -758,77 +771,76 @@ onUnmounted(() => {
 }
 
 .note-time {
-  font-size: 12px;
-  color: #9ca3af;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
 }
 
-/* ignore */
+/* 书签网格 */
 .bookmark-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .bookmark-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 8px;
-  background: #f9fafb;
-  border-radius: 10px;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-sm);
+  border-radius: var(--radius-md);
   cursor: pointer;
   text-align: center;
+  transition: background var(--transition-fast);
 }
 
 .bookmark-item:hover {
-  background: #f3f4f6;
+  background: var(--bg-tertiary);
 }
 
 .bookmark-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  font-size: 20px;
-  color: #fa709a;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: 16px;
+  color: var(--text-secondary);
 }
 
 .bookmark-icon img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
 .bookmark-name {
-  font-size: 12px;
-  color: #6b7280;
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
 }
 
-/* ignore */
+/* 空状态 */
 .card-content .el-empty {
-  padding: 20px 0;
+  padding: var(--space-xl) 0;
 }
 
 .el-empty :deep(.el-empty__description) {
-  font-size: 13px;
-  color: #9ca3af;
+  font-size: var(--font-size-footnote);
+  color: var(--text-tertiary);
 }
 
-/* ignore */
+/* 响应式 */
 @media (max-width: 1200px) {
   .dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .bookmark-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -836,25 +848,20 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .dashboard-wrapper {
-    padding: 16px;
+    padding: var(--space-lg);
   }
-  
+
   .dashboard-title {
-    font-size: 24px;
+    font-size: var(--font-size-title2);
   }
-  
+
   .dashboard-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: var(--space-lg);
   }
-  
+
   .bookmark-grid {
     grid-template-columns: repeat(4, 1fr);
   }
-  
-  .today-day {
-    font-size: 48px;
-  }
 }
-
 </style>

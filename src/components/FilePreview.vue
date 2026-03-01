@@ -363,7 +363,7 @@ const resetState = () => {
   padding: 20px;
   background: #f8f8f8;
   border: none;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.6;
   overflow: auto;
@@ -379,7 +379,7 @@ const resetState = () => {
 }
 
 .code-editor :deep(textarea) {
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.6;
   background: #f8f8f8;

@@ -1,5 +1,5 @@
 <template>
-  <div 
+  <div
     v-if="visible"
     class="ai-floating-ball"
     :class="[`style-${style}`, { dragging: isDragging }]"
@@ -15,7 +15,7 @@
         <path d="M2 17L12 22L22 17M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
-    
+
     <div v-if="isHovering" class="ball-tooltip">AI 助手</div>
   </div>
 </template>
@@ -73,13 +73,13 @@ const initPosition = () => {
 // 开始拖拽
 const startDrag = (e) => {
   if (e.button !== 0) return // 只响应左键
-  
+
   isDragging.value = true
   dragStart.value = {
     x: e.clientX - position.value.x,
     y: e.clientY - position.value.y
   }
-  
+
   e.preventDefault()
   document.addEventListener('mousemove', onDrag)
   document.addEventListener('mouseup', stopDrag)
@@ -88,16 +88,16 @@ const startDrag = (e) => {
 // 拖拽中
 const onDrag = (e) => {
   if (!isDragging.value) return
-  
+
   position.value = {
     x: e.clientX - dragStart.value.x,
     y: e.clientY - dragStart.value.y
   }
-  
+
   // 边界限制
   const maxX = window.innerWidth - props.size
   const maxY = window.innerHeight - props.size
-  
+
   position.value.x = Math.max(0, Math.min(position.value.x, maxX))
   position.value.y = Math.max(0, Math.min(position.value.y, maxY))
 }
@@ -119,7 +119,7 @@ const handleClick = (e) => {
 const onResize = () => {
   const maxX = window.innerWidth - props.size
   const maxY = window.innerHeight - props.size
-  
+
   position.value.x = Math.min(position.value.x, maxX)
   position.value.y = Math.min(position.value.y, maxY)
 }
@@ -149,9 +149,9 @@ watch(() => props.visible, (newVal) => {
   z-index: 9999;
   cursor: pointer;
   user-select: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--accent-blue);
+  box-shadow: var(--shadow-lg);
+  transition: box-shadow var(--transition-normal);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,8 +159,7 @@ watch(() => props.visible, (newVal) => {
 }
 
 .ai-floating-ball:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+  box-shadow: var(--shadow-lg);
 }
 
 .ai-floating-ball.dragging {
@@ -169,20 +168,18 @@ watch(() => props.visible, (newVal) => {
   cursor: grabbing;
 }
 
-/* ignore */
 .ai-floating-ball.style-circle {
   border-radius: 50%;
 }
 
 .ai-floating-ball.style-rounded {
-  border-radius: 15px;
+  border-radius: var(--radius-lg);
 }
 
 .ai-floating-ball.style-capsule {
   border-radius: 30px;
 }
 
-/* ignore */
 .ball-icon {
   width: 60%;
   height: 60%;
@@ -194,23 +191,22 @@ watch(() => props.visible, (newVal) => {
 .ball-icon svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-/* ignore */
 .ball-tooltip {
   position: absolute;
   right: 110%;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.85);
-  color: white;
+  background: var(--text-primary);
+  color: var(--bg-primary);
   padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-caption);
   white-space: nowrap;
   pointer-events: none;
-  animation: tooltip-fade-in 0.2s ease;
+  opacity: 0;
+  animation: tooltip-fade-in 150ms ease forwards;
 }
 
 .ball-tooltip::after {
@@ -220,17 +216,15 @@ watch(() => props.visible, (newVal) => {
   top: 50%;
   transform: translateY(-50%);
   border: 5px solid transparent;
-  border-left-color: rgba(0, 0, 0, 0.85);
+  border-left-color: var(--text-primary);
 }
 
 @keyframes tooltip-fade-in {
   from {
     opacity: 0;
-    transform: translateY(-50%) translateX(-10px);
   }
   to {
     opacity: 1;
-    transform: translateY(-50%) translateX(0);
   }
 }
 </style>

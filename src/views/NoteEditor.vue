@@ -1112,7 +1112,7 @@ const scrollToHeading = (index) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "PingFang SC";
   color: var(--text-primary);
   background-color: var(--bg-body);
 }
@@ -1522,7 +1522,7 @@ const scrollToHeading = (index) => {
   padding: 40px 60px;
   border: none;
   outline: none;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.8;
   resize: none;

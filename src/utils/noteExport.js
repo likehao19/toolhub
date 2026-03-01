@@ -26,7 +26,7 @@ export async function exportNoteToHTML(noteName) {
   <title>${noteName}</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      font-family: 'PingFang SC';
       line-height: 1.8;
       max-width: 800px;
       margin: 0 auto;
@@ -38,7 +38,7 @@ export async function exportNoteToHTML(noteName) {
     h2 { font-size: 24px; font-weight: 600; margin: 20px 0 12px; padding-bottom: 6px; border-bottom: 1px solid #ebeef5; }
     h3 { font-size: 20px; font-weight: 600; margin: 16px 0 8px; }
     p { margin: 12px 0; }
-    code { padding: 2px 6px; background: #f5f7fa; border-radius: 3px; font-family: 'Consolas', 'Monaco', monospace; }
+    code { padding: 2px 6px; background: #f5f7fa; border-radius: 3px; font-family: 'PingFang SC'; }
     pre { margin: 16px 0; padding: 16px; background: #f5f7fa; border-radius: 6px; overflow-x: auto; }
     pre code { padding: 0; background: transparent; }
     blockquote { margin: 12px 0; padding: 12px 16px; border-left: 4px solid #409eff; background: #f5f7fa; border-radius: 4px; }
@@ -117,7 +117,7 @@ export async function exportNotesBatch(noteNames, format = 'html') {
   <meta charset="UTF-8">
   <title>${noteName}</title>
   <style>
-    body { font-family: sans-serif; line-height: 1.8; max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+    body { font-family: 'PingFang SC'; line-height: 1.8; max-width: 800px; margin: 0 auto; padding: 40px 20px; }
     h1 { font-size: 28px; margin: 24px 0 16px; border-bottom: 2px solid #ebeef5; }
     h2 { font-size: 24px; margin: 20px 0 12px; border-bottom: 1px solid #ebeef5; }
     code { background: #f5f7fa; padding: 2px 6px; border-radius: 3px; }

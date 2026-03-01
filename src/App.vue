@@ -2,7 +2,7 @@
   <div id="app" @contextmenu.prevent="handleContextMenu">
     <!-- 独立窗口模式 (桌面悬浮球、AI助手窗口) -->
     <router-view v-if="isStandaloneWindow" />
-    
+
     <!-- 主应用模式 -->
     <template v-else>
       <!-- 启动画面 -->
@@ -47,12 +47,12 @@
           @close="contextMenuVisible = false"
           @item-click="handleMenuItemClick"
         />
-        
+
         <!-- 全局AI助手 (对话框模式) -->
         <AIAssistant v-model="showAIAssistant" />
-        
+
         <!-- AI助手悬浮球 (应用内) -->
-        <AIFloatingBall 
+        <AIFloatingBall
           v-if="floatingBallConfig.enabled && floatingBallConfig.mode === 'inApp'"
           :visible="true"
           :mode="floatingBallConfig.mode"
@@ -135,11 +135,11 @@ watch(floatingBallConfig, (newConfig) => {
 const openAIAssistantWindow = async () => {
   try {
     const { WebviewWindow, getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
-    
+
     // 检查窗口是否已存在
     const allWindows = await getAllWebviewWindows()
     const existingWindow = allWindows.find(w => w.label === 'ai-assistant')
-    
+
     if (existingWindow) {
       try {
         await existingWindow.show()
@@ -149,7 +149,7 @@ const openAIAssistantWindow = async () => {
       }
       return
     }
-    
+
     // 创建新窗口
     const assistantUrl = `${window.location.origin}/ai-assistant-window`
     new WebviewWindow('ai-assistant', {
@@ -174,7 +174,7 @@ const handleFloatingBallToggle = async (event) => {
   const { enabled, mode, style, size } = event.detail
   // 先关闭旧的桌面悬浮球窗口
   await closeDesktopFloatingBall()
-  
+
   // 更新配置
   aiFloatingBallSettings.value = {
     enableFloatingBall: enabled,
@@ -197,21 +197,21 @@ const createDesktopFloatingBall = async () => {
   try {
     const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
     const { LogicalSize, LogicalPosition } = await import('@tauri-apps/api/window')
-    
+
     // 获取所有窗口，找到悬浮球窗口
     const allWindows = await getAllWebviewWindows()
     const ballWindow = allWindows.find(w => w.label === 'floating-ball')
-    
+
     if (!ballWindow) {
       return
     }
     // 获取屏幕尺寸，设置窗口位置到右下角
     const { availWidth, availHeight } = window.screen
     await ballWindow.setPosition(new LogicalPosition(availWidth - 100, availHeight - 100))
-    
+
     // 确保窗口大小正确
     await ballWindow.setSize(new LogicalSize(60, 60))
-    
+
     // 显示窗口
     await ballWindow.show()
   } catch (error) {
@@ -223,11 +223,11 @@ const createDesktopFloatingBall = async () => {
 const closeDesktopFloatingBall = async () => {
   try {
     const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
-    
+
     // 获取所有窗口，找到悬浮球窗口
     const allWindows = await getAllWebviewWindows()
     const ballWindow = allWindows.find(w => w.label === 'floating-ball')
-    
+
     if (ballWindow) {
       await ballWindow.hide()
     }
@@ -239,10 +239,10 @@ const closeDesktopFloatingBall = async () => {
 // 处理右键菜单
 const handleContextMenu = (event) => {
   if (window.__TAURI_RELOADING__) return
-  
+
   event.preventDefault()
   event.stopPropagation()
-  
+
   contextMenuPosition.value = {
     x: event.clientX,
     y: event.clientY
@@ -259,14 +259,14 @@ const handleMenuItemClick = (item) => {
 if (typeof window !== 'undefined') {
   // 初始化刷新标志
   window.__TAURI_RELOADING__ = false
-  
+
   // 捕获未处理的 Promise 拒绝
   window.addEventListener('unhandledrejection', (event) => {
     const reason = event.reason
     const errorMessage = typeof reason === 'string' ? reason : (reason?.message || '')
-    
+
     // 如果是 callback 相关的错误，静默处理
-    if (errorMessage.includes('callback') || 
+    if (errorMessage.includes('callback') ||
         errorMessage.includes('Couldn\'t find callback') ||
         errorMessage.includes('callback id')) {
       event.preventDefault()
@@ -274,12 +274,12 @@ if (typeof window !== 'undefined') {
       return false
     }
   })
-  
+
   // 捕获控制台错误和警告（Tauri 的错误会通过 console.error/warn 输出）
   const originalConsoleError = console.error
   const originalConsoleWarn = console.warn
   const originalConsoleLog = console.log
-  
+
   // 统一的过滤函数
   const shouldFilterMessage = (message) => {
     // 检查是否是 callback 相关的 TAURI 错误/警告
@@ -301,7 +301,7 @@ if (typeof window !== 'undefined') {
     }
     return false
   }
-  
+
   // 只取字符串参数拼接（Vue warn 会传不可转换的对象，全部跳过即可）
   const safeJoin = (args) => args.filter(a => typeof a === 'string').join(' ')
 
@@ -314,7 +314,7 @@ if (typeof window !== 'undefined') {
     // 其他错误正常输出
     originalConsoleError.apply(console, args)
   }
-  
+
   console.warn = function(...args) {
     const message = safeJoin(args)
     // 如果是 callback 相关的警告，不输出
@@ -324,7 +324,7 @@ if (typeof window !== 'undefined') {
     // 其他警告正常输出
     originalConsoleWarn.apply(console, args)
   }
-  
+
   // 也拦截 console.log，因为某些情况下错误可能通过 log 输出
   console.log = function(...args) {
     const message = safeJoin(args)
@@ -335,12 +335,12 @@ if (typeof window !== 'undefined') {
     // 其他日志正常输出
     originalConsoleLog.apply(console, args)
   }
-  
+
   // 监听页面卸载事件，标记正在刷新
   window.addEventListener('beforeunload', () => {
     window.__TAURI_RELOADING__ = true
   })
-  
+
   // 监听页面隐藏事件
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -350,7 +350,7 @@ if (typeof window !== 'undefined') {
       }, 500)
     }
   })
-  
+
   // 全局键盘快捷键：Ctrl+K 唤起AI助手
   window.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -362,7 +362,7 @@ if (typeof window !== 'undefined') {
       }
     }
   })
-  
+
   // 监听悬浮球设置变化
   window.addEventListener('ai-floating-ball-toggle', handleFloatingBallToggle)
 }
@@ -371,7 +371,7 @@ onMounted(async () => {
   // 🔥 如果是独立窗口，导航到对应路由
   if (isStandaloneWindow.value) {
     isLoading.value = false
-    
+
     // 根据窗口标签导航到对应路由
     const currentWindow = getCurrentWebviewWindow()
     const label = currentWindow.label
@@ -400,32 +400,32 @@ onMounted(async () => {
       } else {
       }
     }
-    
+
     return
   }
   const isDev = import.meta.env.DEV
   const appStartTimer = createTimer('应用启动')
-  
+
   // 启动加载流程
   try {
     // 步骤 1: 加载配置
     loadingStatus.value = '正在加载配置...'
     loadingProgress.value = 20
     const configTimer = createTimer('加载配置')
-    
+
     try {
       const config = await loadConfig()
       configTimer.end()
       if (config.theme) {
         document.documentElement.setAttribute('data-theme', config.theme)
       }
-      
+
       // 加载 AI 助手悬浮球设置
       if (config.aiAssistantSettings) {
         aiFloatingBallSettings.value = config.aiAssistantSettings
       } else {
       }
-      
+
       // 同步窗口关闭行为到 store
       if (config.closeAction) {
         appStore.setCloseAction(config.closeAction)
@@ -435,12 +435,12 @@ onMounted(async () => {
       configTimer.end()
       handleError(error, '加载配置')
     }
-    
+
     // 步骤 2: 初始化数据库
     loadingStatus.value = '正在初始化数据库...'
     loadingProgress.value = 40
     const dbTimer = createTimer('初始化数据库')
-    
+
     const dbInitialized = await checkDatabaseInitialized()
     if (!dbInitialized) {
       await initDatabase()
@@ -453,16 +453,16 @@ onMounted(async () => {
       }
     }
     dbTimer.end()
-    
+
     // 步骤 3: 加载数据
     loadingStatus.value = '正在加载数据...'
     loadingProgress.value = 70
     const dataTimer = createTimer('加载数据')
-    
+
     // 这里可以预加载一些数据
     // 例如：待办、日程等
     dataTimer.end()
-    
+
     // 步骤 4: 初始化通知服务
     loadingStatus.value = '正在初始化通知服务...'
     loadingProgress.value = 85
@@ -474,23 +474,23 @@ onMounted(async () => {
       notificationTimer.end()
       handleError(error, '初始化通知服务')
     }
-    
+
     // 步骤 5: 完成加载
     loadingStatus.value = '启动完成'
     loadingProgress.value = 100
-    
+
     // 确保最小加载时间（至少 500ms，提供良好的视觉体验）
     const totalTime = appStartTimer.end()
     const minLoadTime = 500
     if (totalTime < minLoadTime) {
       await new Promise(resolve => setTimeout(resolve, minLoadTime - totalTime))
     }
-    
+
     recordLoadTime('应用启动总时间', totalTime)
-    
+
     // 关闭启动画面
     isLoading.value = false
-    
+
     // 关闭启动窗口
     if (!window.__TAURI_RELOADING__) {
       try {
@@ -499,14 +499,14 @@ onMounted(async () => {
         // 静默处理错误
       }
     }
-    
+
     // 启动桌面悬浮球（如果配置已启用）
     if (aiFloatingBallSettings.value.enableFloatingBall && aiFloatingBallSettings.value.floatingBallMode === 'desktop') {
       setTimeout(() => {
         createDesktopFloatingBall()
       }, 500)
     }
-    
+
     // 开发模式下默认打开控制台
     if (isDev) {
       try {
@@ -553,22 +553,22 @@ onMounted(async () => {
       const Database = (await import('@tauri-apps/plugin-sql')).default
       const { exists, mkdir } = await import('@tauri-apps/plugin-fs')
       const { join } = await import('@tauri-apps/api/path')
-      
+
       // 默认文件夹名称（从配置读取）
       const stickyConfig = JSON.parse(localStorage.getItem('sticky_notes_config') || '{}')
       const DEFAULT_FOLDER = stickyConfig.noteFolder || '便签'
-      
+
       // 确保默认文件夹存在
       const notesDir = await notesAPI.getNotesDir()
       const folderPath = await join(notesDir, DEFAULT_FOLDER)
       if (!(await exists(folderPath))) {
         await mkdir(folderPath, { recursive: true })
       }
-      
+
       // 保存到默认文件夹
       await notesAPI.saveNote(noteName, content, DEFAULT_FOLDER)
       await versionAPI.saveNoteVersion(noteName, content, '便签保存')
-      
+
       // 更新数据库
       const db = await Database.load('sqlite:productivity.db')
       const now = new Date().toISOString()
@@ -585,7 +585,7 @@ onMounted(async () => {
       // 忽略数据库错误，不影响便签保存功能
     }
   })
-  
+
   // 注册全局快捷键：创建新的便签窗口
   let stickyShortcutProcessing = false
   let currentStickyShortcut = null
@@ -737,7 +737,7 @@ const handleCloseConfirm = async ({ action, remember }) => {
   if (window.__TAURI_RELOADING__) {
     return
   }
-  
+
   // 如果用户选择记住，保存偏好
   if (remember) {
     appStore.setCloseAction(action)
@@ -759,30 +759,208 @@ const handleCloseConfirm = async ({ action, remember }) => {
 </script>
 
 <style>
+/* ===== 全局设计令牌 (Design Tokens) ===== */
+:root {
+  /* —— 背景层级 —— */
+  --bg-primary:        #ffffff;
+  --bg-secondary:      #f5f5f7;
+  --bg-tertiary:       #e8e8ed;
+  --bg-grouped:        #f2f2f7;
+
+  /* —— 文字层级 —— */
+  --text-primary:      #1d1d1f;
+  --text-secondary:    #6e6e73;
+  --text-tertiary:     #aeaeb2;
+  --text-quaternary:   #c7c7cc;
+
+  /* —— 系统强调色 —— */
+  --accent-blue:       #007aff;
+  --accent-blue-hover: #0066d6;
+  --accent-blue-active:#0055b3;
+  --accent-blue-bg:    rgba(0,122,255,0.08);
+
+  /* —— 语义色（低饱和） —— */
+  --color-red:         #ff3b30;
+  --color-orange:      #ff9500;
+  --color-yellow:      #ffcc00;
+  --color-green:       #34c759;
+  --color-teal:        #5ac8fa;
+  --color-purple:      #af52de;
+
+  /* —— 分割与边框 —— */
+  --border-color:      rgba(0,0,0,0.06);
+  --border-color-strong:rgba(0,0,0,0.10);
+  --divider:           rgba(0,0,0,0.04);
+
+  /* —— 阴影层级 —— */
+  --shadow-sm:         0 0.5px 1px rgba(0,0,0,0.04);
+  --shadow-md:         0 2px 8px rgba(0,0,0,0.08);
+  --shadow-lg:         0 8px 24px rgba(0,0,0,0.12);
+  --shadow-popover:    0 4px 16px rgba(0,0,0,0.14), 0 0 1px rgba(0,0,0,0.06);
+  --shadow-card:       0 0 0 0.5px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-card-hover: 0 0 0 0.5px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.08);
+
+  /* —— 圆角 —— */
+  --radius-xs:         4px;
+  --radius-sm:         6px;
+  --radius-md:         10px;
+  --radius-lg:         12px;
+  --radius-xl:         16px;
+
+  /* —— 间距 —— */
+  --space-xs:          4px;
+  --space-sm:          8px;
+  --space-md:          12px;
+  --space-lg:          16px;
+  --space-xl:          20px;
+  --space-2xl:         24px;
+  --space-3xl:         32px;
+
+  /* —— 字体 —— */
+  --font-family:       "PingFang SC";
+  --font-family-mono:  "PingFang SC";
+
+  /* —— 字号层级 —— */
+  --font-size-caption2: 11px;
+  --font-size-caption:  12px;
+  --font-size-footnote: 13px;
+  --font-size-body:     14px;
+  --font-size-callout:  15px;
+  --font-size-headline: 16px;
+  --font-size-title3:   18px;
+  --font-size-title2:   22px;
+  --font-size-title1:   26px;
+  --font-size-large:    32px;
+
+  /* —— 字重 —— */
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  /* —— 动效 —— */
+  --transition-fast:   120ms ease;
+  --transition-normal: 200ms ease;
+  --transition-smooth: 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  /* —— 布局尺寸 —— */
+  --header-height:     38px;
+  --sidebar-width:     220px;
+  --sidebar-collapsed: 56px;
+
+  /* —— Element Plus 覆盖 —— */
+  --el-color-primary: var(--accent-blue);
+  --el-color-success: var(--color-green);
+  --el-color-warning: var(--color-orange);
+  --el-color-danger: var(--color-red);
+  --el-color-info: var(--text-tertiary);
+
+  --el-bg-color: var(--bg-primary);
+  --el-bg-color-page: var(--bg-secondary);
+  --el-bg-color-overlay: var(--bg-primary);
+
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-text-color-secondary: var(--text-tertiary);
+  --el-text-color-placeholder: var(--text-tertiary);
+
+  --el-border-color: var(--border-color-strong);
+  --el-border-color-light: var(--border-color);
+  --el-border-color-lighter: var(--divider);
+
+  --el-border-radius-base: var(--radius-sm);
+  --el-border-radius-small: var(--radius-xs);
+  --el-border-radius-round: 20px;
+
+  --el-font-family: var(--font-family);
+  --el-font-size-base: var(--font-size-body);
+  --el-font-size-small: var(--font-size-footnote);
+  --el-font-size-extra-small: var(--font-size-caption);
+
+  --el-transition-duration: 200ms;
+
+  --el-card-border-radius: var(--radius-md);
+  --el-card-border-color: var(--border-color);
+  --el-card-padding: var(--space-xl);
+
+  --el-dialog-border-radius: var(--radius-xl);
+
+  --el-switch-on-color: var(--accent-blue);
+
+  --el-input-bg-color: var(--bg-primary);
+  --el-input-border-color: var(--border-color-strong);
+  --el-input-hover-border-color: var(--text-quaternary);
+  --el-input-focus-border-color: var(--accent-blue);
+  --el-input-border-radius: var(--radius-sm);
+  --el-input-text-color: var(--text-primary);
+  --el-input-placeholder-color: var(--text-tertiary);
+}
+
+/* ===== 暗色模式 ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary:        #1c1c1e;
+    --bg-secondary:      #000000;
+    --bg-tertiary:       #2c2c2e;
+    --bg-grouped:        #1c1c1e;
+
+    --text-primary:      #f5f5f7;
+    --text-secondary:    #98989d;
+    --text-tertiary:     #636366;
+    --text-quaternary:   #48484a;
+
+    --accent-blue:       #0a84ff;
+    --accent-blue-hover: #409cff;
+    --accent-blue-bg:    rgba(10,132,255,0.12);
+
+    --color-red:         #ff453a;
+    --color-orange:      #ff9f0a;
+    --color-yellow:      #ffd60a;
+    --color-green:       #30d158;
+    --color-teal:        #64d2ff;
+    --color-purple:      #bf5af2;
+
+    --border-color:      rgba(255,255,255,0.08);
+    --border-color-strong:rgba(255,255,255,0.12);
+    --divider:           rgba(255,255,255,0.06);
+
+    --shadow-sm:         0 0.5px 1px rgba(0,0,0,0.3);
+    --shadow-md:         0 2px 8px rgba(0,0,0,0.4);
+    --shadow-lg:         0 8px 24px rgba(0,0,0,0.5);
+    --shadow-popover:    0 4px 16px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.3);
+  }
+}
+
+/* ===== 全局重置 ===== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
 #app {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   width: 100%;
   height: 100vh;
   overflow: hidden;
   position: relative;
+  color: var(--text-primary);
 }
 
-/* 启动画面 */
+/* ===== 启动画面 — 纯白底色，简洁居中 ===== */
 .splash-screen {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  inset: 0;
+  background: var(--bg-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -791,70 +969,72 @@ const handleCloseConfirm = async ({ action, remember }) => {
 
 .splash-content {
   text-align: center;
-  color: #ffffff;
 }
 
 .splash-logo {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
-  animation: pulse 2s ease-in-out infinite;
+  margin-bottom: var(--space-lg);
 }
 
 .splash-logo svg {
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  width: 56px;
+  height: 56px;
+}
+
+.splash-logo svg path {
+  fill: var(--text-primary);
+}
+
+.splash-logo svg circle {
+  fill: var(--accent-blue);
 }
 
 .splash-title {
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 32px;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  margin-bottom: var(--space-2xl);
 }
 
 .splash-progress {
-  width: 300px;
+  width: 180px;
   margin: 0 auto;
 }
 
 .progress-bar {
   width: 100%;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 2px;
+  height: 2px;
+  background: var(--bg-tertiary);
+  border-radius: 1px;
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-sm);
 }
 
 .progress-fill {
   height: 100%;
-  background: #ffffff;
-  border-radius: 2px;
-  transition: width 0.3s ease;
+  background: var(--accent-blue);
+  border-radius: 1px;
+  transition: width var(--transition-smooth);
 }
 
 .progress-text {
-  font-size: 14px;
-  opacity: 0.9;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
 }
 
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-}
-
-/* 主应用容器 */
+/* ===== 主应用容器 ===== */
 .app-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding-top: 32px; /* HeaderBar 高度 */
+  background: var(--bg-secondary);
+  font-family: var(--font-family);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  padding-top: var(--header-height);
 }
 
 .app-body {
@@ -866,13 +1046,13 @@ const handleCloseConfirm = async ({ action, remember }) => {
 .app-content {
   flex: 1;
   overflow: hidden;
-  background: #f5f7fa;
+  background: var(--bg-secondary);
 }
 
-/* 过渡动画 */
+/* ===== 页面切换动画 ===== */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s ease;
+  transition: opacity 150ms ease;
 }
 
 .fade-enter-from,
@@ -880,22 +1060,45 @@ const handleCloseConfirm = async ({ action, remember }) => {
   opacity: 0;
 }
 
-body {
-  margin: 0;
-  padding: 0;
+/* ===== Element Plus 全局覆盖 ===== */
+.el-tag {
+  border: none;
+  font-weight: var(--font-weight-medium);
+}
+.el-tag--danger {
+  background: rgba(255,59,48,0.10);
+  color: var(--color-red);
+}
+.el-tag--warning {
+  background: rgba(255,149,0,0.10);
+  color: var(--color-orange);
+}
+.el-tag--success {
+  background: rgba(52,199,89,0.10);
+  color: var(--color-green);
+}
+.el-tag--info {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
-/* Element Plus 自定义主题变量 */
-:root {
-  --el-color-primary: #409eff;
+.el-button--primary {
+  border: none;
+}
+.el-button--default {
+  border: 0.5px solid var(--border-color-strong);
 }
 
-/* 支持明暗主题 */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #1a1a1a;
-    color: #ffffff;
-  }
+.el-scrollbar__thumb {
+  background: var(--text-quaternary);
+  border-radius: 2px;
+}
+.el-scrollbar__bar {
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+.el-scrollbar:hover .el-scrollbar__bar {
+  opacity: 1;
 }
 
 </style>

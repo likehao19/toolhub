@@ -323,7 +323,7 @@ pre {
 }
 
 code {
-  font-family: 'Courier New', monospace;
+  font-family: "PingFang SC";
   font-size: 12px;
   line-height: 1.6;
 }

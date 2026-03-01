@@ -25,12 +25,12 @@
         <div class="sidebar-toolbar">
           <span class="sidebar-title">设置菜单</span>
         </div>
-        
+
         <div class="menu-list">
-          <div 
-            v-for="menu in menuItems" 
+          <div
+            v-for="menu in menuItems"
             :key="menu.key"
-            class="menu-item" 
+            class="menu-item"
             :class="{ active: activeTab === menu.key }"
             @click="activeTab = menu.key"
           >
@@ -47,7 +47,7 @@
         <!-- 通用设置 -->
         <div v-show="activeTab === 'general'" class="settings-section">
           <h3 class="section-title">通用设置</h3>
-          
+
           <!-- 窗口与启动 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -63,8 +63,8 @@
               </el-form-item>
 
               <el-form-item label="开机自启">
-                <el-switch 
-                  v-model="settings.autoStart" 
+                <el-switch
+                  v-model="settings.autoStart"
                   @change="handleAutostartChange"
                   :loading="autostartLoading"
                 />
@@ -157,7 +157,7 @@
                   软件内位置:相对于应用窗口 | 桌面窗口位置:相对于整个屏幕
                 </div>
               </el-form-item>
-              
+
               <el-form-item label="显示位置">
                 <el-select v-model="reminderConfig.position" style="width: 200px;">
                   <el-option label="右上角" value="topRight" />
@@ -171,7 +171,7 @@
                   <el-option label="中心" value="center" />
                 </el-select>
               </el-form-item>
-              
+
               <el-form-item>
                 <el-button type="primary" @click="saveReminderSettings">
                   保存通知设置
@@ -187,7 +187,7 @@
         <!-- 工作空间 -->
         <div v-show="activeTab === 'workspace'" class="settings-section">
           <h3 class="section-title">工作空间</h3>
-          
+
           <!-- 笔记设置 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -243,7 +243,7 @@
                   仅查看笔记时的主题样式
                 </div>
               </el-form-item>
-              
+
               <el-form-item label="代码主题">
                 <el-select v-model="settings.previewCodeTheme" style="width: 300px">
                   <el-option label="Atom" value="atom" />
@@ -274,7 +274,7 @@
                   编辑笔记时预览区的主题样式
                 </div>
               </el-form-item>
-              
+
               <el-form-item label="代码主题">
                 <el-select v-model="settings.editorCodeTheme" style="width: 300px">
                   <el-option label="Atom" value="atom" />
@@ -297,7 +297,7 @@
         <!-- 安全与数据 -->
         <div v-show="activeTab === 'security'" class="settings-section">
           <h3 class="section-title">安全与数据</h3>
-          
+
           <!-- 密码管理 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -305,7 +305,7 @@
             </template>
             <el-form label-width="150px" label-position="left">
               <el-form-item label="启动时验证密码">
-                <el-switch 
+                <el-switch
                   v-model="passwordSettings.requirePasswordOnStart"
                   active-text="开启"
                   inactive-text="关闭"
@@ -314,10 +314,10 @@
                   开启后，每次打开软件都需要输入主密码才能访问密码管理
                 </div>
               </el-form-item>
-              
+
               <el-form-item label="自动锁定时间">
-                <el-select 
-                  v-model="passwordSettings.autoLockTime" 
+                <el-select
+                  v-model="passwordSettings.autoLockTime"
                   style="width: 200px;"
                 >
                   <el-option label="5 分钟" :value="5" />
@@ -330,7 +330,7 @@
                   无操作后自动锁定密码管理器
                 </div>
               </el-form-item>
-              
+
               <el-form-item>
                 <el-button type="primary" @click="showChangePasswordDialog = true">
                   修改主密码
@@ -339,9 +339,9 @@
                   修改用于解锁密码管理器的主密码
                 </div>
               </el-form-item>
-              
+
               <el-divider />
-              
+
               <el-form-item label="密码库状态">
                 <el-descriptions :column="1" border>
                   <el-descriptions-item label="密码数量">
@@ -365,7 +365,7 @@
         <!-- AI 与效率 -->
         <div v-show="activeTab === 'ai'" class="settings-section">
           <h3 class="section-title">AI 与效率</h3>
-          
+
           <!-- AI 助手悬浮球 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -373,7 +373,7 @@
             </template>
             <el-form :model="aiAssistantSettings" label-width="140px" label-position="left">
               <el-form-item label="启用悬浮球">
-                <el-switch 
+                <el-switch
                   v-model="aiAssistantSettings.enableFloatingBall"
                   @change="handleFloatingBallToggle"
                 />
@@ -384,7 +384,7 @@
               </el-form-item>
 
               <el-form-item label="悬浮球位置" v-if="aiAssistantSettings.enableFloatingBall">
-                <el-radio-group 
+                <el-radio-group
                   v-model="aiAssistantSettings.floatingBallMode"
                   @change="handleFloatingBallChange"
                 >
@@ -397,8 +397,8 @@
               </el-form-item>
 
               <el-form-item label="悬浮球样式" v-if="aiAssistantSettings.enableFloatingBall">
-                <el-select 
-                  v-model="aiAssistantSettings.floatingBallStyle" 
+                <el-select
+                  v-model="aiAssistantSettings.floatingBallStyle"
                   style="width: 200px;"
                   @change="handleFloatingBallChange"
                 >
@@ -421,7 +421,7 @@
               </el-form-item>
             </el-form>
           </el-card>
-          
+
           <!-- AI 配置 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -481,7 +481,7 @@
         <!-- 帮助与反馈 -->
         <div v-show="activeTab === 'about'" class="settings-section">
           <h3 class="section-title">帮助与反馈</h3>
-          
+
           <!-- 关于应用 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -544,19 +544,19 @@
         </div>
       </main>
     </div>
-    
+
     <!-- 笔记迁移进度对话框 -->
-    <el-dialog 
-      v-model="showMigrationDialog" 
-      :title="migrateMode === 'move' ? '移动笔记文件' : '复制笔记文件'" 
+    <el-dialog
+      v-model="showMigrationDialog"
+      :title="migrateMode === 'move' ? '移动笔记文件' : '复制笔记文件'"
       width="500px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
     >
       <div style="text-align: center; padding: 20px 0;">
-        <el-progress 
-          :percentage="migrationProgress" 
+        <el-progress
+          :percentage="migrationProgress"
           :status="migrationProgress === 100 ? 'success' : undefined"
           style="margin-bottom: 20px;"
         />
@@ -566,7 +566,7 @@
         </p>
       </div>
     </el-dialog>
-    
+
     <!-- 修改密码对话框 -->
     <el-dialog v-model="showChangePasswordDialog" title="修改主密码" width="450px">
       <el-alert
@@ -577,7 +577,7 @@
       >
         <p>修改主密码后，请务必记住新密码！</p>
       </el-alert>
-      
+
       <el-form label-width="100px">
         <el-form-item label="旧密码">
           <el-input
@@ -605,7 +605,7 @@
           />
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <el-button @click="showChangePasswordDialog = false">取消</el-button>
         <el-button type="primary" @click="changePassword">确认修改</el-button>
@@ -769,7 +769,7 @@ const applyTheme = (theme) => {
 const loadSettings = async () => {
   try {
     const config = await loadConfig()
-    
+
     // 更新设置
     if (config) {
       Object.assign(settings, config)
@@ -779,29 +779,29 @@ const loadSettings = async () => {
       if (config.aiAssistantSettings) {
         Object.assign(aiAssistantSettings, config.aiAssistantSettings)
       }
-      
+
       // 同步窗口关闭行为到 store
       if (config.closeAction) {
         appStore.setCloseAction(config.closeAction)
       }
     }
-    
+
     // 检查自动启动状态
     try {
       const autostartEnabled = await TauriAutostart.checkAutostart()
       settings.autoStart = autostartEnabled
     } catch (e) { /* ignore */ }
-    
+
     // 加载笔记存储路径
     if (!settings.notesStoragePath) {
       const dataDir = await appDataDir()
       settings.notesStoragePath = await join(dataDir, 'notes')
 
     }
-    
+
     // 加载存储统计
     await loadStorageStats()
-    
+
     // 保存原始设置用于比较
     originalSettings.value = JSON.parse(JSON.stringify(settings))
     hasChanges.value = false
@@ -846,7 +846,7 @@ const handleSave = async () => {
       aiAssistantSettings: { ...aiAssistantSettings }
     }
     await saveConfig(config)
-    
+
     // 同步 AI 助手设置到 localStorage（供桌面悬浮球使用）
     localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
 
@@ -856,17 +856,17 @@ const handleSave = async () => {
       baseURL: aiSettings.baseUrl,
       model: aiSettings.model
     }))
-    
+
     // 触发全局事件通知 AI 助手悬浮球设置已更改
     window.dispatchEvent(new CustomEvent('ai-floating-ball-settings-changed', {
       detail: aiAssistantSettings
     }))
-    
+
     // 2. 同步窗口关闭行为到 store
     if (settings.closeAction) {
       appStore.setCloseAction(settings.closeAction)
     }
-    
+
     // 3. 保存密码管理设置到数据库
     try {
       await savePasswordSettings()
@@ -874,7 +874,7 @@ const handleSave = async () => {
 
       // 不中断主流程，只记录错误
     }
-    
+
     originalSettings.value = JSON.parse(JSON.stringify(settings))
     hasChanges.value = false
     lastSaved.value = new Date().toLocaleString('zh-CN')
@@ -897,10 +897,10 @@ const selectNotesStoragePath = async () => {
       multiple: false,
       defaultPath: settings.notesStoragePath
     })
-    
+
     if (selected && selected !== settings.notesStoragePath) {
       const oldPath = settings.notesStoragePath
-      
+
       // 询问用户迁移模式
       try {
         const { value } = await ElMessageBox.confirm(
@@ -917,7 +917,7 @@ const selectNotesStoragePath = async () => {
             buttonSize: 'default'
           }
         )
-        
+
         // 用户选择移动
         migrateMode.value = 'move'
         await performMigration(oldPath, selected)
@@ -938,7 +938,7 @@ const selectNotesStoragePath = async () => {
                 type: 'warning'
               }
             )
-            
+
             // 仅更改路径
             settings.notesStoragePath = selected
             const { resetNotesDir } = await import('@/utils/notes')
@@ -966,32 +966,32 @@ const performMigration = async (oldPath, newPath) => {
   showMigrationDialog.value = true
   migrationProgress.value = 0
   migrationStatus.value = '正在准备迁移...'
-  
+
   try {
     await migrateNotes(oldPath, newPath)
     settings.notesStoragePath = newPath
-    
+
     // 重置笔记目录缓存
     const { resetNotesDir } = await import('@/utils/notes')
     resetNotesDir()
-    
+
     // 自动保存配置
     await handleSave()
-    
+
     // 触发全局事件，通知其他组件笔记路径已更改
-    window.dispatchEvent(new CustomEvent('notes-path-changed', { 
-      detail: { newPath } 
+    window.dispatchEvent(new CustomEvent('notes-path-changed', {
+      detail: { newPath }
     }))
-    
-    migrationStatus.value = migrateMode.value === 'move' 
-      ? '迁移完成！文件已移动到新位置' 
+
+    migrationStatus.value = migrateMode.value === 'move'
+      ? '迁移完成！文件已移动到新位置'
       : '迁移完成！文件已复制到新位置（源文件已保留）'
-    
+
     ElMessage.success({
       message: migrateMode.value === 'move' ? '笔记已成功移动到新位置' : '笔记已成功复制到新位置',
       duration: 3000
     })
-    
+
     setTimeout(() => {
       showMigrationDialog.value = false
     }, 2000)
@@ -1008,68 +1008,68 @@ const performMigration = async (oldPath, newPath) => {
 const migrateNotes = async (oldPath, newPath) => {
   const { readDir, exists, mkdir, copyFile, remove } = await import('@tauri-apps/plugin-fs')
   const { join, sep } = await import('@tauri-apps/api/path')
-  
+
   migrationStatus.value = '正在检查源目录...'
-  
+
   // 检查旧路径是否存在
   if (!(await exists(oldPath))) {
     throw new Error('源目录不存在')
   }
-  
+
   // 确保新路径存在
   if (!(await exists(newPath))) {
     await mkdir(newPath, { recursive: true })
   }
-  
+
   // 获取所有文件列表
   migrationStatus.value = '正在扫描文件...'
   const allFiles = await getAllFiles(oldPath, oldPath)
-  
+
   if (allFiles.length === 0) {
     migrationProgress.value = 100
     migrationStatus.value = '没有文件需要迁移'
     return
   }
-  
+
   // 复制文件
   let processedFiles = 0
   const copiedFiles = []
-  
+
   for (const file of allFiles) {
     const relativePath = file.replace(oldPath, '').replace(/^[/\\]/, '')
     const targetPath = await join(newPath, relativePath)
-    
+
     // 确保目标目录存在
     const targetDir = targetPath.substring(0, targetPath.lastIndexOf(sep()))
     if (!(await exists(targetDir))) {
       await mkdir(targetDir, { recursive: true })
     }
-    
+
     // 复制文件
     migrationStatus.value = `正在${migrateMode.value === 'move' ? '移动' : '复制'}: ${relativePath}`
     await copyFile(file, targetPath)
     copiedFiles.push(file)
-    
+
     processedFiles++
     migrationProgress.value = Math.round((processedFiles / allFiles.length) * 100)
   }
-  
+
   // 如果是移动模式，删除源文件
   if (migrateMode.value === 'move') {
     migrationStatus.value = '正在清理源文件...'
-    
+
     // 删除所有已复制的文件
     for (const file of copiedFiles) {
       try {
         await remove(file)
       } catch (e) { /* ignore */ }
     }
-    
+
     // 尝试删除空目录（从深层到浅层）
     try {
       await removeEmptyDirs(oldPath)
     } catch (e) { /* ignore */ }
-    
+
     migrationStatus.value = `移动完成！共移动 ${processedFiles} 个文件`
   } else {
     migrationStatus.value = `复制完成！共复制 ${processedFiles} 个文件`
@@ -1081,16 +1081,16 @@ const migrateNotes = async (oldPath, newPath) => {
  */
 const removeEmptyDirs = async (dir) => {
   const { readDir, remove } = await import('@tauri-apps/plugin-fs')
-  
+
   try {
     const entries = await readDir(dir)
-    
+
     // 如果目录为空，删除它
     if (entries.length === 0) {
       await remove(dir, { recursive: false })
       return true
     }
-    
+
     // 递归处理子目录
     for (const entry of entries) {
       if (entry.isDirectory) {
@@ -1099,14 +1099,14 @@ const removeEmptyDirs = async (dir) => {
         await removeEmptyDirs(subDir)
       }
     }
-    
+
     // 再次检查当前目录是否为空
     const updatedEntries = await readDir(dir)
     if (updatedEntries.length === 0) {
       await remove(dir, { recursive: false })
       return true
     }
-    
+
     return false
   } catch (error) {
 
@@ -1120,16 +1120,16 @@ const removeEmptyDirs = async (dir) => {
 const getAllFiles = async (dir, baseDir) => {
   const { readDir, stat } = await import('@tauri-apps/plugin-fs')
   const { join } = await import('@tauri-apps/api/path')
-  
+
   const files = []
-  
+
   try {
     const entries = await readDir(dir)
-    
+
     for (const entry of entries) {
       const fullPath = await join(dir, entry.name)
       const fileStat = await stat(fullPath)
-      
+
       if (fileStat.isDirectory) {
         // 递归获取子目录文件
         const subFiles = await getAllFiles(fullPath, baseDir)
@@ -1139,7 +1139,7 @@ const getAllFiles = async (dir, baseDir) => {
       }
     }
   } catch (e) { /* ignore */ }
-  
+
   return files
 }
 
@@ -1220,11 +1220,11 @@ const loadStorageStats = async () => {
     const { getNotesDir } = await import('@/utils/notes')
     const { stat, exists, readDir } = await import('@tauri-apps/plugin-fs')
     const { join, appDataDir } = await import('@tauri-apps/api/path')
-    
+
     // 计算笔记文件大小
     const notesDir = await getNotesDir()
     storageStats.notesSize = await calculateDirectorySize(notesDir)
-    
+
     // 计算数据库文件大小
     const appDir = await appDataDir()
     const dbPath = await join(appDir, 'productivity.db')
@@ -1234,14 +1234,14 @@ const loadStorageStats = async () => {
     } else {
       storageStats.databaseSize = 0
     }
-    
+
     // 计算媒体文件大小（images, videos 文件夹）
     let mediaSize = 0
     const imagesPath = await join(notesDir, 'images')
     if (await exists(imagesPath)) {
       mediaSize += await calculateDirectorySize(imagesPath)
     }
-    
+
     // 遍历所有笔记文件夹，计算其中的 images 和 videos 子文件夹
     try {
       const entries = await readDir(notesDir)
@@ -1250,7 +1250,7 @@ const loadStorageStats = async () => {
           const entryPath = await join(notesDir, entry.name)
           const imagesSubPath = await join(entryPath, 'images')
           const videosSubPath = await join(entryPath, 'videos')
-          
+
           if (await exists(imagesSubPath)) {
             mediaSize += await calculateDirectorySize(imagesSubPath)
           }
@@ -1260,10 +1260,10 @@ const loadStorageStats = async () => {
         }
       }
     } catch (e) { /* ignore */ }
-    
+
     storageStats.mediaSize = mediaSize
     storageStats.totalSize = storageStats.notesSize + storageStats.databaseSize + storageStats.mediaSize
-    
+
     // ElMessage.success('存储统计已更新') // 已移除提示，避免重复弹出
   } catch (error) {
     ElMessage.error('加载存储统计失败：' + error.message)
@@ -1278,22 +1278,22 @@ const loadStorageStats = async () => {
 const calculateDirectorySize = async (dirPath) => {
   const { stat, exists, readDir } = await import('@tauri-apps/plugin-fs')
   const { join } = await import('@tauri-apps/api/path')
-  
+
   let totalSize = 0
-  
+
   try {
     if (!(await exists(dirPath))) {
       return 0
     }
-    
+
     const entries = await readDir(dirPath)
-    
+
     for (const entry of entries) {
       const entryPath = await join(dirPath, entry.name)
-      
+
       try {
         const entryStat = await stat(entryPath)
-        
+
         if (entryStat.isDirectory) {
           // 递归计算子目录大小
           totalSize += await calculateDirectorySize(entryPath)
@@ -1303,7 +1303,7 @@ const calculateDirectorySize = async (dirPath) => {
       } catch (e) { /* ignore */ }
     }
   } catch (e) { /* ignore */ }
-  
+
   return totalSize
 }
 
@@ -1354,19 +1354,19 @@ const savePasswordSettings = async () => {
 const loadPasswordStats = async () => {
   try {
     const db = await getDatabase()
-    
+
     // 统计密码数量
     const passwords = await db.select('SELECT COUNT(*) as count FROM passwords WHERE is_deleted = 0 OR is_deleted IS NULL')
     passwordStats.totalPasswords = passwords[0]?.count || 0
-    
+
     // 统计历史记录
     const history = await db.select('SELECT COUNT(*) as count FROM password_history')
     passwordStats.historyCount = history[0]?.count || 0
-    
+
     // 统计回收站
     const recycleBin = await db.select('SELECT COUNT(*) as count FROM password_recycle_bin')
     passwordStats.recycleBinCount = recycleBin[0]?.count || 0
-    
+
     // 检查主密码
     const masterPassword = await db.select('SELECT COUNT(*) as count FROM master_password')
     passwordStats.hasMasterPassword = (masterPassword[0]?.count || 0) > 0
@@ -1381,45 +1381,45 @@ const changePassword = async () => {
     ElMessage.warning('请输入旧密码')
     return
   }
-  
+
   if (!newPasswordInput.value || newPasswordInput.value.length < 6) {
     ElMessage.warning('新密码长度至少为 6 位')
     return
   }
-  
+
   if (newPasswordInput.value !== newPasswordConfirm.value) {
     ElMessage.warning('两次输入的新密码不一致')
     return
   }
-  
+
   try {
     const db = await getDatabase()
     const result = await db.select('SELECT * FROM master_password LIMIT 1')
-    
+
     if (!result || result.length === 0) {
       ElMessage.error('未找到主密码记录')
       return
     }
-    
+
     // 验证旧密码
     const { password_hash, salt } = result[0]
     const isValid = verifyPassword(oldPasswordInput.value, password_hash, salt)
-    
+
     if (!isValid) {
       ElMessage.error('旧密码错误')
       return
     }
-    
+
     // 生成新密码哈希
     const newSalt = generateSalt()
     const newHash = hashPassword(newPasswordInput.value, newSalt)
     const now = new Date().toISOString()
-    
+
     await db.execute(
       'UPDATE master_password SET password_hash = ?, salt = ?, updated_at = ? WHERE id = 1',
       [newHash, newSalt, now]
     )
-    
+
     ElMessage.success('密码修改成功')
     showChangePasswordDialog.value = false
     oldPasswordInput.value = ''
@@ -1445,7 +1445,7 @@ const handleReset = async () => {
         type: 'warning'
       }
     )
-    
+
     await resetConfig()
     await loadSettings()
     ElMessage.success('设置已重置')
@@ -1518,7 +1518,7 @@ const submitFeedback = async () => {
   submittingFeedback.value = true
   try {
     const db = await Database.load('sqlite:app.db')
-    
+
     // 确保反馈表存在
     await db.execute(`
       CREATE TABLE IF NOT EXISTS feedback (
@@ -1528,13 +1528,13 @@ const submitFeedback = async () => {
         created_at TEXT NOT NULL
       )
     `)
-    
+
     const now = new Date().toISOString()
     await db.execute(
       'INSERT INTO feedback (content, contact, created_at) VALUES (?, ?, ?)',
       [feedbackContent.value.trim(), feedbackContact.value.trim(), now]
     )
-    
+
     ElMessage.success('感谢您的反馈！我们会认真处理')
     feedbackContent.value = ''
     feedbackContact.value = ''
@@ -1561,17 +1561,17 @@ const handleFloatingBallToggle = async (enabled) => {
   try {
     // 先保存配置
     localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
-    
+
     // 发送全局事件通知应用更新悬浮球状态
-    window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', { 
-      detail: { 
+    window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
+      detail: {
         enabled,
         mode: aiAssistantSettings.floatingBallMode,
         style: aiAssistantSettings.floatingBallStyle,
         size: aiAssistantSettings.floatingBallSize
-      } 
+      }
     }))
-    
+
     // 自动保存
     await handleSave()
   } catch (error) {
@@ -1589,15 +1589,15 @@ const handleFloatingBallChange = async () => {
     localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
 
     // 发送全局事件通知应用更新悬浮球状态
-    window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', { 
-      detail: { 
+    window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
+      detail: {
         enabled: aiAssistantSettings.enableFloatingBall,
         mode: aiAssistantSettings.floatingBallMode,
         style: aiAssistantSettings.floatingBallStyle,
         size: aiAssistantSettings.floatingBallSize
-      } 
+      }
     }))
-    
+
     // 自动保存到配置文件
     await handleSave()
   } catch (error) {
@@ -1612,11 +1612,11 @@ const handleFloatingBallChange = async () => {
 const checkUpdate = async () => {
   checkingUpdate.value = true
   updateInfo.value = ''
-  
+
   try {
     // 模拟检查更新（实际应该调用 Tauri 更新 API）
     await new Promise(resolve => setTimeout(resolve, 1500))
-    
+
     // 这里可以集成 Tauri 的更新功能
     // 目前显示当前已是最新版本
     updateInfo.value = '当前已是最新版本 v1.0.0'
@@ -1636,7 +1636,7 @@ onMounted(async () => {
   await loadPasswordStats()
   await loadReminderSettings()
   // await loadStorageStats() // 已在 loadSettings 中调用，避免重复
-  
+
   // 加载配置路径
   try {
     const dataDir = await appDataDir()
@@ -1646,40 +1646,26 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ignore */
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
-
 .settings-page-wrapper {
-  /* ignore */
-  --bg-body: #f7f9fb;
-  --bg-sidebar: #fcfcfc;
-  --bg-content: #ffffff;
-  --border-color: #e1e4e8;
-  --text-primary: #2c3e50;
-  --text-secondary: #606f7b;
-  --accent-color: #3498db;
-  --hover-bg: #edf2f7;
-  --active-bg: #e6f4ff;
-  
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-family);
   color: var(--text-primary);
-  background-color: var(--bg-body);
+  background-color: var(--bg-grouped);
   height: 100%;
   width: 100%;
 }
 
-/* ignore */
+/* 顶部导航 */
 .header {
   height: 50px;
-  background-color: var(--bg-content);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  border-bottom: 0.5px solid var(--border-color-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 15px;
+  padding: 0 var(--space-lg);
   flex-shrink: 0;
   z-index: 2;
   position: relative;
@@ -1688,16 +1674,13 @@ onMounted(async () => {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .breadcrumb {
-  font-size: 0.9rem;
+  font-size: var(--font-size-body);
   color: var(--text-secondary);
-  background: #f0f2f5;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   display: flex;
   align-items: center;
 }
@@ -1705,10 +1688,10 @@ onMounted(async () => {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 }
 
-/* ignore */
+/* 主容器 */
 .main-container {
   display: flex;
   flex: 1;
@@ -1716,13 +1699,13 @@ onMounted(async () => {
   min-height: 0;
 }
 
-/* ignore */
+/* 左侧设置菜单 */
 .sidebar-left {
   width: 200px;
   min-width: 200px;
   flex-shrink: 0;
-  background-color: var(--bg-sidebar);
-  border-right: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  border-right: 0.5px solid var(--border-color);
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -1730,28 +1713,29 @@ onMounted(async () => {
   height: 100%;
   position: relative;
   z-index: 1;
+  padding: var(--space-sm);
 }
 
 .sidebar-toolbar {
-  padding: 10px 15px;
-  border-bottom: 1px solid var(--border-color);
+  padding: var(--space-sm) var(--space-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .sidebar-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-secondary);
+  font-size: var(--font-size-caption2);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-tertiary);
   text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .menu-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 5px 10px 20px 10px;
+  padding: var(--space-xs);
   margin: 0;
   min-height: 0;
 }
@@ -1759,83 +1743,90 @@ onMounted(async () => {
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  margin: 2px 0;
-  border-radius: 6px;
+  gap: var(--space-sm);
+  padding: 6px 10px;
+  margin: 1px 0;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.85rem;
+  transition: background var(--transition-fast);
+  font-size: var(--font-size-footnote);
   color: var(--text-primary);
   position: relative;
 }
 
 .menu-item:hover {
-  background-color: var(--hover-bg);
+  background-color: var(--bg-tertiary);
 }
 
 .menu-item.active {
-  background-color: var(--active-bg);
-  color: var(--accent-color);
-  font-weight: 600;
+  background-color: var(--accent-blue-bg);
+  color: var(--accent-blue);
+  font-weight: var(--font-weight-medium);
 }
 
 .menu-icon {
   font-size: 16px;
   flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.menu-item.active .menu-icon {
+  color: var(--accent-blue);
 }
 
 .menu-name {
   flex: 1;
-  font-size: 0.85rem;
+  font-size: var(--font-size-footnote);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* ignore */
+/* 右侧内容区域 */
 .content-area {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: var(--bg-content);
-  padding: 20px;
+  background-color: var(--bg-grouped);
+  padding: var(--space-xl);
 }
 
-/* ignore */
+/* 设置区块 */
 .settings-section {
-  max-width: 1000px;
+  max-width: 680px;
   margin: 0 auto;
 }
 
 .section-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 16px;
+  font-size: var(--font-size-title3);
+  font-weight: var(--font-weight-bold);
   color: var(--text-primary);
+  margin-bottom: var(--space-xl);
+}
+
+/* 设置分组卡片 */
+.settings-section :deep(.el-card) {
+  border-radius: var(--radius-lg);
+  border: 0.5px solid var(--border-color);
+  box-shadow: none;
 }
 
 .card-header {
-  font-weight: 600;
-  font-size: 1.1rem;
+  font-size: var(--font-size-callout);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
-/* ignore */
-@media (prefers-color-scheme: dark) {
-  .settings-page-wrapper {
-    --bg-body: #1a1d23;
-    --bg-sidebar: #252932;
-    --bg-content: #2c3038;
-    --border-color: #3a3f4b;
-    --text-primary: #e4e7eb;
-    --text-secondary: #9ca3af;
-    --accent-color: #5dade2;
-    --hover-bg: #353944;
-    --active-bg: #2e5c7a;
-  }
+/* 表单行 */
+.settings-section :deep(.el-form-item) {
+  margin-bottom: var(--space-lg);
+  border-bottom: 0.5px solid var(--divider);
+  padding-bottom: var(--space-lg);
+}
 
-  .breadcrumb {
-    background: #353944;
-  }
+.settings-section :deep(.el-form-item:last-child) {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
 }
 </style>

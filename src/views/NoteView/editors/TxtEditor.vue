@@ -50,7 +50,7 @@ const handleInput = () => {
   border: none;
   outline: none;
   padding: 20px;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.6;
   resize: none;

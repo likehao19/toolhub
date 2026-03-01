@@ -69,7 +69,7 @@ defineExpose({
   padding: 40px 60px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   outline: none;
-  font-family: 'Times New Roman', serif;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.6;
   color: #333;

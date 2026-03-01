@@ -200,7 +200,7 @@ defineProps({
   font-weight: 600;
   color: #303133;
   margin: 0 0 12px 0;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: "PingFang SC";
   background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -236,7 +236,7 @@ defineProps({
 .param-name {
   font-weight: 600;
   color: #409eff;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: "PingFang SC";
   min-width: 140px;
   padding: 4px 8px;
   background: #ecf5ff;
@@ -245,7 +245,7 @@ defineProps({
 
 .param-type {
   color: #909399;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: "PingFang SC";
   min-width: 120px;
   padding: 4px 8px;
   background: #f5f7fa;

@@ -3105,7 +3105,7 @@ const formatFileTime = (time) => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "PingFang SC";
   color: var(--text-primary);
   background-color: var(--bg-body);
   height: 100%;
@@ -3672,7 +3672,7 @@ const formatFileTime = (time) => {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
-  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.8;
   color: #333;
@@ -3941,7 +3941,7 @@ const formatFileTime = (time) => {
   margin: 0;
   white-space: pre-wrap;
   word-wrap: break-word;
-  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-family: "PingFang SC";
   font-size: 13px;
   line-height: 1.6;
   color: #333;

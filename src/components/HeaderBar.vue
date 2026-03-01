@@ -4,21 +4,11 @@
       <div class="header-left" data-tauri-drag-region>
         <div class="app-logo" data-tauri-drag-region>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 7H4C2.9 7 2 7.9 2 9V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V9C22 7.9 21.1 7 20 7Z" fill="url(#gradient1)"/>
-            <path d="M20 4H4C3.45 4 3 4.45 3 5C3 5.55 3.45 6 4 6H20C20.55 6 21 5.55 21 5C21 4.45 20.55 4 20 4Z" fill="url(#gradient2)"/>
+            <path d="M20 7H4C2.9 7 2 7.9 2 9V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V9C22 7.9 21.1 7 20 7Z" fill="currentColor"/>
+            <path d="M20 4H4C3.45 4 3 4.45 3 5C3 5.55 3.45 6 4 6H20C20.55 6 21 5.55 21 5C21 4.45 20.55 4 20 4Z" fill="currentColor" opacity="0.8"/>
             <circle cx="8" cy="13.5" r="1.5" fill="white"/>
             <circle cx="12" cy="13.5" r="1.5" fill="white"/>
             <circle cx="16" cy="13.5" r="1.5" fill="white"/>
-            <defs>
-              <linearGradient id="gradient1" x1="2" y1="7" x2="22" y2="20" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#667eea"/>
-                <stop offset="1" stop-color="#764ba2"/>
-              </linearGradient>
-              <linearGradient id="gradient2" x1="3" y1="4" x2="21" y2="6" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#667eea"/>
-                <stop offset="1" stop-color="#764ba2"/>
-              </linearGradient>
-            </defs>
           </svg>
         </div>
         <span class="app-name" data-tauri-drag-region>ToolHub</span>
@@ -93,8 +83,8 @@
         </div>
       </div>
       <div class="header-right">
-        <button 
-          class="header-button pin-button" 
+        <button
+          class="header-button pin-button"
           :class="{ active: isPinned }"
           @click="handlePin"
           title="置顶"
@@ -104,9 +94,9 @@
         <button class="header-button minimize-button" @click="handleMinimize" title="最小化">
           <el-icon><Minus /></el-icon>
         </button>
-        <button 
-          class="header-button maximize-button" 
-          @click="handleToggleMaximize" 
+        <button
+          class="header-button maximize-button"
+          @click="handleToggleMaximize"
           :title="isMaximized ? '还原' : '最大化'"
         >
           <el-icon><FullScreen v-if="!isMaximized" /><CopyDocument v-else /></el-icon>
@@ -183,12 +173,12 @@ const handleGlobalSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout)
   }
-  
+
   if (!searchQuery.value || searchQuery.value.trim().length < 2) {
     searchResults.value = { notes: [], todos: [], bookmarks: [], passwords: [], events: [], total: 0 }
     return
   }
-  
+
   searchTimeout = setTimeout(async () => {
     isSearching.value = true
     try {
@@ -232,7 +222,7 @@ const getModuleName = (module) => {
 const handleSearchItemClick = (result) => {
   const item = result.item
   showSearchResults.value = false
-  
+
   if (result.module === 'notes') {
     router.push(`/notes?note=${encodeURIComponent(item.name)}`)
   } else if (result.module === 'todos') {
@@ -293,7 +283,7 @@ onMounted(async () => {
   try {
     isMaximized.value = await TauriWindow.isMaximized()
   } catch (e) { /* ignore */ }
-  
+
   await loadSearchHistory()
   document.addEventListener('keydown', handleKeyDown)
 })
@@ -308,9 +298,10 @@ onUnmounted(() => {
 
 <style scoped>
 .header-bar {
-  height: 32px;
-  background: #ffffff;
-  border-bottom: 1px solid #e4e7ed;
+  height: var(--header-height);
+  background: var(--bg-primary);
+  border-bottom: 0.5px solid var(--border-color-strong);
+  backdrop-filter: saturate(180%) blur(20px);
   user-select: none;
   -webkit-app-region: drag;
   position: fixed;
@@ -325,14 +316,14 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 8px;
+  padding: 0 var(--space-sm);
   -webkit-app-region: drag;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   -webkit-app-region: drag;
 }
 
@@ -341,77 +332,98 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   -webkit-app-region: drag;
-  margin-left: 4px;
+  margin-left: var(--space-xs);
 }
 
 .app-logo svg {
   display: block;
 }
 
+/* Logo 单色系统蓝 */
+.app-logo svg path {
+  fill: var(--accent-blue);
+}
+
+.app-logo svg circle {
+  fill: #ffffff;
+}
+
+/* 应用名称：纯色，semibold，移除渐变 */
 .app-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #303133;
-  letter-spacing: 0.5px;
+  font-size: var(--font-size-footnote);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
   -webkit-app-region: drag;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  -webkit-text-fill-color: var(--text-primary);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-xs);
   -webkit-app-region: no-drag;
 }
 
+/* 窗口控制按钮 */
 .header-button {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border: none;
   background: transparent;
+  border-radius: var(--radius-xs);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
-  color: #606266;
+  transition: background var(--transition-fast);
+  color: var(--text-secondary);
 }
 
 .header-button:hover {
-  background: #f5f7fa;
+  background: var(--bg-tertiary);
 }
 
+/* 关闭按钮特殊处理 */
 .header-button.close-button:hover {
-  background: #f56c6c;
+  background: var(--color-red);
   color: #ffffff;
 }
 
 .header-button.pin-button.active {
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .header-button .el-icon {
   font-size: 14px;
 }
 
+/* 搜索框 */
 .global-search {
   position: relative;
   -webkit-app-region: no-drag;
 }
 
+.global-search :deep(.el-input) {
+  width: 260px;
+  --el-input-bg-color: var(--bg-tertiary);
+  --el-input-border-color: transparent;
+  --el-input-hover-border-color: var(--border-color-strong);
+  --el-input-focus-border-color: var(--accent-blue);
+}
+
+/* 搜索结果下拉面板 */
 .search-results {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: 4px;
-  background: #ffffff;
-  border: 1px solid #e4e7ed;
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  margin-top: var(--space-xs);
+  background: var(--bg-primary);
+  border: 0.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-popover);
   max-height: 500px;
   overflow-y: auto;
   z-index: 1000;
@@ -419,21 +431,21 @@ onUnmounted(() => {
 
 .search-loading,
 .search-empty {
-  padding: 20px;
+  padding: var(--space-xl);
   text-align: center;
-  color: #909399;
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .search-results-content {
-  padding: 8px;
+  padding: var(--space-sm);
 }
 
 .search-module {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-lg);
 }
 
 .search-module:last-child {
@@ -443,144 +455,111 @@ onUnmounted(() => {
 .module-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #303133;
-  border-bottom: 1px solid #e4e7ed;
-  margin-bottom: 8px;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
+  color: var(--text-primary);
+  border-bottom: 0.5px solid var(--border-color);
+  margin-bottom: var(--space-sm);
 }
 
 .module-count {
-  color: #909399;
-  font-weight: normal;
-  font-size: 12px;
+  color: var(--text-tertiary);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-caption);
 }
 
 .module-items {
-  padding: 0 8px;
+  padding: 0 var(--space-sm);
 }
 
 .search-item {
-  padding: 8px;
-  border-radius: 4px;
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background var(--transition-fast);
 }
 
 .search-item:hover {
-  background: #f5f7fa;
+  background: var(--bg-tertiary);
 }
 
 .item-title {
-  font-weight: 500;
-  margin-bottom: 4px;
-  color: #303133;
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--space-xs);
+  color: var(--text-primary);
 }
 
 .item-title mark {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255,204,0,0.25);
+  color: inherit;
   padding: 0 2px;
+  border-radius: 2px;
 }
 
 .item-desc {
-  font-size: 12px;
-  color: #909399;
-  margin-bottom: 4px;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-xs);
 }
 
 .item-desc mark {
-  background: #fff3cd;
-  color: #856404;
+  background: rgba(255,204,0,0.25);
+  color: inherit;
   padding: 0 2px;
+  border-radius: 2px;
 }
 
 .item-url {
-  font-size: 12px;
-  color: #409eff;
+  font-size: var(--font-size-caption);
+  color: var(--accent-blue);
 }
 
 .more-results {
-  padding: 8px;
+  padding: var(--space-sm);
   text-align: center;
-  color: #409eff;
+  color: var(--accent-blue);
   cursor: pointer;
-  font-size: 12px;
-  border-top: 1px solid #e4e7ed;
-  margin-top: 8px;
+  font-size: var(--font-size-caption);
+  border-top: 0.5px solid var(--border-color);
+  margin-top: var(--space-sm);
+  transition: background var(--transition-fast);
 }
 
 .more-results:hover {
-  background: #f5f7fa;
+  background: var(--bg-tertiary);
 }
 
 .search-history {
-  padding: 8px;
+  padding: var(--space-sm);
 }
 
 .history-header {
-  padding: 8px;
-  font-weight: 600;
-  font-size: 12px;
-  color: #909399;
+  padding: var(--space-sm);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-caption2);
+  color: var(--text-tertiary);
   text-transform: uppercase;
+  letter-spacing: 0.6px;
 }
 
 .history-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
 }
 
 .history-item:hover {
-  background: #f5f7fa;
+  background: var(--bg-tertiary);
 }
 
 .history-item .el-icon {
-  color: #909399;
-}
-
-/* ignore */
-@media (prefers-color-scheme: dark) {
-  .search-results {
-    background: #2d2d2d;
-    border-color: #3a3a3a;
-  }
-
-  .module-header {
-    color: #eee;
-    border-color: #3a3a3a;
-  }
-
-  .search-item:hover {
-    background: #1a1a1a;
-  }
-
-  .item-title {
-    color: #eee;
-  }
-
-  .item-desc {
-    color: #aaa;
-  }
-
-  .more-results {
-    border-color: #3a3a3a;
-  }
-
-  .more-results:hover {
-    background: #1a1a1a;
-  }
-
-  .history-item:hover {
-    background: #1a1a1a;
-  }
+  color: var(--text-tertiary);
 }
 </style>
 

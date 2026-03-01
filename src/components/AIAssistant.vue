@@ -183,7 +183,7 @@ const sendMessage = async () => {
   try {
     // 1. 意图识别
     const intent = await recognizeIntent(userMessage, conversationContext.value)
-    
+
     if (!intent || intent.type === 'unknown') {
       // 无法识别意图，使用通用对话
       const response = await chatWithAI(conversationContext.value)
@@ -198,7 +198,7 @@ const sendMessage = async () => {
     } else {
       // 2. 提取参数
       const params = await extractParams(userMessage, intent.type)
-      
+
       // 3. 显示确认
       const assistantMsg = {
         role: 'assistant',
@@ -228,7 +228,7 @@ const confirmOperation = async (messageIndex) => {
   if (!message.confirmation) return
 
   const { intent, params, originalMessage } = message.confirmation
-  
+
   // 移除确认框
   message.confirmation = null
   isLoading.value = true
@@ -236,7 +236,7 @@ const confirmOperation = async (messageIndex) => {
   try {
     // 执行操作
     const result = await executeOperation(intent, params)
-    
+
     // 显示结果
     message.result = {
       status: 'success',
@@ -253,7 +253,7 @@ const confirmOperation = async (messageIndex) => {
     })
 
     ElMessage.success(result.message)
-    
+
     // 触发操作完成事件
     emit('operation-complete', { intent, result })
   } catch (error) {

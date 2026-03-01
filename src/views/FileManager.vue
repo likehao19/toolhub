@@ -1012,7 +1012,7 @@ onMounted(async () => {
   padding-right: 10px !important;
   padding-left: 0 !important;
   margin: 0 !important;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: "PingFang SC";
   font-weight: 500;
   display: inline-flex !important;
   align-items: center !important;
