@@ -25,6 +25,59 @@
         </el-tooltip>
       </div>
 
+      <!-- 常用工具 -->
+      <div class="menu-section">
+        <div v-if="isCollapsed" class="section-divider"></div>
+        <div
+          v-show="!isCollapsed"
+          class="section-header"
+          @click="toggleFavorites"
+        >
+          <el-icon>
+            <ArrowRight v-if="!favoritesExpanded" />
+            <ArrowDown v-else />
+          </el-icon>
+          <span>常用工具</span>
+        </div>
+        <div class="section-items" v-show="favoritesExpanded || isCollapsed">
+          <!-- 有收藏时显示列表 -->
+          <template v-if="favoriteTools.length > 0">
+            <el-tooltip
+              v-for="tool in favoriteTools"
+              :key="tool.id"
+              :content="tool.name"
+              placement="right"
+              :disabled="!isCollapsed"
+            >
+              <div
+                class="menu-item"
+                :class="{ active: currentPath === getToolPath(tool) }"
+                @click="openFavoriteTool(tool)"
+              >
+                <span class="tool-emoji-icon">{{ tool.icon }}</span>
+                <span v-show="!isCollapsed">{{ tool.name }}</span>
+              </div>
+            </el-tooltip>
+          </template>
+          <!-- 空状态：与普通菜单项完全一致的样式 -->
+          <el-tooltip
+            v-else
+            content="去工具箱添加常用工具"
+            placement="right"
+            :disabled="!isCollapsed"
+          >
+            <div
+              v-show="!isCollapsed"
+              class="menu-item favorites-empty-item"
+              @click="navigateTo('/toolbox')"
+            >
+              <el-icon><Star /></el-icon>
+              <span>添加常用工具</span>
+            </div>
+          </el-tooltip>
+        </div>
+      </div>
+
       <!-- 分割线 - 仅折叠时显示 -->
       <div v-if="isCollapsed" class="section-divider"></div>
 
@@ -112,14 +165,42 @@ import { ref, computed, watch, markRaw } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   Menu, Fold, HomeFilled, Setting, ArrowRight, ArrowDown,
-  Document, Lock, Link, List, Calendar, ChatDotRound, ChatLineRound, Briefcase
+  Document, Lock, Link, List, Calendar, ChatDotRound, ChatLineRound, Briefcase,
+  Star, ChatRound
 } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
+import { useFavoriteTools } from '@/composables/useFavoriteTools'
 
 const router = useRouter()
 const route = useRoute()
 
 const isCollapsed = ref(false)
 const currentPath = computed(() => route.path)
+const favoritesExpanded = ref(true)
+
+const { favoriteTools } = useFavoriteTools()
+
+// 切换常用分类展开/收起
+const toggleFavorites = () => {
+  favoritesExpanded.value = !favoritesExpanded.value
+}
+
+// 点击常用工具
+const openFavoriteTool = (tool) => {
+  const path = getToolPath(tool)
+  if (path) {
+    router.push(path)
+  } else {
+    ElMessage.info(`${tool.name} 正在开发中，敬请期待...`)
+  }
+}
+
+// 工具对应的路由路径，没有独立页面的返回 null（不参与 active 判断）
+const toolPathMap = {
+  'sticky-notes': '/toolbox/sticky-notes',
+}
+
+const getToolPath = (tool) => toolPathMap[tool.id] ?? null
 
 // 启用的工具数量（从配置读取）
 const enabledToolsCount = computed(() => {
@@ -143,7 +224,8 @@ const menuSections = ref([
     expanded: true,
     items: [
       { title: '智能对话', path: '/ai-conversation', icon: markRaw(ChatLineRound) },
-      { title: 'AI 问答', path: '/ai-chat', icon: markRaw(ChatDotRound) }
+      { title: 'AI 问答', path: '/ai-chat', icon: markRaw(ChatDotRound) },
+      { title: '即时聊天', path: '/chat', icon: markRaw(ChatRound) }
     ]
   },
   {
@@ -379,6 +461,27 @@ watch(currentPath, (newPath) => {
 
 .productivity-sidebar.collapsed .menu-section:first-child .menu-item {
   margin-top: var(--space-xs);
+}
+
+/* 工具 emoji 图标 — 覆盖 .menu-item span 的 flex:1，保持和 el-icon 一致的固定宽度 */
+.tool-emoji-icon {
+  font-size: 15px;
+  width: 16px;
+  min-width: 16px;
+  text-align: center;
+  flex: none !important;   /* 不参与 flex 伸缩，与 el-icon 对齐 */
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* 折叠时 emoji 图标保持显示（不被 .collapsed .menu-item span 规则隐藏） */
+.productivity-sidebar.collapsed .menu-item .tool-emoji-icon {
+  display: inline !important;
+}
+
+/* 常用工具空状态 — 与普通菜单项结构一致，仅颜色更淡 */
+.favorites-empty-item {
+  opacity: 0.5;
 }
 
 /* 工具箱按钮 */

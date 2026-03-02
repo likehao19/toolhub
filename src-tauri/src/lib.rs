@@ -84,6 +84,10 @@ pub fn run() {
             commands::file_ops::rename_file,
             commands::shell::execute_shell_command,
             commands::database::get_database_init_sql,
+            commands::chat::get_local_ip,
+            commands::chat::discover_lan_chat,
+            commands::chat::start_lan_server,
+            commands::chat::stop_lan_server,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -35,7 +35,9 @@
           <div class="app-content">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
-                <component :is="Component" />
+                <keep-alive include="Chat">
+                  <component :is="Component" />
+                </keep-alive>
               </transition>
             </router-view>
           </div>

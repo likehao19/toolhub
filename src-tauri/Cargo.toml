@@ -48,7 +48,8 @@ uuid = { version = "1", features = ["v4"] }
 base64 = "0.22"
 encoding_rs = "0.8"
 urlencoding = "2.1"
-axum = "0.7"
+axum = { version = "0.7", features = ["ws"] }
+futures-util = "0.3"
 tower = "0.4"
 tower-http = { version = "0.5", features = ["cors"] }
 reqwest = { version = "0.12", features = ["stream"] }

@@ -6,3 +6,4 @@ pub mod file_tree;
 pub mod file_ops;
 pub mod shell;
 pub mod database;
+pub mod chat;

@@ -44,6 +44,12 @@ const routes = [
     meta: { title: 'AI 对话' }
   },
   {
+    path: '/agent-team',
+    name: 'agentTeam',
+    component: () => import('@/views/AgentTeam.vue'),
+    meta: { title: '团队讨论' }
+  },
+  {
     path: '/todos',
     name: 'todos',
     component: () => import('@/views/Todos.vue'),
@@ -222,6 +228,12 @@ const routes = [
     name: 'stickyNotes',
     component: () => import('@/views/StickyNotes.vue'),
     meta: { title: '便签' }
+  },
+  {
+    path: '/chat',
+    name: 'chat',
+    component: () => import('@/views/Chat.vue'),
+    meta: { title: '即时聊天' }
   },
   {
     path: '/toolbox',

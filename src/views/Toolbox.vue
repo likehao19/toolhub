@@ -9,725 +9,64 @@
         </div>
       </div>
       <div class="header-actions">
+        <span class="fav-hint">
+          <el-icon style="color: #f59e0b"><StarFilled /></el-icon>
+          点击工具右下角星标可添加到常用
+        </span>
         <el-button type="primary" size="small" @click="goToSettings">
           <el-icon><Setting /></el-icon>
           自定义工具箱
         </el-button>
       </div>
     </div>
-    
+
     <div class="content-area">
-        <!-- 笔记工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📝 笔记工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in noteTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
+      <div
+        class="tool-category"
+        v-for="category in allCategories"
+        :key="category.name"
+      >
+        <div class="category-header">
+          <span>{{ category.label }}</span>
+        </div>
+        <div class="tool-grid">
+          <div
+            v-for="tool in category.tools"
+            :key="tool.id"
+            class="tool-card"
+            :class="{ disabled: !tool.enabled }"
+            @click="openTool(tool)"
+          >
+            <div class="tool-icon">{{ tool.icon }}</div>
+            <div class="tool-name">{{ tool.name }}</div>
+            <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
+            <div
+              class="favorite-btn"
+              :class="{ starred: isFavorite(tool.id) }"
+              @click.stop="toggleFavorite(tool)"
+              :title="isFavorite(tool.id) ? '取消常用' : '添加到常用'"
             >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
+              <el-icon>
+                <StarFilled v-if="isFavorite(tool.id)" />
+                <Star v-else />
+              </el-icon>
             </div>
           </div>
         </div>
-
-        <!-- 开发工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>💻 开发工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in devTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 实用工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🔧 实用工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in utilityTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 效率工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🎯 效率工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in efficiencyTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 网络工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🌐 网络工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in networkTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 编码转换 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🔤 编码转换</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in encodingTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 文件处理 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📁 文件处理</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in fileTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 图片工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🖼️ 图片工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in imageTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- Git工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🌳 Git工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in gitTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 数据库工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🗄️ 数据库工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in databaseTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 前端工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🎨 前端工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in frontendTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 后端工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>☕ 后端工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in backendTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 测试工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🧪 测试工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in testTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 运维工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🔧 运维工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in devopsTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 安全工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🔐 安全工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in securityTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 文档工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📚 文档工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in documentTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 学习工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🎓 学习工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in learningTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 办公工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>💼 办公工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in officeTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 设计工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🎨 设计工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in designTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 数据分析 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📊 数据分析</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in dataAnalysisTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 音视频工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🎬 音视频工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in mediaTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 系统工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>⚙️ 系统工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in systemTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 浏览器工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🌐 浏览器工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in browserTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 代码质量 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>✨ 代码质量</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in codeQualityTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- API工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🔌 API工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in apiTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 移动开发 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📱 移动开发</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in mobileDevTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 性能优化 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>⚡ 性能优化</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in performanceTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 项目管理 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📋 项目管理</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in projectManagementTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 协作通讯 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>💬 协作通讯</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in collaborationTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 云服务工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>☁️ 云服务工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in cloudTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 金融工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>💰 金融工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in financeTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 生活工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🏠 生活工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in lifeTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 教育工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>📚 教育工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in educationTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- 游戏辅助 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🎮 游戏辅助</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in gamingTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
-        <!-- AI助手工具 -->
-        <div class="tool-category">
-          <div class="category-header">
-            <span>🤖 AI助手工具</span>
-          </div>
-          <div class="tool-grid">
-            <div 
-              v-for="tool in aiAssistantTools" 
-              :key="tool.id"
-              class="tool-card"
-              :class="{ disabled: !tool.enabled }"
-              @click="openTool(tool)"
-            >
-              <div class="tool-icon">{{ tool.icon }}</div>
-              <div class="tool-name">{{ tool.name }}</div>
-              <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
-            </div>
-          </div>
-        </div>
-
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Briefcase, Setting } from '@element-plus/icons-vue'
+import { Briefcase, Setting, Star, StarFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { useFavoriteTools } from '@/composables/useFavoriteTools'
 
 const router = useRouter()
+const { toggleFavorite, isFavorite } = useFavoriteTools()
 
 // 笔记工具
 const noteTools = ref([
@@ -1172,6 +511,45 @@ const aiAssistantTools = ref([
   { id: 'regex-generator', name: '正则生成', icon: '🎨', type: 'window', enabled: false }
 ])
 
+// 所有分类
+const allCategories = computed(() => [
+  { name: 'note', label: '📝 笔记工具', tools: noteTools.value },
+  { name: 'dev', label: '💻 开发工具', tools: devTools.value },
+  { name: 'utility', label: '🔧 实用工具', tools: utilityTools.value },
+  { name: 'efficiency', label: '🎯 效率工具', tools: efficiencyTools.value },
+  { name: 'network', label: '🌐 网络工具', tools: networkTools.value },
+  { name: 'encoding', label: '🔤 编码转换', tools: encodingTools.value },
+  { name: 'file', label: '📁 文件处理', tools: fileTools.value },
+  { name: 'image', label: '🖼️ 图片工具', tools: imageTools.value },
+  { name: 'git', label: '🌳 Git工具', tools: gitTools.value },
+  { name: 'database', label: '🗄️ 数据库工具', tools: databaseTools.value },
+  { name: 'frontend', label: '🎨 前端工具', tools: frontendTools.value },
+  { name: 'backend', label: '☕ 后端工具', tools: backendTools.value },
+  { name: 'test', label: '🧪 测试工具', tools: testTools.value },
+  { name: 'devops', label: '🔧 运维工具', tools: devopsTools.value },
+  { name: 'security', label: '🔐 安全工具', tools: securityTools.value },
+  { name: 'document', label: '📚 文档工具', tools: documentTools.value },
+  { name: 'learning', label: '🎓 学习工具', tools: learningTools.value },
+  { name: 'office', label: '💼 办公工具', tools: officeTools.value },
+  { name: 'design', label: '🎨 设计工具', tools: designTools.value },
+  { name: 'dataAnalysis', label: '📊 数据分析', tools: dataAnalysisTools.value },
+  { name: 'media', label: '🎬 音视频工具', tools: mediaTools.value },
+  { name: 'system', label: '⚙️ 系统工具', tools: systemTools.value },
+  { name: 'browser', label: '🌐 浏览器工具', tools: browserTools.value },
+  { name: 'codeQuality', label: '✨ 代码质量', tools: codeQualityTools.value },
+  { name: 'api', label: '🔌 API工具', tools: apiTools.value },
+  { name: 'mobileDev', label: '📱 移动开发', tools: mobileDevTools.value },
+  { name: 'performance', label: '⚡ 性能优化', tools: performanceTools.value },
+  { name: 'projectManagement', label: '📋 项目管理', tools: projectManagementTools.value },
+  { name: 'collaboration', label: '💬 协作通讯', tools: collaborationTools.value },
+  { name: 'cloud', label: '☁️ 云服务工具', tools: cloudTools.value },
+  { name: 'finance', label: '💰 金融工具', tools: financeTools.value },
+  { name: 'life', label: '🏠 生活工具', tools: lifeTools.value },
+  { name: 'education', label: '📚 教育工具', tools: educationTools.value },
+  { name: 'gaming', label: '🎮 游戏辅助', tools: gamingTools.value },
+  { name: 'aiAssistant', label: '🤖 AI助手工具', tools: aiAssistantTools.value },
+])
+
 // 打开工具
 const openTool = async (tool) => {
   if (!tool.enabled) {
@@ -1179,12 +557,11 @@ const openTool = async (tool) => {
     return
   }
 
-  // 已启用的工具
   if (tool.id === 'sticky-notes') {
     router.push('/toolbox/sticky-notes')
     return
   }
-  
+
   // TODO: 其他工具的打开逻辑
 }
 
@@ -1237,7 +614,16 @@ const goToSettings = () => {
 
 .header-actions {
   display: flex;
+  align-items: center;
   gap: var(--space-sm);
+}
+
+.fav-hint {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
 }
 
 .content-area {
@@ -1353,5 +739,41 @@ const goToSettings = () => {
   height: 16px;
   line-height: 14px;
   border-radius: 2px;
+}
+
+/* 收藏按钮 */
+.favorite-btn {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.25;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+  color: var(--text-tertiary);
+  z-index: 1;
+}
+
+.tool-card:hover .favorite-btn {
+  opacity: 0.7;
+}
+
+.favorite-btn.starred {
+  opacity: 1 !important;
+  color: #f59e0b;
+}
+
+.favorite-btn:hover {
+  opacity: 1 !important;
+  color: #f59e0b;
+}
+
+.favorite-btn .el-icon {
+  font-size: 12px;
 }
 </style>
