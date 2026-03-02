@@ -16,7 +16,7 @@ use std::{
         atomic::{AtomicU16, Ordering},
         Arc, OnceLock,
     },
-    time::{SystemTime, UNIX_EPOCH},
+    time::{Instant, SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::{broadcast, oneshot, Mutex, RwLock};
 
@@ -80,24 +80,26 @@ pub async fn get_local_ip() -> Result<String, String> {
     Ok(s.local_addr().map_err(|e| e.to_string())?.ip().to_string())
 }
 
-/// 扫描局域网，寻找已有聊天室（UDP 广播，等待 2 秒）
+/// 扫描局域网，寻找已有聊天室（UDP 广播，持续 2 秒反复发送查询）
 #[tauri::command]
 pub async fn discover_lan_chat() -> Result<Vec<Value>, String> {
     tokio::task::spawn_blocking(|| -> Result<Vec<Value>, String> {
         let sock = UdpSocket::bind("0.0.0.0:0").map_err(|e| e.to_string())?;
         sock.set_broadcast(true).map_err(|e| e.to_string())?;
-        sock.set_read_timeout(Some(std::time::Duration::from_millis(2000)))
+        // 短超时：每 200ms 重发一次查询，持续 2 秒，覆盖服务端任意时序窗口
+        sock.set_read_timeout(Some(std::time::Duration::from_millis(200)))
             .map_err(|e| e.to_string())?;
 
-        sock.send_to(
-            format!("{}QUERY", PREFIX).as_bytes(),
-            format!("255.255.255.255:{}", UDP_PORT),
-        )
-        .map_err(|e| e.to_string())?;
-
+        let broadcast_addr = format!("255.255.255.255:{}", UDP_PORT);
+        let query = format!("{}QUERY", PREFIX);
         let mut found: Vec<Value> = Vec::new();
         let mut buf = [0u8; 256];
-        loop {
+        let deadline = Instant::now() + std::time::Duration::from_secs(2);
+
+        while Instant::now() < deadline {
+            // 持续重发查询，确保服务端一定能收到
+            let _ = sock.send_to(query.as_bytes(), &broadcast_addr);
+
             match sock.recv_from(&mut buf) {
                 Ok((len, src)) => {
                     let msg = String::from_utf8_lossy(&buf[..len]);
@@ -107,13 +109,12 @@ pub async fn discover_lan_chat() -> Result<Vec<Value>, String> {
                         let parts: Vec<&str> = payload.splitn(2, ':').collect();
                         let port: u16 = parts.first().and_then(|p| p.parse().ok()).unwrap_or(18765);
                         let host = parts.get(1).copied().unwrap_or(&src.ip().to_string()).to_string();
-                        // 去重
                         if !found.iter().any(|v| v["host"] == host && v["port"] == port) {
                             found.push(json!({ "host": host, "port": port }));
                         }
                     }
                 }
-                Err(_) => break,
+                Err(_) => {} // 超时，继续发送下一次查询
             }
         }
         Ok(found)
@@ -151,32 +152,39 @@ pub async fn start_lan_server(port: u16) -> Result<String, String> {
             .ok();
     });
 
-    // UDP：定期广播 + 响应查询
+    // UDP：启动即广播，之后全时响应查询 + 每 2 秒主动广播一次
     let ip_udp = ip_clone.clone();
     tokio::spawn(async move {
-        // 尝试监听 UDP 发现端口（可能已被占用，忽略错误）
         let Ok(udp) = UdpSocket::bind(format!("0.0.0.0:{}", UDP_PORT)) else { return };
         let _ = udp.set_broadcast(true);
-        let _ = udp.set_read_timeout(Some(std::time::Duration::from_millis(500)));
+        // 300ms 读超时：让出 CPU 的同时几乎全时监听查询包
+        let _ = udp.set_read_timeout(Some(std::time::Duration::from_millis(300)));
+
+        let announce = format!("{}{}:{}", PREFIX, port, ip_udp);
+        let query_msg = format!("{}QUERY", PREFIX);
+        let broadcast_addr = format!("255.255.255.255:{}", UDP_PORT);
+        let mut buf = [0u8; 256];
+
+        // 启动后立即广播一次，让正在扫描的对端马上发现
+        let _ = udp.send_to(announce.as_bytes(), &broadcast_addr);
+        let mut last_announce = Instant::now();
 
         loop {
             if ACTIVE_PORT.load(Ordering::SeqCst) == 0 { break; }
 
-            // 广播自身
-            let announce = format!("{}{}:{}", PREFIX, port, ip_udp);
-            let _ = udp.send_to(announce.as_bytes(), format!("255.255.255.255:{}", UDP_PORT));
-
-            // 响应查询
-            let mut buf = [0u8; 256];
-            if let Ok((len, src)) = udp.recv_from(&mut buf) {
-                let msg = String::from_utf8_lossy(&buf[..len]);
-                if msg == format!("{}QUERY", PREFIX) {
-                    let reply = format!("{}{}:{}", PREFIX, port, ip_udp);
-                    let _ = udp.send_to(reply.as_bytes(), src);
-                }
+            // 每 2 秒主动广播自身
+            if last_announce.elapsed() >= std::time::Duration::from_secs(2) {
+                let _ = udp.send_to(announce.as_bytes(), &broadcast_addr);
+                last_announce = Instant::now();
             }
 
-            tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+            // 全时监听查询，立即回复（300ms 超时自动进入下一轮）
+            if let Ok((len, src)) = udp.recv_from(&mut buf) {
+                let msg = String::from_utf8_lossy(&buf[..len]);
+                if msg.as_ref() == query_msg {
+                    let _ = udp.send_to(announce.as_bytes(), src);
+                }
+            }
         }
     });
 
