@@ -63,28 +63,33 @@
       <el-config-provider :locale="locale">
         <el-calendar v-model="selectedDate">
           <template #date-cell="{ data }">
-            <div class="calendar-day" :class="{ 
-              'has-events': hasEvents(data.day), 
-              'is-holiday': isHoliday(data.day), 
+            <div class="calendar-day" :class="{
+              'has-events': hasEvents(data.day),
+              'is-holiday': isHoliday(data.day),
+              'is-comp-day': isCompDay(data.day),
               'is-solar-term': getSolarTerm(data.day),
               'is-today': isToday(data.day)
             }" @dblclick="handleDateDoubleClick(data.day)">
-              <div class="day-number">{{ getDayNumber(data.day) }}</div>
-              <div class="lunar-info">
-                <div class="lunar-date">{{ getLunarDateStr(data.day) }}</div>
-                <div v-if="getSolarTerm(data.day)" class="solar-term">{{ getSolarTerm(data.day) }}</div>
+              <div class="day-top">
+                <span class="day-number">{{ getDayNumber(data.day) }}</span>
+                <span class="lunar-date">{{ getLunarDateStr(data.day) }}</span>
               </div>
-              <div v-if="isHoliday(data.day)" class="holiday-label">
-                {{ getHolidayName(data.day) }}
-              </div>
+              <div v-if="getSolarTerm(data.day)" class="solar-term">{{ getSolarTerm(data.day) }}</div>
+              <div v-if="isHoliday(data.day)" class="holiday-label">{{ getHolidayName(data.day) }}</div>
+              <div v-else-if="isCompDay(data.day)" class="comp-day-label">补班</div>
               <div class="day-events">
                 <div
-                  v-for="event in getDayEvents(data.day)"
+                  v-for="event in getDayEvents(data.day).slice(0, 3)"
                   :key="event.id"
-                  class="event-dot"
-                  :style="{ backgroundColor: getEventColor(event) }"
+                  class="event-bar"
+                  :style="{ '--event-color': getEventColor(event) }"
                   @click.stop="viewEvent(event)"
-                />
+                >
+                  <span class="event-bar-title">{{ event.title }}</span>
+                </div>
+                <div v-if="getDayEvents(data.day).length > 3" class="event-more">
+                  +{{ getDayEvents(data.day).length - 3 }}
+                </div>
               </div>
             </div>
           </template>
@@ -95,23 +100,24 @@
     <!-- 周视图 -->
     <div v-else-if="calendarView === 'week'" class="week-view">
       <div class="week-header">
-        <div class="week-day" v-for="day in weekDays" :key="day.date">
+        <div class="week-day" v-for="day in weekDays" :key="day.date" :class="{ 'is-weekend': day.isWeekend, 'is-today': isToday(day.date) }">
           <div class="day-label">{{ day.label }}</div>
           <div class="day-number">{{ day.number }}</div>
         </div>
       </div>
       <div class="week-content">
-        <div class="week-column" v-for="day in weekDays" :key="day.date">
+        <div class="week-column" v-for="day in weekDays" :key="day.date" :class="{ 'is-weekend': day.isWeekend, 'is-today': isToday(day.date) }">
           <div
             v-for="event in getDayEvents(day.date)"
             :key="event.id"
             class="week-event"
-            :style="{ backgroundColor: getEventColor(event) }"
+            :style="{ '--event-color': getEventColor(event) }"
             @click="viewEvent(event)"
           >
             <div class="event-time">{{ formatEventTime(event.start_time) }}</div>
             <div class="event-title">{{ event.title }}</div>
           </div>
+          <div v-if="getDayEvents(day.date).length === 0" class="week-empty"></div>
         </div>
       </div>
     </div>
@@ -120,11 +126,13 @@
     <div v-else-if="calendarView === 'day'" class="day-view">
       <div class="day-header">
         <h3>{{ formatSelectedDate() }}</h3>
-        <div class="day-events-list">
+        <el-empty v-if="selectedDateEvents.length === 0" description="今天没有日程" :image-size="80" />
+        <div v-else class="day-events-list">
           <div
             v-for="event in selectedDateEvents"
             :key="event.id"
             class="day-event-item"
+            :style="{ '--event-color': getEventColor(event) }"
             @click="viewEvent(event)"
           >
             <div class="event-time-block">
@@ -185,36 +193,34 @@
     <div v-if="calendarView === 'month'" class="events-section">
       <h3>{{ formatSelectedDate() }} 的日程</h3>
       <div class="event-list">
-        <el-card
+        <div
           v-for="event in selectedDateEvents"
           :key="event.id"
-          class="event-card"
-          shadow="hover"
+          class="event-item-card"
+          :style="{ '--event-color': getEventColor(event) }"
           @click="viewEvent(event)"
         >
-          <div class="event-card-header">
-            <div class="event-time">
+          <div class="event-item-body">
+            <div class="event-item-time">
               {{ formatEventTime(event.start_time) }}
               <span v-if="event.end_time"> - {{ formatEventTime(event.end_time) }}</span>
             </div>
-            <div class="event-actions">
-              <el-button text size="small" @click.stop="editEvent(event)">
-                <el-icon><Edit /></el-icon>
-              </el-button>
-              <el-button text size="small" type="danger" @click.stop="deleteEvent(event)">
-                <el-icon><Delete /></el-icon>
-              </el-button>
-            </div>
-          </div>
-          <div class="event-content">
-            <div class="event-title">{{ event.title }}</div>
-            <div v-if="event.location" class="event-location">
+            <div class="event-item-title">{{ event.title }}</div>
+            <div v-if="event.location" class="event-item-location">
               <el-icon><Location /></el-icon>
               {{ event.location }}
             </div>
           </div>
-        </el-card>
-        <el-empty v-if="selectedDateEvents.length === 0" description="该日期无日程" />
+          <div class="event-item-actions">
+            <el-button text size="small" @click.stop="editEvent(event)">
+              <el-icon><Edit /></el-icon>
+            </el-button>
+            <el-button text size="small" type="danger" @click.stop="deleteEvent(event)">
+              <el-icon><Delete /></el-icon>
+            </el-button>
+          </div>
+        </div>
+        <el-empty v-if="selectedDateEvents.length === 0" description="该日期无日程" :image-size="80" />
       </div>
     </div>
     </div>
@@ -415,6 +421,53 @@
         <el-button type="primary" @click="addCustomReminder">添加</el-button>
       </template>
     </el-dialog>
+
+    <!-- 导入日程对话框 -->
+    <el-dialog
+      v-model="showImportDialog"
+      title="导入日程"
+      width="500px"
+      @close="importFile = null; importResult = null"
+    >
+      <div v-if="!importResult">
+        <el-alert
+          title="支持导入 iCalendar (.ics)、JSON、CSV 格式文件"
+          type="info"
+          :closable="false"
+          style="margin-bottom: 16px;"
+        />
+        <el-button type="primary" @click="handleImportFileSelect" style="width: 100%;">
+          <el-icon><Upload /></el-icon>
+          选择文件
+        </el-button>
+      </div>
+      <div v-else>
+        <el-alert
+          :title="`解析到 ${importResult.total} 条日程`"
+          :type="importResult.total > 0 ? 'success' : 'warning'"
+          :closable="false"
+          style="margin-bottom: 16px;"
+        />
+        <div v-if="importResult.total > 0" style="max-height: 300px; overflow-y: auto;">
+          <div v-for="(event, i) in importResult.events.slice(0, 20)" :key="i" style="padding: 4px 0; border-bottom: 1px solid var(--border-color); font-size: 13px;">
+            {{ event.title }} - {{ event.start_time }}
+          </div>
+          <div v-if="importResult.total > 20" style="padding: 8px 0; color: var(--text-tertiary); font-size: 12px;">
+            ... 还有 {{ importResult.total - 20 }} 条
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <el-button @click="showImportDialog = false">取消</el-button>
+        <el-button
+          type="primary"
+          @click="executeImport"
+          :disabled="!importResult || importResult.total === 0"
+        >
+          导入（{{ importResult?.total || 0 }} 条）
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -425,15 +478,19 @@ import { ElMessage, ElMessageBox, ElConfigProvider } from 'element-plus'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import { useRoute } from 'vue-router'
 import Database from '@tauri-apps/plugin-sql'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
 import { manualCheckReminders } from '@/utils/reminderService'
-import { generateRecurrenceRule, parseRecurrenceRule, getRecurrenceText, RECURRENCE_TYPES } from '@/utils/recurrence'
-import { isHoliday, getHolidayName } from '@/utils/holidays'
+import { generateRecurrenceRule, parseRecurrenceRule, getRecurrenceText, generateRecurrenceInstances, RECURRENCE_TYPES } from '@/utils/recurrence'
+import { isHoliday, getHolidayName, isCompDay } from '@/utils/holidays'
 import { getLunarDate, getSolarTerm, getDateInfo } from '@/utils/lunarCalendar'
-import { saveFile } from '@/utils/tauri/dialog'
-import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { saveFile, openFile } from '@/utils/tauri/dialog'
+import { writeTextFile, readTextFile } from '@tauri-apps/plugin-fs'
+import { importEventsFromICS, importEventsFromCSV } from '@/utils/calendarImportExport'
 
 const route = useRoute()
-const locale = zhCn // Element Plus 中文本地化
+const locale = zhCn
+dayjs.locale('zh-cn') // 让 el-calendar 从周一开始
 
 const DB_PATH = 'sqlite:productivity.db'
 let dbInstance = null
@@ -443,6 +500,12 @@ async function getDatabase() {
     dbInstance = await Database.load(DB_PATH)
   }
   return dbInstance
+}
+
+// 本地日期格式化（避免 toISOString 的 UTC 时区偏移）
+function formatLocalDate(date) {
+  const d = date instanceof Date ? date : new Date(date)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 const events = ref([])
@@ -455,22 +518,29 @@ const viewDialogVisible = ref(false)
 const editingEvent = ref(null)
 const viewingEvent = ref(null)
 const selectedCategory = ref('')
+const showImportDialog = ref(false)
+const importFile = ref(null)
+const importResult = ref(null)
 
-// 计算周视图的日期
+// 计算周视图的日期（从周一开始）
 const weekDays = computed(() => {
-  const start = new Date(selectedDate.value)
-  const day = start.getDay()
-  const diff = start.getDate() - day
-  start.setDate(diff)
-  
+  const current = new Date(selectedDate.value)
+  const dayOfWeek = current.getDay() // 0=周日
+  // 回退到本周一：如果是周日则回退6天，否则回退 dayOfWeek-1 天
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
+  const monday = new Date(current)
+  monday.setDate(current.getDate() + mondayOffset)
+
+  const labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
   const days = []
   for (let i = 0; i < 7; i++) {
-    const date = new Date(start)
-    date.setDate(start.getDate() + i)
+    const date = new Date(monday)
+    date.setDate(monday.getDate() + i)
     days.push({
-      date: date.toISOString().split('T')[0],
-      label: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][i],
-      number: date.getDate()
+      date: formatLocalDate(date),
+      label: labels[i],
+      number: date.getDate(),
+      isWeekend: i >= 5
     })
   }
   return days
@@ -510,18 +580,60 @@ const categories = computed(() => {
   return Array.from(cats).sort()
 })
 
+// 展开重复事件为虚拟实例
+const expandedEvents = computed(() => {
+  const center = selectedDate.value
+  const rangeStart = new Date(center.getFullYear(), center.getMonth() - 1, 1)
+  const rangeEnd = new Date(center.getFullYear(), center.getMonth() + 2, 0)
+  const rangeEndStr = `${rangeEnd.getFullYear()}-${String(rangeEnd.getMonth() + 1).padStart(2, '0')}-${String(rangeEnd.getDate()).padStart(2, '0')}T23:59:59`
+
+  const result = []
+  for (const event of events.value) {
+    result.push(event)
+
+    if (event.repeat_rule) {
+      const rule = parseRecurrenceRule(event.repeat_rule)
+      if (rule && rule.type !== 'none') {
+        const instances = generateRecurrenceInstances(event.start_time, rule, rangeEndStr)
+        const originalStart = new Date(event.start_time)
+        const originalEnd = event.end_time ? new Date(event.end_time) : null
+        const duration = originalEnd ? originalEnd - originalStart : 0
+
+        for (const instanceDate of instances) {
+          if (formatLocalDate(instanceDate) === formatLocalDate(originalStart)) continue
+          if (instanceDate < rangeStart) continue
+
+          result.push({
+            ...event,
+            start_time: `${formatLocalDate(instanceDate)}T${String(originalStart.getHours()).padStart(2, '0')}:${String(originalStart.getMinutes()).padStart(2, '0')}:00`,
+            end_time: duration > 0
+              ? (() => {
+                  const end = new Date(instanceDate.getTime() + duration)
+                  return `${formatLocalDate(end)}T${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}:00`
+                })()
+              : null,
+            _isRecurrenceInstance: true,
+            _originalId: event.id
+          })
+        }
+      }
+    }
+  }
+  return result
+})
+
 // 按分类过滤的事件
 const filteredEvents = computed(() => {
-  if (!selectedCategory.value) return events.value
-  return events.value.filter(e => e.category === selectedCategory.value)
+  if (!selectedCategory.value) return expandedEvents.value
+  return expandedEvents.value.filter(e => e.category === selectedCategory.value)
 })
 
 // 获取选中日期的日程
 const selectedDateEvents = computed(() => {
-  const dateStr = selectedDate.value.toISOString().split('T')[0]
-  return events.value.filter(e => {
-    const eventDate = new Date(e.start_time).toISOString().split('T')[0]
-    return eventDate === dateStr
+  const dateStr = formatLocalDate(selectedDate.value)
+  const eventList = selectedCategory.value ? filteredEvents.value : expandedEvents.value
+  return eventList.filter(e => {
+    return formatLocalDate(new Date(e.start_time)) === dateStr
   }).sort((a, b) => {
     return new Date(a.start_time) - new Date(b.start_time)
   })
@@ -542,19 +654,14 @@ const loadEvents = async () => {
 
 // 检查日期是否有日程
 const hasEvents = (dateStr) => {
-  const date = new Date(dateStr).toISOString().split('T')[0]
-  const eventList = selectedCategory.value ? filteredEvents.value : events.value
-  return eventList.some(e => {
-    const eventDate = new Date(e.start_time).toISOString().split('T')[0]
-    return eventDate === date
-  })
+  const date = formatLocalDate(new Date(dateStr))
+  const eventList = selectedCategory.value ? filteredEvents.value : expandedEvents.value
+  return eventList.some(e => formatLocalDate(new Date(e.start_time)) === date)
 }
 
 // 检查是否是今天
 const isToday = (dateStr) => {
-  const date = new Date(dateStr).toISOString().split('T')[0]
-  const today = new Date().toISOString().split('T')[0]
-  return date === today
+  return formatLocalDate(new Date(dateStr)) === formatLocalDate(new Date())
 }
 
 // 获取日期数字
@@ -564,12 +671,9 @@ const getDayNumber = (dateStr) => {
 
 // 获取日期的事件
 const getDayEvents = (dateStr) => {
-  const date = new Date(dateStr).toISOString().split('T')[0]
-  const eventList = selectedCategory.value ? filteredEvents.value : events.value
-  return eventList.filter(e => {
-    const eventDate = new Date(e.start_time).toISOString().split('T')[0]
-    return eventDate === date
-  })
+  const date = formatLocalDate(new Date(dateStr))
+  const eventList = selectedCategory.value ? filteredEvents.value : expandedEvents.value
+  return eventList.filter(e => formatLocalDate(new Date(e.start_time)) === date)
 }
 
 // 导出日程
@@ -588,7 +692,7 @@ const handleExport = async () => {
     }))
     
     const jsonContent = JSON.stringify(exportData, null, 2)
-    const fileName = `calendar_export_${new Date().toISOString().split('T')[0]}.json`
+    const fileName = `calendar_export_${formatLocalDate(new Date())}.json`
     
     const filePath = await saveFile({
       filters: [{
@@ -625,12 +729,12 @@ const handleListViewDateChange = () => {
     listViewEvents.value = []
     return
   }
-  
+
   const startDate = new Date(listViewDateRange.value[0])
   const endDate = new Date(listViewDateRange.value[1])
   endDate.setHours(23, 59, 59, 999)
-  
-  const eventList = selectedCategory.value ? filteredEvents.value : events.value
+
+  const eventList = selectedCategory.value ? filteredEvents.value : expandedEvents.value
   listViewEvents.value = eventList.filter(e => {
     const eventDate = new Date(e.start_time)
     return eventDate >= startDate && eventDate <= endDate
@@ -653,7 +757,7 @@ const handleDateDoubleClick = (dateStr) => {
 const showCreateDialog = () => {
   editingEvent.value = null
   const date = selectedDate.value
-  const dateStr = date.toISOString().split('T')[0]
+  const dateStr = formatLocalDate(date)
   eventForm.value = {
     title: '',
     description: '',
@@ -949,6 +1053,68 @@ const addCustomReminder = () => {
   }
 }
 
+// 处理导入文件选择
+const handleImportFileSelect = async () => {
+  try {
+    const selected = await openFile({
+      filters: [{ name: '日程文件', extensions: ['ics', 'json', 'csv'] }]
+    })
+    if (!selected) return
+
+    const content = await readTextFile(selected)
+    const name = selected.split(/[/\\]/).pop()
+    let parsedEvents = []
+
+    if (name.endsWith('.ics')) {
+      parsedEvents = await importEventsFromICS(content)
+    } else if (name.endsWith('.csv')) {
+      parsedEvents = await importEventsFromCSV(content)
+    } else if (name.endsWith('.json')) {
+      parsedEvents = JSON.parse(content)
+      if (!Array.isArray(parsedEvents)) throw new Error('JSON 格式不正确')
+    }
+
+    importResult.value = { total: parsedEvents.length, events: parsedEvents }
+  } catch (error) {
+    if (error !== 'cancelled') {
+      ElMessage.error('解析文件失败: ' + (error.message || error))
+    }
+  }
+}
+
+// 执行导入
+const executeImport = async () => {
+  if (!importResult.value || importResult.value.total === 0) return
+
+  try {
+    const db = await getDatabase()
+    const now = new Date().toISOString()
+    let successCount = 0
+
+    for (const event of importResult.value.events) {
+      if (!event.title || !event.start_time) continue
+      await db.execute(
+        `INSERT INTO calendar_events (title, description, start_time, end_time, location,
+         reminder_minutes, repeat_rule, category, color, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          event.title, event.description || null, event.start_time, event.end_time || null,
+          event.location || null, event.reminder_minutes || null, event.repeat_rule || null,
+          event.category || null, event.color || '#409eff', now, now
+        ]
+      )
+      successCount++
+    }
+
+    ElMessage.success(`导入完成：成功 ${successCount} 条`)
+    showImportDialog.value = false
+    importFile.value = null
+    importResult.value = null
+    await loadEvents()
+  } catch (error) {
+    ElMessage.error('导入失败: ' + (error.message || error))
+  }
+}
 onMounted(async () => {
   await loadEvents()
   
@@ -957,8 +1123,8 @@ onMounted(async () => {
   const firstDay = new Date(now.getFullYear(), now.getMonth(), 1)
   const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
   listViewDateRange.value = [
-    firstDay.toISOString().split('T')[0],
-    lastDay.toISOString().split('T')[0]
+    formatLocalDate(firstDay),
+    formatLocalDate(lastDay)
   ]
   handleListViewDateChange()
   
@@ -975,6 +1141,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* ===== 布局 ===== */
 .calendar-wrapper {
   display: flex;
   flex-direction: column;
@@ -1004,7 +1171,6 @@ onMounted(async () => {
 .breadcrumb {
   font-size: var(--font-size-body);
   color: var(--text-secondary);
-  padding: 0;
   font-weight: 400;
   display: flex;
   align-items: center;
@@ -1013,7 +1179,6 @@ onMounted(async () => {
 
 .breadcrumb i {
   color: var(--accent-blue);
-  font-size: var(--font-size-body);
 }
 
 .header-actions {
@@ -1025,114 +1190,182 @@ onMounted(async () => {
 .content-container {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-2xl);
+  padding: var(--space-xl);
   background: var(--bg-secondary);
 }
 
-.calendar-wrapper {
-  overflow: hidden;
-}
-
-.form-section {
-  margin-bottom: 24px;
-  padding: var(--space-lg);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-}
-
-.form-section:last-child {
-  margin-bottom: 0;
-}
-
-.section-title {
-  margin: 0 0 var(--space-lg) 0;
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  color: var(--text-primary);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--divider);
-}
-
-.calendar-day {
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.calendar-day:hover {
-  background-color: var(--accent-blue-bg) !important;
-}
-
+/* ===== 月视图 - el-calendar 覆写 ===== */
 .calendar-container {
-  margin-bottom: var(--space-lg);
   background: var(--bg-primary);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl);
+  padding: var(--space-lg);
   box-shadow: var(--shadow-card);
 }
 
+.calendar-container :deep(.el-calendar) {
+  --el-calendar-border: var(--border-color);
+  background: transparent;
+}
+
+.calendar-container :deep(.el-calendar__header) {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-container :deep(.el-calendar__body) {
+  padding: 8px;
+}
+
+.calendar-container :deep(.el-calendar-table thead th) {
+  font-size: var(--font-size-caption);
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 8px 0;
+}
+
+.calendar-container :deep(.el-calendar-table .el-calendar-day) {
+  height: auto;
+  min-height: 88px;
+  padding: 0;
+}
+
+.calendar-container :deep(.el-calendar-table td) {
+  border: 1px solid var(--divider);
+}
+
+.calendar-container :deep(.el-calendar-table td.is-selected) {
+  background: transparent;
+}
+
+.calendar-container :deep(.el-calendar-table .prev, .el-calendar-table .next) {
+  opacity: 0.4;
+}
+
+/* ===== 日历单元格 ===== */
 .calendar-day {
   height: 100%;
-  padding: var(--space-xs);
-  position: relative;
+  min-height: 84px;
+  padding: 6px 8px;
   cursor: pointer;
-  transition: background-color var(--transition-fast);
+  transition: background var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: 4px;
 }
 
 .calendar-day:hover {
-  background: var(--bg-tertiary) !important;
-}
-
-.day-number {
-  font-size: var(--font-size-body);
-  font-weight: 500;
-  margin-bottom: var(--space-xs);
-}
-
-.day-events {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px;
-}
-
-.event-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.calendar-day.is-today {
-  background: var(--accent-blue-bg) !important;
-  border: 2px solid var(--accent-blue);
-  border-radius: var(--radius-xs);
-}
-
-.calendar-day.is-today .day-number {
-  color: var(--accent-blue);
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.calendar-day.has-events {
   background: var(--accent-blue-bg);
 }
 
-.calendar-day.is-holiday {
-  background: rgba(255, 149, 0, 0.06);
+.day-top {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.day-top .day-number {
+  font-size: var(--font-size-body);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.day-top .lunar-date {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  line-height: 1;
+}
+
+.solar-term {
+  font-size: 10px;
+  color: var(--color-green);
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .holiday-label {
   font-size: 10px;
   color: var(--color-orange);
   font-weight: 600;
-  margin-top: 2px;
+  line-height: 1.2;
 }
 
+.comp-day-label {
+  font-size: 10px;
+  color: var(--color-red, #ef4444);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* 日期状态 */
+.calendar-day.is-today {
+  background: var(--accent-blue-bg);
+  box-shadow: inset 0 0 0 1.5px var(--accent-blue);
+  border-radius: 6px;
+}
+
+.calendar-day.is-today .day-top .day-number {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+.calendar-day.is-holiday {
+  background: rgba(255, 149, 0, 0.05);
+}
+
+.calendar-day.is-comp-day {
+  background: rgba(239, 68, 68, 0.04);
+}
+
+/* ===== 事件条 (月视图单元格内) ===== */
+.day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: auto;
+  min-height: 0;
+}
+
+.event-bar {
+  display: flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--event-color, var(--accent-blue)) 15%, transparent);
+  border-left: 2.5px solid var(--event-color, var(--accent-blue));
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  overflow: hidden;
+}
+
+.event-bar:hover {
+  background: color-mix(in srgb, var(--event-color, var(--accent-blue)) 25%, transparent);
+}
+
+.event-bar-title {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.5;
+}
+
+.event-more {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  padding-left: 6px;
+  line-height: 1.4;
+}
+
+/* ===== 月视图下方 - 选中日期的日程列表 ===== */
 .events-section {
   margin-top: var(--space-lg);
   background: var(--bg-primary);
   border-radius: var(--radius-lg);
-  padding: var(--space-xl);
+  padding: var(--space-lg);
   box-shadow: var(--shadow-card);
 }
 
@@ -1149,21 +1382,278 @@ onMounted(async () => {
   gap: var(--space-sm);
 }
 
-.event-card {
+.event-item-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--event-color, var(--accent-blue));
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: var(--bg-primary);
+}
+
+.event-item-card:hover {
+  border-color: var(--border-color-strong);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.event-item-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.event-item-time {
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.event-item-title {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-item-location {
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.event-item-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.event-item-card:hover .event-item-actions {
+  opacity: 1;
+}
+
+/* ===== 周视图 ===== */
+.week-view {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.week-day {
+  text-align: center;
+  padding: var(--space-xs) 0;
+}
+
+.week-day .day-label {
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.week-day .day-number {
+  font-size: var(--font-size-headline);
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.week-day.is-weekend .day-label {
+  color: var(--color-orange);
+}
+
+.week-day.is-today .day-number {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.week-content {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  min-height: 420px;
+}
+
+.week-column {
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs);
+  min-height: 400px;
+  background: var(--bg-secondary);
+  transition: background var(--transition-fast);
+}
+
+.week-column.is-today {
+  background: var(--accent-blue-bg);
+}
+
+.week-column.is-weekend {
+  background: rgba(255, 149, 0, 0.03);
+}
+
+.week-event {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border-left: 3px solid var(--event-color, var(--accent-blue));
+  background: var(--bg-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.week-event:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.week-event .event-time {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--event-color, var(--accent-blue));
+  margin-bottom: 2px;
+}
+
+.week-event .event-title {
+  font-size: var(--font-size-caption);
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.week-empty {
+  height: 100%;
+}
+
+/* ===== 日视图 ===== */
+.day-view {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.day-header h3 {
+  margin: 0 0 var(--space-lg) 0;
+  font-size: var(--font-size-title3);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.day-events-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.day-event-item {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--event-color, var(--accent-blue));
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.day-event-item:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border-color-strong);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.event-time-block {
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.time-start {
+  font-weight: 600;
+  color: var(--accent-blue);
+  font-size: var(--font-size-body);
+}
+
+.time-end {
+  font-size: var(--font-size-caption);
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+.event-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-details .event-title {
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.event-details .event-location {
+  font-size: var(--font-size-caption);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+/* ===== 列表视图 ===== */
+.list-view {
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.list-toolbar {
+  margin-bottom: var(--space-lg);
+}
+
+.event-list-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.event-list-view .event-card {
   cursor: pointer;
   transition: var(--transition-normal);
 }
 
-.event-card:hover {
+.event-list-view .event-card:hover {
   box-shadow: var(--shadow-card-hover);
-}
-
-.event-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-sm);
-  color: var(--text-tertiary);
 }
 
 .event-content {
@@ -1192,177 +1682,9 @@ onMounted(async () => {
   gap: var(--space-xs);
 }
 
-.event-actions {
-  display: flex;
-  gap: var(--space-xs);
-  flex-shrink: 0;
-}
-
-.week-view,
-.day-view,
-.list-view {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  box-shadow: var(--shadow-card);
-  margin-bottom: var(--space-lg);
-}
-
-.week-header {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
-  border-bottom: 1px solid var(--divider);
-  padding-bottom: var(--space-md);
-}
-
-.week-day {
-  text-align: center;
-}
-
-.day-label {
-  font-size: var(--font-size-caption);
-  color: var(--text-tertiary);
-  margin-bottom: var(--space-xs);
-}
-
-.day-number {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.week-content {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: var(--space-sm);
-  min-height: 400px;
-}
-
-.week-column {
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xs);
-  padding: var(--space-sm);
-  min-height: 400px;
-}
-
-.week-event {
-  padding: var(--space-sm) 10px;
-  margin-bottom: var(--space-sm);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: var(--font-size-footnote);
-  transition: var(--transition-normal);
-  box-shadow: var(--shadow-card);
-  border-left: 3px solid rgba(255, 255, 255, 0.5);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
-}
-
-.week-event:hover {
-  box-shadow: var(--shadow-card-hover);
-}
-
-.week-event .event-time {
-  font-weight: 600;
-  font-size: var(--font-size-caption);
-  margin-bottom: 3px;
-  opacity: 0.95;
-  color: #ffffff;
-}
-
-.week-event .event-title {
-  font-weight: 500;
-  color: #ffffff;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-
-.day-view {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  box-shadow: var(--shadow-card);
-  margin-bottom: var(--space-lg);
-}
-
-.day-header h3 {
-  margin: 0 0 var(--space-lg) 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.day-events-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.day-event-item {
-  display: flex;
-  gap: var(--space-lg);
-  padding: var(--space-md);
-  border: 0.5px solid var(--border-color);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: var(--transition-normal);
-}
-
-.day-event-item:hover {
-  background: var(--bg-secondary);
-  border-color: var(--accent-blue);
-}
-
-.time-start {
-  font-weight: 600;
-  color: var(--accent-blue);
-}
-
-.time-end {
-  font-size: var(--font-size-caption);
-  color: var(--text-tertiary);
-}
-
-.list-view {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-xl);
-  box-shadow: var(--shadow-card);
-  margin-bottom: var(--space-lg);
-}
-
-.list-toolbar {
-  margin-bottom: var(--space-lg);
-}
-
-.event-list-view {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
+/* ===== 通用 ===== */
 .el-empty {
-  padding: 40px 0;
-}
-
-.lunar-info {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  margin-top: 2px;
-}
-
-.lunar-date {
-  line-height: 1.2;
-}
-
-.solar-term {
-  color: var(--color-green);
-  font-weight: 600;
-  margin-top: 2px;
+  padding: 32px 0;
 }
 </style>
 

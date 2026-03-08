@@ -20,9 +20,13 @@ use log::LevelFilter;
 /// 配置并运行 Tauri 应用程序
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        // 插件配置
-        .plugin(configure_single_instance())
+    let builder = tauri::Builder::default();
+
+    // dev2 feature 下禁用单实例限制，允许多开用于测试
+    #[cfg(not(feature = "dev2"))]
+    let builder = builder.plugin(configure_single_instance());
+
+    builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())

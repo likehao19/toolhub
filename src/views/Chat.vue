@@ -180,17 +180,14 @@
 
               <!-- 普通/文件消息 -->
               <template v-else>
-                <!-- 对方头像 -->
+                <!-- 对方头像（左） -->
                 <div v-if="msg.username !== username" class="avatar">
                   {{ msg.username.charAt(0).toUpperCase() }}
                 </div>
 
                 <div class="bubble-wrap">
-                  <!-- 发送人 + 时间 -->
-                  <div class="msg-meta" :class="{ 'meta-self': msg.username === username }">
-                    <span v-if="msg.username !== username" class="msg-username">{{ msg.username }}</span>
-                    <span class="msg-time">{{ msg.time }}</span>
-                  </div>
+                  <!-- 发送人（仅对方显示，气泡上方） -->
+                  <div v-if="msg.username !== username" class="msg-username">{{ msg.username }}</div>
 
                   <!-- 文本气泡 -->
                   <div v-if="msg.type === 'message'"
@@ -202,16 +199,25 @@
                   <template v-else-if="msg.type === 'file'">
                     <!-- 图片 -->
                     <div v-if="msg.isImage"
-                         class="img-bubble" :class="{ 'img-bubble-self': msg.username === username }"
-                         @click="viewingImage = msg.dataUrl">
-                      <img :src="msg.dataUrl" class="msg-image" />
-                      <span class="media-filename">{{ msg.filename }}</span>
+                         class="img-bubble" :class="{ 'img-bubble-self': msg.username === username }">
+                      <img :src="msg.dataUrl" class="msg-image" @click="viewingImage = msg.dataUrl" />
+                      <div class="media-footer">
+                        <span class="media-filename">{{ msg.filename }}</span>
+                        <button class="media-dl-btn" @click.stop="downloadFile(msg)" title="保存文件">
+                          <el-icon><Download /></el-icon>
+                        </button>
+                      </div>
                     </div>
                     <!-- 视频 -->
                     <div v-else-if="msg.isVideo"
                          class="video-bubble" :class="{ 'video-bubble-self': msg.username === username }">
                       <video :src="msg.dataUrl" class="msg-video" controls />
-                      <span class="media-filename">{{ msg.filename }}</span>
+                      <div class="media-footer">
+                        <span class="media-filename">{{ msg.filename }}</span>
+                        <button class="media-dl-btn" @click.stop="downloadFile(msg)" title="保存文件">
+                          <el-icon><Download /></el-icon>
+                        </button>
+                      </div>
                     </div>
                     <!-- 其他文件 -->
                     <div v-else
@@ -220,9 +226,12 @@
                       <div class="file-card-icon"><el-icon><Document /></el-icon></div>
                       <div class="file-card-body">
                         <p class="file-card-name">{{ msg.filename }}</p>
-                        <p class="file-card-size">{{ formatFileSize(msg.size) }} · 点击下载</p>
+                        <p class="file-card-size">{{ formatFileSize(msg.size) }}</p>
                       </div>
-                      <el-icon class="file-card-dl"><Download /></el-icon>
+                      <div class="file-card-dl-wrap">
+                        <el-icon class="file-card-dl"><Download /></el-icon>
+                        <span class="file-card-dl-text">保存</span>
+                      </div>
                     </div>
                   </template>
 
@@ -236,7 +245,7 @@
                           <div class="file-progress-bar" :style="{ width: (msg.sent / msg.total * 100) + '%' }"></div>
                         </div>
                         <p class="file-progress-info">
-                          发送中 {{ msg.sent }}/{{ msg.total }} 块 · {{ formatFileSize(msg.size) }}
+                          发送中 {{ Math.round(msg.sent / msg.total * 100) }}% · {{ formatFileSize(msg.size) }}
                         </p>
                       </div>
                     </div>
@@ -252,14 +261,17 @@
                           <div class="file-progress-bar recv" :style="{ width: (msg.received / msg.total * 100) + '%' }"></div>
                         </div>
                         <p class="file-progress-info">
-                          接收中 {{ msg.received }}/{{ msg.total }} 块 · {{ formatFileSize(msg.size) }}
+                          接收中 {{ Math.round(msg.received / msg.total * 100) }}% · {{ formatFileSize(msg.size) }}
                         </p>
                       </div>
                     </div>
                   </template>
+
+                  <!-- 时间（气泡下方） -->
+                  <span class="msg-time">{{ msg.time }}</span>
                 </div>
 
-                <!-- 自己头像 -->
+                <!-- 自己头像（右） -->
                 <div v-if="msg.username === username" class="avatar avatar-self">
                   {{ username.charAt(0).toUpperCase() }}
                 </div>
@@ -304,19 +316,16 @@
 
         <!-- 主输入框 -->
         <div class="input-box" :class="{ focused: inputFocused }">
-          <!-- 隐藏的原生 file input -->
           <input
             type="file" ref="fileInputRef" @change="onFileSelected"
             multiple
             style="display:none"
           />
 
-          <!-- 附件按钮 -->
           <button class="attach-btn" @click="pickFiles" title="发送图片 / 文件 / 视频">
             <el-icon><Paperclip /></el-icon>
           </button>
 
-          <!-- 文本输入 -->
           <textarea
             ref="textareaRef"
             v-model="inputMsg"
@@ -330,7 +339,6 @@
             @paste="onPaste"
           ></textarea>
 
-          <!-- 发送按钮（嵌入输入框内） -->
           <button
             class="send-btn-round"
             :class="{ 'send-active': inputMsg.trim() || pendingFiles.length }"
@@ -369,6 +377,8 @@ import {
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { invoke } from '@tauri-apps/api/core'
+import { save } from '@tauri-apps/plugin-dialog'
+import { writeFile } from '@tauri-apps/plugin-fs'
 
 // ---- 连接状态 ----
 const mode = ref('lan')
@@ -397,10 +407,14 @@ const inputFocused = ref(false)
 const viewingImage = ref(null)
 
 // ---- 文件传输状态 ----
-const CHUNK_SIZE = 256 * 1024  // 256 KB
-const objectUrls = []          // 组件销毁时统一 revoke
+// 内网高速传输：1 MB 分块；4 块并发读取
+const CHUNK_SIZE  = 1024 * 1024
+const PIPELINE    = 4
+
+const objectUrls = []
 const selfSentFileIds = new Set()
-const receivingChunks = new Map() // fileId → { chunks, received, total, filename, mime, size, username, time }
+// fileId → { chunks, received, total, filename, mime, size, username, time }
+const receivingChunks = new Map()
 
 const LAN_PORT = 18765
 let ws = null
@@ -486,6 +500,8 @@ const connectWs = () => {
   const url = `ws://${serverHost.value.trim()}:${serverPort.value}/chat/${room}`
   if (!wsUrl.value) wsUrl.value = `${serverHost.value.trim()}:${serverPort.value}`
   ws = new WebSocket(url)
+  // 接收二进制帧为 ArrayBuffer，而不是 Blob，便于直接操作字节
+  ws.binaryType = 'arraybuffer'
 
   ws.onopen = () => {
     connecting.value = false
@@ -495,86 +511,115 @@ const connectWs = () => {
   }
 
   ws.onmessage = ({ data }) => {
-    try {
-      const d = JSON.parse(data)
-      if (d.type === 'message') {
-        messages.value.push({ type: 'message', username: d.username, content: d.content, time: d.time || ft() })
-        scrollBottom()
-      } else if (d.type === 'file_chunk') {
-        // 忽略自己发出的回声（自己发的已在本地显示）
-        if (d.username === username.value && selfSentFileIds.has(d.fileId)) return
-
-        const { fileId, filename, mime, size, chunkIndex, totalChunks } = d
-
-        if (!receivingChunks.has(fileId)) {
-          receivingChunks.set(fileId, {
-            filename, mime, size, username: d.username,
-            chunks: new Array(totalChunks).fill(null),
-            received: 0, total: totalChunks, time: d.time || ft()
-          })
-          messages.value.push({
-            type: 'file_receiving', fileId,
-            username: d.username, filename, size,
-            received: 0, total: totalChunks, time: d.time || ft()
-          })
+    if (data instanceof ArrayBuffer) {
+      handleBinaryChunk(data)
+    } else {
+      try {
+        const d = JSON.parse(data)
+        if (d.type === 'message') {
+          messages.value.push({ type: 'message', username: d.username, content: d.content, time: d.time || ft() })
           scrollBottom()
-        }
-
-        const state = receivingChunks.get(fileId)
-        if (state.chunks[chunkIndex] === null) {
-          // 解码 base64 → Uint8Array，避免保留大量 base64 字符串
-          const bin = atob(d.data)
-          const bytes = new Uint8Array(bin.length)
-          for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-          state.chunks[chunkIndex] = bytes
-          state.received++
-        }
-
-        // 更新进度
-        const idx = messages.value.findIndex(m => m.type === 'file_receiving' && m.fileId === fileId)
-        if (idx !== -1) messages.value[idx] = { ...messages.value[idx], received: state.received }
-
-        if (state.received === state.total) {
-          // 所有块到齐 → 拼装 Blob → 创建 Object URL
-          try {
-            const blob = new Blob(state.chunks, { type: state.mime })
-            const blobUrl = URL.createObjectURL(blob)
-            objectUrls.push(blobUrl)
-            if (idx !== -1) {
-              messages.value.splice(idx, 1, {
-                type: 'file', username: state.username, filename: state.filename,
-                mime: state.mime, dataUrl: blobUrl, size: state.size, time: state.time,
-                isImage: state.mime.startsWith('image/'), isVideo: state.mime.startsWith('video/')
-              })
-            }
-          } catch {
-            if (idx !== -1) messages.value.splice(idx, 1)
-            ElMessage.error(`${state.filename} 接收失败`)
-          }
-          receivingChunks.delete(fileId)
+        } else if (d.type === 'system') {
+          messages.value.push({ type: 'system', content: d.content, time: ft() })
           scrollBottom()
+        } else if (d.type === 'users') {
+          onlineUsers.value = d.list || []
         }
-      } else if (d.type === 'system') {
-        messages.value.push({ type: 'system', content: d.content, time: ft() })
-        scrollBottom()
-      } else if (d.type === 'users') {
-        onlineUsers.value = d.list || []
-      }
-    } catch {}
+      } catch {}
+    }
   }
 
-  ws.onerror = () => { connecting.value = false; connectError.value = '连接失败，请检查地址'; lanState.value = 'found' }
+  ws.onerror = () => {
+    connecting.value = false
+    connectError.value = '连接失败，请检查地址'
+    lanState.value = 'found'
+  }
 
   ws.onclose = () => {
     connecting.value = false
-    if (connected.value) { connected.value = false; messages.value.push({ type: 'system', content: '已断开连接', time: ft() }) }
+    if (connected.value) {
+      connected.value = false
+      messages.value.push({ type: 'system', content: '已断开连接', time: ft() })
+    }
   }
 
   setTimeout(() => {
     if (connecting.value || lanState.value === 'connecting') {
-      ws?.close(); connecting.value = false; connectError.value = '连接超时，请重试'; lanState.value = 'found'
+      ws?.close()
+      connecting.value = false
+      connectError.value = '连接超时，请重试'
+      lanState.value = 'found'
     }
   }, 8000)
+}
+
+// ---- 二进制文件块处理（接收）----
+// 协议：[4字节 header长度 big-endian][header JSON][chunk 二进制数据]
+// header: { fileId, chunkIndex, totalChunks, size, filename, mime, username, time }
+const handleBinaryChunk = (buffer) => {
+  const bytes = new Uint8Array(buffer)
+  if (bytes.length < 4) return
+  const view = new DataView(buffer)
+  const headerLen = view.getUint32(0, false)
+  if (4 + headerLen > bytes.length) return
+
+  let d
+  try {
+    d = JSON.parse(new TextDecoder().decode(bytes.slice(4, 4 + headerLen)))
+  } catch { return }
+
+  // 过滤自己发出的回声
+  if (d.username === username.value && selfSentFileIds.has(d.fileId)) return
+
+  const { fileId, filename, mime, size, chunkIndex, totalChunks } = d
+  const chunkData = new Uint8Array(buffer, 4 + headerLen)
+
+  if (!receivingChunks.has(fileId)) {
+    receivingChunks.set(fileId, {
+      filename, mime, size, username: d.username,
+      chunks: new Array(totalChunks).fill(null),
+      received: 0, total: totalChunks, time: d.time || ft()
+    })
+    messages.value.push({
+      type: 'file_receiving', fileId,
+      username: d.username, filename, size,
+      received: 0, total: totalChunks, time: d.time || ft()
+    })
+    scrollBottom()
+  }
+
+  const state = receivingChunks.get(fileId)
+  if (state.chunks[chunkIndex] === null) {
+    // 复制 chunk 字节（避免 ArrayBuffer 被 GC 前被引用问题）
+    state.chunks[chunkIndex] = chunkData.slice()
+    state.received++
+  }
+
+  // 更新接收进度
+  const idx = messages.value.findIndex(m => m.type === 'file_receiving' && m.fileId === fileId)
+  if (idx !== -1) messages.value[idx] = { ...messages.value[idx], received: state.received }
+
+  if (state.received === state.total) {
+    try {
+      const blob = new Blob(state.chunks, { type: state.mime })
+      const blobUrl = URL.createObjectURL(blob)
+      objectUrls.push(blobUrl)
+      if (idx !== -1) {
+        messages.value.splice(idx, 1, {
+          type: 'file', username: state.username, filename: state.filename,
+          mime: state.mime, dataUrl: blobUrl, blob,
+          size: state.size, time: state.time,
+          isImage: state.mime.startsWith('image/'),
+          isVideo: state.mime.startsWith('video/')
+        })
+      }
+    } catch {
+      if (idx !== -1) messages.value.splice(idx, 1)
+      ElMessage.error(`${state.filename} 接收失败`)
+    }
+    receivingChunks.delete(fileId)
+    scrollBottom()
+  }
 }
 
 // ---- 文件处理 ----
@@ -584,7 +629,6 @@ const onFileSelected = (e) => {
   Array.from(e.target.files).forEach(file => {
     const mime = file.type || 'application/octet-stream'
     const isImage = mime.startsWith('image/')
-    // 仅图片生成缩略图预览 URL，避免大文件读入内存
     const previewUrl = isImage ? URL.createObjectURL(file) : null
     if (previewUrl) objectUrls.push(previewUrl)
     pendingFiles.value.push({
@@ -611,18 +655,38 @@ const onPaste = (e) => {
   }
 }
 
-const downloadFile = (msg) => {
-  const a = document.createElement('a')
-  a.href = msg.dataUrl; a.download = msg.filename
-  document.body.appendChild(a); a.click(); document.body.removeChild(a)
+// ---- 下载文件（Tauri 原生保存对话框）----
+const downloadFile = async (msg) => {
+  try {
+    const ext = msg.filename.includes('.') ? msg.filename.split('.').pop() : ''
+    const savePath = await save({
+      defaultPath: msg.filename,
+      filters: ext ? [{ name: 'File', extensions: [ext] }] : []
+    })
+    if (!savePath) return
+
+    // 优先用 blob 对象，否则 fetch blob URL
+    const buffer = msg.blob
+      ? await msg.blob.arrayBuffer()
+      : await fetch(msg.dataUrl).then(r => r.arrayBuffer())
+
+    await writeFile(savePath, new Uint8Array(buffer))
+    ElMessage.success('文件已保存')
+  } catch (err) {
+    ElMessage.error('保存失败：' + err)
+  }
 }
 
-// ---- 分块发送 ----
-const arrayBufferToBase64 = (buffer) => {
-  const bytes = new Uint8Array(buffer)
-  let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i])
-  return btoa(binary)
+// ---- 二进制分块发送（高性能：无 base64，并发读取）----
+const buildBinaryChunk = (fileId, chunkIndex, totalChunks, size, filename, mime, chunkBuffer) => {
+  const header = JSON.stringify({ fileId, chunkIndex, totalChunks, size, filename, mime })
+  const headerBytes = new TextEncoder().encode(header)
+  const out = new ArrayBuffer(4 + headerBytes.byteLength + chunkBuffer.byteLength)
+  const view = new DataView(out)
+  view.setUint32(0, headerBytes.byteLength, false)
+  new Uint8Array(out, 4, headerBytes.byteLength).set(headerBytes)
+  new Uint8Array(out, 4 + headerBytes.byteLength).set(new Uint8Array(chunkBuffer))
+  return out
 }
 
 const sendFileChunked = async (pending) => {
@@ -632,7 +696,6 @@ const sendFileChunked = async (pending) => {
 
   selfSentFileIds.add(fileId)
 
-  // 在消息流中插入"发送中"占位
   messages.value.push({
     type: 'file_sending', fileId,
     username: username.value, filename: name, size,
@@ -641,33 +704,40 @@ const sendFileChunked = async (pending) => {
   scrollBottom()
 
   try {
-    for (let i = 0; i < totalChunks; i++) {
+    // 并发读取 PIPELINE 块，流水线发送
+    for (let i = 0; i < totalChunks; i += PIPELINE) {
       if (!ws || ws.readyState !== WebSocket.OPEN) break
-      const slice = file.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
-      const buffer = await slice.arrayBuffer()
-      ws.send(JSON.stringify({
-        type: 'file_chunk', fileId,
-        filename: name, mime, size,
-        chunkIndex: i, totalChunks,
-        data: arrayBufferToBase64(buffer)
-      }))
-      // 更新发送进度
-      const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
-      if (idx !== -1) messages.value[idx] = { ...messages.value[idx], sent: i + 1 }
+      const end = Math.min(i + PIPELINE, totalChunks)
+
+      // 并发读取本批次所有切片
+      const buffers = await Promise.all(
+        Array.from({ length: end - i }, (_, k) =>
+          file.slice((i + k) * CHUNK_SIZE, (i + k + 1) * CHUNK_SIZE).arrayBuffer()
+        )
+      )
+
+      // 顺序发送（WebSocket 保证顺序，接收方按 chunkIndex 拼接）
+      for (let k = 0; k < buffers.length; k++) {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return
+        ws.send(buildBinaryChunk(fileId, i + k, totalChunks, size, name, mime, buffers[k]))
+        const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
+        if (idx !== -1) messages.value[idx] = { ...messages.value[idx], sent: i + k + 1 }
+      }
     }
 
-    // 全部发完 → 本地直接从 File 创建 Blob URL 展示，无需等服务器回声
-    const blobUrl = URL.createObjectURL(new Blob([file], { type: mime }))
+    // 全部发完 → 本地直接从 File 创建 Blob URL 展示
+    const blob = new Blob([file], { type: mime })
+    const blobUrl = URL.createObjectURL(blob)
     objectUrls.push(blobUrl)
     const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
     if (idx !== -1) {
       messages.value.splice(idx, 1, {
         type: 'file', username: username.value, filename: name,
-        mime, dataUrl: blobUrl, size, time: ft(),
+        mime, dataUrl: blobUrl, blob, size, time: ft(),
         isImage: mime.startsWith('image/'), isVideo: mime.startsWith('video/')
       })
     }
-  } catch (err) {
+  } catch {
     const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
     if (idx !== -1) messages.value.splice(idx, 1)
     ElMessage.error(`${name} 发送失败`)
@@ -679,7 +749,6 @@ const sendFileChunked = async (pending) => {
 const sendMessage = () => {
   if (!ws || ws.readyState !== WebSocket.OPEN) return
 
-  // 文字先发
   const content = inputMsg.value.trim()
   if (content) {
     ws.send(JSON.stringify({ type: 'message', content }))
@@ -687,7 +756,6 @@ const sendMessage = () => {
     if (textareaRef.value) textareaRef.value.style.height = 'auto'
   }
 
-  // 文件分块异步发送
   const filesToSend = [...pendingFiles.value]
   pendingFiles.value = []
   if (filesToSend.length > 0) {
@@ -861,13 +929,16 @@ onUnmounted(async () => {
 .empty-text { margin: 0; font-size: var(--font-size-callout); font-weight: var(--font-weight-medium); color: var(--text-secondary); }
 .empty-sub { margin: 0; font-size: var(--font-size-caption); color: var(--text-tertiary); }
 
-/* ---- 消息条目 ---- */
+/* ===================================================
+   消息条目（微信风格）
+   =================================================== */
 .message-item {
   display: flex;
-  align-items: flex-end;   /* 头像和气泡底部对齐 */
-  gap: var(--space-sm);
+  align-items: flex-start;  /* 头像与气泡顶部对齐 */
+  gap: 8px;
 }
-.message-item.is-self { flex-direction: row-reverse; }
+/* 自己的消息：整体靠右，头像在 bubble-wrap 右侧（DOM顺序：bubble-wrap → avatar-self）*/
+.message-item.is-self { justify-content: flex-end; }
 .message-item.is-system { justify-content: center; }
 
 .system-msg {
@@ -878,78 +949,162 @@ onUnmounted(async () => {
 }
 .system-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--text-quaternary); flex-shrink: 0; }
 
-/* 头像 */
+/* ---- 头像 ---- */
 .avatar {
-  width: 30px; height: 30px; border-radius: 50%;
+  width: 32px; height: 32px; border-radius: 50%;
   background: var(--accent-blue); color: white;
   display: flex; align-items: center; justify-content: center;
-  font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold);
-  flex-shrink: 0;
-  /* 不设置 align-self，让其跟随 align-items: flex-end，与气泡底部对齐 */
+  font-size: 13px; font-weight: var(--font-weight-semibold);
+  flex-shrink: 0; user-select: none;
 }
-.avatar-self { background: linear-gradient(135deg, var(--color-green), #27a24a); }
+.avatar-self {
+  background: linear-gradient(135deg, #07c160, #05a04f);
+}
 
-/* 气泡容器 */
-.bubble-wrap { max-width: min(360px, 65%); display: flex; flex-direction: column; gap: 4px; }
+/* ---- 气泡容器 ---- */
+.bubble-wrap {
+  max-width: min(380px, 65%);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+/* 自己的消息：内部元素右对齐 */
+.message-item.is-self .bubble-wrap {
+  align-items: flex-end;
+}
 
-.msg-meta { display: flex; align-items: center; gap: 5px; padding: 0 4px; }
-.meta-self { justify-content: flex-end; }
-.msg-username { font-size: var(--font-size-caption); font-weight: var(--font-weight-medium); color: var(--text-secondary); }
-.msg-time { font-size: 11px; color: var(--text-quaternary); }
+/* ---- 元信息行 ---- */
+.msg-username { font-size: var(--font-size-caption); font-weight: var(--font-weight-medium); color: var(--text-secondary); padding: 0 4px 2px; }
+.msg-time { font-size: 11px; color: var(--text-quaternary); padding: 2px 4px 0; }
 
-/* 文本气泡 */
+/* ---- 文本气泡（带三角尾巴）---- */
 .bubble {
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-lg); border-top-left-radius: 4px;
-  font-size: var(--font-size-footnote); line-height: 1.55; word-break: break-word;
+  position: relative;
+  padding: 9px 13px;
+  border-radius: 16px 16px 16px 4px; /* 左下直角 */
+  font-size: var(--font-size-footnote); line-height: 1.6; word-break: break-word;
   background: var(--bg-primary); color: var(--text-primary);
-  box-shadow: var(--shadow-sm); border: 0.5px solid var(--border-color);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  border: 0.5px solid var(--border-color);
 }
 .bubble-self {
-  background: var(--accent-blue); color: white; border: none;
-  border-radius: var(--radius-lg); border-top-right-radius: 4px; border-top-left-radius: var(--radius-lg);
-  box-shadow: 0 1px 4px rgba(0,122,255,0.25);
+  background: #07c160; /* 微信绿 */
+  color: white; border: none;
+  border-radius: 16px 16px 4px 16px; /* 右下直角 */
+  box-shadow: 0 1px 3px rgba(7,193,96,0.3);
 }
 
 /* ---- 图片消息 ---- */
 .img-bubble {
-  cursor: pointer; overflow: hidden;
-  border-radius: var(--radius-md); border-top-left-radius: 4px;
-  border: 0.5px solid var(--border-color); box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border-radius: 12px 12px 12px 4px;
+  border: 0.5px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   display: flex; flex-direction: column;
+  background: var(--bg-primary);
+  cursor: pointer;
   transition: opacity var(--transition-fast);
 }
-.img-bubble:hover { opacity: 0.9; }
-.img-bubble-self { border-radius: var(--radius-md); border-top-right-radius: 4px; border-top-left-radius: var(--radius-md); }
+.img-bubble:hover { opacity: 0.92; }
+.img-bubble-self {
+  border-radius: 12px 12px 4px 12px;
+}
 .msg-image { display: block; max-width: 240px; max-height: 300px; object-fit: cover; }
-.media-filename { font-size: 10px; color: var(--text-tertiary); padding: 4px var(--space-sm); background: var(--bg-secondary); }
 
 /* ---- 视频消息 ---- */
 .video-bubble {
-  border-radius: var(--radius-md); border-top-left-radius: 4px;
-  border: 0.5px solid var(--border-color); box-shadow: var(--shadow-sm);
+  border-radius: 12px 12px 12px 4px;
+  border: 0.5px solid var(--border-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   overflow: hidden; display: flex; flex-direction: column;
+  background: var(--bg-primary);
 }
-.video-bubble-self { border-radius: var(--radius-md); border-top-right-radius: 4px; border-top-left-radius: var(--radius-md); }
+.video-bubble-self { border-radius: 12px 12px 4px 12px; }
 .msg-video { display: block; max-width: 240px; max-height: 200px; background: #000; }
+
+/* 图片/视频底栏 */
+.media-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 8px;
+  background: var(--bg-secondary);
+}
+.media-filename {
+  font-size: 11px; color: var(--text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1; min-width: 0;
+}
+.media-dl-btn {
+  flex-shrink: 0; margin-left: 6px;
+  width: 22px; height: 22px; border-radius: 50%;
+  border: none; background: var(--bg-tertiary);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; padding: 0;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.media-dl-btn:hover { background: var(--accent-blue); color: white; }
 
 /* ---- 文件卡片 ---- */
 .file-card {
   display: flex; align-items: center; gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
+  padding: 10px 12px;
   background: var(--bg-primary); border: 0.5px solid var(--border-color);
-  border-radius: var(--radius-md); border-top-left-radius: 4px;
-  box-shadow: var(--shadow-sm); cursor: pointer;
-  transition: background var(--transition-fast);
-  min-width: 180px; max-width: 240px;
+  border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.07); cursor: pointer;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast);
+  min-width: 190px; max-width: 260px;
 }
-.file-card:hover { background: var(--accent-blue-bg); }
-.file-card-self { border-radius: var(--radius-md); border-top-right-radius: 4px; border-top-left-radius: var(--radius-md); }
-.file-card-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-blue-bg); color: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.file-card:hover { background: var(--accent-blue-bg); box-shadow: 0 2px 6px rgba(0,122,255,0.12); }
+.file-card-self { border-radius: 12px 12px 4px 12px; }
+.file-card-icon {
+  width: 38px; height: 38px; border-radius: var(--radius-sm);
+  background: var(--accent-blue-bg); color: var(--accent-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; flex-shrink: 0;
+}
 .file-card-body { flex: 1; min-width: 0; }
 .file-card-name { margin: 0; font-size: var(--font-size-footnote); font-weight: var(--font-weight-medium); color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.file-card-size { margin: 0; font-size: var(--font-size-caption2); color: var(--text-tertiary); margin-top: 2px; }
-.file-card-dl { color: var(--text-quaternary); font-size: 16px; flex-shrink: 0; }
+.file-card-size { margin: 2px 0 0; font-size: var(--font-size-caption2); color: var(--text-tertiary); }
+.file-card-dl-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  flex-shrink: 0; padding: 0 2px;
+}
+.file-card-dl { color: var(--text-quaternary); font-size: 16px; }
+.file-card-dl-text { font-size: 10px; color: var(--text-quaternary); }
+.file-card:hover .file-card-dl,
+.file-card:hover .file-card-dl-text { color: var(--accent-blue); }
+
+/* ---- 传输进度卡片 ---- */
+.file-progress-card {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: 10px 12px;
+  background: var(--bg-primary); border: 0.5px solid var(--border-color);
+  border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.07);
+  min-width: 220px; max-width: 280px;
+}
+.file-progress-self { border-radius: 12px 12px 4px 12px; }
+.file-progress-icon {
+  width: 38px; height: 38px; border-radius: var(--radius-sm);
+  background: var(--accent-blue-bg); color: var(--accent-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.file-progress-icon.recv { background: rgba(7,193,96,0.12); color: #07c160; }
+.file-progress-body { flex: 1; min-width: 0; }
+.file-progress-name {
+  margin: 0;
+  font-size: var(--font-size-footnote); font-weight: var(--font-weight-medium);
+  color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.file-progress-bar-wrap {
+  height: 4px; background: var(--bg-tertiary); border-radius: 2px; margin: 5px 0; overflow: hidden;
+}
+.file-progress-bar {
+  height: 100%; background: var(--accent-blue); border-radius: 2px; transition: width 0.1s linear;
+}
+.file-progress-bar.recv { background: #07c160; }
+.file-progress-info { margin: 0; font-size: 11px; color: var(--text-tertiary); }
 
 /* ---- 用户面板 ---- */
 .user-panel {
@@ -967,208 +1122,80 @@ onUnmounted(async () => {
 .user-item { display: flex; align-items: center; gap: var(--space-sm); padding: 6px var(--space-md); transition: background var(--transition-fast); }
 .user-item:hover { background: var(--bg-secondary); }
 .user-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--bg-tertiary); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; font-size: var(--font-size-caption); font-weight: var(--font-weight-semibold); flex-shrink: 0; }
-.user-avatar-me { background: var(--accent-blue-bg); color: var(--accent-blue); }
+.user-avatar-me { background: rgba(7,193,96,0.15); color: #07c160; }
 .user-name { flex: 1; font-size: var(--font-size-footnote); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-item.is-me .user-name { color: var(--accent-blue); }
-.me-badge { font-size: 10px; font-weight: var(--font-weight-medium); color: var(--accent-blue); background: var(--accent-blue-bg); padding: 1px 5px; border-radius: 4px; flex-shrink: 0; }
+.user-item.is-me .user-name { color: #07c160; }
+.me-badge { font-size: 10px; font-weight: var(--font-weight-medium); color: #07c160; background: rgba(7,193,96,0.12); padding: 1px 5px; border-radius: 4px; flex-shrink: 0; }
 
 /* ===================================================
    输入区
    =================================================== */
 .input-area {
   padding: var(--space-sm) var(--space-xl) var(--space-md);
-  background: var(--bg-primary);
-  border-top: 0.5px solid var(--border-color);
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+  background: var(--bg-primary); border-top: 0.5px solid var(--border-color);
+  flex-shrink: 0; display: flex; flex-direction: column; gap: var(--space-sm);
 }
 
-/* 待发文件预览条 */
-.pending-strip {
-  display: flex;
-  gap: var(--space-sm);
-  overflow-x: auto;
-  padding: 4px 0 2px;
-}
+.pending-strip { display: flex; gap: var(--space-sm); overflow-x: auto; padding: 4px 0 2px; }
 .pending-strip::-webkit-scrollbar { height: 3px; }
 .pending-strip::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 2px; }
-
-.pending-item {
-  position: relative;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  max-width: 72px;
-}
-.pending-thumb {
-  width: 64px; height: 64px; object-fit: cover;
-  border-radius: var(--radius-sm); border: 0.5px solid var(--border-color);
-}
-.pending-file-icon {
-  width: 64px; height: 64px; border-radius: var(--radius-sm);
-  background: var(--bg-tertiary); border: 0.5px solid var(--border-color);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; color: var(--text-secondary);
-}
+.pending-item { position: relative; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 3px; max-width: 72px; }
+.pending-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: var(--radius-sm); border: 0.5px solid var(--border-color); }
+.pending-file-icon { width: 64px; height: 64px; border-radius: var(--radius-sm); background: var(--bg-tertiary); border: 0.5px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--text-secondary); }
 .pending-name { font-size: 10px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 64px; }
-.pending-remove {
-  position: absolute; top: -5px; right: -5px;
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--text-secondary); color: white;
-  border: none; cursor: pointer; padding: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 10px;
-  transition: background var(--transition-fast);
-}
+.pending-remove { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-secondary); color: white; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: background var(--transition-fast); }
 .pending-remove:hover { background: var(--color-red); }
 
-/* 主输入框容器 */
 .input-box {
-  display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color-strong);
-  border-radius: 22px;
-  padding: 4px 4px 4px var(--space-md);
+  display: flex; align-items: flex-end; gap: 6px;
+  background: var(--bg-secondary); border: 1px solid var(--border-color-strong);
+  border-radius: 22px; padding: 4px 4px 4px var(--space-md);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
-.input-box.focused {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px var(--accent-blue-bg);
-  background: var(--bg-primary);
-}
+.input-box.focused { border-color: #07c160; box-shadow: 0 0 0 3px rgba(7,193,96,0.12); background: var(--bg-primary); }
 
-/* 附件按钮 */
 .attach-btn {
-  flex-shrink: 0;
-  width: 32px; height: 32px;
-  border: none; background: transparent; border-radius: 50%;
-  color: var(--text-tertiary); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px; padding: 0;
-  align-self: flex-end; margin-bottom: 1px;
+  flex-shrink: 0; width: 32px; height: 32px; border: none; background: transparent; border-radius: 50%;
+  color: var(--text-tertiary); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 17px; padding: 0; align-self: flex-end; margin-bottom: 1px;
   transition: color var(--transition-fast), background var(--transition-fast);
 }
-.attach-btn:hover { color: var(--accent-blue); background: var(--accent-blue-bg); }
+.attach-btn:hover { color: #07c160; background: rgba(7,193,96,0.1); }
 
-/* 文本输入 */
 .msg-textarea {
-  flex: 1;
-  min-height: 34px; max-height: 120px;
+  flex: 1; min-height: 34px; max-height: 120px;
   background: transparent; border: none; outline: none; resize: none;
   font-size: var(--font-size-footnote); font-family: var(--font-family);
-  color: var(--text-primary); line-height: 1.55;
-  padding: 7px 0; overflow-y: auto;
+  color: var(--text-primary); line-height: 1.55; padding: 7px 0; overflow-y: auto;
 }
 .msg-textarea::placeholder { color: var(--text-tertiary); }
 .msg-textarea::-webkit-scrollbar { width: 3px; }
 .msg-textarea::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 2px; }
 
-/* 嵌入式发送按钮（圆形） */
 .send-btn-round {
-  flex-shrink: 0;
-  width: 34px; height: 34px; border-radius: 50%; border: none;
+  flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none;
   background: var(--bg-tertiary); color: var(--text-quaternary);
   cursor: default; display: flex; align-items: center; justify-content: center;
-  font-size: 16px; padding: 0;
-  align-self: flex-end; margin-bottom: 1px;
+  font-size: 16px; padding: 0; align-self: flex-end; margin-bottom: 1px;
   transition: all var(--transition-fast);
 }
-.send-btn-round.send-active {
-  background: var(--accent-blue); color: white; cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,122,255,0.3);
-}
-.send-btn-round.send-active:hover { background: var(--accent-blue-hover); transform: scale(1.06); }
+.send-btn-round.send-active { background: #07c160; color: white; cursor: pointer; box-shadow: 0 2px 6px rgba(7,193,96,0.35); }
+.send-btn-round.send-active:hover { background: #05a04f; transform: scale(1.06); }
 .send-btn-round.send-active:active { transform: scale(0.94); }
-
-/* ---- 文件传输进度卡片 ---- */
-.file-progress-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-primary);
-  border: 0.5px solid var(--border-color);
-  border-radius: var(--radius-md);
-  border-top-left-radius: 4px;
-  box-shadow: var(--shadow-sm);
-  min-width: 220px;
-  max-width: 280px;
-}
-.file-progress-self {
-  border-radius: var(--radius-md);
-  border-top-right-radius: 4px;
-  border-top-left-radius: var(--radius-md);
-}
-.file-progress-icon {
-  width: 36px; height: 36px;
-  border-radius: var(--radius-sm);
-  background: var(--accent-blue-bg); color: var(--accent-blue);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-}
-.file-progress-icon.recv {
-  background: rgba(52, 199, 89, 0.1); color: var(--color-green);
-}
-.file-progress-body { flex: 1; min-width: 0; }
-.file-progress-name {
-  margin: 0;
-  font-size: var(--font-size-footnote);
-  font-weight: var(--font-weight-medium);
-  color: var(--text-primary);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.file-progress-bar-wrap {
-  height: 4px;
-  background: var(--bg-tertiary);
-  border-radius: 2px;
-  margin: 5px 0;
-  overflow: hidden;
-}
-.file-progress-bar {
-  height: 100%;
-  background: var(--accent-blue);
-  border-radius: 2px;
-  transition: width 0.15s linear;
-}
-.file-progress-bar.recv { background: var(--color-green); }
-.file-progress-info {
-  margin: 0;
-  font-size: 11px;
-  color: var(--text-tertiary);
-}
 
 /* ===================================================
    图片全屏查看器
    =================================================== */
 .image-overlay {
   position: fixed; inset: 0; z-index: 9999;
-  background: rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.88);
   display: flex; align-items: center; justify-content: center;
   cursor: zoom-out;
   animation: overlay-in 150ms ease;
 }
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
-
-.overlay-img {
-  max-width: 90vw; max-height: 90vh;
-  object-fit: contain; border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg); cursor: default;
-  animation: img-in 150ms ease;
-}
+.overlay-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); cursor: default; animation: img-in 150ms ease; }
 @keyframes img-in { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-.overlay-close {
-  position: fixed; top: 20px; right: 20px;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,0.15); color: white;
-  border: none; cursor: pointer; font-size: 18px;
-  display: flex; align-items: center; justify-content: center;
-  transition: background var(--transition-fast);
-}
+.overlay-close { position: fixed; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); color: white; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background var(--transition-fast); }
 .overlay-close:hover { background: rgba(255,255,255,0.25); }
 </style>

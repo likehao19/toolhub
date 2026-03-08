@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev2": "vite --port 1421 --strictPort",
     "build": "vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev2": "set CARGO_TARGET_DIR=../target_dev2&& tauri dev --config src-tauri/tauri.dev2.conf.json -- --features dev2"
   },
   "dependencies": {
     "@antv/g6": "^5.0.51",

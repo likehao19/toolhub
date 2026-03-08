@@ -155,9 +155,17 @@ const save = async () => {
 const load = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
+    // 只加载 7 天前至未来的日程，限制 50 条
+    const cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - 7)
+    const cutoffStr = `${cutoff.getFullYear()}-${String(cutoff.getMonth() + 1).padStart(2, '0')}-${String(cutoff.getDate()).padStart(2, '0')}T00:00:00`
+
     const result = await db.select(
-      `SELECT id, title, start_time, end_time FROM calendar_events 
-       ORDER BY start_time DESC`
+      `SELECT id, title, start_time, end_time FROM calendar_events
+       WHERE start_time >= ?
+       ORDER BY start_time ASC
+       LIMIT 50`,
+      [cutoffStr]
     )
     
     if (result && result.length > 0) {

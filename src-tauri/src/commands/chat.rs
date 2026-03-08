@@ -23,11 +23,19 @@ use tokio::sync::{broadcast, oneshot, Mutex, RwLock};
 const UDP_PORT: u16 = 18766;
 const PREFIX: &str = "TOOLHUB_CHAT:";
 
+// ---- 广播消息类型 ----
+
+#[derive(Clone)]
+enum BroadcastMsg {
+    Text(String),
+    Binary(Vec<u8>),
+}
+
 // ---- 服务器状态 ----
 
 #[derive(Clone)]
 struct RoomState {
-    tx: broadcast::Sender<String>,
+    tx: broadcast::Sender<BroadcastMsg>,
     users: Arc<RwLock<Vec<String>>>,
 }
 
@@ -48,7 +56,8 @@ impl ServerState {
                 return r.clone();
             }
         }
-        let (tx, _) = broadcast::channel(128);
+        // 增大 channel 容量，应对高速文件传输大量块
+        let (tx, _) = broadcast::channel::<BroadcastMsg>(512);
         let room = RoomState { tx, users: Arc::new(RwLock::new(Vec::new())) };
         self.rooms.write().await.insert(id.to_string(), room.clone());
         room
@@ -86,7 +95,6 @@ pub async fn discover_lan_chat() -> Result<Vec<Value>, String> {
     tokio::task::spawn_blocking(|| -> Result<Vec<Value>, String> {
         let sock = UdpSocket::bind("0.0.0.0:0").map_err(|e| e.to_string())?;
         sock.set_broadcast(true).map_err(|e| e.to_string())?;
-        // 短超时：每 200ms 重发一次查询，持续 2 秒，覆盖服务端任意时序窗口
         sock.set_read_timeout(Some(std::time::Duration::from_millis(200)))
             .map_err(|e| e.to_string())?;
 
@@ -97,15 +105,12 @@ pub async fn discover_lan_chat() -> Result<Vec<Value>, String> {
         let deadline = Instant::now() + std::time::Duration::from_secs(2);
 
         while Instant::now() < deadline {
-            // 持续重发查询，确保服务端一定能收到
             let _ = sock.send_to(query.as_bytes(), &broadcast_addr);
-
             match sock.recv_from(&mut buf) {
                 Ok((len, src)) => {
                     let msg = String::from_utf8_lossy(&buf[..len]);
                     if let Some(payload) = msg.strip_prefix(PREFIX) {
                         if payload == "QUERY" { continue; }
-                        // 格式：{port}:{host_ip}
                         let parts: Vec<&str> = payload.splitn(2, ':').collect();
                         let port: u16 = parts.first().and_then(|p| p.parse().ok()).unwrap_or(18765);
                         let host = parts.get(1).copied().unwrap_or(&src.ip().to_string()).to_string();
@@ -114,7 +119,7 @@ pub async fn discover_lan_chat() -> Result<Vec<Value>, String> {
                         }
                     }
                 }
-                Err(_) => {} // 超时，继续发送下一次查询
+                Err(_) => {}
             }
         }
         Ok(found)
@@ -135,7 +140,6 @@ pub async fn start_lan_server(port: u16) -> Result<String, String> {
     *shutdown_cell().lock().await = Some(tx);
     ACTIVE_PORT.store(port, Ordering::SeqCst);
 
-    // 在 spawn 前绑定，保证 start_lan_server 返回时服务已就绪
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
     let listener = tokio::net::TcpListener::bind(addr)
         .await
@@ -152,12 +156,10 @@ pub async fn start_lan_server(port: u16) -> Result<String, String> {
             .ok();
     });
 
-    // UDP：启动即广播，之后全时响应查询 + 每 2 秒主动广播一次
     let ip_udp = ip_clone.clone();
     tokio::spawn(async move {
         let Ok(udp) = UdpSocket::bind(format!("0.0.0.0:{}", UDP_PORT)) else { return };
         let _ = udp.set_broadcast(true);
-        // 300ms 读超时：让出 CPU 的同时几乎全时监听查询包
         let _ = udp.set_read_timeout(Some(std::time::Duration::from_millis(300)));
 
         let announce = format!("{}{}:{}", PREFIX, port, ip_udp);
@@ -165,20 +167,17 @@ pub async fn start_lan_server(port: u16) -> Result<String, String> {
         let broadcast_addr = format!("255.255.255.255:{}", UDP_PORT);
         let mut buf = [0u8; 256];
 
-        // 启动后立即广播一次，让正在扫描的对端马上发现
         let _ = udp.send_to(announce.as_bytes(), &broadcast_addr);
         let mut last_announce = Instant::now();
 
         loop {
             if ACTIVE_PORT.load(Ordering::SeqCst) == 0 { break; }
 
-            // 每 2 秒主动广播自身
             if last_announce.elapsed() >= std::time::Duration::from_secs(2) {
                 let _ = udp.send_to(announce.as_bytes(), &broadcast_addr);
                 last_announce = Instant::now();
             }
 
-            // 全时监听查询，立即回复（300ms 超时自动进入下一轮）
             if let Ok((len, src)) = udp.recv_from(&mut buf) {
                 let msg = String::from_utf8_lossy(&buf[..len]);
                 if msg.as_ref() == query_msg {
@@ -208,7 +207,10 @@ async fn ws_handler(
     Path(room_id): Path<String>,
     State(state): State<ServerState>,
 ) -> Response {
-    ws.on_upgrade(move |socket| handle_socket(socket, state, room_id))
+    // 提高 WebSocket 帧大小上限，支持大块二进制传输（最大 2MB 帧）
+    ws.max_message_size(2 * 1024 * 1024)
+      .max_frame_size(2 * 1024 * 1024)
+      .on_upgrade(move |socket| handle_socket(socket, state, room_id))
 }
 
 async fn handle_socket(socket: WebSocket, state: ServerState, room_id: String) {
@@ -220,58 +222,72 @@ async fn handle_socket(socket: WebSocket, state: ServerState, room_id: String) {
 
     let (mut sink, mut stream) = socket.split();
 
+    // 发送任务：支持 Text 和 Binary 两种广播消息
     let send_task = tokio::spawn(async move {
         while let Ok(msg) = rx.recv().await {
-            if sink.send(Message::Text(msg)).await.is_err() { break; }
+            let res = match msg {
+                BroadcastMsg::Text(t)   => sink.send(Message::Text(t)).await,
+                BroadcastMsg::Binary(b) => sink.send(Message::Binary(b.into())).await,
+            };
+            if res.is_err() { break; }
         }
     });
 
     while let Some(Ok(msg)) = stream.next().await {
-        let Message::Text(text) = msg else { continue };
-        let Ok(v): Result<Value, _> = serde_json::from_str(&text) else { continue };
+        match msg {
+            // ---- 文本消息（聊天文字 / 加入 / 用户列表）----
+            Message::Text(text) => {
+                let Ok(v): Result<Value, _> = serde_json::from_str(&text) else { continue };
+                match v["type"].as_str().unwrap_or("") {
+                    "join" => {
+                        let name = v["username"].as_str().unwrap_or("匿名").trim().to_string();
+                        username = name.clone();
+                        users.write().await.push(name.clone());
+                        sys_msg(&tx, &format!("{} 加入了聊天室", name));
+                        push_users(&tx, &users).await;
+                    }
+                    "message" => {
+                        let content = v["content"].as_str().unwrap_or("").trim().to_string();
+                        if !content.is_empty() && !username.is_empty() {
+                            let _ = tx.send(BroadcastMsg::Text(json!({
+                                "type": "message",
+                                "username": username,
+                                "content": content,
+                                "time": hhmm(),
+                            }).to_string()));
+                        }
+                    }
+                    _ => {}
+                }
+            }
 
-        match v["type"].as_str().unwrap_or("") {
-            "join" => {
-                let name = v["username"].as_str().unwrap_or("匿名").trim().to_string();
-                username = name.clone();
-                users.write().await.push(name.clone());
-                sys_msg(&tx, &format!("{} 加入了聊天室", name));
-                push_users(&tx, &users).await;
-            }
-            "message" => {
-                let content = v["content"].as_str().unwrap_or("").trim().to_string();
-                if !content.is_empty() && !username.is_empty() {
-                    let _ = tx.send(json!({
-                        "type": "message",
-                        "username": username,
-                        "content": content,
-                        "time": hhmm(),
-                    }).to_string());
+            // ---- 二进制消息（文件分块，高性能无 base64）----
+            // 格式：[4字节 header长度 big-endian][header JSON][块二进制数据]
+            // header JSON 由客户端提供：{ fileId, chunkIndex, totalChunks, size, filename, mime }
+            // 服务端注入 username 和 time 后重新广播
+            Message::Binary(data) => {
+                if username.is_empty() || data.len() < 4 { continue; }
+                let header_len = u32::from_be_bytes([data[0], data[1], data[2], data[3]]) as usize;
+                if 4 + header_len > data.len() { continue; }
+
+                if let Ok(header_str) = std::str::from_utf8(&data[4..4 + header_len]) {
+                    if let Ok(mut v) = serde_json::from_str::<Value>(header_str) {
+                        v["username"] = json!(username);
+                        v["time"]     = json!(hhmm());
+
+                        let new_header = v.to_string().into_bytes();
+                        let chunk_data = &data[4 + header_len..];
+
+                        let mut out = Vec::with_capacity(4 + new_header.len() + chunk_data.len());
+                        out.extend_from_slice(&(new_header.len() as u32).to_be_bytes());
+                        out.extend_from_slice(&new_header);
+                        out.extend_from_slice(chunk_data);
+
+                        let _ = tx.send(BroadcastMsg::Binary(out));
+                    }
                 }
             }
-            "file_chunk" => {
-                if !username.is_empty() {
-                    let file_id = v["fileId"].as_str().unwrap_or("").to_string();
-                    let filename = v["filename"].as_str().unwrap_or("file").to_string();
-                    let mime = v["mime"].as_str().unwrap_or("application/octet-stream").to_string();
-                    let size = v["size"].as_i64().unwrap_or(0);
-                    let chunk_index = v["chunkIndex"].as_i64().unwrap_or(0);
-                    let total_chunks = v["totalChunks"].as_i64().unwrap_or(1);
-                    let data = v["data"].as_str().unwrap_or("").to_string();
-                    let _ = tx.send(json!({
-                        "type": "file_chunk",
-                        "username": username,
-                        "fileId": file_id,
-                        "filename": filename,
-                        "mime": mime,
-                        "size": size,
-                        "chunkIndex": chunk_index,
-                        "totalChunks": total_chunks,
-                        "data": data,
-                        "time": hhmm(),
-                    }).to_string());
-                }
-            }
+
             _ => {}
         }
     }
@@ -284,11 +300,15 @@ async fn handle_socket(socket: WebSocket, state: ServerState, room_id: String) {
     }
 }
 
-fn sys_msg(tx: &broadcast::Sender<String>, content: &str) {
-    let _ = tx.send(json!({ "type": "system", "content": content }).to_string());
+fn sys_msg(tx: &broadcast::Sender<BroadcastMsg>, content: &str) {
+    let _ = tx.send(BroadcastMsg::Text(
+        json!({ "type": "system", "content": content }).to_string()
+    ));
 }
 
-async fn push_users(tx: &broadcast::Sender<String>, users: &Arc<RwLock<Vec<String>>>) {
+async fn push_users(tx: &broadcast::Sender<BroadcastMsg>, users: &Arc<RwLock<Vec<String>>>) {
     let list = users.read().await.clone();
-    let _ = tx.send(json!({ "type": "users", "list": list }).to_string());
+    let _ = tx.send(BroadcastMsg::Text(
+        json!({ "type": "users", "list": list }).to_string()
+    ));
 }
