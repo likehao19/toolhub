@@ -108,6 +108,27 @@ const basicCode = `import { TauriProcess } from '@/utils/tauri'
 
 // 获取完整的系统信息
 const info = await TauriProcess.getSystemInfo()
+console.log(info.platform) // 'windows' | 'macos' | 'linux'
+console.log(info.arch)     // 'x86_64' | 'aarch64'
+console.log(info.version)  // OS version string`
+
+const separateCode = `import { TauriProcess } from '@/utils/tauri'
+
+// 单独获取各项信息
+const platform = await TauriProcess.getPlatform()
+const arch = await TauriProcess.getArch()
+const version = await TauriProcess.getOSVersion()`
+
+const getPlatformType = (platform) => {
+  const map = { windows: 'primary', macos: 'success', linux: 'warning' }
+  return map[platform] || 'info'
+}
+
+const refreshInfo = async () => {
+  loading.value = true
+  try {
+    const info = await TauriProcess.getSystemInfo()
+    systemInfo.value = info
     ElMessage.success('系统信息已刷新')
   } catch (error) {
     ElMessage.error('获取系统信息失败: ' + error.message)

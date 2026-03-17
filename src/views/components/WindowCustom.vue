@@ -229,7 +229,10 @@ await TauriWindow.setFullscreen(true)
 await TauriWindow.setSize(1200, 800)
 
 // 获取窗口大小
-const size = await TauriWindow.getSize()
+const size = await TauriWindow.getSize()`
+
+const handleMinimize = () => {
+  TauriWindow.minimize()
 }
 
 const handleToggleMaximize = async () => {

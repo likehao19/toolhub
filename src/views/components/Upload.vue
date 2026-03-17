@@ -141,7 +141,10 @@ const result = await TauriUpload.uploadFile(
   filePath
 )
 
-const data = await result.json()
+const data = await result.json()`
+
+const multiFileCode = `import { TauriUpload } from '@/utils/tauri'
+
 // 上传多个文件
 const result = await TauriUpload.uploadFile(
   'https://httpbin.org/post',
@@ -151,7 +154,12 @@ const result = await TauriUpload.uploadFile(
   }
 )
 
-const data = await result.json()
+const data = await result.json()`
+
+const uploadResponseBody = computed(() => {
+  if (!uploadResult.value) return ''
+  try {
+    return JSON.stringify(JSON.parse(uploadResult.value.body), null, 2)
   } catch {
     return uploadResult.value.body
   }

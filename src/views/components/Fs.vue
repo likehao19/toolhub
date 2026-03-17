@@ -465,8 +465,14 @@ const listDirExecuted = ref(false)
 const readFileCode = `import { TauriFS } from '@/utils/tauri'
 
 // 读取文本文件
-const content = await TauriFS.readText('C:\\Users\\test.txt')
-// 如果文件不存在会自动创建，如果目录不存在会自动创建目录`
+const content = await TauriFS.readText('C:\\\\Users\\\\test.txt')`
+
+const writeFileCode = `import { TauriFS } from '@/utils/tauri'
+
+// 写入文本文件
+await TauriFS.writeText('C:\\\\Users\\\\test.txt', 'Hello World')
+
+// 如果文件不存在会自动创建`
 
 const createDirCode = `import { TauriFS } from '@/utils/tauri'
 
@@ -511,15 +517,17 @@ await TauriFS.renameFile('C:\\Users\\OldFolder', 'NewFolder')`
 const checkExistsCode = `import { TauriFS } from '@/utils/tauri'
 
 // 检查文件是否存在
-const exists = await TauriFS.checkExists('C:\\Users\\test.txt')
+const exists = await TauriFS.checkExists('C:\\\\Users\\\\test.txt')
 if (exists) {
-`
+  console.log('文件存在')
+}`
 
 const listDirCode = `import { TauriFS } from '@/utils/tauri'
 
 // 列出目录内容
-const items = await TauriFS.listDir('C:\\Users')
+const items = await TauriFS.listDir('C:\\\\Users')
 items.forEach(item => {
+  console.log(item.name, item.isDirectory ? '目录' : '文件')
 })`
 
 // 方法实现

@@ -97,29 +97,26 @@ import { TauriClipboard } from '@/utils/tauri'
 const clipboardContent = ref('')
 const textToWrite = ref('')
 
-const readCode = `import TauriClipboard from '@/utils/tauri/clipboard'
+const readCode = `import { TauriClipboard } from '@/utils/tauri'
 
 // 读取剪贴板内容
+const content = await TauriClipboard.readText()`
+
+const writeCode = `import { TauriClipboard } from '@/utils/tauri'
+
+// 写入文本到剪贴板
+await TauriClipboard.writeText('Hello World')`
+
+const fullCode = `import { TauriClipboard } from '@/utils/tauri'
+
+// 读取剪贴板
 const content = await TauriClipboard.readText()
-const clipboardContent = ref('')
 
-const readClipboard = async () => {
-  try {
-    clipboardContent.value = await TauriClipboard.readText()
-  } catch (error) {
-    ElMessage.error('读取失败')
-  }
-}
+// 写入剪贴板
+await TauriClipboard.writeText('Hello World')
 
-const writeClipboard = async () => {
-  try {
-    await TauriClipboard.writeText(text.value)
-    ElMessage.success('已写入剪贴板')
-  } catch (error) {
-    ElMessage.error('写入失败')
-  }
-}
-<\/script>`
+// 清空剪贴板
+await TauriClipboard.writeText('')`
 
 const readClipboard = async () => {
   try {
