@@ -33,7 +33,7 @@
               circle
               size="small"
               @click="onAIClick"
-              title="AI 整理"
+              :title="t('stickyNotes.aiOrganize')"
             />
             <el-button
               v-if="!isCollapsed"
@@ -43,7 +43,7 @@
               circle
               size="small"
               @click="toggleAlwaysOnTop"
-              :title="alwaysOnTop ? '取消置顶' : '置顶窗口'"
+              :title="alwaysOnTop ? t('stickyNotes.unpinWindow') : t('stickyNotes.pinWindow')"
             />
             <el-button
               class="icon-btn"
@@ -51,7 +51,7 @@
               circle
               size="small"
               @click="closeWindow"
-              title="关闭"
+              :title="t('stickyNotes.close')"
             />
           </div>
         </div>
@@ -69,6 +69,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { t } from '@/i18n'
 import { getCurrentWebviewWindow, getAllWebviewWindows } from '@tauri-apps/api/webviewWindow'
 import { Document, Star, Calendar, CircleCheck, Close, MagicStick, Lock } from '@element-plus/icons-vue'
 
@@ -85,29 +86,29 @@ const isCollapsed = ref(false)
 const currentContent = ref('') // 当前页面内容
 
 // 页签配置 - 不同颜色
-const tabs = [
-  { id: 'documents', label: '笔记', icon: Document, color: '#E0E7FF', bg: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)', component: DocumentPreview },
-  { id: 'bookmarks', label: '书签', icon: Star, color: '#FCE7F3', bg: 'linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)', component: BookmarkGrid },
-  { id: 'schedule', label: '日程', icon: Calendar, color: '#D1FAE5', bg: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)', component: ScheduleView },
-  { id: 'tasks', label: '任务', icon: CircleCheck, color: '#FEF3C7', bg: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', component: TaskList }
-]
+const tabs = computed(() => [
+  { id: 'documents', label: t('stickyNotes.notes'), icon: Document, color: '#E0E7FF', bg: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)', component: DocumentPreview },
+  { id: 'bookmarks', label: t('stickyNotes.bookmarks'), icon: Star, color: '#FCE7F3', bg: 'linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)', component: BookmarkGrid },
+  { id: 'schedule', label: t('stickyNotes.schedule'), icon: Calendar, color: '#D1FAE5', bg: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)', component: ScheduleView },
+  { id: 'tasks', label: t('stickyNotes.tasks'), icon: CircleCheck, color: '#FEF3C7', bg: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', component: TaskList }
+])
 
 const currentTabBg = computed(() => {
-  const tab = tabs.find(t => t.id === activeTab.value)
+  const tab = tabs.value.find(item => item.id === activeTab.value)
   return tab ? tab.bg : '#f8fafc'
 })
 
 // 计算当前组件
 const currentComponent = computed(() => {
-  const tab = tabs.find(t => t.id === activeTab.value)
-  return tab ? tab.component : tabs[0].component
+  const tab = tabs.value.find(item => item.id === activeTab.value)
+  return tab ? tab.component : tabs.value[0].component
 })
 
 // 折叠时显示的内容（截取前30个字符）
 const collapsedContent = computed(() => {
   if (!currentContent.value) {
-    const tab = tabs.find(t => t.id === activeTab.value)
-    return tab ? tab.label : '笔记'
+    const tab = tabs.value.find(item => item.id === activeTab.value)
+    return tab ? tab.label : t('stickyNotes.notes')
   }
   const text = currentContent.value.trim()
   if (text.length > 30) {
@@ -256,8 +257,8 @@ const handleKeydown = (e) => {
   if (e.ctrlKey && ['1', '2', '3', '4'].includes(e.key)) {
     e.preventDefault()
     const index = parseInt(e.key) - 1
-    if (tabs[index]) {
-      switchTab(tabs[index].id)
+    if (tabs.value[index]) {
+      switchTab(tabs.value[index].id)
     }
   }
   

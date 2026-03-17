@@ -8,16 +8,16 @@
           <span class="connect-logo-emoji">💬</span>
         </div>
         <div class="connect-title-group">
-          <h2 class="connect-title">即时聊天</h2>
-          <p class="connect-subtitle">局域网内自动发现，零配置开始聊天</p>
+          <h2 class="connect-title">{{ t('chat.title') }}</h2>
+          <p class="connect-subtitle">{{ t('chat.subtitle') }}</p>
         </div>
 
         <div class="mode-tabs">
           <div class="mode-tab" :class="{ active: mode === 'lan' }" @click="switchMode('lan')">
-            <el-icon><Monitor /></el-icon>局域网
+            <el-icon><Monitor /></el-icon>{{ t('chat.lan') }}
           </div>
           <div class="mode-tab" :class="{ active: mode === 'internet' }" @click="switchMode('internet')">
-            <el-icon><Connection /></el-icon>互联网
+            <el-icon><Connection /></el-icon>{{ t('chat.internet') }}
           </div>
         </div>
 
@@ -26,13 +26,13 @@
         <!-- LAN 模式 -->
         <template v-if="mode === 'lan'">
           <div class="form-row">
-            <label>我的昵称</label>
-            <el-input v-model="username" placeholder="输入昵称" maxlength="20" clearable />
+            <label>{{ t('chat.myNickname') }}</label>
+            <el-input v-model="username" :placeholder="t('chat.inputNickname')" maxlength="20" clearable />
           </div>
 
           <template v-if="lanState === 'idle'">
             <el-button type="primary" size="large" class="full-btn" @click="scanLan">
-              <el-icon><Search /></el-icon>扫描局域网聊天室
+              <el-icon><Search /></el-icon>{{ t('chat.scanLan') }}
             </el-button>
           </template>
 
@@ -44,20 +44,20 @@
                 <div class="scan-ring" style="animation-delay:1.2s"></div>
                 <el-icon class="scan-icon"><Monitor /></el-icon>
               </div>
-              <p class="scan-tip">正在扫描局域网，最多等待 2 秒…</p>
+              <p class="scan-tip">{{ t('chat.scanning') }}</p>
             </div>
           </template>
 
           <template v-else-if="lanState === 'found'">
             <template v-if="discoveredRooms.length > 0">
-              <p class="section-label">发现 {{ discoveredRooms.length }} 个聊天室</p>
+              <p class="section-label">{{ t('chat.foundRooms').replace('{n}', discoveredRooms.length) }}</p>
               <div class="room-list">
                 <div v-for="room in discoveredRooms" :key="room.host + room.port"
                      class="room-item" @click="joinRoom(room)">
                   <div class="room-item-icon"><el-icon><Connection /></el-icon></div>
                   <div class="room-info">
                     <div class="room-addr">{{ room.host }}:{{ room.port }}</div>
-                    <div class="room-label">点击加入</div>
+                    <div class="room-label">{{ t('chat.joinRoom') }}</div>
                   </div>
                   <el-icon class="room-arrow"><ArrowRight /></el-icon>
                 </div>
@@ -66,14 +66,14 @@
             <template v-else>
               <div class="no-room-tip">
                 <div class="no-room-icon"><el-icon><Monitor /></el-icon></div>
-                <p class="no-room-text">未发现聊天室</p>
-                <p class="no-room-sub">可以创建一个，让同一局域网的朋友加入</p>
+                <p class="no-room-text">{{ t('chat.noRoom') }}</p>
+                <p class="no-room-sub">{{ t('chat.noRoomSub') }}</p>
               </div>
             </template>
             <div class="lan-actions">
-              <el-button @click="scanLan"><el-icon><Refresh /></el-icon>重新扫描</el-button>
+              <el-button @click="scanLan"><el-icon><Refresh /></el-icon>{{ t('chat.rescan') }}</el-button>
               <el-button type="primary" @click="createRoom" :loading="creating">
-                <el-icon v-if="!creating"><Plus /></el-icon>创建聊天室
+                <el-icon v-if="!creating"><Plus /></el-icon>{{ t('chat.createRoom') }}
               </el-button>
             </div>
           </template>
@@ -81,14 +81,14 @@
           <template v-else-if="lanState === 'connecting'">
             <div class="connecting-tip">
               <el-icon class="is-loading"><Loading /></el-icon>
-              {{ creating ? '正在创建聊天室…' : '正在连接…' }}
+              {{ creating ? t('chat.creatingRoom') : t('chat.connectingRoom') }}
             </div>
           </template>
 
           <div v-if="connectError" class="connect-error">
             <el-icon><CircleCloseFilled /></el-icon>
             <span>{{ connectError }}</span>
-            <el-button text size="small" @click="lanState = 'idle'">重试</el-button>
+            <el-button text size="small" @click="lanState = 'idle'">{{ t('chat.retry') }}</el-button>
           </div>
         </template>
 
@@ -96,32 +96,32 @@
         <template v-else>
           <div class="mode-hint">
             <el-icon><InfoFilled /></el-icon>
-            输入服务器公网 IP 或域名，连接互联网聊天室
+            {{ t('chat.internetHint') }}
           </div>
           <div class="connect-form">
             <div class="form-row">
-              <label>我的昵称</label>
-              <el-input v-model="username" placeholder="输入昵称" maxlength="20" clearable />
+              <label>{{ t('chat.myNickname') }}</label>
+              <el-input v-model="username" :placeholder="t('chat.inputNickname')" maxlength="20" clearable />
             </div>
             <div class="form-row">
-              <label>服务器地址</label>
+              <label>{{ t('chat.serverAddress') }}</label>
               <el-input v-model="serverHost" placeholder="your.server.com 或 1.2.3.4" clearable>
                 <template #prepend>ws://</template>
               </el-input>
             </div>
             <div class="form-row form-row-inline">
               <div class="form-row" style="flex:1">
-                <label>端口</label>
+                <label>{{ t('chat.port') }}</label>
                 <el-input v-model="serverPort" placeholder="8765" />
               </div>
               <div class="form-row" style="flex:2">
-                <label>房间（留空为默认）</label>
+                <label>{{ t('chat.room') }}</label>
                 <el-input v-model="roomId" placeholder="default" clearable />
               </div>
             </div>
           </div>
           <el-button type="primary" size="large" class="full-btn" :loading="connecting" @click="connectManual">
-            {{ connecting ? '连接中…' : '加入聊天室' }}
+            {{ connecting ? t('chat.connectingRoom') : t('chat.joinChat') }}
           </el-button>
           <div v-if="connectError" class="connect-error">
             <el-icon><CircleCloseFilled /></el-icon>
@@ -138,19 +138,19 @@
       <div class="chat-header">
         <div class="chat-header-left">
           <div class="connection-dot"></div>
-          <span class="room-name">{{ roomId || '默认聊天室' }}</span>
-          <el-tag size="small" type="success">{{ onlineUsers.length }} 人在线</el-tag>
-          <el-tag v-if="isHost" size="small" type="warning">主机</el-tag>
+          <span class="room-name">{{ roomId || t('chat.defaultRoom') }}</span>
+          <el-tag size="small" type="success">{{ onlineUsers.length }}{{ t('chat.onlineCount') }}</el-tag>
+          <el-tag v-if="isHost" size="small" type="warning">{{ t('chat.host') }}</el-tag>
         </div>
         <div class="chat-header-right">
           <span class="server-addr">{{ wsUrl }}</span>
-          <el-tooltip content="复制地址给同局域网的朋友" placement="bottom">
+          <el-tooltip :content="t('chat.copyAddressHint')" placement="bottom">
             <el-button text size="small" @click="copyAddr">
               <el-icon><CopyDocument /></el-icon>
             </el-button>
           </el-tooltip>
           <el-button text size="small" type="danger" @click="disconnect">
-            <el-icon><SwitchButton /></el-icon>断开
+            <el-icon><SwitchButton /></el-icon>{{ t('chat.disconnect') }}
           </el-button>
         </div>
       </div>
@@ -162,14 +162,14 @@
         <div class="message-area" ref="messageAreaRef">
           <div v-if="messages.length === 0" class="empty-messages">
             <div class="empty-icon">👋</div>
-            <p class="empty-text">聊天室已就绪</p>
-            <p class="empty-sub">发送第一条消息打个招呼吧</p>
+            <p class="empty-text">{{ t('chat.chatReady') }}</p>
+            <p class="empty-sub">{{ t('chat.sendFirst') }}</p>
           </div>
 
           <template v-else>
             <div
-              v-for="(msg, idx) in messages"
-              :key="idx"
+              v-for="msg in messages"
+              :key="msg._id"
               class="message-item"
               :class="{ 'is-self': msg.username === username, 'is-system': msg.type === 'system' }"
             >
@@ -203,7 +203,7 @@
                       <img :src="msg.dataUrl" class="msg-image" @click="viewingImage = msg.dataUrl" />
                       <div class="media-footer">
                         <span class="media-filename">{{ msg.filename }}</span>
-                        <button class="media-dl-btn" @click.stop="downloadFile(msg)" title="保存文件">
+                        <button class="media-dl-btn" @click.stop="downloadFile(msg)" :title="t('chat.saveFile')">
                           <el-icon><Download /></el-icon>
                         </button>
                       </div>
@@ -214,7 +214,7 @@
                       <video :src="msg.dataUrl" class="msg-video" controls />
                       <div class="media-footer">
                         <span class="media-filename">{{ msg.filename }}</span>
-                        <button class="media-dl-btn" @click.stop="downloadFile(msg)" title="保存文件">
+                        <button class="media-dl-btn" @click.stop="downloadFile(msg)" :title="t('chat.saveFile')">
                           <el-icon><Download /></el-icon>
                         </button>
                       </div>
@@ -230,7 +230,7 @@
                       </div>
                       <div class="file-card-dl-wrap">
                         <el-icon class="file-card-dl"><Download /></el-icon>
-                        <span class="file-card-dl-text">保存</span>
+                        <span class="file-card-dl-text">{{ t('chat.save') }}</span>
                       </div>
                     </div>
                   </template>
@@ -245,7 +245,7 @@
                           <div class="file-progress-bar" :style="{ width: (msg.sent / msg.total * 100) + '%' }"></div>
                         </div>
                         <p class="file-progress-info">
-                          发送中 {{ Math.round(msg.sent / msg.total * 100) }}% · {{ formatFileSize(msg.size) }}
+                          {{ t('chat.sending') }} {{ Math.round(msg.sent / msg.total * 100) }}% · {{ formatFileSize(msg.size) }}
                         </p>
                       </div>
                     </div>
@@ -261,7 +261,7 @@
                           <div class="file-progress-bar recv" :style="{ width: (msg.received / msg.total * 100) + '%' }"></div>
                         </div>
                         <p class="file-progress-info">
-                          接收中 {{ Math.round(msg.received / msg.total * 100) }}% · {{ formatFileSize(msg.size) }}
+                          {{ t('chat.receiving') }} {{ Math.round(msg.received / msg.total * 100) }}% · {{ formatFileSize(msg.size) }}
                         </p>
                       </div>
                     </div>
@@ -284,7 +284,7 @@
         <div class="user-panel">
           <div class="user-panel-title">
             <el-icon><User /></el-icon>
-            <span>在线成员</span>
+            <span>{{ t('chat.onlineMembers') }}</span>
             <span class="user-count">{{ onlineUsers.length }}</span>
           </div>
           <div class="user-list">
@@ -294,7 +294,7 @@
                 {{ u.charAt(0).toUpperCase() }}
               </div>
               <span class="user-name">{{ u }}</span>
-              <span v-if="u === username" class="me-badge">我</span>
+              <span v-if="u === username" class="me-badge">{{ t('chat.me') }}</span>
             </div>
           </div>
         </div>
@@ -322,7 +322,7 @@
             style="display:none"
           />
 
-          <button class="attach-btn" @click="pickFiles" title="发送图片 / 文件 / 视频">
+          <button class="attach-btn" @click="pickFiles" :title="t('chat.sendFilesBtn')">
             <el-icon><Paperclip /></el-icon>
           </button>
 
@@ -330,7 +330,7 @@
             ref="textareaRef"
             v-model="inputMsg"
             class="msg-textarea"
-            placeholder="输入消息… Enter 发送，Shift+Enter 换行"
+            :placeholder="t('chat.inputPlaceholder')"
             rows="1"
             @keydown="onKeydown"
             @input="autoResize"
@@ -344,7 +344,7 @@
             :class="{ 'send-active': inputMsg.trim() || pendingFiles.length }"
             :disabled="!inputMsg.trim() && !pendingFiles.length"
             @click="sendMessage"
-            title="发送 (Enter)"
+            :title="t('chat.send')"
           >
             <el-icon><Promotion /></el-icon>
           </button>
@@ -370,6 +370,7 @@ export default { name: 'Chat' }
 
 <script setup>
 import { ref, nextTick, onUnmounted } from 'vue'
+import { t } from '@/i18n'
 import {
   Monitor, Connection, Search, ArrowRight, Loading, Refresh, Plus,
   InfoFilled, CircleCloseFilled, CopyDocument, SwitchButton,
@@ -411,6 +412,9 @@ const viewingImage = ref(null)
 const CHUNK_SIZE  = 1024 * 1024
 const PIPELINE    = 4
 
+let _msgSeq = 0
+const msgId = () => `msg-${Date.now()}-${++_msgSeq}`
+
 const objectUrls = []
 const selfSentFileIds = new Set()
 // fileId → { chunks, received, total, filename, mime, size, username, time }
@@ -444,7 +448,7 @@ const switchMode = (m) => { mode.value = m; lanState.value = 'idle'; connectErro
 
 // ---- 局域网扫描 ----
 const scanLan = async () => {
-  if (!username.value.trim()) { ElMessage.warning('请先输入昵称'); return }
+  if (!username.value.trim()) { ElMessage.warning(t('chat.enterNickname')); return }
   saveUsername()
   lanState.value = 'scanning'
   connectError.value = ''
@@ -452,7 +456,7 @@ const scanLan = async () => {
     discoveredRooms.value = await invoke('discover_lan_chat')
     lanState.value = 'found'
   } catch (e) {
-    connectError.value = '扫描失败：' + e
+    connectError.value = t('chat.scanFailed') + e
     lanState.value = 'idle'
   }
 }
@@ -465,7 +469,7 @@ const joinRoom = (room) => {
 }
 
 const createRoom = async () => {
-  if (!username.value.trim()) { ElMessage.warning('请先输入昵称'); return }
+  if (!username.value.trim()) { ElMessage.warning(t('chat.enterNickname')); return }
   creating.value = true
   lanState.value = 'connecting'
   connectError.value = ''
@@ -477,7 +481,7 @@ const createRoom = async () => {
     wsUrl.value = `${localIp}:${LAN_PORT}`
     connectWs()
   } catch (e) {
-    connectError.value = '创建失败：' + e
+    connectError.value = t('chat.createFailed') + e
     lanState.value = 'found'
   } finally {
     creating.value = false
@@ -485,8 +489,8 @@ const createRoom = async () => {
 }
 
 const connectManual = () => {
-  if (!username.value.trim()) { ElMessage.warning('请输入昵称'); return }
-  if (!serverHost.value.trim()) { ElMessage.warning('请输入服务器地址'); return }
+  if (!username.value.trim()) { ElMessage.warning(t('chat.enterNickname')); return }
+  if (!serverHost.value.trim()) { ElMessage.warning(t('chat.enterServerAddress')); return }
   saveUsername()
   connecting.value = true
   connectError.value = ''
@@ -503,7 +507,17 @@ const connectWs = () => {
   // 接收二进制帧为 ArrayBuffer，而不是 Blob，便于直接操作字节
   ws.binaryType = 'arraybuffer'
 
+  const connectTimer = setTimeout(() => {
+    if (!connected.value && (connecting.value || lanState.value === 'connecting')) {
+      ws?.close()
+      connecting.value = false
+      connectError.value = t('chat.connectTimeout')
+      lanState.value = 'found'
+    }
+  }, 8000)
+
   ws.onopen = () => {
+    clearTimeout(connectTimer)
     connecting.value = false
     connected.value = true
     lanState.value = 'idle'
@@ -517,10 +531,10 @@ const connectWs = () => {
       try {
         const d = JSON.parse(data)
         if (d.type === 'message') {
-          messages.value.push({ type: 'message', username: d.username, content: d.content, time: d.time || ft() })
+          messages.value.push({ _id: msgId(), type: 'message', username: d.username, content: d.content, time: d.time || ft() })
           scrollBottom()
         } else if (d.type === 'system') {
-          messages.value.push({ type: 'system', content: d.content, time: ft() })
+          messages.value.push({ _id: msgId(), type: 'system', content: d.content, time: ft() })
           scrollBottom()
         } else if (d.type === 'users') {
           onlineUsers.value = d.list || []
@@ -531,7 +545,7 @@ const connectWs = () => {
 
   ws.onerror = () => {
     connecting.value = false
-    connectError.value = '连接失败，请检查地址'
+    connectError.value = t('chat.connectFailed')
     lanState.value = 'found'
   }
 
@@ -539,18 +553,9 @@ const connectWs = () => {
     connecting.value = false
     if (connected.value) {
       connected.value = false
-      messages.value.push({ type: 'system', content: '已断开连接', time: ft() })
+      messages.value.push({ _id: msgId(), type: 'system', content: t('chat.disconnected'), time: ft() })
     }
   }
-
-  setTimeout(() => {
-    if (connecting.value || lanState.value === 'connecting') {
-      ws?.close()
-      connecting.value = false
-      connectError.value = '连接超时，请重试'
-      lanState.value = 'found'
-    }
-  }, 8000)
 }
 
 // ---- 二进制文件块处理（接收）----
@@ -581,7 +586,7 @@ const handleBinaryChunk = (buffer) => {
       received: 0, total: totalChunks, time: d.time || ft()
     })
     messages.value.push({
-      type: 'file_receiving', fileId,
+      _id: msgId(), type: 'file_receiving', fileId,
       username: d.username, filename, size,
       received: 0, total: totalChunks, time: d.time || ft()
     })
@@ -615,7 +620,7 @@ const handleBinaryChunk = (buffer) => {
       }
     } catch {
       if (idx !== -1) messages.value.splice(idx, 1)
-      ElMessage.error(`${state.filename} 接收失败`)
+      ElMessage.error(`${state.filename} ${t('chat.receiveFailed')}`)
     }
     receivingChunks.delete(fileId)
     scrollBottom()
@@ -639,7 +644,11 @@ const onFileSelected = (e) => {
   e.target.value = ''
 }
 
-const removePendingFile = (i) => pendingFiles.value.splice(i, 1)
+const removePendingFile = (i) => {
+  const f = pendingFiles.value[i]
+  if (f?.previewUrl) URL.revokeObjectURL(f.previewUrl)
+  pendingFiles.value.splice(i, 1)
+}
 
 const onPaste = (e) => {
   for (const item of (e.clipboardData?.items || [])) {
@@ -671,9 +680,9 @@ const downloadFile = async (msg) => {
       : await fetch(msg.dataUrl).then(r => r.arrayBuffer())
 
     await writeFile(savePath, new Uint8Array(buffer))
-    ElMessage.success('文件已保存')
+    ElMessage.success(t('chat.fileSaved'))
   } catch (err) {
-    ElMessage.error('保存失败：' + err)
+    ElMessage.error(t('chat.saveFailed') + err)
   }
 }
 
@@ -697,7 +706,7 @@ const sendFileChunked = async (pending) => {
   selfSentFileIds.add(fileId)
 
   messages.value.push({
-    type: 'file_sending', fileId,
+    _id: msgId(), type: 'file_sending', fileId,
     username: username.value, filename: name, size,
     sent: 0, total: totalChunks, time: ft()
   })
@@ -757,6 +766,8 @@ const sendMessage = () => {
   }
 
   const filesToSend = [...pendingFiles.value]
+  // 释放预览 URL（发送后不再需要缩略图）
+  filesToSend.forEach(f => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl) })
   pendingFiles.value = []
   if (filesToSend.length > 0) {
     ;(async () => { for (const f of filesToSend) await sendFileChunked(f) })()
@@ -775,11 +786,13 @@ const autoResize = () => {
 // ---- 断开 ----
 const disconnect = async () => {
   ws?.close(); ws = null
-  connected.value = false; messages.value = []; onlineUsers.value = []; wsUrl.value = ''; pendingFiles.value = []
+  connected.value = false; messages.value = []; onlineUsers.value = []; wsUrl.value = ''
+  pendingFiles.value.forEach(f => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl) })
+  pendingFiles.value = []
   if (isHost.value) { await invoke('stop_lan_server').catch(() => {}); isHost.value = false }
 }
 
-const copyAddr = () => navigator.clipboard.writeText(wsUrl.value).then(() => ElMessage.success('已复制地址'))
+const copyAddr = () => navigator.clipboard.writeText(wsUrl.value).then(() => ElMessage.success(t('bookmarks.copied')))
 
 onUnmounted(async () => {
   ws?.close()

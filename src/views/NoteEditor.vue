@@ -3,27 +3,27 @@
     <div class="editor-view">
       <div class="editor-top-toolbar">
         <div class="toolbar-left">
-          <div class="breadcrumb" id="breadcrumb">知识库 / {{ currentFolderName || '默认文件夹' }}</div>
+          <div class="breadcrumb" id="breadcrumb">{{ t('noteEditor.knowledgeBase') }} / {{ currentFolderName || t('noteEditor.defaultFolder') }}</div>
         </div>
         <div class="toolbar-right">
           <el-button size="small" circle @click="hideSidebar = !hideSidebar"
-                     :title="hideSidebar ? '显示侧边栏' : '隐藏侧边栏'">
+                     :title="hideSidebar ? t('noteEditor.showSidebar') : t('noteEditor.hideSidebar')">
             <el-icon>
               <ArrowLeft v-if="!hideSidebar"/>
               <ArrowRight v-else/>
             </el-icon>
           </el-button>
-          <el-button size="small" circle @click="showVersionHistory" title="版本历史">
+          <el-button size="small" circle @click="showVersionHistory" :title="t('noteEditor.versionHistory')">
             <el-icon>
               <Clock/>
             </el-icon>
           </el-button>
-          <el-button size="small" type="success" circle @click="saveNote" title="保存">
+          <el-button size="small" type="success" circle @click="saveNote" :title="t('noteEditor.save')">
             <el-icon>
               <Check/>
             </el-icon>
           </el-button>
-          <el-button size="small" type="danger" circle @click="deleteCurrentNote" title="删除">
+          <el-button size="small" type="danger" circle @click="deleteCurrentNote" :title="t('noteEditor.delete')">
             <el-icon>
               <Delete/>
             </el-icon>
@@ -51,7 +51,7 @@
       <!-- 右侧大纲 -->
       <aside class="sidebar-right" :class="{ active: showTOC && showEditor && currentFileType === 'md' }">
         <div class="toc-header">
-          <span><el-icon><Menu/></el-icon> 大纲</span>
+          <span><el-icon><Menu/></el-icon> {{ t('noteEditor.outline') }}</span>
           <el-icon style="cursor:pointer; color:#999" @click="toggleTOC">
             <Close/>
           </el-icon>
@@ -74,6 +74,7 @@
 
 <script setup>
 import {ref, computed, onMounted, nextTick, watch} from 'vue'
+import { t } from '@/i18n'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {
   Plus, Menu, Close, Edit, View, ArrowLeft, Check, Clock, Delete, ArrowRight, DocumentCopy
@@ -216,7 +217,7 @@ const currentFolderName = ref('')
 const showEditor = ref(false)
 const showTOC = ref(false)
 const selectedFile = ref(null)
-const statusText = ref('就绪')
+const statusText = ref(t('noteEditor.ready'))
 const fileInputRef = ref(null)
 const currentFileType = ref('md')
 const noteContent = ref('')
@@ -239,7 +240,7 @@ const markdownPreview = computed(() => {
     const noteName = selectedFile.value?.name || selectedFile.value?.title || ''
     return markdownToHtml(noteContent.value, noteName)
   } catch (error) {
-    return '<p>预览错误</p>'
+    return '<p>' + t('noteEditor.previewError') + '</p>'
   }
 })
 
@@ -309,9 +310,9 @@ const loadNotesTree = async () => {
       await loadFolderFiles(firstFolder)
     }
 
-    updateStatus('加载完成')
+    updateStatus(t('noteEditor.loadComplete'))
   } catch (error) {
-    ElMessage.error('加载笔记树失败')
+    ElMessage.error(t('noteEditor.loadTreeFailed'))
   }
 }
 
@@ -432,7 +433,7 @@ const selectFolder = async (folder) => {
     await loadFolderFiles(folder)
   }
 
-  updateStatus(`已切换到文件夹: ${folder.name}`)
+  updateStatus(t('noteEditor.switchedToFolder', { name: folder.name }))
 }
 
 const handleLoadSubFolders = async (folder) => {
@@ -447,10 +448,10 @@ const handleFolderCommand = (command, folder) => {
 
 const createFolder = async (parentFolder) => {
   try {
-    const {value: name} = await ElMessageBox.prompt('请输入新文件夹名称', '新建文件夹', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      inputValue: '新建文件夹'
+    const {value: name} = await ElMessageBox.prompt(t('noteEditor.newFolderPrompt'), t('noteEditor.newFolderTitle'), {
+      confirmButtonText: t('noteEditor.confirm'),
+      cancelButtonText: t('noteEditor.cancel'),
+      inputValue: t('noteEditor.newFolderDefault')
     })
 
     if (name && name.trim()) {
@@ -499,7 +500,7 @@ const createFolder = async (parentFolder) => {
         expandedFolders.value.add(selectedFolderKey.value)
       }
 
-      updateStatus('文件夹创建成功')
+      updateStatus(t('noteEditor.folderCreateSuccess'))
     }
   } catch (error) {
     // 用户取消
@@ -508,9 +509,9 @@ const createFolder = async (parentFolder) => {
 
 const renameFolder = async (folder) => {
   try {
-    const {value: newName} = await ElMessageBox.prompt('请输入新名称', '重命名文件夹', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    const {value: newName} = await ElMessageBox.prompt(t('noteEditor.renameFolderPrompt'), t('noteEditor.renameFolderTitle'), {
+      confirmButtonText: t('noteEditor.confirm'),
+      cancelButtonText: t('noteEditor.cancel'),
       inputValue: folder.name
     })
 
@@ -529,18 +530,18 @@ const renameFolder = async (folder) => {
         selectedFolderKey.value = getFolderKey(folder)
       }
 
-      updateStatus('重命名成功')
+      updateStatus(t('noteEditor.renameSuccess'))
     }
   } catch (error) {
-    ElMessage.error('重命名失败')
+    ElMessage.error(t('noteEditor.renameFailed'))
   }
 }
 
 const deleteFolder = async (folder) => {
   try {
-    await ElMessageBox.confirm('确定要删除此文件夹及其内容吗？', '确认删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('noteEditor.confirmDeleteFolder'), t('noteEditor.confirmDeleteTitle'), {
+      confirmButtonText: t('noteEditor.confirm'),
+      cancelButtonText: t('noteEditor.cancel'),
       type: 'warning'
     })
 
@@ -565,9 +566,9 @@ const deleteFolder = async (folder) => {
       }
     }
 
-    updateStatus('文件夹已删除')
+    updateStatus(t('noteEditor.folderDeleted'))
   } catch (error) {
-    ElMessage.error('删除失败')
+    ElMessage.error(t('noteEditor.deleteFailed'))
   }
 }
 
@@ -591,9 +592,9 @@ const openFile = async (file) => {
       await loadWordFile(file)
     }
 
-    updateStatus(`正在编辑: ${file.name || file.title}`)
+    updateStatus(t('noteEditor.editing', { name: file.name || file.title }))
   } catch (error) {
-    ElMessage.error('打开文件失败')
+    ElMessage.error(t('noteEditor.openFileFailed'))
   }
 }
 
@@ -607,7 +608,7 @@ const backToList = () => {
   showEditor.value = false
   showTOC.value = false
   selectedFile.value = null
-  updateStatus('返回文件列表')
+  updateStatus(t('noteEditor.backToList'))
 }
 
 const saveNote = async () => {
@@ -618,33 +619,33 @@ const saveNote = async () => {
 
     if (ext === 'md' || ext === 'txt') {
       await writeTextFile(selectedFile.value.path, noteContent.value)
-      updateStatus('保存成功')
+      updateStatus(t('noteEditor.saveSuccess'))
     } else if (ext === 'xlsx') {
       await saveExcelFile()
     } else if (ext === 'docx') {
       await saveWordFile()
     }
   } catch (error) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('noteEditor.saveFailed'))
   }
 }
 
 const showFileMenu = (event, file) => {
   event.stopPropagation()
   ElMessageBox.confirm(
-      `对文件 "${file.name || file.title}" 执行操作`,
-      '文件操作',
+      t('noteEditor.fileOperationMsg', { name: file.name || file.title }),
+      t('noteEditor.fileOperation'),
       {
         distinguishCancelAndClose: true,
-        confirmButtonText: '重命名',
-        cancelButtonText: '删除',
+        confirmButtonText: t('noteEditor.renameBtn'),
+        cancelButtonText: t('noteEditor.deleteBtn'),
         type: 'info'
       }
   ).then(() => {
     // 重命名
-    ElMessageBox.prompt('请输入新文件名（不含扩展名）', '重命名文件', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    ElMessageBox.prompt(t('noteEditor.renameFilePrompt'), t('noteEditor.renameFileTitle'), {
+      confirmButtonText: t('noteEditor.confirm'),
+      cancelButtonText: t('noteEditor.cancel'),
       inputValue: file.name || file.title
     }).then(async ({value}) => {
       try {
@@ -657,17 +658,17 @@ const showFileMenu = (event, file) => {
         file.name = value
         file.path = newPath
 
-        updateStatus('文件名已修改')
+        updateStatus(t('noteEditor.fileRenamed'))
       } catch (error) {
-        ElMessage.error('重命名失败')
+        ElMessage.error(t('noteEditor.renameFailed'))
       }
     })
   }).catch((action) => {
     if (action === 'cancel') {
       // 删除
-      ElMessageBox.confirm(`确定删除 ${file.name || file.title} 吗?`, '确认删除', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+      ElMessageBox.confirm(t('noteEditor.confirmDeleteFile', { name: file.name || file.title }), t('noteEditor.confirmDeleteTitle'), {
+        confirmButtonText: t('noteEditor.confirm'),
+        cancelButtonText: t('noteEditor.cancel'),
         type: 'warning'
       }).then(async () => {
         try {
@@ -682,9 +683,9 @@ const showFileMenu = (event, file) => {
             folderFilesCache.value.set(folderKey, files)
           }
 
-          updateStatus('文件已删除')
+          updateStatus(t('noteEditor.fileDeleted'))
         } catch (error) {
-          ElMessage.error('删除失败')
+          ElMessage.error(t('noteEditor.deleteFailed'))
         }
       })
     }
@@ -698,25 +699,25 @@ const triggerImport = () => {
 const handleFileImport = (event) => {
   const files = event.target.files
   if (files && files.length > 0) {
-    ElMessage.success(`模拟导入: 已读取文件 ${files[0].name}`)
+    ElMessage.success(t('noteEditor.importSimulate', { name: files[0].name }))
   }
 }
 
 const triggerExport = () => {
-  ElMessage.info('模拟导出: 正在打包当前文件夹内容为 ZIP...')
+  ElMessage.info(t('noteEditor.exportSimulate'))
 }
 
 const createNewNote = async () => {
   if (!selectedFolderKey.value) {
-    ElMessage.warning('请先选择一个文件夹')
+    ElMessage.warning(t('noteEditor.selectFolderFirst'))
     return
   }
 
   try {
-    const {value: name} = await ElMessageBox.prompt('请输入笔记名称 (无需后缀)', '新建笔记', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      inputValue: '未命名笔记'
+    const {value: name} = await ElMessageBox.prompt(t('noteEditor.newNotePrompt'), t('noteEditor.newNoteTitle'), {
+      confirmButtonText: t('noteEditor.confirm'),
+      cancelButtonText: t('noteEditor.cancel'),
+      inputValue: t('noteEditor.newNoteDefault')
     })
 
     if (name) {
@@ -739,7 +740,7 @@ const createNewNote = async () => {
       }
     }
   } catch (error) {
-    ElMessage.error('创建笔记失败')
+    ElMessage.error(t('noteEditor.createNoteFailed'))
   }
 }
 
@@ -791,7 +792,7 @@ const loadWordFile = async (file) => {
     noteContent.value = ''
   } catch (error) {
     wordContent.value = '<p></p>'
-    ElMessage.warning('文件为空或不存在，已创建空白文档')
+    ElMessage.warning(t('noteEditor.wordEmpty'))
   }
 }
 
@@ -813,9 +814,9 @@ const saveWordFile = async () => {
     const uint8Array = new Uint8Array(arrayBuffer)
 
     await writeFile(selectedFile.value.path, uint8Array)
-    updateStatus('保存成功')
+    updateStatus(t('noteEditor.saveSuccess'))
   } catch (error) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('noteEditor.saveFailed'))
   }
 }
 
@@ -973,9 +974,9 @@ const saveExcelFile = async () => {
 
     const excelBuffer = XLSX.write(excelWorkbook.value, {type: 'array', bookType: 'xlsx'})
     await writeFile(selectedFile.value.path, new Uint8Array(excelBuffer))
-    updateStatus('保存成功')
+    updateStatus(t('noteEditor.saveSuccess'))
   } catch (error) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('noteEditor.saveFailed'))
   }
 }
 
@@ -1002,7 +1003,7 @@ const updateStatus = (msg) => {
   statusText.value = msg
   setTimeout(() => {
     if (statusText.value === msg) {
-      statusText.value = '就绪'
+      statusText.value = t('noteEditor.ready')
     }
   }, 3000)
 }
@@ -1037,9 +1038,9 @@ const formatFileTime = (time) => {
   if (days === 0) {
     return date.toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
   } else if (days === 1) {
-    return '昨天'
+    return t('noteEditor.yesterday')
   } else if (days < 7) {
-    return `${days}天前`
+    return t('noteEditor.daysAgo', { days })
   } else {
     return date.toLocaleDateString('zh-CN', {month: '2-digit', day: '2-digit'})
   }
@@ -1067,7 +1068,7 @@ const handleKeydown = (event) => {
 }
 
 const insertImage = () => {
-  ElMessage.info('插入图片功能开发中')
+  ElMessage.info(t('noteEditor.insertImageDev'))
 }
 
 const scrollToHeading = (index) => {

@@ -15,7 +15,7 @@
         <div class="global-search" @click.stop>
           <el-input
             v-model="searchQuery"
-            placeholder="全局搜索 (Ctrl+K)"
+            :placeholder="t('header.search')"
             clearable
             size="small"
             style="width: 300px;"
@@ -30,10 +30,10 @@
           <div v-if="showSearchResults && (searchQuery || searchResults.total > 0)" class="search-results" @click.stop>
             <div v-if="searchQuery && isSearching" class="search-loading">
               <el-icon class="is-loading"><Loading /></el-icon>
-              <span>搜索中...</span>
+              <span>{{ t('header.searching') }}</span>
             </div>
             <div v-else-if="searchQuery && searchResults.total === 0" class="search-empty">
-              <el-empty description="未找到结果" :image-size="60" />
+              <el-empty :description="t('header.noResults')" :image-size="60" />
             </div>
             <div v-else-if="searchResults.total > 0" class="search-results-content">
               <template v-for="(items, module) in searchResults" :key="module">
@@ -61,14 +61,14 @@
                       <div v-if="result.item.url || result.item.website" class="item-url">{{ result.item.url || result.item.website }}</div>
                     </div>
                     <div v-if="items.length > 5" class="more-results" @click="viewAllResults(module)">
-                      查看全部 {{ items.length }} 个结果
+                      {{ t('header.viewAll', { n: items.length }) }}
                     </div>
                   </div>
                 </div>
               </template>
             </div>
             <div v-if="searchHistory.length > 0 && !searchQuery" class="search-history">
-              <div class="history-header">搜索历史</div>
+              <div class="history-header">{{ t('header.searchHistory') }}</div>
               <div
                 v-for="history in searchHistory"
                 :key="history.id"
@@ -87,21 +87,21 @@
           class="header-button pin-button"
           :class="{ active: isPinned }"
           @click="handlePin"
-          title="置顶"
+          :title="t('header.pinTop')"
         >
           <el-icon><Top /></el-icon>
         </button>
-        <button class="header-button minimize-button" @click="handleMinimize" title="最小化">
+        <button class="header-button minimize-button" @click="handleMinimize" :title="t('header.minimize')">
           <el-icon><Minus /></el-icon>
         </button>
         <button
           class="header-button maximize-button"
           @click="handleToggleMaximize"
-          :title="isMaximized ? '还原' : '最大化'"
+          :title="isMaximized ? t('header.restore') : t('header.maximize')"
         >
           <el-icon><FullScreen v-if="!isMaximized" /><CopyDocument v-else /></el-icon>
         </button>
-        <button class="header-button close-button" @click="handleClose" title="关闭">
+        <button class="header-button close-button" @click="handleClose" :title="t('header.close')">
           <el-icon><Close /></el-icon>
         </button>
       </div>
@@ -116,6 +116,7 @@ import { TauriWindow } from '@/utils/tauri'
 import { useRouter } from 'vue-router'
 import * as searchAPI from '@/utils/search'
 import { ElMessage } from 'element-plus'
+import { t } from '@/i18n'
 
 const router = useRouter()
 const isPinned = ref(false)
@@ -209,11 +210,11 @@ const highlightText = (text, query) => {
 // 获取模块名称
 const getModuleName = (module) => {
   const names = {
-    notes: '笔记',
-    todos: '待办',
-    bookmarks: '书签',
-    passwords: '密码',
-    events: '日程'
+    notes: t('header.notes'),
+    todos: t('header.todos'),
+    bookmarks: t('header.bookmarks'),
+    passwords: t('header.passwords'),
+    events: t('header.events')
   }
   return names[module] || module
 }

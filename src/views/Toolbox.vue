@@ -5,17 +5,17 @@
       <div class="header-left">
         <div class="breadcrumb">
           <el-icon><Briefcase /></el-icon>
-          工具箱
+          {{ t('toolbox.title') }}
         </div>
       </div>
       <div class="header-actions">
         <span class="fav-hint">
           <el-icon style="color: #f59e0b"><StarFilled /></el-icon>
-          点击工具右下角星标可添加到常用
+          {{ t('toolbox.favHint') }}
         </span>
         <el-button type="primary" size="small" @click="goToSettings">
           <el-icon><Setting /></el-icon>
-          自定义工具箱
+          {{ t('toolbox.customizeToolbox') }}
         </el-button>
       </div>
     </div>
@@ -39,12 +39,12 @@
           >
             <div class="tool-icon">{{ tool.icon }}</div>
             <div class="tool-name">{{ tool.name }}</div>
-            <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">开发中</el-tag>
+            <el-tag v-if="!tool.enabled" size="small" type="info" class="dev-tag">{{ t('toolbox.inDev') }}</el-tag>
             <div
               class="favorite-btn"
               :class="{ starred: isFavorite(tool.id) }"
               @click.stop="toggleFavorite(tool)"
-              :title="isFavorite(tool.id) ? '取消常用' : '添加到常用'"
+              :title="isFavorite(tool.id) ? t('toolbox.removeFav') : t('toolbox.addFav')"
             >
               <el-icon>
                 <StarFilled v-if="isFavorite(tool.id)" />
@@ -59,501 +59,502 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { Briefcase, Setting, Star, StarFilled } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { useFavoriteTools } from '@/composables/useFavoriteTools'
+import { t } from '@/i18n'
 
 const router = useRouter()
 const { toggleFavorite, isFavorite } = useFavoriteTools()
 
 // 笔记工具
-const noteTools = ref([
-  { id: 'sticky-notes', name: '便签', icon: '📌', type: 'window', enabled: true },
-  { id: 'whiteboard', name: '画板', icon: '✏️', type: 'window', enabled: false },
-  { id: 'code-snippet', name: '代码片段', icon: '📋', type: 'window', enabled: false },
-  { id: 'screenshot', name: '截图标注', icon: '📸', type: 'window', enabled: false },
-  { id: 'markdown-editor', name: 'MD编辑器', icon: '📝', type: 'window', enabled: false },
-  { id: 'mind-map', name: '思维导图', icon: '🧠', type: 'window', enabled: false },
-  { id: 'flowchart', name: '流程图', icon: '📊', type: 'window', enabled: false },
-  { id: 'rich-text', name: '富文本', icon: '📄', type: 'window', enabled: false }
+const noteTools = computed(() => [
+  { id: 'sticky-notes', name: t('toolbox.tools.stickyNotes'), icon: '📌', type: 'window', enabled: true },
+  { id: 'whiteboard', name: t('toolbox.tools.whiteboard'), icon: '✏️', type: 'window', enabled: false },
+  { id: 'code-snippet', name: t('toolbox.tools.codeSnippet'), icon: '📋', type: 'window', enabled: false },
+  { id: 'screenshot', name: t('toolbox.tools.screenshot'), icon: '📸', type: 'window', enabled: false },
+  { id: 'markdown-editor', name: t('toolbox.tools.markdownEditor'), icon: '📝', type: 'window', enabled: false },
+  { id: 'mind-map', name: t('toolbox.tools.mindMap'), icon: '🧠', type: 'window', enabled: false },
+  { id: 'flowchart', name: t('toolbox.tools.flowchart'), icon: '📊', type: 'window', enabled: false },
+  { id: 'rich-text', name: t('toolbox.tools.richText'), icon: '📄', type: 'window', enabled: false }
 ])
 
 // 开发工具
-const devTools = ref([
-  { id: 'json-formatter', name: 'JSON格式化', icon: '🔄', type: 'window', enabled: false },
-  { id: 'json-diff', name: 'JSON对比', icon: '🔍', type: 'window', enabled: false },
-  { id: 'json-to-ts', name: 'JSON转TS', icon: '📦', type: 'window', enabled: false },
-  { id: 'json-to-java', name: 'JSON转Java', icon: '☕', type: 'window', enabled: false },
-  { id: 'regex-tester', name: '正则测试', icon: '🎨', type: 'window', enabled: false },
-  { id: 'cron-parser', name: 'Cron表达式', icon: '⏰', type: 'window', enabled: false },
-  { id: 'crypto', name: '加密解密', icon: '🔐', type: 'window', enabled: false },
-  { id: 'hash-generator', name: 'Hash生成', icon: '#️⃣', type: 'window', enabled: false },
-  { id: 'url-encoder', name: 'URL编解码', icon: '🌐', type: 'window', enabled: false },
+const devTools = computed(() => [
+  { id: 'json-formatter', name: t('toolbox.tools.jsonFormatter'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'json-diff', name: t('toolbox.tools.jsonDiff'), icon: '🔍', type: 'window', enabled: false },
+  { id: 'json-to-ts', name: t('toolbox.tools.jsonToTs'), icon: '📦', type: 'window', enabled: false },
+  { id: 'json-to-java', name: t('toolbox.tools.jsonToJava'), icon: '☕', type: 'window', enabled: false },
+  { id: 'regex-tester', name: t('toolbox.tools.regexTester'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'cron-parser', name: t('toolbox.tools.cronParser'), icon: '⏰', type: 'window', enabled: false },
+  { id: 'crypto', name: t('toolbox.tools.crypto'), icon: '🔐', type: 'window', enabled: false },
+  { id: 'hash-generator', name: t('toolbox.tools.hashGenerator'), icon: '#️⃣', type: 'window', enabled: false },
+  { id: 'url-encoder', name: t('toolbox.tools.urlEncoder'), icon: '🌐', type: 'window', enabled: false },
   { id: 'base64', name: 'Base64', icon: '🔤', type: 'window', enabled: false },
-  { id: 'api-tester', name: '接口测试', icon: '📡', type: 'window', enabled: false },
-  { id: 'sql-formatter', name: 'SQL格式化', icon: '🧪', type: 'window', enabled: false },
-  { id: 'sql-generator', name: 'SQL生成器', icon: '⚡', type: 'window', enabled: false },
-  { id: 'timestamp', name: '时间戳', icon: '🕐', type: 'window', enabled: false },
-  { id: 'date-calculator', name: '日期计算', icon: '📅', type: 'window', enabled: false },
-  { id: 'diff-checker', name: '文本对比', icon: '📊', type: 'window', enabled: false },
-  { id: 'uuid-generator', name: 'UUID生成', icon: '🎲', type: 'window', enabled: false },
-  { id: 'random-data', name: '随机数据', icon: '🎰', type: 'window', enabled: false },
-  { id: 'jwt-decoder', name: 'JWT解析', icon: '🔓', type: 'window', enabled: false },
-  { id: 'xml-formatter', name: 'XML格式化', icon: '📋', type: 'window', enabled: false },
-  { id: 'yaml-formatter', name: 'YAML格式化', icon: '📝', type: 'window', enabled: false },
-  { id: 'html-encoder', name: 'HTML编码', icon: '🌐', type: 'window', enabled: false },
-  { id: 'ascii-converter', name: 'ASCII转换', icon: '🔡', type: 'window', enabled: false },
-  { id: 'unicode-converter', name: 'Unicode转换', icon: '🔠', type: 'window', enabled: false }
+  { id: 'api-tester', name: t('toolbox.tools.apiTester'), icon: '📡', type: 'window', enabled: false },
+  { id: 'sql-formatter', name: t('toolbox.tools.sqlFormatter'), icon: '🧪', type: 'window', enabled: false },
+  { id: 'sql-generator', name: t('toolbox.tools.sqlGenerator'), icon: '⚡', type: 'window', enabled: false },
+  { id: 'timestamp', name: t('toolbox.tools.timestamp'), icon: '🕐', type: 'window', enabled: false },
+  { id: 'date-calculator', name: t('toolbox.tools.dateCalculator'), icon: '📅', type: 'window', enabled: false },
+  { id: 'diff-checker', name: t('toolbox.tools.diffChecker'), icon: '📊', type: 'window', enabled: false },
+  { id: 'uuid-generator', name: t('toolbox.tools.uuidGenerator'), icon: '🎲', type: 'window', enabled: false },
+  { id: 'random-data', name: t('toolbox.tools.randomData'), icon: '🎰', type: 'window', enabled: false },
+  { id: 'jwt-decoder', name: t('toolbox.tools.jwtDecoder'), icon: '🔓', type: 'window', enabled: false },
+  { id: 'xml-formatter', name: t('toolbox.tools.xmlFormatter'), icon: '📋', type: 'window', enabled: false },
+  { id: 'yaml-formatter', name: t('toolbox.tools.yamlFormatter'), icon: '📝', type: 'window', enabled: false },
+  { id: 'html-encoder', name: t('toolbox.tools.htmlEncoder'), icon: '🌐', type: 'window', enabled: false },
+  { id: 'ascii-converter', name: t('toolbox.tools.asciiConverter'), icon: '🔡', type: 'window', enabled: false },
+  { id: 'unicode-converter', name: t('toolbox.tools.unicodeConverter'), icon: '🔠', type: 'window', enabled: false }
 ])
 
 // 编码转换
-const encodingTools = ref([
-  { id: 'charset-detect', name: '编码检测', icon: '🔍', type: 'window', enabled: false },
-  { id: 'charset-convert', name: '编码转换', icon: '🔄', type: 'window', enabled: false },
-  { id: 'hex-converter', name: '进制转换', icon: '🔢', type: 'window', enabled: false },
-  { id: 'morse-code', name: '摩斯密码', icon: '📻', type: 'window', enabled: false },
-  { id: 'binary-converter', name: '二进制', icon: '💾', type: 'window', enabled: false },
-  { id: 'color-converter', name: '颜色转换', icon: '🎨', type: 'window', enabled: false }
+const encodingTools = computed(() => [
+  { id: 'charset-detect', name: t('toolbox.tools.charsetDetect'), icon: '🔍', type: 'window', enabled: false },
+  { id: 'charset-convert', name: t('toolbox.tools.charsetConvert'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'hex-converter', name: t('toolbox.tools.hexConverter'), icon: '🔢', type: 'window', enabled: false },
+  { id: 'morse-code', name: t('toolbox.tools.morseCode'), icon: '📻', type: 'window', enabled: false },
+  { id: 'binary-converter', name: t('toolbox.tools.binaryConverter'), icon: '💾', type: 'window', enabled: false },
+  { id: 'color-converter', name: t('toolbox.tools.colorConverter'), icon: '🎨', type: 'window', enabled: false }
 ])
 
 // 文件处理
-const fileTools = ref([
-  { id: 'file-hash', name: '文件Hash', icon: '🔐', type: 'window', enabled: false },
-  { id: 'file-merge', name: '文件合并', icon: '📎', type: 'window', enabled: false },
-  { id: 'file-split', name: '文件分割', icon: '✂️', type: 'window', enabled: false },
-  { id: 'file-rename', name: '批量改名', icon: '📝', type: 'window', enabled: false },
-  { id: 'duplicate-finder', name: '重复文件', icon: '🔎', type: 'window', enabled: false },
-  { id: 'file-compare', name: '文件对比', icon: '⚖️', type: 'window', enabled: false },
-  { id: 'csv-parser', name: 'CSV处理', icon: '📊', type: 'window', enabled: false },
-  { id: 'excel-viewer', name: 'Excel查看', icon: '📈', type: 'window', enabled: false },
-  { id: 'pdf-tool', name: 'PDF工具', icon: '📕', type: 'window', enabled: false },
-  { id: 'zip-tool', name: '压缩工具', icon: '📦', type: 'window', enabled: false }
+const fileTools = computed(() => [
+  { id: 'file-hash', name: t('toolbox.tools.fileHash'), icon: '🔐', type: 'window', enabled: false },
+  { id: 'file-merge', name: t('toolbox.tools.fileMerge'), icon: '📎', type: 'window', enabled: false },
+  { id: 'file-split', name: t('toolbox.tools.fileSplit'), icon: '✂️', type: 'window', enabled: false },
+  { id: 'file-rename', name: t('toolbox.tools.fileRename'), icon: '📝', type: 'window', enabled: false },
+  { id: 'duplicate-finder', name: t('toolbox.tools.duplicateFinder'), icon: '🔎', type: 'window', enabled: false },
+  { id: 'file-compare', name: t('toolbox.tools.fileCompare'), icon: '⚖️', type: 'window', enabled: false },
+  { id: 'csv-parser', name: t('toolbox.tools.csvParser'), icon: '📊', type: 'window', enabled: false },
+  { id: 'excel-viewer', name: t('toolbox.tools.excelViewer'), icon: '📈', type: 'window', enabled: false },
+  { id: 'pdf-tool', name: t('toolbox.tools.pdfTool'), icon: '📕', type: 'window', enabled: false },
+  { id: 'zip-tool', name: t('toolbox.tools.zipTool'), icon: '📦', type: 'window', enabled: false }
 ])
 
 // 图片工具
-const imageTools = ref([
-  { id: 'image-compress', name: '图片压缩', icon: '🗜️', type: 'window', enabled: false },
-  { id: 'image-resize', name: '尺寸调整', icon: '📏', type: 'window', enabled: false },
-  { id: 'image-crop', name: '图片裁剪', icon: '✂️', type: 'window', enabled: false },
-  { id: 'image-format', name: '格式转换', icon: '🔄', type: 'window', enabled: false },
-  { id: 'image-watermark', name: '添加水印', icon: '💧', type: 'window', enabled: false },
-  { id: 'icon-generator', name: '图标生成', icon: '🎨', type: 'window', enabled: false },
-  { id: 'sprite-sheet', name: '雪碧图', icon: '🖼️', type: 'window', enabled: false },
-  { id: 'image-to-base64', name: '图片Base64', icon: '🔤', type: 'window', enabled: false }
+const imageTools = computed(() => [
+  { id: 'image-compress', name: t('toolbox.tools.imageCompress'), icon: '🗜️', type: 'window', enabled: false },
+  { id: 'image-resize', name: t('toolbox.tools.imageResize'), icon: '📏', type: 'window', enabled: false },
+  { id: 'image-crop', name: t('toolbox.tools.imageCrop'), icon: '✂️', type: 'window', enabled: false },
+  { id: 'image-format', name: t('toolbox.tools.imageFormat'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'image-watermark', name: t('toolbox.tools.imageWatermark'), icon: '💧', type: 'window', enabled: false },
+  { id: 'icon-generator', name: t('toolbox.tools.iconGenerator'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'sprite-sheet', name: t('toolbox.tools.spriteSheet'), icon: '🖼️', type: 'window', enabled: false },
+  { id: 'image-to-base64', name: t('toolbox.tools.imageToBase64'), icon: '🔤', type: 'window', enabled: false }
 ])
 
 // 实用工具
-const utilityTools = ref([
-  { id: 'calculator', name: '计算器', icon: '🧮', type: 'window', enabled: false },
-  { id: 'scientific-calc', name: '科学计算', icon: '🔬', type: 'window', enabled: false },
-  { id: 'programmer-calc', name: '程序员计算器', icon: '💻', type: 'window', enabled: false },
-  { id: 'pomodoro', name: '番茄钟', icon: '⏱️', type: 'window', enabled: false },
-  { id: 'stopwatch', name: '秒表', icon: '⏰', type: 'window', enabled: false },
-  { id: 'countdown', name: '倒计时', icon: '⏳', type: 'window', enabled: false },
-  { id: 'unit-converter', name: '单位转换', icon: '📐', type: 'window', enabled: false },
-  { id: 'currency-converter', name: '汇率换算', icon: '💱', type: 'window', enabled: false },
-  { id: 'color-picker', name: '取色器', icon: '🎨', type: 'window', enabled: false },
-  { id: 'ruler', name: '像素尺', icon: '📏', type: 'window', enabled: false },
-  { id: 'screen-recorder', name: '录屏', icon: '📹', type: 'window', enabled: false },
-  { id: 'qrcode-generator', name: '二维码生成', icon: '📱', type: 'window', enabled: false },
-  { id: 'qrcode-scanner', name: '二维码扫描', icon: '📲', type: 'window', enabled: false },
-  { id: 'barcode-generator', name: '条形码', icon: '🏷️', type: 'window', enabled: false }
+const utilityTools = computed(() => [
+  { id: 'calculator', name: t('toolbox.tools.calculator'), icon: '🧮', type: 'window', enabled: false },
+  { id: 'scientific-calc', name: t('toolbox.tools.scientificCalc'), icon: '🔬', type: 'window', enabled: false },
+  { id: 'programmer-calc', name: t('toolbox.tools.programmerCalc'), icon: '💻', type: 'window', enabled: false },
+  { id: 'pomodoro', name: t('toolbox.tools.pomodoro'), icon: '⏱️', type: 'window', enabled: false },
+  { id: 'stopwatch', name: t('toolbox.tools.stopwatch'), icon: '⏰', type: 'window', enabled: false },
+  { id: 'countdown', name: t('toolbox.tools.countdown'), icon: '⏳', type: 'window', enabled: false },
+  { id: 'unit-converter', name: t('toolbox.tools.unitConverter'), icon: '📐', type: 'window', enabled: false },
+  { id: 'currency-converter', name: t('toolbox.tools.currencyConverter'), icon: '💱', type: 'window', enabled: false },
+  { id: 'color-picker', name: t('toolbox.tools.colorPicker'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'ruler', name: t('toolbox.tools.ruler'), icon: '📏', type: 'window', enabled: false },
+  { id: 'screen-recorder', name: t('toolbox.tools.screenRecorder'), icon: '📹', type: 'window', enabled: false },
+  { id: 'qrcode-generator', name: t('toolbox.tools.qrcodeGenerator'), icon: '📱', type: 'window', enabled: false },
+  { id: 'qrcode-scanner', name: t('toolbox.tools.qrcodeScanner'), icon: '📲', type: 'window', enabled: false },
+  { id: 'barcode-generator', name: t('toolbox.tools.barcodeGenerator'), icon: '🏷️', type: 'window', enabled: false }
 ])
 
 // Git工具
-const gitTools = ref([
-  { id: 'git-graph', name: 'Git图谱', icon: '🌳', type: 'window', enabled: false },
-  { id: 'git-diff', name: 'Git对比', icon: '🔄', type: 'window', enabled: false },
-  { id: 'git-ignore', name: 'Gitignore生成', icon: '🚫', type: 'window', enabled: false },
-  { id: 'commit-msg', name: '提交信息', icon: '📝', type: 'window', enabled: false },
-  { id: 'changelog', name: '更新日志', icon: '📋', type: 'window', enabled: false }
+const gitTools = computed(() => [
+  { id: 'git-graph', name: t('toolbox.tools.gitGraph'), icon: '🌳', type: 'window', enabled: false },
+  { id: 'git-diff', name: t('toolbox.tools.gitDiff'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'git-ignore', name: t('toolbox.tools.gitIgnore'), icon: '🚫', type: 'window', enabled: false },
+  { id: 'commit-msg', name: t('toolbox.tools.commitMsg'), icon: '📝', type: 'window', enabled: false },
+  { id: 'changelog', name: t('toolbox.tools.changelog'), icon: '📋', type: 'window', enabled: false }
 ])
 
 // 数据库工具
-const databaseTools = ref([
-  { id: 'sql-client', name: 'SQL客户端', icon: '🗄️', type: 'window', enabled: false },
-  { id: 'redis-client', name: 'Redis客户端', icon: '🔴', type: 'window', enabled: false },
-  { id: 'mongodb-client', name: 'MongoDB客户端', icon: '🍃', type: 'window', enabled: false },
-  { id: 'db-compare', name: '数据库对比', icon: '⚖️', type: 'window', enabled: false },
-  { id: 'er-diagram', name: 'ER图生成', icon: '📊', type: 'window', enabled: false },
-  { id: 'data-generator', name: '测试数据', icon: '🎲', type: 'window', enabled: false }
+const databaseTools = computed(() => [
+  { id: 'sql-client', name: t('toolbox.tools.sqlClient'), icon: '🗄️', type: 'window', enabled: false },
+  { id: 'redis-client', name: t('toolbox.tools.redisClient'), icon: '🔴', type: 'window', enabled: false },
+  { id: 'mongodb-client', name: t('toolbox.tools.mongodbClient'), icon: '🍃', type: 'window', enabled: false },
+  { id: 'db-compare', name: t('toolbox.tools.dbCompare'), icon: '⚖️', type: 'window', enabled: false },
+  { id: 'er-diagram', name: t('toolbox.tools.erDiagram'), icon: '📊', type: 'window', enabled: false },
+  { id: 'data-generator', name: t('toolbox.tools.dataGenerator'), icon: '🎲', type: 'window', enabled: false }
 ])
 
 // 效率工具
-const efficiencyTools = ref([
-  { id: 'kanban', name: '工作看板', icon: '📊', type: 'page', enabled: false },
-  { id: 'time-tracker', name: '时间统计', icon: '📈', type: 'page', enabled: false },
-  { id: 'habit-tracker', name: '习惯打卡', icon: '✅', type: 'page', enabled: false },
-  { id: 'focus-mode', name: '专注模式', icon: '🎯', type: 'window', enabled: false },
-  { id: 'break-reminder', name: '休息提醒', icon: '☕', type: 'window', enabled: false },
-  { id: 'quick-launcher', name: '快速启动', icon: '🚀', type: 'window', enabled: false },
-  { id: 'workflow-automation', name: '工作流自动化', icon: '⚙️', type: 'window', enabled: false },
-  { id: 'template-manager', name: '模板管理', icon: '📋', type: 'window', enabled: false },
-  { id: 'goal-tracker', name: '目标追踪', icon: '🎯', type: 'window', enabled: false },
-  { id: 'project-timer', name: '项目计时', icon: '⏱️', type: 'window', enabled: false },
-  { id: 'meeting-notes', name: '会议记录', icon: '📝', type: 'window', enabled: false },
-  { id: 'daily-report', name: '日报周报', icon: '📊', type: 'window', enabled: false },
-  { id: 'okr-manager', name: 'OKR管理', icon: '🎯', type: 'window', enabled: false },
-  { id: 'sprint-planner', name: '敏捷冲刺', icon: '⚡', type: 'window', enabled: false },
-  { id: 'retrospective', name: '复盘工具', icon: '🔄', type: 'window', enabled: false },
-  { id: 'eisenhower-matrix', name: '四象限法', icon: '📐', type: 'window', enabled: false },
-  { id: 'gtd-tool', name: 'GTD工具', icon: '✅', type: 'window', enabled: false },
-  { id: 'brainstorm', name: '头脑风暴', icon: '💡', type: 'window', enabled: false }
+const efficiencyTools = computed(() => [
+  { id: 'kanban', name: t('toolbox.tools.kanban'), icon: '📊', type: 'page', enabled: false },
+  { id: 'time-tracker', name: t('toolbox.tools.timeTracker'), icon: '📈', type: 'page', enabled: false },
+  { id: 'habit-tracker', name: t('toolbox.tools.habitTracker'), icon: '✅', type: 'page', enabled: false },
+  { id: 'focus-mode', name: t('toolbox.tools.focusMode'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'break-reminder', name: t('toolbox.tools.breakReminder'), icon: '☕', type: 'window', enabled: false },
+  { id: 'quick-launcher', name: t('toolbox.tools.quickLauncher'), icon: '🚀', type: 'window', enabled: false },
+  { id: 'workflow-automation', name: t('toolbox.tools.workflowAutomation'), icon: '⚙️', type: 'window', enabled: false },
+  { id: 'template-manager', name: t('toolbox.tools.templateManager'), icon: '📋', type: 'window', enabled: false },
+  { id: 'goal-tracker', name: t('toolbox.tools.goalTracker'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'project-timer', name: t('toolbox.tools.projectTimer'), icon: '⏱️', type: 'window', enabled: false },
+  { id: 'meeting-notes', name: t('toolbox.tools.meetingNotes'), icon: '📝', type: 'window', enabled: false },
+  { id: 'daily-report', name: t('toolbox.tools.dailyReport'), icon: '📊', type: 'window', enabled: false },
+  { id: 'okr-manager', name: t('toolbox.tools.okrManager'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'sprint-planner', name: t('toolbox.tools.sprintPlanner'), icon: '⚡', type: 'window', enabled: false },
+  { id: 'retrospective', name: t('toolbox.tools.retrospective'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'eisenhower-matrix', name: t('toolbox.tools.eisenhowerMatrix'), icon: '📐', type: 'window', enabled: false },
+  { id: 'gtd-tool', name: t('toolbox.tools.gtdTool'), icon: '✅', type: 'window', enabled: false },
+  { id: 'brainstorm', name: t('toolbox.tools.brainstorm'), icon: '💡', type: 'window', enabled: false }
 ])
 
 // 网络工具
-const networkTools = ref([
-  { id: 'port-checker', name: '端口检测', icon: '🌍', type: 'window', enabled: false },
-  { id: 'port-scanner', name: '端口扫描', icon: '🔍', type: 'window', enabled: false },
-  { id: 'ip-lookup', name: 'IP查询', icon: '📡', type: 'window', enabled: false },
-  { id: 'dns-lookup', name: 'DNS查询', icon: '🌐', type: 'window', enabled: false },
-  { id: 'whois', name: 'Whois查询', icon: '🔎', type: 'window', enabled: false },
-  { id: 'url-shortener', name: '短链生成', icon: '🔗', type: 'window', enabled: false },
-  { id: 'ping-test', name: 'Ping测试', icon: '📶', type: 'window', enabled: false },
-  { id: 'traceroute', name: '路由追踪', icon: '🛤️', type: 'window', enabled: false },
-  { id: 'speed-test', name: '测速', icon: '⚡', type: 'window', enabled: false },
-  { id: 'websocket-test', name: 'WebSocket测试', icon: '🔌', type: 'window', enabled: false },
-  { id: 'http-headers', name: 'HTTP头查看', icon: '📋', type: 'window', enabled: false }
+const networkTools = computed(() => [
+  { id: 'port-checker', name: t('toolbox.tools.portChecker'), icon: '🌍', type: 'window', enabled: false },
+  { id: 'port-scanner', name: t('toolbox.tools.portScanner'), icon: '🔍', type: 'window', enabled: false },
+  { id: 'ip-lookup', name: t('toolbox.tools.ipLookup'), icon: '📡', type: 'window', enabled: false },
+  { id: 'dns-lookup', name: t('toolbox.tools.dnsLookup'), icon: '🌐', type: 'window', enabled: false },
+  { id: 'whois', name: t('toolbox.tools.whois'), icon: '🔎', type: 'window', enabled: false },
+  { id: 'url-shortener', name: t('toolbox.tools.urlShortener'), icon: '🔗', type: 'window', enabled: false },
+  { id: 'ping-test', name: t('toolbox.tools.pingTest'), icon: '📶', type: 'window', enabled: false },
+  { id: 'traceroute', name: t('toolbox.tools.traceroute'), icon: '🛤️', type: 'window', enabled: false },
+  { id: 'speed-test', name: t('toolbox.tools.speedTest'), icon: '⚡', type: 'window', enabled: false },
+  { id: 'websocket-test', name: t('toolbox.tools.websocketTest'), icon: '🔌', type: 'window', enabled: false },
+  { id: 'http-headers', name: t('toolbox.tools.httpHeaders'), icon: '📋', type: 'window', enabled: false }
 ])
 
 // 前端工具
-const frontendTools = ref([
-  { id: 'css-generator', name: 'CSS生成器', icon: '🎨', type: 'window', enabled: false },
-  { id: 'gradient-generator', name: '渐变生成', icon: '🌈', type: 'window', enabled: false },
-  { id: 'shadow-generator', name: '阴影生成', icon: '🌑', type: 'window', enabled: false },
+const frontendTools = computed(() => [
+  { id: 'css-generator', name: t('toolbox.tools.cssGenerator'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'gradient-generator', name: t('toolbox.tools.gradientGenerator'), icon: '🌈', type: 'window', enabled: false },
+  { id: 'shadow-generator', name: t('toolbox.tools.shadowGenerator'), icon: '🌑', type: 'window', enabled: false },
   { id: 'flexbox-generator', name: 'Flexbox', icon: '📦', type: 'window', enabled: false },
-  { id: 'grid-generator', name: 'Grid生成', icon: '🔲', type: 'window', enabled: false },
-  { id: 'svg-editor', name: 'SVG编辑', icon: '🖼️', type: 'window', enabled: false },
-  { id: 'html-formatter', name: 'HTML格式化', icon: '📄', type: 'window', enabled: false },
-  { id: 'css-minify', name: 'CSS压缩', icon: '📦', type: 'window', enabled: false },
-  { id: 'js-minify', name: 'JS压缩', icon: '📦', type: 'window', enabled: false },
-  { id: 'html-escape', name: 'HTML转义', icon: '🔐', type: 'window', enabled: false }
+  { id: 'grid-generator', name: t('toolbox.tools.gridGenerator'), icon: '🔲', type: 'window', enabled: false },
+  { id: 'svg-editor', name: t('toolbox.tools.svgEditor'), icon: '🖼️', type: 'window', enabled: false },
+  { id: 'html-formatter', name: t('toolbox.tools.htmlFormatter'), icon: '📄', type: 'window', enabled: false },
+  { id: 'css-minify', name: t('toolbox.tools.cssMinify'), icon: '📦', type: 'window', enabled: false },
+  { id: 'js-minify', name: t('toolbox.tools.jsMinify'), icon: '📦', type: 'window', enabled: false },
+  { id: 'html-escape', name: t('toolbox.tools.htmlEscape'), icon: '🔐', type: 'window', enabled: false }
 ])
 
 // 后端工具
-const backendTools = ref([
-  { id: 'maven-helper', name: 'Maven助手', icon: '🔧', type: 'window', enabled: false },
-  { id: 'gradle-helper', name: 'Gradle助手', icon: '🐘', type: 'window', enabled: false },
-  { id: 'lombok-helper', name: 'Lombok代码', icon: '☕', type: 'window', enabled: false },
-  { id: 'mybatis-generator', name: 'MyBatis生成', icon: '🗄️', type: 'window', enabled: false },
-  { id: 'swagger-parser', name: 'Swagger解析', icon: '📖', type: 'window', enabled: false },
-  { id: 'openapi-generator', name: 'OpenAPI生成', icon: '🎯', type: 'window', enabled: false },
-  { id: 'pom-analyzer', name: 'POM分析', icon: '📋', type: 'window', enabled: false }
+const backendTools = computed(() => [
+  { id: 'maven-helper', name: t('toolbox.tools.mavenHelper'), icon: '🔧', type: 'window', enabled: false },
+  { id: 'gradle-helper', name: t('toolbox.tools.gradleHelper'), icon: '🐘', type: 'window', enabled: false },
+  { id: 'lombok-helper', name: t('toolbox.tools.lombokHelper'), icon: '☕', type: 'window', enabled: false },
+  { id: 'mybatis-generator', name: t('toolbox.tools.mybatisGenerator'), icon: '🗄️', type: 'window', enabled: false },
+  { id: 'swagger-parser', name: t('toolbox.tools.swaggerParser'), icon: '📖', type: 'window', enabled: false },
+  { id: 'openapi-generator', name: t('toolbox.tools.openapiGenerator'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'pom-analyzer', name: t('toolbox.tools.pomAnalyzer'), icon: '📋', type: 'window', enabled: false }
 ])
 
 // 测试工具
-const testTools = ref([
-  { id: 'mock-data', name: 'Mock数据', icon: '🎭', type: 'window', enabled: false },
-  { id: 'load-test', name: '压力测试', icon: '💪', type: 'window', enabled: false },
+const testTools = computed(() => [
+  { id: 'mock-data', name: t('toolbox.tools.mockData'), icon: '🎭', type: 'window', enabled: false },
+  { id: 'load-test', name: t('toolbox.tools.loadTest'), icon: '💪', type: 'window', enabled: false },
   { id: 'api-mock', name: 'API Mock', icon: '🎯', type: 'window', enabled: false },
-  { id: 'test-case', name: '测试用例', icon: '✅', type: 'window', enabled: false }
+  { id: 'test-case', name: t('toolbox.tools.testCase'), icon: '✅', type: 'window', enabled: false }
 ])
 
 // 运维工具
-const devopsTools = ref([
-  { id: 'log-viewer', name: '日志查看', icon: '📜', type: 'window', enabled: false },
-  { id: 'log-parser', name: '日志分析', icon: '🔍', type: 'window', enabled: false },
-  { id: 'docker-manager', name: 'Docker管理', icon: '🐋', type: 'window', enabled: false },
-  { id: 'k8s-helper', name: 'K8s助手', icon: '☸️', type: 'window', enabled: false },
-  { id: 'nginx-config', name: 'Nginx配置', icon: '🌐', type: 'window', enabled: false },
-  { id: 'cron-monitor', name: '定时任务', icon: '⏰', type: 'window', enabled: false },
-  { id: 'system-monitor', name: '系统监控', icon: '📊', type: 'window', enabled: false },
-  { id: 'process-monitor', name: '进程监控', icon: '⚙️', type: 'window', enabled: false }
+const devopsTools = computed(() => [
+  { id: 'log-viewer', name: t('toolbox.tools.logViewer'), icon: '📜', type: 'window', enabled: false },
+  { id: 'log-parser', name: t('toolbox.tools.logParser'), icon: '🔍', type: 'window', enabled: false },
+  { id: 'docker-manager', name: t('toolbox.tools.dockerManager'), icon: '🐋', type: 'window', enabled: false },
+  { id: 'k8s-helper', name: t('toolbox.tools.k8sHelper'), icon: '☸️', type: 'window', enabled: false },
+  { id: 'nginx-config', name: t('toolbox.tools.nginxConfig'), icon: '🌐', type: 'window', enabled: false },
+  { id: 'cron-monitor', name: t('toolbox.tools.cronMonitor'), icon: '⏰', type: 'window', enabled: false },
+  { id: 'system-monitor', name: t('toolbox.tools.systemMonitor'), icon: '📊', type: 'window', enabled: false },
+  { id: 'process-monitor', name: t('toolbox.tools.processMonitor'), icon: '⚙️', type: 'window', enabled: false }
 ])
 
 // 安全工具
-const securityTools = ref([
-  { id: 'password-generator', name: '密码生成', icon: '🔐', type: 'window', enabled: false },
-  { id: 'password-strength', name: '密码强度', icon: '🔒', type: 'window', enabled: false },
-  { id: 'rsa-tool', name: 'RSA工具', icon: '🔑', type: 'window', enabled: false },
-  { id: 'aes-tool', name: 'AES工具', icon: '🔐', type: 'window', enabled: false },
-  { id: 'certificate-viewer', name: '证书查看', icon: '📜', type: 'window', enabled: false }
+const securityTools = computed(() => [
+  { id: 'password-generator', name: t('toolbox.tools.passwordGenerator'), icon: '🔐', type: 'window', enabled: false },
+  { id: 'password-strength', name: t('toolbox.tools.passwordStrength'), icon: '🔒', type: 'window', enabled: false },
+  { id: 'rsa-tool', name: t('toolbox.tools.rsaTool'), icon: '🔑', type: 'window', enabled: false },
+  { id: 'aes-tool', name: t('toolbox.tools.aesTool'), icon: '🔐', type: 'window', enabled: false },
+  { id: 'certificate-viewer', name: t('toolbox.tools.certificateViewer'), icon: '📜', type: 'window', enabled: false }
 ])
 
 // 文档工具
-const documentTools = ref([
-  { id: 'api-doc', name: 'API文档', icon: '📚', type: 'window', enabled: false },
-  { id: 'markdown-toc', name: 'MD目录', icon: '📑', type: 'window', enabled: false },
-  { id: 'readme-generator', name: 'README生成', icon: '📄', type: 'window', enabled: false },
-  { id: 'changelog-generator', name: 'Changelog生成', icon: '📝', type: 'window', enabled: false }
+const documentTools = computed(() => [
+  { id: 'api-doc', name: t('toolbox.tools.apiDoc'), icon: '📚', type: 'window', enabled: false },
+  { id: 'markdown-toc', name: t('toolbox.tools.markdownToc'), icon: '📑', type: 'window', enabled: false },
+  { id: 'readme-generator', name: t('toolbox.tools.readmeGenerator'), icon: '📄', type: 'window', enabled: false },
+  { id: 'changelog-generator', name: t('toolbox.tools.changelogGenerator'), icon: '📝', type: 'window', enabled: false }
 ])
 
 // 学习工具
-const learningTools = ref([
-  { id: 'doc-search', name: '文档快搜', icon: '📖', type: 'window', enabled: false },
-  { id: 'code-generator', name: '代码生成', icon: '💡', type: 'window', enabled: false },
-  { id: 'flashcard', name: '知识卡片', icon: '🎓', type: 'window', enabled: false },
-  { id: 'algorithm', name: '算法可视化', icon: '🧬', type: 'window', enabled: false },
-  { id: 'sql-practice', name: 'SQL练习', icon: '🎯', type: 'window', enabled: false },
-  { id: 'regex-practice', name: '正则练习', icon: '🎨', type: 'window', enabled: false },
-  { id: 'typing-practice', name: '打字练习', icon: '⌨️', type: 'window', enabled: false }
+const learningTools = computed(() => [
+  { id: 'doc-search', name: t('toolbox.tools.docSearch'), icon: '📖', type: 'window', enabled: false },
+  { id: 'code-generator', name: t('toolbox.tools.codeGenerator'), icon: '💡', type: 'window', enabled: false },
+  { id: 'flashcard', name: t('toolbox.tools.flashcard'), icon: '🎓', type: 'window', enabled: false },
+  { id: 'algorithm', name: t('toolbox.tools.algorithm'), icon: '🧬', type: 'window', enabled: false },
+  { id: 'sql-practice', name: t('toolbox.tools.sqlPractice'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'regex-practice', name: t('toolbox.tools.regexPractice'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'typing-practice', name: t('toolbox.tools.typingPractice'), icon: '⌨️', type: 'window', enabled: false }
 ])
 
 // 办公工具
-const officeTools = ref([
-  { id: 'word-counter', name: '字数统计', icon: '🔢', type: 'window', enabled: false },
-  { id: 'text-formatter', name: '文本格式化', icon: '📝', type: 'window', enabled: false },
-  { id: 'case-converter', name: '大小写转换', icon: '🔤', type: 'window', enabled: false },
-  { id: 'invoice-generator', name: '发票生成', icon: '🧾', type: 'window', enabled: false },
-  { id: 'expense-tracker', name: '报销记录', icon: '💰', type: 'window', enabled: false },
-  { id: 'contract-template', name: '合同模板', icon: '📄', type: 'window', enabled: false },
-  { id: 'letter-generator', name: '信函生成', icon: '✉️', type: 'window', enabled: false },
-  { id: 'presentation-timer', name: '演讲计时', icon: '⏱️', type: 'window', enabled: false },
-  { id: 'signature-tool', name: '电子签名', icon: '✍️', type: 'window', enabled: false },
-  { id: 'pdf-merger', name: 'PDF合并', icon: '📑', type: 'window', enabled: false }
+const officeTools = computed(() => [
+  { id: 'word-counter', name: t('toolbox.tools.wordCounter'), icon: '🔢', type: 'window', enabled: false },
+  { id: 'text-formatter', name: t('toolbox.tools.textFormatter'), icon: '📝', type: 'window', enabled: false },
+  { id: 'case-converter', name: t('toolbox.tools.caseConverter'), icon: '🔤', type: 'window', enabled: false },
+  { id: 'invoice-generator', name: t('toolbox.tools.invoiceGenerator'), icon: '🧾', type: 'window', enabled: false },
+  { id: 'expense-tracker', name: t('toolbox.tools.expenseTracker'), icon: '💰', type: 'window', enabled: false },
+  { id: 'contract-template', name: t('toolbox.tools.contractTemplate'), icon: '📄', type: 'window', enabled: false },
+  { id: 'letter-generator', name: t('toolbox.tools.letterGenerator'), icon: '✉️', type: 'window', enabled: false },
+  { id: 'presentation-timer', name: t('toolbox.tools.presentationTimer'), icon: '⏱️', type: 'window', enabled: false },
+  { id: 'signature-tool', name: t('toolbox.tools.signatureTool'), icon: '✍️', type: 'window', enabled: false },
+  { id: 'pdf-merger', name: t('toolbox.tools.pdfMerger'), icon: '📑', type: 'window', enabled: false }
 ])
 
 // 设计工具
-const designTools = ref([
-  { id: 'mockup-tool', name: '原型设计', icon: '🎨', type: 'window', enabled: false },
-  { id: 'wireframe', name: '线框图', icon: '📐', type: 'window', enabled: false },
-  { id: 'color-palette', name: '配色方案', icon: '🎨', type: 'window', enabled: false },
-  { id: 'font-tester', name: '字体测试', icon: '🔤', type: 'window', enabled: false },
-  { id: 'icon-library', name: '图标库', icon: '🎯', type: 'window', enabled: false },
-  { id: 'logo-maker', name: 'Logo制作', icon: '🎨', type: 'window', enabled: false },
-  { id: 'gradient-library', name: '渐变库', icon: '🌈', type: 'window', enabled: false },
-  { id: 'design-token', name: '设计令牌', icon: '🎨', type: 'window', enabled: false },
-  { id: 'ui-patterns', name: 'UI模式库', icon: '📦', type: 'window', enabled: false },
-  { id: 'responsive-preview', name: '响应式预览', icon: '📱', type: 'window', enabled: false }
+const designTools = computed(() => [
+  { id: 'mockup-tool', name: t('toolbox.tools.mockupTool'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'wireframe', name: t('toolbox.tools.wireframe'), icon: '📐', type: 'window', enabled: false },
+  { id: 'color-palette', name: t('toolbox.tools.colorPalette'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'font-tester', name: t('toolbox.tools.fontTester'), icon: '🔤', type: 'window', enabled: false },
+  { id: 'icon-library', name: t('toolbox.tools.iconLibrary'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'logo-maker', name: t('toolbox.tools.logoMaker'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'gradient-library', name: t('toolbox.tools.gradientLibrary'), icon: '🌈', type: 'window', enabled: false },
+  { id: 'design-token', name: t('toolbox.tools.designToken'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'ui-patterns', name: t('toolbox.tools.uiPatterns'), icon: '📦', type: 'window', enabled: false },
+  { id: 'responsive-preview', name: t('toolbox.tools.responsivePreview'), icon: '📱', type: 'window', enabled: false }
 ])
 
 // 数据分析
-const dataAnalysisTools = ref([
-  { id: 'chart-generator', name: '图表生成', icon: '📊', type: 'window', enabled: false },
-  { id: 'data-visualization', name: '数据可视化', icon: '📈', type: 'window', enabled: false },
-  { id: 'pivot-table', name: '数据透视表', icon: '🔄', type: 'window', enabled: false },
-  { id: 'sql-analyzer', name: 'SQL分析', icon: '🔍', type: 'window', enabled: false },
-  { id: 'log-analyzer', name: '日志分析', icon: '📜', type: 'window', enabled: false },
-  { id: 'json-analyzer', name: 'JSON分析', icon: '📋', type: 'window', enabled: false },
-  { id: 'csv-analyzer', name: 'CSV分析', icon: '📊', type: 'window', enabled: false },
-  { id: 'statistics-tool', name: '统计工具', icon: '📐', type: 'window', enabled: false },
-  { id: 'data-cleaner', name: '数据清洗', icon: '🧹', type: 'window', enabled: false },
-  { id: 'data-export', name: '数据导出', icon: '📤', type: 'window', enabled: false }
+const dataAnalysisTools = computed(() => [
+  { id: 'chart-generator', name: t('toolbox.tools.chartGenerator'), icon: '📊', type: 'window', enabled: false },
+  { id: 'data-visualization', name: t('toolbox.tools.dataVisualization'), icon: '📈', type: 'window', enabled: false },
+  { id: 'pivot-table', name: t('toolbox.tools.pivotTable'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'sql-analyzer', name: t('toolbox.tools.sqlAnalyzer'), icon: '🔍', type: 'window', enabled: false },
+  { id: 'log-analyzer', name: t('toolbox.tools.logAnalyzer'), icon: '📜', type: 'window', enabled: false },
+  { id: 'json-analyzer', name: t('toolbox.tools.jsonAnalyzer'), icon: '📋', type: 'window', enabled: false },
+  { id: 'csv-analyzer', name: t('toolbox.tools.csvAnalyzer'), icon: '📊', type: 'window', enabled: false },
+  { id: 'statistics-tool', name: t('toolbox.tools.statisticsTool'), icon: '📐', type: 'window', enabled: false },
+  { id: 'data-cleaner', name: t('toolbox.tools.dataCleaner'), icon: '🧹', type: 'window', enabled: false },
+  { id: 'data-export', name: t('toolbox.tools.dataExport'), icon: '📤', type: 'window', enabled: false }
 ])
 
 // 音视频工具
-const mediaTools = ref([
-  { id: 'audio-converter', name: '音频转换', icon: '🎵', type: 'window', enabled: false },
-  { id: 'video-converter', name: '视频转换', icon: '🎬', type: 'window', enabled: false },
-  { id: 'audio-trim', name: '音频剪辑', icon: '✂️', type: 'window', enabled: false },
-  { id: 'video-trim', name: '视频剪辑', icon: '🎞️', type: 'window', enabled: false },
-  { id: 'gif-maker', name: 'GIF制作', icon: '🎬', type: 'window', enabled: false },
-  { id: 'subtitle-tool', name: '字幕工具', icon: '📝', type: 'window', enabled: false },
-  { id: 'audio-merger', name: '音频合并', icon: '🎵', type: 'window', enabled: false },
-  { id: 'video-merger', name: '视频合并', icon: '🎬', type: 'window', enabled: false },
-  { id: 'screen-capture', name: '录屏工具', icon: '📹', type: 'window', enabled: false },
-  { id: 'audio-recorder', name: '录音工具', icon: '🎤', type: 'window', enabled: false }
+const mediaTools = computed(() => [
+  { id: 'audio-converter', name: t('toolbox.tools.audioConverter'), icon: '🎵', type: 'window', enabled: false },
+  { id: 'video-converter', name: t('toolbox.tools.videoConverter'), icon: '🎬', type: 'window', enabled: false },
+  { id: 'audio-trim', name: t('toolbox.tools.audioTrim'), icon: '✂️', type: 'window', enabled: false },
+  { id: 'video-trim', name: t('toolbox.tools.videoTrim'), icon: '🎞️', type: 'window', enabled: false },
+  { id: 'gif-maker', name: t('toolbox.tools.gifMaker'), icon: '🎬', type: 'window', enabled: false },
+  { id: 'subtitle-tool', name: t('toolbox.tools.subtitleTool'), icon: '📝', type: 'window', enabled: false },
+  { id: 'audio-merger', name: t('toolbox.tools.audioMerger'), icon: '🎵', type: 'window', enabled: false },
+  { id: 'video-merger', name: t('toolbox.tools.videoMerger'), icon: '🎬', type: 'window', enabled: false },
+  { id: 'screen-capture', name: t('toolbox.tools.screenCapture'), icon: '📹', type: 'window', enabled: false },
+  { id: 'audio-recorder', name: t('toolbox.tools.audioRecorder'), icon: '🎤', type: 'window', enabled: false }
 ])
 
 // 系统工具
-const systemTools = ref([
-  { id: 'disk-cleaner', name: '磁盘清理', icon: '🧹', type: 'window', enabled: false },
-  { id: 'disk-analyzer', name: '磁盘分析', icon: '💾', type: 'window', enabled: false },
-  { id: 'registry-cleaner', name: '注册表清理', icon: '🔧', type: 'window', enabled: false },
-  { id: 'startup-manager', name: '启动管理', icon: '🚀', type: 'window', enabled: false },
-  { id: 'service-manager', name: '服务管理', icon: '⚙️', type: 'window', enabled: false },
-  { id: 'env-variable', name: '环境变量', icon: '🔧', type: 'window', enabled: false },
-  { id: 'hosts-editor', name: 'Hosts编辑', icon: '🌐', type: 'window', enabled: false },
-  { id: 'task-scheduler', name: '任务计划', icon: '⏰', type: 'window', enabled: false },
-  { id: 'clipboard-manager', name: '剪贴板管理', icon: '📋', type: 'window', enabled: false },
-  { id: 'window-manager', name: '窗口管理', icon: '🪟', type: 'window', enabled: false }
+const systemTools = computed(() => [
+  { id: 'disk-cleaner', name: t('toolbox.tools.diskCleaner'), icon: '🧹', type: 'window', enabled: false },
+  { id: 'disk-analyzer', name: t('toolbox.tools.diskAnalyzer'), icon: '💾', type: 'window', enabled: false },
+  { id: 'registry-cleaner', name: t('toolbox.tools.registryCleaner'), icon: '🔧', type: 'window', enabled: false },
+  { id: 'startup-manager', name: t('toolbox.tools.startupManager'), icon: '🚀', type: 'window', enabled: false },
+  { id: 'service-manager', name: t('toolbox.tools.serviceManager'), icon: '⚙️', type: 'window', enabled: false },
+  { id: 'env-variable', name: t('toolbox.tools.envVariable'), icon: '🔧', type: 'window', enabled: false },
+  { id: 'hosts-editor', name: t('toolbox.tools.hostsEditor'), icon: '🌐', type: 'window', enabled: false },
+  { id: 'task-scheduler', name: t('toolbox.tools.taskScheduler'), icon: '⏰', type: 'window', enabled: false },
+  { id: 'clipboard-manager', name: t('toolbox.tools.clipboardManager'), icon: '📋', type: 'window', enabled: false },
+  { id: 'window-manager', name: t('toolbox.tools.windowManager'), icon: '🪟', type: 'window', enabled: false }
 ])
 
 // 浏览器工具
-const browserTools = ref([
-  { id: 'bookmark-manager', name: '书签管理', icon: '🔖', type: 'window', enabled: false },
-  { id: 'cookie-manager', name: 'Cookie管理', icon: '🍪', type: 'window', enabled: false },
-  { id: 'cache-cleaner', name: '缓存清理', icon: '🧹', type: 'window', enabled: false },
+const browserTools = computed(() => [
+  { id: 'bookmark-manager', name: t('toolbox.tools.bookmarkManager'), icon: '🔖', type: 'window', enabled: false },
+  { id: 'cookie-manager', name: t('toolbox.tools.cookieManager'), icon: '🍪', type: 'window', enabled: false },
+  { id: 'cache-cleaner', name: t('toolbox.tools.cacheCleaner'), icon: '🧹', type: 'window', enabled: false },
   { id: 'user-agent', name: 'UserAgent', icon: '🌐', type: 'window', enabled: false },
-  { id: 'web-scraper', name: '网页抓取', icon: '🕷️', type: 'window', enabled: false },
-  { id: 'seo-analyzer', name: 'SEO分析', icon: '📊', type: 'window', enabled: false },
-  { id: 'page-speed', name: '页面测速', icon: '⚡', type: 'window', enabled: false },
+  { id: 'web-scraper', name: t('toolbox.tools.webScraper'), icon: '🕷️', type: 'window', enabled: false },
+  { id: 'seo-analyzer', name: t('toolbox.tools.seoAnalyzer'), icon: '📊', type: 'window', enabled: false },
+  { id: 'page-speed', name: t('toolbox.tools.pageSpeed'), icon: '⚡', type: 'window', enabled: false },
   { id: 'lighthouse', name: 'Lighthouse', icon: '💡', type: 'window', enabled: false }
 ])
 
 // 代码质量
-const codeQualityTools = ref([
-  { id: 'code-formatter', name: '代码格式化', icon: '✨', type: 'window', enabled: false },
-  { id: 'code-lint', name: '代码检查', icon: '🔍', type: 'window', enabled: false },
-  { id: 'code-review', name: '代码审查', icon: '👀', type: 'window', enabled: false },
-  { id: 'complexity-analyzer', name: '复杂度分析', icon: '📊', type: 'window', enabled: false },
-  { id: 'duplicate-detector', name: '重复代码', icon: '🔎', type: 'window', enabled: false },
-  { id: 'dependency-checker', name: '依赖检查', icon: '📦', type: 'window', enabled: false },
-  { id: 'security-scanner', name: '安全扫描', icon: '🔐', type: 'window', enabled: false },
-  { id: 'test-coverage', name: '测试覆盖率', icon: '📈', type: 'window', enabled: false },
-  { id: 'code-metrics', name: '代码指标', icon: '📊', type: 'window', enabled: false }
+const codeQualityTools = computed(() => [
+  { id: 'code-formatter', name: t('toolbox.tools.codeFormatter'), icon: '✨', type: 'window', enabled: false },
+  { id: 'code-lint', name: t('toolbox.tools.codeLint'), icon: '🔍', type: 'window', enabled: false },
+  { id: 'code-review', name: t('toolbox.tools.codeReview'), icon: '👀', type: 'window', enabled: false },
+  { id: 'complexity-analyzer', name: t('toolbox.tools.complexityAnalyzer'), icon: '📊', type: 'window', enabled: false },
+  { id: 'duplicate-detector', name: t('toolbox.tools.duplicateDetector'), icon: '🔎', type: 'window', enabled: false },
+  { id: 'dependency-checker', name: t('toolbox.tools.dependencyChecker'), icon: '📦', type: 'window', enabled: false },
+  { id: 'security-scanner', name: t('toolbox.tools.securityScanner'), icon: '🔐', type: 'window', enabled: false },
+  { id: 'test-coverage', name: t('toolbox.tools.testCoverage'), icon: '📈', type: 'window', enabled: false },
+  { id: 'code-metrics', name: t('toolbox.tools.codeMetrics'), icon: '📊', type: 'window', enabled: false }
 ])
 
 // API工具
-const apiTools = ref([
-  { id: 'api-docs', name: 'API文档', icon: '📚', type: 'window', enabled: false },
-  { id: 'api-client', name: 'API客户端', icon: '🔌', type: 'window', enabled: false },
-  { id: 'graphql-client', name: 'GraphQL客户端', icon: '📡', type: 'window', enabled: false },
-  { id: 'rest-client', name: 'REST客户端', icon: '🌐', type: 'window', enabled: false },
-  { id: 'soap-client', name: 'SOAP客户端', icon: '🧼', type: 'window', enabled: false },
-  { id: 'webhook-tester', name: 'Webhook测试', icon: '🔗', type: 'window', enabled: false },
-  { id: 'api-monitor', name: 'API监控', icon: '📊', type: 'window', enabled: false },
-  { id: 'api-versioning', name: 'API版本', icon: '🔢', type: 'window', enabled: false }
+const apiTools = computed(() => [
+  { id: 'api-docs', name: t('toolbox.tools.apiDocs'), icon: '📚', type: 'window', enabled: false },
+  { id: 'api-client', name: t('toolbox.tools.apiClient'), icon: '🔌', type: 'window', enabled: false },
+  { id: 'graphql-client', name: t('toolbox.tools.graphqlClient'), icon: '📡', type: 'window', enabled: false },
+  { id: 'rest-client', name: t('toolbox.tools.restClient'), icon: '🌐', type: 'window', enabled: false },
+  { id: 'soap-client', name: t('toolbox.tools.soapClient'), icon: '🧼', type: 'window', enabled: false },
+  { id: 'webhook-tester', name: t('toolbox.tools.webhookTester'), icon: '🔗', type: 'window', enabled: false },
+  { id: 'api-monitor', name: t('toolbox.tools.apiMonitor'), icon: '📊', type: 'window', enabled: false },
+  { id: 'api-versioning', name: t('toolbox.tools.apiVersioning'), icon: '🔢', type: 'window', enabled: false }
 ])
 
 // 移动开发
-const mobileDevTools = ref([
-  { id: 'app-icon-generator', name: '应用图标', icon: '📱', type: 'window', enabled: false },
-  { id: 'splash-generator', name: '启动图', icon: '🎨', type: 'window', enabled: false },
-  { id: 'device-preview', name: '设备预览', icon: '📱', type: 'window', enabled: false },
-  { id: 'android-tools', name: 'Android工具', icon: '🤖', type: 'window', enabled: false },
-  { id: 'ios-tools', name: 'iOS工具', icon: '🍎', type: 'window', enabled: false },
-  { id: 'react-native-helper', name: 'RN助手', icon: '⚛️', type: 'window', enabled: false },
-  { id: 'flutter-helper', name: 'Flutter助手', icon: '🦋', type: 'window', enabled: false }
+const mobileDevTools = computed(() => [
+  { id: 'app-icon-generator', name: t('toolbox.tools.appIconGenerator'), icon: '📱', type: 'window', enabled: false },
+  { id: 'splash-generator', name: t('toolbox.tools.splashGenerator'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'device-preview', name: t('toolbox.tools.devicePreview'), icon: '📱', type: 'window', enabled: false },
+  { id: 'android-tools', name: t('toolbox.tools.androidTools'), icon: '🤖', type: 'window', enabled: false },
+  { id: 'ios-tools', name: t('toolbox.tools.iosTools'), icon: '🍎', type: 'window', enabled: false },
+  { id: 'react-native-helper', name: t('toolbox.tools.reactNativeHelper'), icon: '⚛️', type: 'window', enabled: false },
+  { id: 'flutter-helper', name: t('toolbox.tools.flutterHelper'), icon: '🦋', type: 'window', enabled: false }
 ])
 
 // 性能优化
-const performanceTools = ref([
-  { id: 'bundle-analyzer', name: '打包分析', icon: '📦', type: 'window', enabled: false },
-  { id: 'memory-profiler', name: '内存分析', icon: '💾', type: 'window', enabled: false },
-  { id: 'cpu-profiler', name: 'CPU分析', icon: '⚡', type: 'window', enabled: false },
-  { id: 'network-profiler', name: '网络分析', icon: '🌐', type: 'window', enabled: false },
-  { id: 'lighthouse-audit', name: '性能审计', icon: '💡', type: 'window', enabled: false },
-  { id: 'image-optimizer', name: '图片优化', icon: '🖼️', type: 'window', enabled: false },
-  { id: 'code-splitter', name: '代码分割', icon: '✂️', type: 'window', enabled: false },
-  { id: 'lazy-loading', name: '懒加载配置', icon: '⏳', type: 'window', enabled: false }
+const performanceTools = computed(() => [
+  { id: 'bundle-analyzer', name: t('toolbox.tools.bundleAnalyzer'), icon: '📦', type: 'window', enabled: false },
+  { id: 'memory-profiler', name: t('toolbox.tools.memoryProfiler'), icon: '💾', type: 'window', enabled: false },
+  { id: 'cpu-profiler', name: t('toolbox.tools.cpuProfiler'), icon: '⚡', type: 'window', enabled: false },
+  { id: 'network-profiler', name: t('toolbox.tools.networkProfiler'), icon: '🌐', type: 'window', enabled: false },
+  { id: 'lighthouse-audit', name: t('toolbox.tools.lighthouseAudit'), icon: '💡', type: 'window', enabled: false },
+  { id: 'image-optimizer', name: t('toolbox.tools.imageOptimizer'), icon: '🖼️', type: 'window', enabled: false },
+  { id: 'code-splitter', name: t('toolbox.tools.codeSplitter'), icon: '✂️', type: 'window', enabled: false },
+  { id: 'lazy-loading', name: t('toolbox.tools.lazyLoading'), icon: '⏳', type: 'window', enabled: false }
 ])
 
 // 项目管理
-const projectManagementTools = ref([
-  { id: 'project-init', name: '项目初始化', icon: '🚀', type: 'window', enabled: false },
-  { id: 'scaffolding', name: '脚手架', icon: '🏗️', type: 'window', enabled: false },
-  { id: 'dependency-manager', name: '依赖管理', icon: '📦', type: 'window', enabled: false },
-  { id: 'changelog-manager', name: '变更日志', icon: '📝', type: 'window', enabled: false },
-  { id: 'release-notes', name: '发布说明', icon: '📋', type: 'window', enabled: false },
-  { id: 'milestone-tracker', name: '里程碑', icon: '🏁', type: 'window', enabled: false },
-  { id: 'gantt-chart', name: '甘特图', icon: '📊', type: 'window', enabled: false },
-  { id: 'resource-planner', name: '资源规划', icon: '📅', type: 'window', enabled: false }
+const projectManagementTools = computed(() => [
+  { id: 'project-init', name: t('toolbox.tools.projectInit'), icon: '🚀', type: 'window', enabled: false },
+  { id: 'scaffolding', name: t('toolbox.tools.scaffolding'), icon: '🏗️', type: 'window', enabled: false },
+  { id: 'dependency-manager', name: t('toolbox.tools.dependencyManager'), icon: '📦', type: 'window', enabled: false },
+  { id: 'changelog-manager', name: t('toolbox.tools.changelogManager'), icon: '📝', type: 'window', enabled: false },
+  { id: 'release-notes', name: t('toolbox.tools.releaseNotes'), icon: '📋', type: 'window', enabled: false },
+  { id: 'milestone-tracker', name: t('toolbox.tools.milestoneTracker'), icon: '🏁', type: 'window', enabled: false },
+  { id: 'gantt-chart', name: t('toolbox.tools.ganttChart'), icon: '📊', type: 'window', enabled: false },
+  { id: 'resource-planner', name: t('toolbox.tools.resourcePlanner'), icon: '📅', type: 'window', enabled: false }
 ])
 
 // 协作通讯
-const collaborationTools = ref([
-  { id: 'team-chat', name: '团队聊天', icon: '💬', type: 'window', enabled: false },
-  { id: 'video-meeting', name: '视频会议', icon: '📹', type: 'window', enabled: false },
-  { id: 'screen-share', name: '屏幕共享', icon: '🖥️', type: 'window', enabled: false },
-  { id: 'whiteboard-collab', name: '协作白板', icon: '🎨', type: 'window', enabled: false },
-  { id: 'code-review-tool', name: '代码评审', icon: '👥', type: 'window', enabled: false },
-  { id: 'pair-programming', name: '结对编程', icon: '👥', type: 'window', enabled: false },
-  { id: 'knowledge-base', name: '知识库', icon: '📚', type: 'window', enabled: false }
+const collaborationTools = computed(() => [
+  { id: 'team-chat', name: t('toolbox.tools.teamChat'), icon: '💬', type: 'window', enabled: false },
+  { id: 'video-meeting', name: t('toolbox.tools.videoMeeting'), icon: '📹', type: 'window', enabled: false },
+  { id: 'screen-share', name: t('toolbox.tools.screenShare'), icon: '🖥️', type: 'window', enabled: false },
+  { id: 'whiteboard-collab', name: t('toolbox.tools.whiteboardCollab'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'code-review-tool', name: t('toolbox.tools.codeReviewTool'), icon: '👥', type: 'window', enabled: false },
+  { id: 'pair-programming', name: t('toolbox.tools.pairProgramming'), icon: '👥', type: 'window', enabled: false },
+  { id: 'knowledge-base', name: t('toolbox.tools.knowledgeBase'), icon: '📚', type: 'window', enabled: false }
 ])
 
 // 云服务工具
-const cloudTools = ref([
-  { id: 'aws-helper', name: 'AWS助手', icon: '☁️', type: 'window', enabled: false },
-  { id: 'azure-helper', name: 'Azure助手', icon: '☁️', type: 'window', enabled: false },
-  { id: 'gcp-helper', name: 'GCP助手', icon: '☁️', type: 'window', enabled: false },
-  { id: 'aliyun-helper', name: '阿里云助手', icon: '☁️', type: 'window', enabled: false },
-  { id: 'tencent-cloud', name: '腾讯云助手', icon: '☁️', type: 'window', enabled: false },
-  { id: 's3-manager', name: 'S3管理', icon: '📦', type: 'window', enabled: false },
-  { id: 'oss-manager', name: 'OSS管理', icon: '📦', type: 'window', enabled: false },
+const cloudTools = computed(() => [
+  { id: 'aws-helper', name: t('toolbox.tools.awsHelper'), icon: '☁️', type: 'window', enabled: false },
+  { id: 'azure-helper', name: t('toolbox.tools.azureHelper'), icon: '☁️', type: 'window', enabled: false },
+  { id: 'gcp-helper', name: t('toolbox.tools.gcpHelper'), icon: '☁️', type: 'window', enabled: false },
+  { id: 'aliyun-helper', name: t('toolbox.tools.aliyunHelper'), icon: '☁️', type: 'window', enabled: false },
+  { id: 'tencent-cloud', name: t('toolbox.tools.tencentCloud'), icon: '☁️', type: 'window', enabled: false },
+  { id: 's3-manager', name: t('toolbox.tools.s3Manager'), icon: '📦', type: 'window', enabled: false },
+  { id: 'oss-manager', name: t('toolbox.tools.ossManager'), icon: '📦', type: 'window', enabled: false },
   { id: 'serverless-helper', name: 'Serverless', icon: '⚡', type: 'window', enabled: false }
 ])
 
 // 金融工具
-const financeTools = ref([
-  { id: 'tax-calculator', name: '税费计算', icon: '💰', type: 'window', enabled: false },
-  { id: 'salary-calculator', name: '薪资计算', icon: '💵', type: 'window', enabled: false },
-  { id: 'loan-calculator', name: '贷款计算', icon: '🏦', type: 'window', enabled: false },
-  { id: 'investment-calculator', name: '投资计算', icon: '📈', type: 'window', enabled: false },
-  { id: 'budget-planner', name: '预算规划', icon: '💼', type: 'window', enabled: false },
-  { id: 'expense-analyzer', name: '支出分析', icon: '📊', type: 'window', enabled: false },
-  { id: 'invoice-maker', name: '发票制作', icon: '🧾', type: 'window', enabled: false }
+const financeTools = computed(() => [
+  { id: 'tax-calculator', name: t('toolbox.tools.taxCalculator'), icon: '💰', type: 'window', enabled: false },
+  { id: 'salary-calculator', name: t('toolbox.tools.salaryCalculator'), icon: '💵', type: 'window', enabled: false },
+  { id: 'loan-calculator', name: t('toolbox.tools.loanCalculator'), icon: '🏦', type: 'window', enabled: false },
+  { id: 'investment-calculator', name: t('toolbox.tools.investmentCalculator'), icon: '📈', type: 'window', enabled: false },
+  { id: 'budget-planner', name: t('toolbox.tools.budgetPlanner'), icon: '💼', type: 'window', enabled: false },
+  { id: 'expense-analyzer', name: t('toolbox.tools.expenseAnalyzer'), icon: '📊', type: 'window', enabled: false },
+  { id: 'invoice-maker', name: t('toolbox.tools.invoiceMaker'), icon: '🧾', type: 'window', enabled: false }
 ])
 
 // 生活工具
-const lifeTools = ref([
-  { id: 'calendar-planner', name: '日历规划', icon: '📅', type: 'window', enabled: false },
-  { id: 'reminder-tool', name: '提醒事项', icon: '⏰', type: 'window', enabled: false },
-  { id: 'shopping-list', name: '购物清单', icon: '🛒', type: 'window', enabled: false },
-  { id: 'recipe-manager', name: '食谱管理', icon: '🍳', type: 'window', enabled: false },
-  { id: 'workout-planner', name: '健身计划', icon: '💪', type: 'window', enabled: false },
-  { id: 'water-reminder', name: '喝水提醒', icon: '💧', type: 'window', enabled: false },
-  { id: 'sleep-tracker', name: '睡眠追踪', icon: '😴', type: 'window', enabled: false },
-  { id: 'mood-tracker', name: '心情记录', icon: '😊', type: 'window', enabled: false }
+const lifeTools = computed(() => [
+  { id: 'calendar-planner', name: t('toolbox.tools.calendarPlanner'), icon: '📅', type: 'window', enabled: false },
+  { id: 'reminder-tool', name: t('toolbox.tools.reminderTool'), icon: '⏰', type: 'window', enabled: false },
+  { id: 'shopping-list', name: t('toolbox.tools.shoppingList'), icon: '🛒', type: 'window', enabled: false },
+  { id: 'recipe-manager', name: t('toolbox.tools.recipeManager'), icon: '🍳', type: 'window', enabled: false },
+  { id: 'workout-planner', name: t('toolbox.tools.workoutPlanner'), icon: '💪', type: 'window', enabled: false },
+  { id: 'water-reminder', name: t('toolbox.tools.waterReminder'), icon: '💧', type: 'window', enabled: false },
+  { id: 'sleep-tracker', name: t('toolbox.tools.sleepTracker'), icon: '😴', type: 'window', enabled: false },
+  { id: 'mood-tracker', name: t('toolbox.tools.moodTracker'), icon: '😊', type: 'window', enabled: false }
 ])
 
 // 教育工具
-const educationTools = ref([
-  { id: 'quiz-maker', name: '测验制作', icon: '📝', type: 'window', enabled: false },
-  { id: 'exam-timer', name: '考试计时', icon: '⏱️', type: 'window', enabled: false },
-  { id: 'grade-calculator', name: '成绩计算', icon: '📊', type: 'window', enabled: false },
-  { id: 'study-planner', name: '学习计划', icon: '📚', type: 'window', enabled: false },
-  { id: 'vocabulary-trainer', name: '单词训练', icon: '📖', type: 'window', enabled: false },
-  { id: 'flashcard-maker', name: '记忆卡片', icon: '🎴', type: 'window', enabled: false },
-  { id: 'citation-generator', name: '引用生成', icon: '📄', type: 'window', enabled: false }
+const educationTools = computed(() => [
+  { id: 'quiz-maker', name: t('toolbox.tools.quizMaker'), icon: '📝', type: 'window', enabled: false },
+  { id: 'exam-timer', name: t('toolbox.tools.examTimer'), icon: '⏱️', type: 'window', enabled: false },
+  { id: 'grade-calculator', name: t('toolbox.tools.gradeCalculator'), icon: '📊', type: 'window', enabled: false },
+  { id: 'study-planner', name: t('toolbox.tools.studyPlanner'), icon: '📚', type: 'window', enabled: false },
+  { id: 'vocabulary-trainer', name: t('toolbox.tools.vocabularyTrainer'), icon: '📖', type: 'window', enabled: false },
+  { id: 'flashcard-maker', name: t('toolbox.tools.flashcardMaker'), icon: '🎴', type: 'window', enabled: false },
+  { id: 'citation-generator', name: t('toolbox.tools.citationGenerator'), icon: '📄', type: 'window', enabled: false }
 ])
 
 // 游戏辅助
-const gamingTools = ref([
-  { id: 'fps-counter', name: 'FPS显示', icon: '🎮', type: 'window', enabled: false },
-  { id: 'game-overlay', name: '游戏覆盖', icon: '🎯', type: 'window', enabled: false },
-  { id: 'macro-recorder', name: '宏录制', icon: '🎬', type: 'window', enabled: false },
-  { id: 'controller-mapper', name: '手柄映射', icon: '🎮', type: 'window', enabled: false }
+const gamingTools = computed(() => [
+  { id: 'fps-counter', name: t('toolbox.tools.fpsCounter'), icon: '🎮', type: 'window', enabled: false },
+  { id: 'game-overlay', name: t('toolbox.tools.gameOverlay'), icon: '🎯', type: 'window', enabled: false },
+  { id: 'macro-recorder', name: t('toolbox.tools.macroRecorder'), icon: '🎬', type: 'window', enabled: false },
+  { id: 'controller-mapper', name: t('toolbox.tools.controllerMapper'), icon: '🎮', type: 'window', enabled: false }
 ])
 
 // AI助手工具
-const aiAssistantTools = ref([
-  { id: 'code-completion', name: '代码补全', icon: '🤖', type: 'window', enabled: false },
-  { id: 'code-explanation', name: '代码解释', icon: '💡', type: 'window', enabled: false },
-  { id: 'bug-finder', name: 'Bug查找', icon: '🐛', type: 'window', enabled: false },
-  { id: 'refactor-suggestion', name: '重构建议', icon: '🔄', type: 'window', enabled: false },
-  { id: 'test-generator', name: '测试生成', icon: '🧪', type: 'window', enabled: false },
-  { id: 'doc-generator', name: '文档生成', icon: '📚', type: 'window', enabled: false },
-  { id: 'comment-generator', name: '注释生成', icon: '💬', type: 'window', enabled: false },
-  { id: 'sql-generator', name: 'SQL生成', icon: '🗄️', type: 'window', enabled: false },
-  { id: 'regex-generator', name: '正则生成', icon: '🎨', type: 'window', enabled: false }
+const aiAssistantTools = computed(() => [
+  { id: 'code-completion', name: t('toolbox.tools.codeCompletion'), icon: '🤖', type: 'window', enabled: false },
+  { id: 'code-explanation', name: t('toolbox.tools.codeExplanation'), icon: '💡', type: 'window', enabled: false },
+  { id: 'bug-finder', name: t('toolbox.tools.bugFinder'), icon: '🐛', type: 'window', enabled: false },
+  { id: 'refactor-suggestion', name: t('toolbox.tools.refactorSuggestion'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'test-generator', name: t('toolbox.tools.testGenerator'), icon: '🧪', type: 'window', enabled: false },
+  { id: 'doc-generator', name: t('toolbox.tools.docGenerator'), icon: '📚', type: 'window', enabled: false },
+  { id: 'comment-generator', name: t('toolbox.tools.commentGenerator'), icon: '💬', type: 'window', enabled: false },
+  { id: 'sql-gen', name: t('toolbox.tools.sqlGen'), icon: '🗄️', type: 'window', enabled: false },
+  { id: 'regex-generator', name: t('toolbox.tools.regexGenerator'), icon: '🎨', type: 'window', enabled: false }
 ])
 
 // 所有分类
 const allCategories = computed(() => [
-  { name: 'note', label: '📝 笔记工具', tools: noteTools.value },
-  { name: 'dev', label: '💻 开发工具', tools: devTools.value },
-  { name: 'utility', label: '🔧 实用工具', tools: utilityTools.value },
-  { name: 'efficiency', label: '🎯 效率工具', tools: efficiencyTools.value },
-  { name: 'network', label: '🌐 网络工具', tools: networkTools.value },
-  { name: 'encoding', label: '🔤 编码转换', tools: encodingTools.value },
-  { name: 'file', label: '📁 文件处理', tools: fileTools.value },
-  { name: 'image', label: '🖼️ 图片工具', tools: imageTools.value },
-  { name: 'git', label: '🌳 Git工具', tools: gitTools.value },
-  { name: 'database', label: '🗄️ 数据库工具', tools: databaseTools.value },
-  { name: 'frontend', label: '🎨 前端工具', tools: frontendTools.value },
-  { name: 'backend', label: '☕ 后端工具', tools: backendTools.value },
-  { name: 'test', label: '🧪 测试工具', tools: testTools.value },
-  { name: 'devops', label: '🔧 运维工具', tools: devopsTools.value },
-  { name: 'security', label: '🔐 安全工具', tools: securityTools.value },
-  { name: 'document', label: '📚 文档工具', tools: documentTools.value },
-  { name: 'learning', label: '🎓 学习工具', tools: learningTools.value },
-  { name: 'office', label: '💼 办公工具', tools: officeTools.value },
-  { name: 'design', label: '🎨 设计工具', tools: designTools.value },
-  { name: 'dataAnalysis', label: '📊 数据分析', tools: dataAnalysisTools.value },
-  { name: 'media', label: '🎬 音视频工具', tools: mediaTools.value },
-  { name: 'system', label: '⚙️ 系统工具', tools: systemTools.value },
-  { name: 'browser', label: '🌐 浏览器工具', tools: browserTools.value },
-  { name: 'codeQuality', label: '✨ 代码质量', tools: codeQualityTools.value },
-  { name: 'api', label: '🔌 API工具', tools: apiTools.value },
-  { name: 'mobileDev', label: '📱 移动开发', tools: mobileDevTools.value },
-  { name: 'performance', label: '⚡ 性能优化', tools: performanceTools.value },
-  { name: 'projectManagement', label: '📋 项目管理', tools: projectManagementTools.value },
-  { name: 'collaboration', label: '💬 协作通讯', tools: collaborationTools.value },
-  { name: 'cloud', label: '☁️ 云服务工具', tools: cloudTools.value },
-  { name: 'finance', label: '💰 金融工具', tools: financeTools.value },
-  { name: 'life', label: '🏠 生活工具', tools: lifeTools.value },
-  { name: 'education', label: '📚 教育工具', tools: educationTools.value },
-  { name: 'gaming', label: '🎮 游戏辅助', tools: gamingTools.value },
-  { name: 'aiAssistant', label: '🤖 AI助手工具', tools: aiAssistantTools.value },
+  { name: 'note', label: t('toolbox.categories.note'), tools: noteTools.value },
+  { name: 'dev', label: t('toolbox.categories.dev'), tools: devTools.value },
+  { name: 'utility', label: t('toolbox.categories.utility'), tools: utilityTools.value },
+  { name: 'efficiency', label: t('toolbox.categories.efficiency'), tools: efficiencyTools.value },
+  { name: 'network', label: t('toolbox.categories.network'), tools: networkTools.value },
+  { name: 'encoding', label: t('toolbox.categories.encoding'), tools: encodingTools.value },
+  { name: 'file', label: t('toolbox.categories.file'), tools: fileTools.value },
+  { name: 'image', label: t('toolbox.categories.image'), tools: imageTools.value },
+  { name: 'git', label: t('toolbox.categories.git'), tools: gitTools.value },
+  { name: 'database', label: t('toolbox.categories.database'), tools: databaseTools.value },
+  { name: 'frontend', label: t('toolbox.categories.frontend'), tools: frontendTools.value },
+  { name: 'backend', label: t('toolbox.categories.backend'), tools: backendTools.value },
+  { name: 'test', label: t('toolbox.categories.test'), tools: testTools.value },
+  { name: 'devops', label: t('toolbox.categories.devops'), tools: devopsTools.value },
+  { name: 'security', label: t('toolbox.categories.security'), tools: securityTools.value },
+  { name: 'document', label: t('toolbox.categories.document'), tools: documentTools.value },
+  { name: 'learning', label: t('toolbox.categories.learning'), tools: learningTools.value },
+  { name: 'office', label: t('toolbox.categories.office'), tools: officeTools.value },
+  { name: 'design', label: t('toolbox.categories.design'), tools: designTools.value },
+  { name: 'dataAnalysis', label: t('toolbox.categories.dataAnalysis'), tools: dataAnalysisTools.value },
+  { name: 'media', label: t('toolbox.categories.media'), tools: mediaTools.value },
+  { name: 'system', label: t('toolbox.categories.system'), tools: systemTools.value },
+  { name: 'browser', label: t('toolbox.categories.browser'), tools: browserTools.value },
+  { name: 'codeQuality', label: t('toolbox.categories.codeQuality'), tools: codeQualityTools.value },
+  { name: 'api', label: t('toolbox.categories.api'), tools: apiTools.value },
+  { name: 'mobileDev', label: t('toolbox.categories.mobileDev'), tools: mobileDevTools.value },
+  { name: 'performance', label: t('toolbox.categories.performance'), tools: performanceTools.value },
+  { name: 'projectManagement', label: t('toolbox.categories.projectManagement'), tools: projectManagementTools.value },
+  { name: 'collaboration', label: t('toolbox.categories.collaboration'), tools: collaborationTools.value },
+  { name: 'cloud', label: t('toolbox.categories.cloud'), tools: cloudTools.value },
+  { name: 'finance', label: t('toolbox.categories.finance'), tools: financeTools.value },
+  { name: 'life', label: t('toolbox.categories.life'), tools: lifeTools.value },
+  { name: 'education', label: t('toolbox.categories.education'), tools: educationTools.value },
+  { name: 'gaming', label: t('toolbox.categories.gaming'), tools: gamingTools.value },
+  { name: 'aiAssistant', label: t('toolbox.categories.aiAssistant'), tools: aiAssistantTools.value },
 ])
 
 // 打开工具
 const openTool = async (tool) => {
   if (!tool.enabled) {
-    ElMessage.info(`${tool.name} 正在开发中，敬请期待...`)
+    ElMessage.info(`${tool.name} ${t('toolbox.comingSoon')}`)
     return
   }
 

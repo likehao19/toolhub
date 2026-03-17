@@ -4,13 +4,13 @@
     <div class="window-header" data-tauri-drag-region>
       <div class="header-title">
         <el-icon class="title-icon"><MagicStick /></el-icon>
-        <span>AI 智能助手</span>
+        <span>{{ t('aiWindow.title') }}</span>
       </div>
       <div class="header-actions">
-        <el-button text size="small" @click="minimizeWindow" title="最小化">
+        <el-button text size="small" @click="minimizeWindow" :title="t('aiWindow.minimize')">
           <el-icon><Minus /></el-icon>
         </el-button>
-        <el-button text size="small" @click="closeWindow" title="关闭">
+        <el-button text size="small" @click="closeWindow" :title="t('aiWindow.close')">
           <el-icon><Close /></el-icon>
         </el-button>
       </div>
@@ -22,25 +22,25 @@
         <!-- 欢迎消息 -->
         <div v-if="messages.length === 0" class="welcome-message">
           <el-icon class="welcome-icon"><MagicStick /></el-icon>
-          <h3>您好！我是 AI 智能助手</h3>
-          <p>我可以帮您管理笔记、日程、待办、密码和书签</p>
+          <h3>{{ t('aiWindow.welcomeTitle') }}</h3>
+          <p>{{ t('aiWindow.welcomeDesc') }}</p>
           
           <div class="example-commands">
-            <div class="command-item" @click="sendMessage('帮我写一篇关于Vue3的笔记')">
+            <div class="command-item" @click="sendMessage(t('aiWindow.exampleNote'))">
               <el-icon><Document /></el-icon>
-              <span>创建笔记</span>
+              <span>{{ t('aiWindow.createNote') }}</span>
             </div>
-            <div class="command-item" @click="sendMessage('明天下午2点开会')">
+            <div class="command-item" @click="sendMessage(t('aiWindow.exampleEvent'))">
               <el-icon><Calendar /></el-icon>
-              <span>添加日程</span>
+              <span>{{ t('aiWindow.addEvent') }}</span>
             </div>
-            <div class="command-item" @click="sendMessage('添加待办：完成项目报告')">
+            <div class="command-item" @click="sendMessage(t('aiWindow.exampleTodo'))">
               <el-icon><CircleCheck /></el-icon>
-              <span>添加待办</span>
+              <span>{{ t('aiWindow.addTodo') }}</span>
             </div>
-            <div class="command-item" @click="sendMessage('收藏网站 github.com')">
+            <div class="command-item" @click="sendMessage(t('aiWindow.exampleBookmark'))">
               <el-icon><Link /></el-icon>
-              <span>收藏网站</span>
+              <span>{{ t('aiWindow.bookmarkSite') }}</span>
             </div>
           </div>
         </div>
@@ -80,18 +80,18 @@
           v-model="userInput"
           type="textarea"
           :rows="2"
-          placeholder="输入您的需求，例如：帮我写一篇笔记、明天提醒我开会..."
+          :placeholder="t('aiWindow.inputPlaceholder')"
           @keydown.enter.exact="handleEnterKey"
           :disabled="isLoading"
         />
         <div class="input-actions">
           <el-button size="small" @click="clearMessages" :disabled="messages.length === 0">
             <el-icon><Delete /></el-icon>
-            清空
+            {{ t('aiWindow.clear') }}
           </el-button>
           <el-button type="primary" size="small" @click="handleSend" :loading="isLoading" :disabled="!userInput.trim()">
             <el-icon><Promotion /></el-icon>
-            发送
+            {{ t('aiWindow.send') }}
           </el-button>
         </div>
       </div>
@@ -107,6 +107,7 @@ import {
   CircleCheck, Link, CircleClose, Delete, Promotion 
 } from '@element-plus/icons-vue'
 import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow'
+import { t } from '@/i18n'
 import { recognizeIntent } from '@/utils/ai/intent'
 import { extractParams } from '@/utils/ai/parser'
 import { executeOperation } from '@/utils/ai/operations'
@@ -157,10 +158,10 @@ const sendMessage = async (content) => {
       } catch (aiError) {
         messages.value.push({
           role: 'assistant',
-          content: '抱歉，AI 服务暂时不可用。请在设置中检查 AI 配置。',
+          content: t('aiWindow.aiUnavailable'),
           result: {
             status: 'error',
-            message: aiError.message || 'AI 服务调用失败'
+            message: aiError.message || t('aiWindow.aiCallFailed')
           }
         })
       }
@@ -170,7 +171,7 @@ const sendMessage = async (content) => {
       // 3. 构建回复消息
       const assistantMessage = {
         role: 'assistant',
-        content: `我理解了，您想${intent.description}`,
+        content: `${intent.description}`,
         result: null
       }
 
@@ -194,21 +195,21 @@ const sendMessage = async (content) => {
       } catch (error) {
         assistantMessage.result = {
           status: 'error',
-          message: error.message || '操作失败'
+          message: error.message || t('aiWindow.operationFailed')
         }
-        ElMessage.error(error.message || '操作失败')
+        ElMessage.error(error.message || t('aiWindow.operationFailed'))
       }
     }
   } catch (error) {
     messages.value.push({
       role: 'assistant',
-      content: '抱歉，我无法理解您的请求。请尝试更明确的表达，例如"帮我写一篇笔记"、"明天提醒我开会"等。',
+      content: t('aiWindow.cannotUnderstand'),
       result: {
         status: 'error',
-        message: error.message || '处理失败'
+        message: error.message || t('aiWindow.processFailed')
       }
     })
-    ElMessage.error('处理失败')
+    ElMessage.error(t('aiWindow.processFailed'))
   } finally {
     isLoading.value = false
     await nextTick()

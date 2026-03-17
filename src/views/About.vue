@@ -3,7 +3,7 @@
     <div class="about-view">
       <el-page-header @back="goBack">
       <template #content>
-        <span class="page-title">关于项目</span>
+        <span class="page-title">{{ t('about.pageTitle') }}</span>
       </template>
     </el-page-header>
 
@@ -11,19 +11,19 @@
       <el-card class="info-card">
         <template #header>
           <div class="card-header">
-            <span>📖 项目信息</span>
+            <span>{{ t('about.projectInfo') }}</span>
           </div>
         </template>
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="项目名称">
-            Vue3 + Vite5 + Tauri2 桌面应用框架
+          <el-descriptions-item :label="t('about.projectName')">
+            {{ t('about.projectNameValue') }}
           </el-descriptions-item>
-          <el-descriptions-item label="版本">0.1.0</el-descriptions-item>
-          <el-descriptions-item label="技术栈">
-            Vue 3 + Vite + Tauri 2 + Element Plus
+          <el-descriptions-item :label="t('about.version')">0.1.0</el-descriptions-item>
+          <el-descriptions-item :label="t('about.techStack')">
+            {{ t('about.techStackValue') }}
           </el-descriptions-item>
-          <el-descriptions-item label="特性">
-            路由管理、状态管理、自动导入、Tauri API 封装
+          <el-descriptions-item :label="t('about.features')">
+            {{ t('about.featuresValue') }}
           </el-descriptions-item>
         </el-descriptions>
       </el-card>
@@ -31,7 +31,7 @@
       <el-card class="features-card">
         <template #header>
           <div class="card-header">
-            <span>✨ 核心功能</span>
+            <span>{{ t('about.coreFeatures') }}</span>
           </div>
         </template>
         <el-timeline>
@@ -50,8 +50,8 @@
       </el-card>
 
       <div class="actions">
-        <el-button type="primary" @click="goBack">返回首页</el-button>
-        <el-button @click="showInfo">显示应用信息</el-button>
+        <el-button type="primary" @click="goBack">{{ t('about.backToHome') }}</el-button>
+        <el-button @click="showInfo">{{ t('about.showAppInfo') }}</el-button>
       </div>
     </div>
   </div>
@@ -60,39 +60,40 @@
 
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { t } from '@/i18n'
 
 const router = useRouter()
 
 const features = [
   {
-    category: '前端框架',
-    title: 'Vue Router 4',
-    description: '现代化的路由管理系统，支持动态路由和路由守卫'
+    category: t('about.catFrontend'),
+    title: t('about.featRouter'),
+    description: t('about.featRouterDesc')
   },
   {
-    category: '状态管理',
-    title: 'Pinia',
-    description: '轻量级状态管理，支持 TypeScript 和状态持久化'
+    category: t('about.catState'),
+    title: t('about.featPinia'),
+    description: t('about.featPiniaDesc')
   },
   {
-    category: 'UI 组件库',
-    title: 'Element Plus',
-    description: '完整的 Vue 3 组件库，按需自动导入优化体积'
+    category: t('about.catUI'),
+    title: t('about.featElement'),
+    description: t('about.featElementDesc')
   },
   {
-    category: '开发体验',
-    title: '自动导入',
-    description: 'Vue API 和组件自动导入，大幅提升开发效率'
+    category: t('about.catDev'),
+    title: t('about.featAutoImport'),
+    description: t('about.featAutoImportDesc')
   },
   {
-    category: '原生能力',
-    title: 'Tauri API 封装',
-    description: '完整封装 Tauri 原生 API，提供简洁的 JavaScript 接口'
+    category: t('about.catNative'),
+    title: t('about.featTauriApi'),
+    description: t('about.featTauriApiDesc')
   },
   {
-    category: '桌面特性',
-    title: '窗口控制',
-    description: '自定义标题栏、系统托盘、启动动画等桌面应用特性'
+    category: t('about.catDesktop'),
+    title: t('about.featWindow'),
+    description: t('about.featWindowDesc')
   }
 ]
 
@@ -102,10 +103,10 @@ const goBack = () => {
 
 const showInfo = () => {
   ElMessageBox.alert(
-    '这是一个功能完整的 Vue3 + Tauri 桌面应用开发模板，包含了企业级应用所需的核心功能和最佳实践。',
-    '应用信息',
+    t('about.appInfoContent'),
+    t('about.appInfoTitle'),
     {
-      confirmButtonText: '确定',
+      confirmButtonText: t('about.confirm'),
       type: 'info'
     }
   )

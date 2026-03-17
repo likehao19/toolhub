@@ -4,11 +4,11 @@
     <div class="header">
       <div class="header-left">
         <div class="breadcrumb">
-          <i class="fas fa-users"></i> 团队讨论
+          <i class="fas fa-users"></i> {{ t('agentTeam.breadcrumb') }}
         </div>
         <div v-if="isDiscussing" class="discussion-progress">
           <span class="progress-dot"></span>
-          {{ currentAgentName }} 发言中... ({{ currentAgentIndex + 1 }}/{{ enabledAgents.length }})
+          {{ t('agentTeam.speaking', { name: currentAgentName, current: currentAgentIndex + 1, total: enabledAgents.length }) }}
         </div>
       </div>
       <div class="header-actions">
@@ -19,7 +19,7 @@
           @click="stopDiscussion"
           :icon="VideoPause"
         >
-          停止
+          {{ t('agentTeam.stop') }}
         </el-button>
         <el-button
           v-if="hasDiscussion"
@@ -27,7 +27,7 @@
           @click="newDiscussion"
           :icon="RefreshRight"
         >
-          新讨论
+          {{ t('agentTeam.newDiscussion') }}
         </el-button>
       </div>
     </div>
@@ -40,13 +40,13 @@
           <div class="topic-icon">
             <i class="fas fa-users-gear"></i>
           </div>
-          <h2 class="topic-title">AI 团队讨论</h2>
-          <p class="topic-desc">多角色 AI 协作，从不同专业视角分析问题</p>
+          <h2 class="topic-title">{{ t('agentTeam.title') }}</h2>
+          <p class="topic-desc">{{ t('agentTeam.desc') }}</p>
 
           <div class="topic-input-area">
             <textarea
               v-model="topic"
-              placeholder="输入讨论主题，例如：如何设计一个高并发的电商秒杀系统？"
+              :placeholder="t('agentTeam.topicPlaceholder')"
               class="topic-input"
               rows="3"
               @keydown="handleTopicKeyDown"
@@ -54,7 +54,7 @@
           </div>
 
           <div class="agent-selector">
-            <span class="selector-label">参与角色：</span>
+            <span class="selector-label">{{ t('agentTeam.participantLabel') }}</span>
             <div class="agent-chips">
               <div
                 v-for="agent in AGENT_ROLES"
@@ -78,7 +78,7 @@
             class="start-btn"
           >
             <i class="fas fa-play" style="margin-right: 6px;"></i>
-            开始讨论
+            {{ t('agentTeam.startDiscussion') }}
           </el-button>
         </div>
       </div>
@@ -91,7 +91,7 @@
             <i class="fas fa-bullhorn"></i>
           </div>
           <div class="topic-message-content">
-            <div class="topic-message-label">讨论主题</div>
+            <div class="topic-message-label">{{ t('agentTeam.discussionTopic') }}</div>
             <div class="topic-message-text">{{ discussionTopic }}</div>
           </div>
         </div>
@@ -139,12 +139,12 @@
         <!-- 讨论结束后的追问区 -->
         <div v-if="hasDiscussion && !isDiscussing" class="followup-area">
           <div class="followup-divider">
-            <span>讨论结束</span>
+            <span>{{ t('agentTeam.discussionEnd') }}</span>
           </div>
           <div class="followup-input-wrapper">
             <textarea
               v-model="followUpInput"
-              placeholder="输入追问或补充问题，让团队继续讨论..."
+              :placeholder="t('agentTeam.followUpPlaceholder')"
               class="followup-input"
               rows="2"
               @keydown="handleFollowUpKeyDown"
@@ -167,6 +167,7 @@
 
 <script setup>
 import { ref, computed, nextTick } from 'vue'
+import { t } from '@/i18n'
 import { callAIStream, checkAIConfig } from '@/utils/ai/api'
 import { ElMessage } from 'element-plus'
 import { VideoPause, RefreshRight } from '@element-plus/icons-vue'
@@ -179,7 +180,7 @@ import 'highlight.js/styles/github-dark.css'
 const AGENT_ROLES = [
   {
     id: 'pm',
-    name: '产品经理',
+    name: t('agentTeam.rolePM'),
     emoji: '\u{1F4CB}',
     color: '#409eff',
     bgColor: 'rgba(64,158,255,0.08)',
@@ -193,7 +194,7 @@ const AGENT_ROLES = [
   },
   {
     id: 'dev',
-    name: '高级工程师',
+    name: t('agentTeam.roleDev'),
     emoji: '\u{1F4BB}',
     color: '#67c23a',
     bgColor: 'rgba(103,194,58,0.08)',
@@ -207,7 +208,7 @@ const AGENT_ROLES = [
   },
   {
     id: 'designer',
-    name: 'UI 设计师',
+    name: t('agentTeam.roleDesigner'),
     emoji: '\u{1F3A8}',
     color: '#e6a23c',
     bgColor: 'rgba(230,162,60,0.08)',
@@ -221,7 +222,7 @@ const AGENT_ROLES = [
   },
   {
     id: 'tester',
-    name: '测试工程师',
+    name: t('agentTeam.roleTester'),
     emoji: '\u{1F50D}',
     color: '#f56c6c',
     bgColor: 'rgba(245,108,108,0.08)',
@@ -235,7 +236,7 @@ const AGENT_ROLES = [
   },
   {
     id: 'ops',
-    name: '运维架构师',
+    name: t('agentTeam.roleOps'),
     emoji: '\u{1F6E0}',
     color: '#af52de',
     bgColor: 'rgba(175,82,222,0.08)',
@@ -259,10 +260,10 @@ const md = new MarkdownIt({
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return `<pre class="hljs-code-block"><div class="code-header"><span class="code-lang">${lang}</span><button class="copy-code-btn" onclick="copyCode(this)">复制</button></div><code class="hljs language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`
+        return `<pre class="hljs-code-block"><div class="code-header"><span class="code-lang">${lang}</span><button class="copy-code-btn" onclick="copyCode(this)">${t('agentTeam.copyBtn')}</button></div><code class="hljs language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`
       } catch (e) {}
     }
-    return `<pre class="hljs-code-block"><div class="code-header"><button class="copy-code-btn" onclick="copyCode(this)">复制</button></div><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`
+    return `<pre class="hljs-code-block"><div class="code-header"><button class="copy-code-btn" onclick="copyCode(this)">${t('agentTeam.copyBtn')}</button></div><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`
   }
 })
 
@@ -272,8 +273,8 @@ if (!window.copyCode) {
     const codeBlock = button.closest('.hljs-code-block')
     const code = codeBlock.querySelector('code').textContent
     navigator.clipboard.writeText(code).then(() => {
-      button.textContent = '已复制!'
-      setTimeout(() => { button.textContent = '复制' }, 2000)
+      button.textContent = t('agentTeam.copiedBtn')
+      setTimeout(() => { button.textContent = t('agentTeam.copyBtn') }, 2000)
     })
   }
 }
@@ -374,7 +375,7 @@ const startDiscussion = async () => {
   if (!topic.value.trim()) return
 
   if (!checkAIConfig()) {
-    ElMessage.warning('请先在设置中配置 AI API（apiKey 和 baseURL）')
+    ElMessage.warning(t('agentTeam.configWarning'))
     return
   }
 
@@ -391,7 +392,7 @@ const continueDiscussion = async () => {
   if (!followUp) return
 
   if (!checkAIConfig()) {
-    ElMessage.warning('请先在设置中配置 AI API')
+    ElMessage.warning(t('agentTeam.configWarningShort'))
     return
   }
 
@@ -460,7 +461,7 @@ const runAgentDiscussion = async (topicText, followUp = null) => {
     } catch (error) {
       discussionMessages.value[msgIndex].streaming = false
       discussionMessages.value[msgIndex].error = true
-      discussionMessages.value[msgIndex].content = `API 调用失败: ${error.message}`
+      discussionMessages.value[msgIndex].content = t('agentTeam.apiCallFailed', { msg: error.message })
       discussionMessages.value[msgIndex].timestamp = new Date().toLocaleTimeString()
     }
 
@@ -472,7 +473,7 @@ const runAgentDiscussion = async (topicText, followUp = null) => {
 
 const stopDiscussion = () => {
   abortFlag.value = true
-  ElMessage.info('将在当前角色发言结束后停止')
+  ElMessage.info(t('agentTeam.stoppingAfterCurrent'))
 }
 
 const newDiscussion = () => {

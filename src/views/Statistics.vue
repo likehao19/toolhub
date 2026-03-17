@@ -1,17 +1,17 @@
 <template>
   <div class="statistics-page">
     <div class="page-header">
-      <h2>数据统计和分析</h2>
+      <h2>{{ t('statistics.title') }}</h2>
       <div class="header-actions">
         <el-select v-model="timeRange" @change="loadStatistics" style="width: 150px;">
-          <el-option label="最近7天" value="7" />
-          <el-option label="最近30天" value="30" />
-          <el-option label="最近90天" value="90" />
-          <el-option label="全部" value="all" />
+          <el-option :label="t('statistics.last7Days')" value="7" />
+          <el-option :label="t('statistics.last30Days')" value="30" />
+          <el-option :label="t('statistics.last90Days')" value="90" />
+          <el-option :label="t('statistics.all')" value="all" />
         </el-select>
         <el-button @click="loadStatistics">
           <el-icon><Refresh /></el-icon>
-          刷新
+          {{ t('statistics.refresh') }}
         </el-button>
       </div>
     </div>
@@ -22,21 +22,21 @@
         <template #header>
           <div class="card-header">
             <el-icon><Document /></el-icon>
-            <span>笔记统计</span>
+            <span>{{ t('statistics.noteStats') }}</span>
           </div>
         </template>
         <div class="stat-overview">
           <div class="stat-item">
             <div class="stat-value">{{ notesStats.totalNotes }}</div>
-            <div class="stat-label">笔记总数</div>
+            <div class="stat-label">{{ t('statistics.totalNotes') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ formatNumber(notesStats.totalWords) }}</div>
-            <div class="stat-label">总字数</div>
+            <div class="stat-label">{{ t('statistics.totalWords') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ notesStats.avgWords }}</div>
-            <div class="stat-label">平均字数</div>
+            <div class="stat-label">{{ t('statistics.avgWords') }}</div>
           </div>
         </div>
         <div class="chart-container">
@@ -49,21 +49,21 @@
         <template #header>
           <div class="card-header">
             <el-icon><List /></el-icon>
-            <span>待办统计</span>
+            <span>{{ t('statistics.todoStats') }}</span>
           </div>
         </template>
         <div class="stat-overview">
           <div class="stat-item">
             <div class="stat-value">{{ todosStats.totalTodos }}</div>
-            <div class="stat-label">待办总数</div>
+            <div class="stat-label">{{ t('statistics.totalTodos') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ todosStats.completionRate.toFixed(1) }}%</div>
-            <div class="stat-label">完成率</div>
+            <div class="stat-label">{{ t('statistics.completionRate') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ todosStats.avgCompletionHours.toFixed(1) }}</div>
-            <div class="stat-label">平均完成时间（小时）</div>
+            <div class="stat-label">{{ t('statistics.avgCompletionHours') }}</div>
           </div>
         </div>
         <div class="chart-container">
@@ -79,21 +79,21 @@
         <template #header>
           <div class="card-header">
             <el-icon><Calendar /></el-icon>
-            <span>日程统计</span>
+            <span>{{ t('statistics.eventStats') }}</span>
           </div>
         </template>
         <div class="stat-overview">
           <div class="stat-item">
             <div class="stat-value">{{ eventsStats.totalEvents }}</div>
-            <div class="stat-label">事件总数</div>
+            <div class="stat-label">{{ t('statistics.totalEvents') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ eventsStats.busiestDate.count }}</div>
-            <div class="stat-label">最忙碌日期事件数</div>
+            <div class="stat-label">{{ t('statistics.busiestDateCount') }}</div>
           </div>
           <div class="stat-item">
-            <div class="stat-value">{{ eventsStats.busiestDate.date || '无' }}</div>
-            <div class="stat-label">最忙碌日期</div>
+            <div class="stat-value">{{ eventsStats.busiestDate.date || t('statistics.noData') }}</div>
+            <div class="stat-label">{{ t('statistics.busiestDate') }}</div>
           </div>
         </div>
         <div class="chart-container">
@@ -106,21 +106,21 @@
         <template #header>
           <div class="card-header">
             <el-icon><Lock /></el-icon>
-            <span>密码统计</span>
+            <span>{{ t('statistics.passwordStats') }}</span>
           </div>
         </template>
         <div class="stat-overview">
           <div class="stat-item">
             <div class="stat-value">{{ passwordsStats.totalPasswords }}</div>
-            <div class="stat-label">密码总数</div>
+            <div class="stat-label">{{ t('statistics.totalPasswords') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ passwordsStats.expiredPasswords }}</div>
-            <div class="stat-label">过期密码</div>
+            <div class="stat-label">{{ t('statistics.expiredPasswords') }}</div>
           </div>
           <div class="stat-item">
             <div class="stat-value">{{ passwordsStats.weakPasswords }}</div>
-            <div class="stat-label">弱密码</div>
+            <div class="stat-label">{{ t('statistics.weakPasswords') }}</div>
           </div>
         </div>
         <div class="chart-container">
@@ -133,7 +133,7 @@
         <template #header>
           <div class="card-header">
             <el-icon><TrendCharts /></el-icon>
-            <span>生产力趋势分析</span>
+            <span>{{ t('statistics.productivityTrend') }}</span>
           </div>
         </template>
         <div class="chart-container">
@@ -146,6 +146,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { t } from '@/i18n'
 import { Document, List, Calendar, Lock, TrendCharts, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { use } from 'echarts/core'
@@ -203,7 +204,7 @@ const passwordsStats = ref({
 // 格式化数字
 const formatNumber = (num) => {
   if (num >= 10000) {
-    return (num / 10000).toFixed(1) + '万'
+    return (num / 10000).toFixed(1) + t('statistics.tenThousand')
   }
   return num.toLocaleString()
 }
@@ -220,8 +221,8 @@ const notesTrendOption = computed(() => {
     },
     xAxis: {
       type: 'category',
-      data: filteredTrend.map(t => {
-        const date = new Date(t.date)
+      data: filteredTrend.map(d => {
+        const date = new Date(d.date)
         return `${date.getMonth() + 1}/${date.getDate()}`
       })
     },
@@ -230,9 +231,9 @@ const notesTrendOption = computed(() => {
     },
     series: [
       {
-        name: '创建数量',
+        name: t('statistics.createdCount'),
         type: 'line',
-        data: filteredTrend.map(t => t.count),
+        data: filteredTrend.map(d => d.count),
         smooth: true,
         areaStyle: {},
         itemStyle: { color: '#409eff' }
@@ -252,12 +253,12 @@ const todosTrendOption = computed(() => {
       trigger: 'axis'
     },
     legend: {
-      data: ['完成', '创建']
+      data: [t('statistics.completed'), t('statistics.created')]
     },
     xAxis: {
       type: 'category',
-      data: filteredTrend.map(t => {
-        const date = new Date(t.date)
+      data: filteredTrend.map(d => {
+        const date = new Date(d.date)
         return `${date.getMonth() + 1}/${date.getDate()}`
       })
     },
@@ -266,16 +267,16 @@ const todosTrendOption = computed(() => {
     },
     series: [
       {
-        name: '完成',
+        name: t('statistics.completed'),
         type: 'line',
-        data: filteredTrend.map(t => t.completed || 0),
+        data: filteredTrend.map(d => d.completed || 0),
         smooth: true,
         itemStyle: { color: '#67c23a' }
       },
       {
-        name: '创建',
+        name: t('statistics.created'),
         type: 'line',
-        data: filteredTrend.map(t => t.created || 0),
+        data: filteredTrend.map(d => d.created || 0),
         smooth: true,
         itemStyle: { color: '#409eff' }
       }
@@ -297,13 +298,13 @@ const todosPriorityOption = computed(() => {
     },
     series: [
       {
-        name: '优先级分布',
+        name: t('statistics.priorityDistribution'),
         type: 'pie',
         radius: '60%',
         data: [
-          { name: '高', value: dist.high || 0 },
-          { name: '中', value: dist.medium || 0 },
-          { name: '低', value: dist.low || 0 }
+          { name: t('statistics.high'), value: dist.high || 0 },
+          { name: t('statistics.medium'), value: dist.medium || 0 },
+          { name: t('statistics.low'), value: dist.low || 0 }
         ],
         emphasis: {
           itemStyle: {
@@ -321,7 +322,7 @@ const todosPriorityOption = computed(() => {
 const eventsDistributionOption = computed(() => {
   const distribution = eventsStats.value.categoryDistribution || {}
   const data = Object.entries(distribution).map(([name, value]) => ({
-    name: name || '未分类',
+    name: name || t('statistics.uncategorized'),
     value
   }))
   
@@ -336,7 +337,7 @@ const eventsDistributionOption = computed(() => {
     },
     series: [
       {
-        name: '日程分布',
+        name: t('statistics.eventDistribution'),
         type: 'pie',
         radius: '60%',
         data,
@@ -366,13 +367,13 @@ const passwordsStrengthOption = computed(() => {
     },
     series: [
       {
-        name: '密码强度',
+        name: t('statistics.passwordStrength'),
         type: 'pie',
         radius: '60%',
         data: [
-          { name: '强', value: dist.strong || 0 },
-          { name: '中', value: dist.medium || 0 },
-          { name: '弱', value: dist.weak || 0 }
+          { name: t('statistics.strong'), value: dist.strong || 0 },
+          { name: t('statistics.medium'), value: dist.medium || 0 },
+          { name: t('statistics.weak'), value: dist.weak || 0 }
         ],
         emphasis: {
           itemStyle: {
@@ -403,10 +404,10 @@ const productivityTrendOption = computed(() => {
     const dateStr = date.toISOString().split('T')[0]
     dates.push(`${date.getMonth() + 1}/${date.getDate()}`)
     
-    const noteItem = notesTrend.find(t => t.date === dateStr)
+    const noteItem = notesTrend.find(d => d.date === dateStr)
     notesData.push(noteItem ? noteItem.count : 0)
-    
-    const todoItem = todosTrend.find(t => t.date === dateStr)
+
+    const todoItem = todosTrend.find(d => d.date === dateStr)
     todosData.push(todoItem ? (todoItem.completed || 0) : 0)
   }
   
@@ -415,7 +416,7 @@ const productivityTrendOption = computed(() => {
       trigger: 'axis'
     },
     legend: {
-      data: ['笔记创建', '待办完成']
+      data: [t('statistics.notesCreated'), t('statistics.todosCompleted')]
     },
     xAxis: {
       type: 'category',
@@ -426,14 +427,14 @@ const productivityTrendOption = computed(() => {
     },
     series: [
       {
-        name: '笔记创建',
+        name: t('statistics.notesCreated'),
         type: 'line',
         data: notesData,
         smooth: true,
         itemStyle: { color: '#409eff' }
       },
       {
-        name: '待办完成',
+        name: t('statistics.todosCompleted'),
         type: 'line',
         data: todosData,
         smooth: true,
@@ -461,7 +462,7 @@ const loadStatistics = async () => {
       weakPasswords: (passwords.strengthDistribution?.weak || 0)
     }
   } catch (error) {
-    ElMessage.error('加载统计数据失败')
+    ElMessage.error(t('statistics.loadFailed'))
   }
 }
 

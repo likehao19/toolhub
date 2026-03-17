@@ -3,7 +3,6 @@
  */
 
 import { enable, disable, isEnabled } from '@tauri-apps/plugin-autostart'
-import { ElMessage } from 'element-plus'
 
 /**
  * 启用开机自启
@@ -11,10 +10,8 @@ import { ElMessage } from 'element-plus'
 export async function enableAutostart() {
   try {
     await enable()
-    ElMessage.success('已启用开机自启')
     return true
   } catch (error) {
-    ElMessage.error('启用开机自启失败: ' + error.message)
     return false
   }
 }
@@ -25,10 +22,8 @@ export async function enableAutostart() {
 export async function disableAutostart() {
   try {
     await disable()
-    ElMessage.success('已禁用开机自启')
     return true
   } catch (error) {
-    ElMessage.error('禁用开机自启失败: ' + error.message)
     return false
   }
 }

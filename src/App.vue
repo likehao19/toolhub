@@ -80,6 +80,7 @@ import ContextMenu from '@/components/ContextMenu.vue'
 import AIAssistant from '@/components/AIAssistant.vue'
 import AIFloatingBall from '@/components/AIFloatingBall.vue'
 import { loadConfig } from '@/utils/tauri/store'
+import { setLocale, t } from '@/i18n'
 import { initDatabase, checkDatabaseInitialized } from '@/utils/database'
 import { initNotificationService } from '@/services/notificationService'
 import { useRouter, useRoute } from 'vue-router'
@@ -109,7 +110,7 @@ const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
 const isLoading = ref(true)
 const loadingProgress = ref(0)
-const loadingStatus = ref('正在启动...')
+const loadingStatus = ref(t('common.starting'))
 const showAIAssistant = ref(false)
 
 // AI 助手悬浮球设置
@@ -156,7 +157,7 @@ const openAIAssistantWindow = async () => {
     const assistantUrl = `${window.location.origin}/ai-assistant-window`
     new WebviewWindow('ai-assistant', {
       url: assistantUrl,
-      title: 'AI 智能助手',
+      title: 'AI Assistant',
       width: 450,
       height: 650,
       resizable: true,
@@ -167,7 +168,7 @@ const openAIAssistantWindow = async () => {
       focus: true
     })
   } catch (error) {
-    ElMessage.error('打开AI助手失败')
+    ElMessage.error(t('common.openAIFailed'))
   }
 }
 
@@ -408,18 +409,82 @@ onMounted(async () => {
   const isDev = import.meta.env.DEV
   const appStartTimer = createTimer('应用启动')
 
+  // —— 全局外观辅助函数 ——
+  const applyAppTheme = (theme) => {
+    if (theme === 'auto') {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light')
+    } else {
+      document.documentElement.setAttribute('data-theme', theme)
+    }
+  }
+
+  const applyFontSize = (size) => {
+    const base = Number(size) || 14
+    const root = document.documentElement
+    root.style.setProperty('--font-size-caption2', `${base - 3}px`)
+    root.style.setProperty('--font-size-caption',  `${base - 2}px`)
+    root.style.setProperty('--font-size-footnote', `${base - 1}px`)
+    root.style.setProperty('--font-size-body',     `${base}px`)
+    root.style.setProperty('--font-size-callout',  `${base + 1}px`)
+    root.style.setProperty('--font-size-headline', `${base + 2}px`)
+    root.style.setProperty('--font-size-title3',   `${base + 4}px`)
+    root.style.setProperty('--font-size-title2',   `${base + 8}px`)
+    root.style.setProperty('--font-size-title1',   `${base + 12}px`)
+    root.style.setProperty('--font-size-large',    `${base + 18}px`)
+  }
+
+  const applyFontFamily = (family) => {
+    const root = document.documentElement
+    if (!family || family === 'system') {
+      root.style.removeProperty('--font-family')
+    } else {
+      root.style.setProperty('--font-family', `"${family}", "PingFang SC", sans-serif`)
+    }
+  }
+
   // 启动加载流程
   try {
     // 步骤 1: 加载配置
-    loadingStatus.value = '正在加载配置...'
+    loadingStatus.value = t('common.loadingConfig')
     loadingProgress.value = 20
     const configTimer = createTimer('加载配置')
 
     try {
       const config = await loadConfig()
       configTimer.end()
-      if (config.theme) {
-        document.documentElement.setAttribute('data-theme', config.theme)
+
+      // 应用主题
+      applyAppTheme(config.theme || 'light')
+
+      // 监听系统主题变化（auto 模式下实时响应）
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        const savedTheme = document.documentElement.getAttribute('data-theme-setting') || 'light'
+        if (savedTheme === 'auto') {
+          applyAppTheme('auto')
+        }
+      })
+      // 记录用户选择的主题模式（用于 auto 监听判断）
+      document.documentElement.setAttribute('data-theme-setting', config.theme || 'light')
+
+      // 应用字体大小
+      if (config.fontSize) {
+        applyFontSize(config.fontSize)
+      }
+
+      // 应用字体家族
+      if (config.fontFamily && config.fontFamily !== 'system') {
+        applyFontFamily(config.fontFamily)
+      }
+
+      // 应用动画设置
+      if (config.enableAnimations === false) {
+        document.documentElement.classList.add('no-animations')
+      }
+
+      // 应用语言设置
+      if (config.language) {
+        setLocale(config.language)
       }
 
       // 加载 AI 助手悬浮球设置
@@ -439,7 +504,7 @@ onMounted(async () => {
     }
 
     // 步骤 2: 初始化数据库
-    loadingStatus.value = '正在初始化数据库...'
+    loadingStatus.value = t('common.initDatabase')
     loadingProgress.value = 40
     const dbTimer = createTimer('初始化数据库')
 
@@ -457,7 +522,7 @@ onMounted(async () => {
     dbTimer.end()
 
     // 步骤 3: 加载数据
-    loadingStatus.value = '正在加载数据...'
+    loadingStatus.value = t('common.loadingData')
     loadingProgress.value = 70
     const dataTimer = createTimer('加载数据')
 
@@ -466,7 +531,7 @@ onMounted(async () => {
     dataTimer.end()
 
     // 步骤 4: 初始化通知服务
-    loadingStatus.value = '正在初始化通知服务...'
+    loadingStatus.value = t('common.initNotification')
     loadingProgress.value = 85
     const notificationTimer = createTimer('初始化通知服务')
     try {
@@ -478,7 +543,7 @@ onMounted(async () => {
     }
 
     // 步骤 5: 完成加载
-    loadingStatus.value = '启动完成'
+    loadingStatus.value = t('common.startComplete')
     loadingProgress.value = 100
 
     // 确保最小加载时间（至少 500ms，提供良好的视觉体验）
@@ -558,7 +623,7 @@ onMounted(async () => {
 
       // 默认文件夹名称（从配置读取）
       const stickyConfig = JSON.parse(localStorage.getItem('sticky_notes_config') || '{}')
-      const DEFAULT_FOLDER = stickyConfig.noteFolder || '便签'
+      const DEFAULT_FOLDER = stickyConfig.noteFolder || t('common.stickyNoteFolder')
 
       // 确保默认文件夹存在
       const notesDir = await notesAPI.getNotesDir()
@@ -569,7 +634,7 @@ onMounted(async () => {
 
       // 保存到默认文件夹
       await notesAPI.saveNote(noteName, content, DEFAULT_FOLDER)
-      await versionAPI.saveNoteVersion(noteName, content, '便签保存')
+      await versionAPI.saveNoteVersion(noteName, content, t('common.stickyNoteSave'))
 
       // 更新数据库
       const db = await Database.load('sqlite:productivity.db')
@@ -580,7 +645,7 @@ onMounted(async () => {
       } else {
         await db.execute(
           'INSERT INTO note_metadata (note_name, title, created_at, updated_at) VALUES (?, ?, ?, ?)',
-          [noteName, '便签', now, now]
+          [noteName, t('common.stickyNote'), now, now]
         )
       }
     } catch (error) {
@@ -657,7 +722,7 @@ onMounted(async () => {
       const stickyUrl = `${window.location.origin}/sticky-notes?id=${timestamp}`
       const stickyWindow = new WebviewWindow(label, {
         url: stickyUrl,
-        title: '便签',
+        title: t('common.stickyNote'),
         x, y,
         width: cfgWidth,
         height: cfgHeight,
@@ -899,8 +964,7 @@ const handleCloseConfirm = async ({ action, remember }) => {
 }
 
 /* ===== 暗色模式 ===== */
-@media (prefers-color-scheme: dark) {
-  :root {
+[data-theme="dark"] {
     --bg-primary:        #1c1c1e;
     --bg-secondary:      #000000;
     --bg-tertiary:       #2c2c2e;
@@ -930,7 +994,6 @@ const handleCloseConfirm = async ({ action, remember }) => {
     --shadow-md:         0 2px 8px rgba(0,0,0,0.4);
     --shadow-lg:         0 8px 24px rgba(0,0,0,0.5);
     --shadow-popover:    0 4px 16px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.3);
-  }
 }
 
 /* ===== 全局重置 ===== */
@@ -940,11 +1003,22 @@ const handleCloseConfirm = async ({ action, remember }) => {
   box-sizing: border-box;
 }
 
+/* ===== 禁用动画 ===== */
+.no-animations,
+.no-animations *,
+.no-animations *::before,
+.no-animations *::after {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+}
+
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-secondary);
   color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
 }
 
 #app {

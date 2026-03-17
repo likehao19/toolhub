@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    title="确认关闭"
+    :title="t('closeConfirm.title')"
     width="400px"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -13,19 +13,19 @@
           <QuestionFilled />
         </el-icon>
       </div>
-      <p class="message">您想要如何关闭窗口？</p>
+      <p class="message">{{ t('closeConfirm.message') }}</p>
       <el-checkbox v-model="rememberChoice" class="remember-checkbox">
-        记住我的选择，下次不再询问
+        {{ t('closeConfirm.remember') }}
       </el-checkbox>
     </div>
 
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="handleAction('minimize')" type="primary">
-          📥 最小化到托盘
+          {{ t('closeConfirm.minimizeToTray') }}
         </el-button>
         <el-button @click="handleAction('exit')" type="danger">
-          ❌ 完全退出
+          {{ t('closeConfirm.exitApp') }}
         </el-button>
       </div>
     </template>
@@ -35,6 +35,7 @@
 <script setup>
 import { ref } from 'vue'
 import { QuestionFilled } from '@element-plus/icons-vue'
+import { t } from '@/i18n'
 
 const dialogVisible = ref(false)
 const rememberChoice = ref(false)

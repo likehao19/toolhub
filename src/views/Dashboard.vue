@@ -1,164 +1,201 @@
 <template>
   <div class="dashboard-wrapper">
-    <!-- 顶部标题栏 -->
-    <div class="dashboard-header">
-      <h1 class="dashboard-title">工作台</h1>
-      <div class="dashboard-actions">
-        <el-button type="primary" :icon="MagicStick" circle title="AI助手 (Ctrl+K)" @click="showAIAssistant = true" />
-        <el-button :icon="Refresh" circle @click="refreshAll" title="刷新所有数据" />
+    <!-- 顶部状态栏：日期 + 快速统计 -->
+    <header class="dash-topbar">
+      <div class="topbar-date">
+        <span class="date-day">{{ new Date().getDate() }}</span>
+        <div class="date-meta">
+          <span class="date-ym">{{ new Date().toLocaleDateString(locale === 'zh-CN' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long' }) }}</span>
+          <span class="date-week">{{ todayWeekday }}</span>
+        </div>
+      </div>
+      <div class="topbar-stats">
+        <div class="stat-chip" @click="navigateTo('/todos')">
+          <span class="stat-dot todo-dot"></span>
+          <span class="stat-label">{{ t('dashboard.statTodos') }}</span>
+          <span class="stat-num">{{ totalTodos }}</span>
+        </div>
+        <div class="stat-chip" @click="navigateTo('/calendar')">
+          <span class="stat-dot event-dot"></span>
+          <span class="stat-label">{{ t('dashboard.statEvents') }}</span>
+          <span class="stat-num">{{ todayEvents.length }}</span>
+        </div>
+        <div class="stat-chip" @click="navigateTo('/notes')">
+          <span class="stat-dot note-dot"></span>
+          <span class="stat-label">{{ t('dashboard.statNotes') }}</span>
+          <span class="stat-num">{{ totalNotes }}</span>
+        </div>
+        <div class="stat-chip" @click="navigateTo('/bookmarks')">
+          <span class="stat-dot bm-dot"></span>
+          <span class="stat-label">{{ t('dashboard.statBookmarks') }}</span>
+          <span class="stat-num">{{ totalBookmarks }}</span>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button class="icon-btn" :title="t('dashboard.aiAssistant')" @click="showAIAssistant = true">
+          <el-icon><MagicStick /></el-icon>
+        </button>
+        <button class="icon-btn" @click="refreshAll" :title="t('dashboard.refresh')">
+          <el-icon><Refresh /></el-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- 快捷入口：左书签图标 | 右凭据列表 -->
+    <div class="quick-strip" v-if="topBookmarks.length > 0 || topPasswords.length > 0">
+      <!-- 左：常用网站（仅图标） -->
+      <div class="qs-bookmarks" v-if="topBookmarks.length > 0">
+        <div
+          v-for="bm in topBookmarks"
+          :key="'bm-' + bm.id"
+          class="qs-bm-icon"
+          @click="openBookmark(bm)"
+          :title="bm.title + '\n' + bm.url"
+        >
+          <img v-if="bm.favicon_url" :src="bm.favicon_url" class="qs-favicon" />
+          <el-icon v-else class="qs-favicon-fallback"><Link /></el-icon>
+        </div>
+      </div>
+
+      <div class="qs-divider" v-if="topBookmarks.length > 0 && topPasswords.length > 0"></div>
+
+      <!-- 右：常用凭据（标题 + 复制账号/密码） -->
+      <div class="qs-credentials" v-if="topPasswords.length > 0">
+        <div
+          v-for="pwd in topPasswords"
+          :key="'pwd-' + pwd.id"
+          class="qs-cred-item"
+        >
+          <span class="qs-cred-title">{{ pwd.title }}</span>
+          <button class="qs-copy-btn" @click="copyText(pwd.username, t('dashboard.copyAccount'))" :title="t('dashboard.copyAccount')">
+            <el-icon><User /></el-icon>
+          </button>
+          <button class="qs-copy-btn" @click="copyText(decryptPassword(pwd.password), t('dashboard.copyPassword'))" :title="t('dashboard.copyPassword')">
+            <el-icon><Key /></el-icon>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- 卡片网格布局 -->
-    <div class="dashboard-grid">
-      <!-- 今日概览卡片 -->
-      <el-card class="dashboard-card today-card" shadow="never">
-        <div class="today-header">
-          <div class="today-date-main">
-            <div class="today-day">{{ new Date().getDate() }}</div>
-            <div class="today-meta">
-              <div class="today-month-year">{{ new Date().getFullYear() }}年{{ new Date().getMonth() + 1 }}月</div>
-              <div class="today-weekday">{{ todayWeekday }}</div>
+    <!-- 主体内容 -->
+    <div class="dash-body">
+      <!-- 左列：最近笔记 -->
+      <section class="dash-primary">
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">{{ t('dashboard.recentNotes') }}</span>
+            <button class="link-btn" @click="navigateTo('/notes')"><el-icon><ArrowRight /></el-icon></button>
+          </div>
+          <div class="section-content">
+            <div v-if="recentNotes.length === 0" class="empty-state" @click="navigateTo('/notes')">
+              <el-icon class="empty-icon"><Document /></el-icon>
+              <span class="empty-text">{{ t('dashboard.noNotes') }}</span>
+            </div>
+            <div v-else class="note-rows">
+              <div
+                v-for="note in recentNotes"
+                :key="note.name"
+                class="note-row"
+                @click="openNote(note)"
+              >
+                <el-icon class="note-row-icon"><Document /></el-icon>
+                <span class="note-row-name">{{ note.title || note.name }}</span>
+                <span class="note-row-time">{{ formatDate(note.updated_at) }}</span>
+              </div>
             </div>
           </div>
         </div>
-        <div class="today-summary">
-          <div class="summary-item">
-            <span class="summary-label">待办</span>
-            <span class="summary-value">{{ todayTodos.length }} 项</span>
-          </div>
-          <div class="summary-divider"></div>
-          <div class="summary-item">
-            <span class="summary-label">日程</span>
-            <span class="summary-value">{{ todayEvents.length }} 项</span>
-          </div>
-        </div>
-      </el-card>
+      </section>
 
-      <!-- 今日待办卡片 -->
-      <el-card class="dashboard-card content-card" shadow="never">
-        <div class="card-header">
-          <div class="header-left">
-            <div class="header-icon-wrapper todos-bg">
-              <el-icon class="header-icon-large"><CircleCheck /></el-icon>
+      <!-- 右列：待办 + 日程 -->
+      <aside class="dash-secondary">
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">{{ t('dashboard.todos') }}</span>
+            <button class="link-btn" @click="navigateTo('/todos')"><el-icon><ArrowRight /></el-icon></button>
+          </div>
+          <div class="section-content">
+            <div v-if="todayTodos.length === 0" class="empty-state" @click="navigateTo('/todos')">
+              <el-icon class="empty-icon"><CircleCheck /></el-icon>
+              <span class="empty-text">{{ t('dashboard.noTodos') }}</span>
+              <span class="empty-sub">{{ t('dashboard.goAddTask') }}</span>
             </div>
-            <div class="header-text">
-              <h3 class="header-title">今日待办</h3>
-              <p class="header-subtitle">{{ todayTodos.length }} 项任务</p>
+            <div v-else class="todo-rows">
+              <template v-for="todo in todayTodos.slice(0, 5)" :key="todo.id">
+                <!-- 主任务 -->
+                <div class="todo-row">
+                  <span
+                    v-if="todo.children && todo.children.length"
+                    class="todo-arrow"
+                    :class="{ 'is-open': expandedTodos.has(todo.id) }"
+                    @click="toggleExpand(todo.id)"
+                  >&#9654;</span>
+                  <span v-else class="todo-arrow-placeholder"></span>
+                  <el-checkbox
+                    v-model="todo.completed"
+                    @change="toggleTodo(todo)"
+                    class="todo-check"
+                  />
+                  <span class="todo-label" :class="{ 'is-done': todo.completed }">{{ todo.title }}</span>
+                  <span v-if="todo.priority === 2" class="priority-dot"></span>
+                  <span class="todo-progress-bar" :title="Math.round(childProgress(todo) * 100) + '%'">
+                    <span class="todo-progress-fill" :style="{ width: (childProgress(todo) * 100) + '%' }"></span>
+                  </span>
+                  <span class="todo-progress-text">{{ Math.round(childProgress(todo) * 100) }}%</span>
+                  <span v-if="todo.due_date" class="todo-due">{{ todo.due_date }}</span>
+                </div>
+                <!-- 子任务（折叠） -->
+                <template v-if="expandedTodos.has(todo.id)">
+                  <div
+                    v-for="child in todo.children"
+                    :key="child.id"
+                    class="todo-row todo-child"
+                  >
+                    <el-checkbox
+                      v-model="child.completed"
+                      @change="toggleTodo(child)"
+                      class="todo-check"
+                    />
+                    <span class="todo-label" :class="{ 'is-done': child.completed }">{{ child.title }}</span>
+                  </div>
+                </template>
+              </template>
             </div>
           </div>
-          <el-button text type="primary" size="small" @click="navigateTo('/todos')">
-            查看全部 →
-          </el-button>
         </div>
-        <div class="card-content">
-          <el-empty v-if="todayTodos.length === 0" description="今天没有待办事项" :image-size="80" />
-          <div v-else class="todo-list">
-            <div v-for="todo in todayTodos.slice(0, 4)" :key="todo.id" class="todo-item">
-              <el-checkbox v-model="todo.completed" @change="toggleTodo(todo)" />
-              <span class="todo-text" :class="{ completed: todo.completed }">{{ todo.title }}</span>
-              <el-tag v-if="todo.priority === 'high'" size="small" type="danger">重要</el-tag>
-            </div>
-          </div>
-        </div>
-      </el-card>
 
-      <!-- 今日日程卡片 -->
-      <el-card class="dashboard-card content-card" shadow="never">
-        <div class="card-header">
-          <div class="header-left">
-            <div class="header-icon-wrapper events-bg">
-              <el-icon class="header-icon-large"><Clock /></el-icon>
-            </div>
-            <div class="header-text">
-              <h3 class="header-title">今日日程</h3>
-              <p class="header-subtitle">{{ todayEvents.length }} 项安排</p>
-            </div>
+        <div class="section-block">
+          <div class="section-head">
+            <span class="section-title">{{ t('dashboard.upcomingEvents') }}</span>
+            <button class="link-btn" @click="navigateTo('/calendar')"><el-icon><ArrowRight /></el-icon></button>
           </div>
-          <el-button text type="primary" size="small" @click="navigateTo('/calendar')">
-            查看全部 →
-          </el-button>
-        </div>
-        <div class="card-content">
-          <el-empty v-if="todayEvents.length === 0" description="今天没有日程安排" :image-size="80" />
-          <div v-else class="event-list">
-            <div v-for="event in todayEvents.slice(0, 4)" :key="event.id" class="event-item" @click="navigateTo('/calendar')">
-              <div class="event-time">
-                <div class="time-badge">{{ formatTime(event.start_time) }}</div>
-              </div>
-              <div class="event-info">
-                <div class="event-title">{{ event.title }}</div>
-                <div class="event-desc" v-if="event.description">{{ event.description }}</div>
-              </div>
+          <div class="section-content">
+            <div v-if="todayEvents.length === 0" class="empty-state" @click="navigateTo('/calendar')">
+              <el-icon class="empty-icon"><Clock /></el-icon>
+              <span class="empty-text">{{ t('dashboard.noEvents') }}</span>
+              <span class="empty-sub">{{ t('dashboard.goAddEvent') }}</span>
             </div>
-          </div>
-        </div>
-      </el-card>
-
-      <!-- 最近笔记卡片 -->
-      <el-card class="dashboard-card content-card" shadow="never">
-        <div class="card-header">
-          <div class="header-left">
-            <div class="header-icon-wrapper notes-bg">
-              <el-icon class="header-icon-large"><Document /></el-icon>
-            </div>
-            <div class="header-text">
-              <h3 class="header-title">最近笔记</h3>
-              <p class="header-subtitle">最新编辑的笔记</p>
-            </div>
-          </div>
-          <el-button text type="primary" size="small" @click="navigateTo('/notes')">
-            查看全部 →
-          </el-button>
-        </div>
-        <div class="card-content">
-          <el-empty v-if="recentNotes.length === 0" description="还没有笔记" :image-size="80" />
-          <div v-else class="note-list">
-            <div v-for="note in recentNotes.slice(0, 5)" :key="note.name" class="note-item" @click="openNote(note)">
-              <div class="note-icon">
-                <el-icon><Document /></el-icon>
-              </div>
-              <div class="note-info">
-                <div class="note-name">{{ note.title || note.name }}</div>
-                <div class="note-time">{{ formatDate(note.updated_at) }}</div>
+            <div v-else class="event-timeline">
+              <div
+                v-for="(event, idx) in todayEvents.slice(0, 8)"
+                :key="event.id"
+                class="tl-item"
+                @click="navigateTo('/calendar')"
+              >
+                <div class="tl-rail">
+                  <span class="tl-dot" :class="{ 'tl-dot-now': isNowOrFuture(event.start_time) }"></span>
+                  <span v-if="idx < todayEvents.slice(0, 8).length - 1" class="tl-line"></span>
+                </div>
+                <div class="tl-content">
+                  <span class="tl-time">{{ formatEventTime(event.start_time) }}</span>
+                  <span class="tl-title">{{ event.title }}</span>
+                  <span v-if="event.description" class="tl-desc">{{ event.description }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </el-card>
-
-      <!-- 常用书签卡片 -->
-      <el-card class="dashboard-card content-card bookmarks-card" shadow="never">
-        <div class="card-header">
-          <div class="header-left">
-            <div class="header-icon-wrapper bookmarks-bg">
-              <el-icon class="header-icon-large"><Link /></el-icon>
-            </div>
-            <div class="header-text">
-              <h3 class="header-title">常用书签</h3>
-              <p class="header-subtitle">快速访问收藏</p>
-            </div>
-          </div>
-          <el-button text type="primary" size="small" @click="navigateTo('/bookmarks')">
-            查看全部 →
-          </el-button>
-        </div>
-        <div class="card-content">
-          <el-empty v-if="frequentBookmarks.length === 0" description="还没有书签" :image-size="80" />
-          <div v-else class="bookmark-grid">
-            <div v-for="bookmark in frequentBookmarks.slice(0, 8)" :key="bookmark.id"
-                 class="bookmark-item"
-                 @click="openBookmark(bookmark)"
-                 :title="bookmark.name">
-              <div class="bookmark-icon">
-                <img v-if="bookmark.icon_url" :src="bookmark.icon_url" />
-                <el-icon v-else><Link /></el-icon>
-              </div>
-              <div class="bookmark-name">{{ bookmark.name }}</div>
-            </div>
-          </div>
-        </div>
-      </el-card>
+      </aside>
     </div>
 
     <!-- AI助手对话框 -->
@@ -169,19 +206,23 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Calendar, CircleCheck, Clock, Document, Link, Lock, MagicStick, Refresh } from '@element-plus/icons-vue'
+import { ArrowRight, Calendar, CircleCheck, Clock, Document, Key, Link, Lock, MagicStick, Refresh, User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
+import { decryptPassword } from '@/utils/encryption'
 import AIAssistant from '@/components/AIAssistant.vue'
+import { t, locale } from '@/i18n'
 
 const router = useRouter()
 const showAIAssistant = ref(false)
+const expandedTodos = ref(new Set())
 
 // 数据状态
 const todayTodos = ref([])
 const todayEvents = ref([])
 const recentNotes = ref([])
-const frequentBookmarks = ref([])
+const topBookmarks = ref([])
+const topPasswords = ref([])
 const passwordStats = ref({
   total: 0,
   strong: 0,
@@ -204,34 +245,54 @@ const lunarDate = ref('')
 // 初始化今日日期
 const initTodayDate = () => {
   const now = new Date()
-  todayDate.value = now.toLocaleDateString('zh-CN', {
+  const loc = locale.value === 'zh-CN' ? 'zh-CN' : 'en-US'
+  todayDate.value = now.toLocaleDateString(loc, {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
-  todayWeekday.value = now.toLocaleDateString('zh-CN', { weekday: 'long' })
+  todayWeekday.value = now.toLocaleDateString(loc, { weekday: 'long' })
 
   // 简单的农历显示（可以后续集成农历库）
   lunarDate.value = `农历${now.getMonth() + 1}月${now.getDate()}日`
 }
 
-// 加载今日待办
+// 加载待办
 const loadTodayTodos = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
-    const today = new Date().toISOString().split('T')[0]
 
-    // 获取今日待办或未完成的待办（status=0表示未完成）
-    const todos = await db.select(
+    // 获取主任务
+    const parents = await db.select(
       `SELECT * FROM todos
-       WHERE (due_date = ? OR due_date IS NULL)
-       AND status = 0
-       ORDER BY priority DESC, created_at DESC
-       LIMIT 10`,
-      [today]
+       WHERE status = 0 AND (parent_id IS NULL OR parent_id = 0)
+       ORDER BY priority DESC, due_date ASC, created_at DESC
+       LIMIT 8`
     )
-    // 添加completed字段以兼容UI
-    todayTodos.value = todos.map(t => ({ ...t, completed: t.status === 1 }))
+
+    // 获取这些主任务的子任务
+    const parentIds = parents.map(p => p.id)
+    let children = []
+    if (parentIds.length > 0) {
+      children = await db.select(
+        `SELECT * FROM todos
+         WHERE parent_id IN (${parentIds.map(() => '?').join(',')})
+         ORDER BY created_at ASC`,
+        parentIds
+      )
+    }
+
+    // 组装树结构
+    const childMap = {}
+    for (const c of children) {
+      if (!childMap[c.parent_id]) childMap[c.parent_id] = []
+      childMap[c.parent_id].push({ ...c, completed: c.status === 1 })
+    }
+    todayTodos.value = parents.map(t => ({
+      ...t,
+      completed: t.status === 1,
+      children: childMap[t.id] || []
+    }))
 
     // 获取待办总数和完成数
     const totalResult = await db.select('SELECT COUNT(*) as count FROM todos WHERE status = 0')
@@ -251,18 +312,19 @@ const loadTodayTodos = async () => {
   }
 }
 
-// 加载今日日程
+// 加载日程
 const loadTodayEvents = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const today = new Date().toISOString().split('T')[0]
-    const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
 
+    // 获取今天及之后的日程
     const events = await db.select(
       `SELECT * FROM calendar_events
-       WHERE DATE(start_time) >= ? AND DATE(start_time) < ?
-       ORDER BY start_time ASC`,
-      [today, tomorrow]
+       WHERE DATE(start_time) >= ?
+       ORDER BY start_time ASC
+       LIMIT 8`,
+      [today]
     )
     todayEvents.value = events || []
 
@@ -284,45 +346,102 @@ const loadTodayEvents = async () => {
   }
 }
 
-// 加载最近笔记
+// 加载最近笔记（从文件系统扫描）
 const loadRecentNotes = async () => {
   try {
-    const db = await Database.load('sqlite:productivity.db')
-    const notes = await db.select(
-      `SELECT note_name as name, title, updated_at
-       FROM note_metadata
-       ORDER BY updated_at DESC
-       LIMIT 5`
-    )
-    recentNotes.value = notes || []
+    const { getNotesDir } = await import('@/utils/notes')
+    const { readDir, stat } = await import('@tauri-apps/plugin-fs')
+    const { join } = await import('@tauri-apps/api/path')
 
-    // 获取笔记总数
-    const totalResult = await db.select('SELECT COUNT(*) as count FROM note_metadata')
-    totalNotes.value = totalResult[0]?.count || 0
-  } catch (error) {
+    const notesDir = await getNotesDir()
+    const allFiles = []
+
+    const scanDir = async (dirPath, folder) => {
+      try {
+        const entries = await readDir(dirPath)
+        for (const entry of entries) {
+          const fullPath = await join(dirPath, entry.name)
+          if (entry.isDirectory && entry.name !== 'images' && !entry.name.startsWith('_')) {
+            await scanDir(fullPath, entry.name)
+          } else if (/\.(md|txt)$/i.test(entry.name)) {
+            let mtime = null
+            try {
+              const s = await stat(fullPath)
+              mtime = s.mtime
+            } catch { /* ignore */ }
+            allFiles.push({
+              name: (folder ? folder + '/' : '') + entry.name,
+              title: entry.name.replace(/\.(md|txt)$/i, ''),
+              folder,
+              updated_at: mtime ? new Date(mtime).toISOString() : new Date().toISOString()
+            })
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
+    await scanDir(notesDir, null)
+    allFiles.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+    recentNotes.value = allFiles.slice(0, 20)
+    totalNotes.value = allFiles.length
+  } catch {
     recentNotes.value = []
     totalNotes.value = 0
   }
 }
 
-// 加载常用书签
-const loadFrequentBookmarks = async () => {
+// 加载常用书签（quick-strip 展示）
+const loadTopBookmarks = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const bookmarks = await db.select(
-      `SELECT id, title as name, url, favicon_url as icon_url, access_count as visit_count
+      `SELECT id, title, url, favicon_url
        FROM bookmarks
-       WHERE access_count > 5 OR read_later = 1
-       ORDER BY access_count DESC
-       LIMIT 6`
+       ORDER BY access_count DESC, updated_at DESC
+       LIMIT 8`
     )
-    frequentBookmarks.value = bookmarks || []
+    topBookmarks.value = bookmarks || []
+  } catch {
+    topBookmarks.value = []
+  }
+}
+
+// 加载常用凭据（quick-strip 展示）
+const loadTopPasswords = async () => {
+  try {
+    const db = await Database.load('sqlite:productivity.db')
+    let passwords = []
+    try {
+      passwords = await db.select(
+        `SELECT id, title, username, password, website
+         FROM passwords
+         WHERE is_deleted = 0 OR is_deleted IS NULL
+         ORDER BY is_favorite DESC, updated_at DESC
+         LIMIT 6`
+      )
+    } catch {
+      passwords = await db.select(
+        `SELECT id, title, username, password, website
+         FROM passwords
+         ORDER BY updated_at DESC
+         LIMIT 6`
+      )
+    }
+    topPasswords.value = passwords || []
+  } catch {
+    topPasswords.value = []
+  }
+}
+
+// 加载书签统计
+const loadBookmarkStats = async () => {
+  try {
+    const db = await Database.load('sqlite:productivity.db')
 
     // 获取书签总数
     const totalResult = await db.select('SELECT COUNT(*) as count FROM bookmarks')
     totalBookmarks.value = totalResult[0]?.count || 0
   } catch (error) {
-    frequentBookmarks.value = []
     totalBookmarks.value = 0
   }
 }
@@ -357,12 +476,14 @@ const refreshAll = async () => {
       loadTodayTodos(),
       loadTodayEvents(),
       loadRecentNotes(),
-      loadFrequentBookmarks(),
+      loadTopBookmarks(),
+      loadTopPasswords(),
+      loadBookmarkStats(),
       loadPasswordStats()
     ])
-    ElMessage.success('数据已更新')
+    ElMessage.success(t('dashboard.dataUpdated'))
   } catch (error) {
-    ElMessage.error('刷新失败')
+    ElMessage.error(t('dashboard.refreshFailed'))
   }
 }
 
@@ -375,18 +496,53 @@ const toggleTodo = async (todo) => {
       'UPDATE todos SET status = ?, updated_at = ?, completed_at = ? WHERE id = ?',
       [newStatus, new Date().toISOString(), todo.completed ? new Date().toISOString() : null, todo.id]
     )
-    ElMessage.success(todo.completed ? '已完成' : '已标记为未完成')
+    ElMessage.success(todo.completed ? t('dashboard.completed') : t('dashboard.markedUncompleted'))
   } catch (error) {
     todo.completed = !todo.completed // 回滚
-    ElMessage.error('更新失败')
+    ElMessage.error(t('dashboard.updateFailed'))
   }
+}
+
+// 展开/折叠子任务
+const toggleExpand = (todoId) => {
+  if (expandedTodos.value.has(todoId)) {
+    expandedTodos.value.delete(todoId)
+  } else {
+    expandedTodos.value.add(todoId)
+  }
+}
+
+// 计算子任务完成进度
+const childProgress = (todo) => {
+  if (!todo.children || todo.children.length === 0) return todo.progress || 0
+  const done = todo.children.filter(c => c.completed).length
+  return done / todo.children.length
+}
+
+// 判断是否当前或未来时间
+const isNowOrFuture = (timeStr) => {
+  if (!timeStr) return false
+  return new Date(timeStr) >= new Date()
 }
 
 // 格式化时间
 const formatTime = (timeStr) => {
   if (!timeStr) return ''
   const date = new Date(timeStr)
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleTimeString(locale.value === 'zh-CN' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' })
+}
+
+// 格式化日程时间（完整年月日时分秒）
+const formatEventTime = (timeStr) => {
+  if (!timeStr) return ''
+  const date = new Date(timeStr)
+  const y = date.getFullYear()
+  const M = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  const h = String(date.getHours()).padStart(2, '0')
+  const m = String(date.getMinutes()).padStart(2, '0')
+  const s = String(date.getSeconds()).padStart(2, '0')
+  return `${y}-${M}-${d} ${h}:${m}:${s}`
 }
 
 // 格式化日期
@@ -397,10 +553,10 @@ const formatDate = (dateStr) => {
   const diff = now - date
   const days = Math.floor(diff / 86400000)
 
-  if (days === 0) return '今天'
-  if (days === 1) return '昨天'
-  if (days < 7) return `${days}天前`
-  return date.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
+  if (days === 0) return t('dashboard.today')
+  if (days === 1) return t('dashboard.yesterday')
+  if (days < 7) return `${days}${t('dashboard.daysAgo')}`
+  return date.toLocaleDateString(locale.value === 'zh-CN' ? 'zh-CN' : 'en-US', { month: 'numeric', day: 'numeric' })
 }
 
 // 导航
@@ -416,6 +572,20 @@ const openNote = (note) => {
 // 打开书签
 const openBookmark = (bookmark) => {
   window.open(bookmark.url, '_blank')
+}
+
+// 复制文本到剪贴板
+const copyText = async (text, label) => {
+  if (!text) {
+    ElMessage.warning(`${label}`)
+    return
+  }
+  try {
+    await navigator.clipboard.writeText(text)
+    ElMessage.success(`${label}`)
+  } catch {
+    ElMessage.error(t('dashboard.copyFailed'))
+  }
 }
 
 // AI操作完成回调
@@ -445,423 +615,656 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* ================================================================
+   Borderless — 纯白底 · 细线分区 · 快捷入口
+   ================================================================ */
 .dashboard-wrapper {
   width: 100%;
   height: 100%;
-  padding: var(--space-2xl);
-  background: var(--bg-secondary);
-  overflow-y: auto;
-}
-
-/* 页面头部 */
-.dashboard-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-2xl);
-}
-
-.dashboard-title {
-  font-size: var(--font-size-title1);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  letter-spacing: -0.5px;
-  margin: 0;
-}
-
-.dashboard-actions {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-/* 卡片网格 */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--space-xl);
-  max-width: 1600px;
-}
-
-/* 通用卡片 */
-.dashboard-card {
-  border-radius: var(--radius-md);
+  flex-direction: column;
+  background: var(--bg-primary, #fff);
   overflow: hidden;
-  background: var(--bg-primary);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow var(--transition-normal);
 }
 
-.dashboard-card:hover {
-  box-shadow: var(--shadow-card-hover);
-}
-
-/* 卡片头部 */
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-xl);
-}
-
-.header-left {
+/* ── 顶部状态栏 ───────────────────────────────── */
+.dash-topbar {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 24px;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border-color, #ebebef);
+  flex-shrink: 0;
 }
 
-/* 卡片头部图标 — 浅色圆底 + 单色图标 */
-.header-icon-wrapper {
+.topbar-date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.date-day {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.date-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.date-ym {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.date-week {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+}
+
+.topbar-stats {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.stat-chip:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.04));
+}
+
+.stat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.todo-dot  { background: #3b82f6; }
+.event-dot { background: #f59e0b; }
+.note-dot  { background: #10b981; }
+.bm-dot   { background: #8b5cf6; }
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+}
+
+.stat-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.icon-btn {
   width: 32px;
   height: 32px;
-  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-}
-
-.header-icon-large {
+  border: none;
+  background: none;
+  border-radius: 6px;
+  color: var(--text-tertiary, #999);
+  cursor: pointer;
   font-size: 16px;
+  transition: background 0.15s, color 0.15s;
 }
 
-.todos-bg {
-  background: rgba(0,122,255,0.10);
-  color: var(--accent-blue);
-}
-.events-bg {
-  background: rgba(255,149,0,0.10);
-  color: var(--color-orange);
-}
-.notes-bg {
-  background: rgba(52,199,89,0.10);
-  color: var(--color-green);
-}
-.bookmarks-bg {
-  background: rgba(175,82,222,0.10);
-  color: var(--color-purple);
-}
-
-.header-text {
-  flex: 1;
-}
-
-.header-title {
-  font-size: var(--font-size-callout);
-  font-weight: var(--font-weight-semibold);
+.icon-btn:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.04));
   color: var(--text-primary);
-  margin: 0 0 2px 0;
 }
 
-.header-subtitle {
-  font-size: var(--font-size-caption);
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-/* 卡片内容 */
-.card-content {
-  padding: var(--space-lg) var(--space-xl) var(--space-xl);
-  min-height: 140px;
-}
-
-/* 今日概览卡片 — 不使用渐变，保持白色 */
-.today-card {
-  background: var(--bg-primary);
-}
-
-.today-header {
-  padding: var(--space-2xl) var(--space-xl);
-}
-
-.today-date-main {
+/* ── 快捷入口条：左书签 | 右凭据 均匀分布 ────────── */
+.quick-strip {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  padding: 10px 28px;
+  border-bottom: 1px solid var(--border-color, #ebebef);
+  flex-shrink: 0;
+  gap: 0;
+  min-height: 0;
 }
 
-.today-day {
-  font-size: var(--font-size-large);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.today-meta {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.today-month-year {
-  font-size: var(--font-size-callout);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-}
-
-.today-weekday {
-  font-size: var(--font-size-caption);
-  color: var(--text-secondary);
-}
-
-/* 摘要统计 */
-.today-summary {
-  display: flex;
-  padding: var(--space-lg) var(--space-xl) var(--space-xl);
-  gap: var(--space-lg);
-}
-
-.summary-item {
+.qs-bookmarks {
   flex: 1;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-width: 0;
 }
 
-.summary-label {
-  font-size: var(--font-size-caption);
-  color: var(--text-tertiary);
+.qs-bm-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  border: 1px solid var(--border-color, #ebebef);
 }
 
-.summary-value {
-  font-size: var(--font-size-headline);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
+.qs-bm-icon:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.04));
+  transform: scale(1.08);
 }
 
-.summary-divider {
+.qs-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  object-fit: contain;
+}
+
+.qs-favicon-fallback {
+  font-size: 14px;
+  color: var(--text-quaternary, #c7c7cc);
+}
+
+.qs-divider {
   width: 1px;
   height: 24px;
-  background: var(--border-color);
-  align-self: center;
+  background: var(--border-color, #ebebef);
+  flex-shrink: 0;
+  margin: 0 16px;
 }
 
-/* 待办列表 */
-.todo-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.todo-item {
+.qs-credentials {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) 0;
-  border-bottom: 0.5px solid var(--divider);
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
 }
 
-.todo-item:last-child {
-  border-bottom: none;
-}
+.qs-credentials::-webkit-scrollbar { display: none; }
 
-.todo-item:hover {
-  background: transparent;
-}
-
-.todo-text {
-  flex: 1;
-  font-size: var(--font-size-body);
-  color: var(--text-primary);
-  line-height: 1.5;
-}
-
-.todo-text.completed {
-  text-decoration: line-through;
-  color: var(--text-tertiary);
-}
-
-/* 日程列表 */
-.event-list {
+.qs-cred-item {
   display: flex;
-  flex-direction: column;
-}
-
-.event-item {
-  display: flex;
-  gap: var(--space-md);
-  padding: var(--space-sm) 0;
-  border-bottom: 0.5px solid var(--divider);
-  cursor: pointer;
-}
-
-.event-item:last-child {
-  border-bottom: none;
-}
-
-.event-time {
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ebebef);
   flex-shrink: 0;
+  max-width: 220px;
 }
 
-.time-badge {
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-medium);
-  color: var(--accent-blue);
-  min-width: 48px;
-}
-
-.event-info {
-  flex: 1;
-}
-
-.event-title {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
+.qs-cred-title {
+  font-size: 12px;
   color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.event-desc {
-  font-size: var(--font-size-caption);
-  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* 笔记列表 */
-.note-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.note-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-sm) 0;
-  border-bottom: 0.5px solid var(--divider);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  border-radius: var(--radius-xs);
-}
-
-.note-item:last-child {
-  border-bottom: none;
-}
-
-.note-item:hover {
-  background: var(--bg-tertiary);
-}
-
-.note-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(52,199,89,0.10);
-  color: var(--color-green);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.note-info {
   flex: 1;
   min-width: 0;
 }
 
-.note-name {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-medium);
+.qs-copy-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  color: var(--text-quaternary, #aeaeb2);
+  cursor: pointer;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+}
+
+.qs-copy-btn:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.06));
+  color: var(--text-primary);
+}
+
+/* ── 主体双栏布局 ──────────────────────────────── */
+.dash-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.dash-primary {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-secondary {
+  width: 340px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-color, #ebebef);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 区块容器 ──────────────────────────────────── */
+.section-block {
+  padding: 20px 28px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.section-block + .section-block {
+  border-top: 1px solid var(--border-color, #ebebef);
+}
+
+/* ── 区块标题栏 ────────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary, #8e8e93);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.link-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-quaternary, #aeaeb2);
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.link-btn:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.04));
+  color: var(--text-primary);
+}
+
+.section-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── 空态 ──────────────────────────────────────── */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px 16px;
+  border-radius: 8px;
+  border: 1px dashed var(--border-color, #e0e0e3);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  min-height: 90px;
+}
+
+.empty-state:hover {
+  border-color: var(--text-quaternary, #c7c7cc);
+  background: var(--bg-hover, rgba(0,0,0,0.015));
+}
+
+.empty-icon {
+  font-size: 26px;
+  color: var(--text-quaternary, #d1d1d6);
+}
+
+.empty-text {
+  font-size: 13px;
+  color: var(--text-tertiary, #8e8e93);
+}
+
+.empty-sub {
+  font-size: 11px;
+  color: var(--text-quaternary, #c7c7cc);
+}
+
+/* ── 笔记行 ───────────────────────────────────── */
+.note-rows {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.note-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+  border-bottom: 1px solid var(--border-color, #ebebef);
+}
+
+.note-row:last-child {
+  border-bottom: none;
+}
+
+.note-row:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.03));
+}
+
+.note-row-icon {
+  font-size: 15px;
+  color: var(--text-quaternary, #c7c7cc);
+  flex-shrink: 0;
+}
+
+.note-row-name {
+  flex: 1;
+  font-size: 13px;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin-bottom: 2px;
 }
 
-.note-time {
-  font-size: var(--font-size-caption);
-  color: var(--text-tertiary);
+.note-row-time {
+  font-size: 11px;
+  color: var(--text-quaternary, #aeaeb2);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 
-/* 书签网格 */
-.bookmark-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--space-md);
-}
-
-.bookmark-item {
+/* ── 待办行 ────────────────────────────────────── */
+.todo-rows {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md) var(--space-sm);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  text-align: center;
-  transition: background var(--transition-fast);
 }
 
-.bookmark-item:hover {
-  background: var(--bg-tertiary);
-}
-
-.bookmark-icon {
-  width: 32px;
-  height: 32px;
+.todo-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-sm);
-  font-size: 16px;
-  color: var(--text-secondary);
+  gap: 6px;
+  padding: 5px 6px;
+  border-radius: 5px;
+  transition: background 0.12s;
+  border-bottom: 1px solid var(--border-color, #ebebef);
 }
 
-.bookmark-icon img {
-  width: 20px;
-  height: 20px;
-  object-fit: contain;
+.todo-row:last-child {
+  border-bottom: none;
 }
 
-.bookmark-name {
-  font-size: var(--font-size-caption);
-  color: var(--text-secondary);
+.todo-row:hover {
+  background: var(--bg-hover, rgba(0,0,0,0.03));
+}
+
+.todo-arrow {
+  width: 14px;
+  font-size: 8px;
+  color: var(--text-quaternary, #aeaeb2);
+  cursor: pointer;
+  flex-shrink: 0;
+  text-align: center;
+  transition: transform 0.15s;
+  user-select: none;
+  line-height: 1;
+}
+
+.todo-arrow.is-open {
+  transform: rotate(90deg);
+}
+
+.todo-arrow-placeholder {
+  width: 14px;
+  flex-shrink: 0;
+}
+
+.todo-check {
+  flex-shrink: 0;
+}
+
+.todo-check :deep(.el-checkbox__inner) {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.todo-label {
+  flex: 1;
+  font-size: 12px;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
+  min-width: 0;
 }
 
-/* 空状态 */
-.card-content .el-empty {
-  padding: var(--space-xl) 0;
+.todo-label.is-done {
+  text-decoration: line-through;
+  color: var(--text-quaternary, #c7c7cc);
 }
 
-.el-empty :deep(.el-empty__description) {
-  font-size: var(--font-size-footnote);
-  color: var(--text-tertiary);
+.priority-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ef4444;
+  flex-shrink: 0;
 }
 
-/* 响应式 */
-@media (max-width: 1200px) {
-  .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .bookmark-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
+.todo-progress-bar {
+  width: 36px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border-color, #ebebef);
+  overflow: hidden;
+  flex-shrink: 0;
 }
 
-@media (max-width: 768px) {
-  .dashboard-wrapper {
-    padding: var(--space-lg);
+.todo-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: #3b82f6;
+}
+
+.todo-progress-text {
+  font-size: 10px;
+  color: var(--text-quaternary, #aeaeb2);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  width: 26px;
+  text-align: right;
+}
+
+.todo-due {
+  font-size: 10px;
+  color: var(--text-quaternary, #aeaeb2);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.todo-child {
+  padding-left: 34px;
+}
+
+.todo-child .todo-label {
+  font-size: 11px;
+  color: var(--text-secondary, #636366);
+}
+
+/* ── 日程时间线 ──────────────────────────────────── */
+.event-timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.tl-item {
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+  padding-right: 4px;
+}
+
+.tl-item:hover .tl-title {
+  color: var(--el-color-primary, #409eff);
+}
+
+.tl-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 12px;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.tl-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-color, #dcdfe6);
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.tl-dot-now {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+.tl-line {
+  width: 1px;
+  flex: 1;
+  background: var(--border-color, #e4e7ed);
+  min-height: 8px;
+}
+
+.tl-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-bottom: 10px;
+}
+
+.tl-time {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-quaternary, #aeaeb2);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.tl-title {
+  font-size: 12px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+
+.tl-desc {
+  font-size: 10px;
+  color: var(--text-quaternary, #aeaeb2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 滚动条 ────────────────────────────────────── */
+.dash-primary::-webkit-scrollbar,
+.dash-secondary::-webkit-scrollbar,
+.note-rows::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dash-primary::-webkit-scrollbar-track,
+.dash-secondary::-webkit-scrollbar-track,
+.note-rows::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dash-primary::-webkit-scrollbar-thumb,
+.dash-secondary::-webkit-scrollbar-thumb,
+.note-rows::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+}
+
+.dash-primary:hover::-webkit-scrollbar-thumb,
+.dash-secondary:hover::-webkit-scrollbar-thumb,
+.note-rows:hover::-webkit-scrollbar-thumb {
+  background: var(--text-quaternary, #d1d1d6);
+}
+
+/* ── 响应式 ────────────────────────────────────── */
+@media (max-width: 900px) {
+  .dash-body {
+    flex-direction: column;
   }
 
-  .dashboard-title {
-    font-size: var(--font-size-title2);
+  .dash-secondary {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border-color, #ebebef);
   }
 
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-lg);
+  .topbar-stats {
+    display: none;
   }
 
-  .bookmark-grid {
-    grid-template-columns: repeat(4, 1fr);
+  .quick-nav {
+    padding: 12px 20px;
+  }
+
+  .section-block {
+    padding: 16px 20px;
   }
 }
 </style>

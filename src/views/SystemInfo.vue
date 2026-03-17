@@ -1,55 +1,55 @@
 <template>
   <div class="system-info-page">
-    <TitleBar title="系统信息 - Tauri 功能演示" />
+    <TitleBar :title="t('systemInfo.pageTitle')" />
     <div class="info-view">
       <el-page-header @back="goBack">
         <template #content>
-          <span class="page-title">💻 系统信息</span>
+          <span class="page-title">{{ t('systemInfo.title') }}</span>
         </template>
       </el-page-header>
 
       <div class="content-section">
         <el-card shadow="hover" class="info-card">
           <template #header>
-            <div class="card-header">操作系统信息</div>
+            <div class="card-header">{{ t('systemInfo.osInfo') }}</div>
           </template>
           <el-descriptions :column="1" border v-loading="loading">
-            <el-descriptions-item label="操作系统">
+            <el-descriptions-item :label="t('systemInfo.os')">
               <el-tag :type="getPlatformType(systemInfo.platform)">
                 {{ systemInfo.platform }}
               </el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="系统版本">
+            <el-descriptions-item :label="t('systemInfo.version')">
               {{ systemInfo.version }}
             </el-descriptions-item>
-            <el-descriptions-item label="CPU 架构">
+            <el-descriptions-item :label="t('systemInfo.cpuArch')">
               <el-tag>{{ systemInfo.arch }}</el-tag>
             </el-descriptions-item>
-            <el-descriptions-item label="应用版本">
+            <el-descriptions-item :label="t('systemInfo.appVersion')">
               <el-tag type="success">v0.1.0</el-tag>
             </el-descriptions-item>
           </el-descriptions>
           <el-button @click="refreshInfo" style="margin-top: 16px" :loading="loading">
             <el-icon><Refresh /></el-icon>
-            刷新信息
+            {{ t('systemInfo.refreshInfo') }}
           </el-button>
         </el-card>
 
         <el-card shadow="hover" class="info-card">
           <template #header>
-            <div class="card-header">环境信息</div>
+            <div class="card-header">{{ t('systemInfo.envInfo') }}</div>
           </template>
           <el-descriptions :column="1" border>
-            <el-descriptions-item label="Node 环境">
+            <el-descriptions-item :label="t('systemInfo.nodeEnv')">
               {{ envMode }}
             </el-descriptions-item>
-            <el-descriptions-item label="基础路径">
+            <el-descriptions-item :label="t('systemInfo.basePath')">
               {{ baseUrl }}
             </el-descriptions-item>
-            <el-descriptions-item label="用户代理">
+            <el-descriptions-item :label="t('systemInfo.userAgent')">
               {{ userAgent }}
             </el-descriptions-item>
-            <el-descriptions-item label="语言">
+            <el-descriptions-item :label="t('systemInfo.language')">
               {{ language }}
             </el-descriptions-item>
           </el-descriptions>
@@ -65,6 +65,7 @@ import { useRouter } from 'vue-router'
 import { Refresh } from '@element-plus/icons-vue'
 import TitleBar from '@/components/TitleBar.vue'
 import { TauriProcess } from '@/utils/tauri'
+import { t } from '@/i18n'
 
 const router = useRouter()
 const loading = ref(false)
@@ -79,8 +80,8 @@ const envMode = import.meta.env.MODE
 const baseUrl = import.meta.env.BASE_URL
 
 // 浏览器信息（安全访问）
-const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'Tauri 环境'
-const language = typeof navigator !== 'undefined' ? navigator.language : '未知'
+const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : t('systemInfo.tauriEnv')
+const language = typeof navigator !== 'undefined' ? navigator.language : t('systemInfo.unknown')
 
 const getPlatformType = (platform) => {
   if (platform.includes('win')) return 'primary'

@@ -4,11 +4,11 @@
     <div class="header">
       <div class="header-left">
         <div class="breadcrumb">
-          <i class="fas fa-comments"></i> AI 对话
+          <i class="fas fa-comments"></i> {{ t('aiConv.title') }}
         </div>
         <el-select
           v-model="selectedModel"
-          placeholder="选择 AI 模型"
+          :placeholder="t('aiConv.selectModel')"
           size="small"
           style="width: 200px; margin-left: 16px;"
           :teleported="false"
@@ -31,14 +31,14 @@
           circle
           size="small"
           @click="newConversation"
-          title="新建对话"
+          :title="t('aiConv.newConversation')"
         />
         <el-button
           :icon="Setting"
           circle
           size="small"
           @click="showSettingsDialog = true"
-          title="API 设置"
+          :title="t('aiConv.apiSettings')"
         />
         <el-button
           :icon="Delete"
@@ -46,7 +46,7 @@
           size="small"
           type="danger"
           @click="clearMessages"
-          title="清空对话"
+          :title="t('aiConv.clearMessages')"
         />
       </div>
     </div>
@@ -57,11 +57,11 @@
       <div class="conversation-sidebar" :class="{ collapsed: sidebarCollapsed }">
         <template v-if="!sidebarCollapsed">
           <div class="sidebar-header">
-            <div class="sidebar-new-btn" @click="newConversation" title="新建对话">
+            <div class="sidebar-new-btn" @click="newConversation" :title="t('aiConv.newConversation')">
               <i class="fas fa-plus"></i>
-              <span>新建对话</span>
+              <span>{{ t('aiConv.newConversation') }}</span>
             </div>
-            <div class="sidebar-collapse-btn" @click="sidebarCollapsed = true" title="收起历史记录">
+            <div class="sidebar-collapse-btn" @click="sidebarCollapsed = true" :title="t('aiConv.collapseHistory')">
               <i class="fas fa-angles-left"></i>
             </div>
           </div>
@@ -83,14 +83,14 @@
             </div>
             <div v-if="conversationList.length === 0" class="sidebar-empty">
               <i class="fas fa-inbox"></i>
-              <span>暂无对话</span>
+              <span>{{ t('aiConv.noConversations') }}</span>
             </div>
           </div>
         </template>
       </div>
 
       <!-- 折叠态：展开按钮浮在聊天区左上角 -->
-      <div v-if="sidebarCollapsed" class="sidebar-expand-btn" @click="sidebarCollapsed = false" title="展开历史记录">
+      <div v-if="sidebarCollapsed" class="sidebar-expand-btn" @click="sidebarCollapsed = false" :title="t('aiConv.expandHistory')">
         <i class="fas fa-bars"></i>
       </div>
 
@@ -100,8 +100,8 @@
         <div class="messages-container" ref="messagesContainer">
           <div v-if="messages.length === 0" class="empty-state">
             <i class="fas fa-robot"></i>
-            <p>开始与 AI 对话</p>
-            <p class="hint">{{ currentModelInfo?.name || '请选择 AI 模型' }}</p>
+            <p>{{ t('aiConv.startChat') }}</p>
+            <p class="hint">{{ currentModelInfo?.name || t('aiConv.selectModelHint') }}</p>
           </div>
 
           <div v-for="(msg, index) in messages" :key="index" class="message-item" :class="msg.role">
@@ -156,7 +156,7 @@
             <textarea
               ref="inputRef"
               v-model="userInput"
-              placeholder="发送消息给 AI..."
+              :placeholder="t('aiConv.inputPlaceholder')"
               @keydown="handleKeyDown"
               @input="adjustTextareaHeight"
               :disabled="isLoading || !selectedModel"
@@ -167,7 +167,7 @@
               class="send-button"
               @click="sendMessage"
               :disabled="!userInput.trim() || !selectedModel || isLoading"
-              title="发送消息 (Enter)"
+              :title="t('aiConv.send')"
             >
               <svg v-if="!isLoading" width="20" height="20" viewBox="0 0 24 24" fill="none">
                 <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -175,7 +175,7 @@
               <span v-else class="loading-spinner"></span>
             </button>
           </div>
-          <div class="input-hint">按 Enter 发送消息，Shift + Enter 换行</div>
+          <div class="input-hint">{{ t('aiConv.inputHint') }}</div>
         </div>
       </div>
     </div>
@@ -183,7 +183,7 @@
     <!-- API 设置对话框 -->
     <el-dialog
       v-model="showSettingsDialog"
-      title="AI API 设置"
+      :title="t('aiConv.settingsTitle')"
       width="560px"
       top="5vh"
       class="settings-dialog"
@@ -200,23 +200,23 @@
                 show-password
               />
             </el-form-item>
-            <el-form-item label="API 地址">
+            <el-form-item :label="t('aiConv.apiAddress')">
               <el-input
                 v-model="apiSettings.openai.baseUrl"
                 placeholder="https://api.openai.com/v1"
               />
-              <span style="font-size: 12px; color: #909399;">默认: https://api.openai.com/v1</span>
+              <span style="font-size: 12px; color: #909399;">{{ t('aiConv.defaultHint') }} https://api.openai.com/v1</span>
             </el-form-item>
-            <el-form-item label="模型">
+            <el-form-item :label="t('aiConv.model')">
               <el-select v-model="apiSettings.openai.model" style="width: 100%;">
                 <el-option label="GPT-4" value="gpt-4" />
                 <el-option label="GPT-4 Turbo" value="gpt-4-turbo-preview" />
                 <el-option label="GPT-3.5 Turbo" value="gpt-3.5-turbo" />
               </el-select>
             </el-form-item>
-            <el-form-item label="流式输出">
+            <el-form-item :label="t('aiConv.streamOutput')">
               <el-switch v-model="apiSettings.openai.stream" />
-              <span style="font-size: 12px; color: #909399; margin-left: 8px;">启用类似ChatGPT的打字效果</span>
+              <span style="font-size: 12px; color: #909399; margin-left: 8px;">{{ t('aiConv.streamHint') }}</span>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -231,84 +231,98 @@
                 show-password
               />
             </el-form-item>
-            <el-form-item label="API 地址">
+            <el-form-item :label="t('aiConv.apiAddress')">
               <el-input
                 v-model="apiSettings.claude.baseUrl"
                 placeholder="https://api.anthropic.com"
               />
+              <span style="font-size: 12px; color: #909399;">{{ t('aiConv.defaultHint') }} https://api.anthropic.com{{ t('aiConv.claudeProxyHint') }}</span>
             </el-form-item>
-            <el-form-item label="模型">
-              <el-select v-model="apiSettings.claude.model" style="width: 100%;">
-                <el-option label="Claude 3 Opus" value="claude-3-opus-20240229" />
-                <el-option label="Claude 3 Sonnet" value="claude-3-sonnet-20240229" />
-                <el-option label="Claude 3 Haiku" value="claude-3-haiku-20240307" />
-              </el-select>
+            <el-form-item :label="t('aiConv.model')">
+              <el-input
+                v-model="apiSettings.claude.model"
+                :placeholder="t('aiConv.exampleModel')"
+              />
+              <span style="font-size: 12px; color: #909399;">{{ t('aiConv.claudeModelHint') }}</span>
             </el-form-item>
-            <el-form-item label="流式输出">
+            <el-form-item :label="t('aiConv.streamOutput')">
               <el-switch v-model="apiSettings.claude.stream" />
+              <span style="font-size: 12px; color: #909399; margin-left: 8px;">{{ t('aiConv.streamTypingHint') }}</span>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                @click="testClaudeApi"
+                :loading="testingClaude"
+                :disabled="!apiSettings.claude.apiKey || !apiSettings.claude.baseUrl"
+              >
+                <el-icon v-if="!testingClaude"><Connection /></el-icon>
+                {{ t('aiConv.testConnection') }}
+              </el-button>
+              <el-tag v-if="claudeTestResult === 'success'" type="success" size="small" style="margin-left: 8px;">{{ t('aiConv.connected') }}</el-tag>
+              <el-tag v-if="claudeTestResult === 'failed'" type="danger" size="small" style="margin-left: 8px;">{{ claudeTestError }}</el-tag>
             </el-form-item>
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="自定义" name="custom">
+        <el-tab-pane :label="t('aiConv.custom')" name="custom">
           <el-form :model="customApiForm" label-width="100px">
-            <el-form-item label="名称" required>
+            <el-form-item :label="t('aiConv.providerName')" required>
               <el-input
                 v-model="customApiForm.name"
-                placeholder="例如：DeepSeek API"
+                :placeholder="t('aiConv.namePlaceholder')"
               />
             </el-form-item>
             <el-form-item label="API Key" required>
               <el-input
                 v-model="customApiForm.apiKey"
-                placeholder="输入 API Key"
+                :placeholder="t('aiConv.apiKeyPlaceholder')"
                 type="password"
                 show-password
               />
             </el-form-item>
-            <el-form-item label="API 地址" required>
+            <el-form-item :label="t('aiConv.apiAddress')" required>
               <el-input
                 v-model="customApiForm.baseUrl"
                 placeholder="https://api.example.com/v1"
               />
               <span style="font-size: 12px; color: #909399;">
-                OpenAI 兼容接口地址，必须包含 /v1 路径
+                {{ t('aiConv.openaiCompatHint') }}
               </span>
             </el-form-item>
-            <el-form-item label="模型名称" required>
+            <el-form-item :label="t('aiConv.modelName')" required>
               <el-input
                 v-model="customApiForm.model"
                 placeholder="gpt-3.5-turbo"
               />
             </el-form-item>
-            <el-form-item label="流式输出">
+            <el-form-item :label="t('aiConv.streamOutput')">
               <el-switch v-model="customApiForm.stream" />
               <span style="font-size: 12px; color: #909399; margin-left: 8px;">
-                启用类似ChatGPT的打字效果
+                {{ t('aiConv.streamHint') }}
               </span>
             </el-form-item>
-            
+
             <!-- 测试按钮和结果 -->
             <el-form-item>
-              <el-button 
-                @click="testCustomApiForm" 
+              <el-button
+                @click="testCustomApiForm"
                 :loading="testingApiForm"
                 :disabled="!customApiForm.apiKey || !customApiForm.baseUrl || !customApiForm.model"
               >
                 <el-icon v-if="!testingApiForm"><Connection /></el-icon>
-                测试连接
+                {{ t('aiConv.testConnection') }}
               </el-button>
               <span style="margin-left: 12px; font-size: 13px;">
                 <el-tag v-if="customApiFormTestResult === 'success'" type="success" size="small">
-                  ✓ 连接成功
+                  ✓ {{ t('aiConv.connected') }}
                 </el-tag>
                 <el-tag v-else-if="customApiFormTestResult === 'failed'" type="danger" size="small">
                   ✗ 连接失败
                 </el-tag>
-                <span v-else style="color: #909399;">测试API是否配置正确</span>
+                <span v-else style="color: #909399;">{{ t('aiConv.testApiHint') }}</span>
               </span>
             </el-form-item>
-            
+
             <!-- 测试错误信息 -->
             <el-alert
               v-if="customApiFormTestError"
@@ -317,15 +331,15 @@
               :closable="false"
               style="margin-bottom: 16px;"
             />
-            
+
             <!-- 保存按钮 -->
             <el-form-item>
-              <el-button 
-                type="primary" 
+              <el-button
+                type="primary"
                 @click="saveCustomApiFromTab"
                 :disabled="!customApiForm.name || !customApiForm.apiKey || !customApiForm.baseUrl || !customApiForm.model"
               >
-                {{ isEditingCustomApi ? '更新配置' : '添加到列表' }}
+                {{ isEditingCustomApi ? t('aiConv.updateConfig') : t('aiConv.addToList') }}
               </el-button>
               <el-button v-if="isEditingCustomApi" @click="cancelEditCustomApi">
                 取消编辑
@@ -334,21 +348,21 @@
           </el-form>
         </el-tab-pane>
 
-        <el-tab-pane label="自定义列表" name="custom-list">
+        <el-tab-pane :label="t('aiConv.customList')" name="custom-list">
           <el-table :data="apiSettings.customApis" style="width: 100%" border class="custom-api-table">
-            <el-table-column prop="name" label="名称" width="120" show-overflow-tooltip />
+            <el-table-column prop="name" :label="t('aiConv.nameCol')" width="120" show-overflow-tooltip />
             <el-table-column prop="baseUrl" label="API 地址" min-width="200" show-overflow-tooltip />
-            <el-table-column prop="model" label="模型" width="140" show-overflow-tooltip />
-            <el-table-column label="流式" width="60" align="center">
+            <el-table-column prop="model" :label="t('aiConv.modelCol')" width="140" show-overflow-tooltip />
+            <el-table-column :label="t('aiConv.streamCol')" width="60" align="center">
               <template #default="scope">
                 <el-tag :type="scope.row.stream ? 'success' : 'info'" size="small">
-                  {{ scope.row.stream ? '是' : '否' }}
+                  {{ scope.row.stream ? t('aiConv.yes') : t('aiConv.no') }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="状态" width="80" align="center">
+            <el-table-column :label="t('aiConv.statusCol')" width="80" align="center">
               <template #default="scope">
-                <el-tooltip :content="scope.row.lastTestTime || '未测试'" placement="top">
+                <el-tooltip :content="scope.row.lastTestTime || t('aiConv.notTested')" placement="top">
                   <el-tag v-if="scope.row.testStatus === 'success'" type="success" size="small">
                     ✓ 正常
                   </el-tag>
@@ -361,14 +375,14 @@
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="140" align="center" fixed="right">
+            <el-table-column :label="t('aiConv.operationsCol')" width="140" align="center" fixed="right">
               <template #default="scope">
                 <el-button 
                   circle
                   size="small" 
                   @click="testCustomApiById(scope.row.id)"
                   :loading="testingApiId === scope.row.id"
-                  title="测试连接"
+                  :title="t('aiConv.testConnection')"
                 >
                   <el-icon><Connection /></el-icon>
                 </el-button>
@@ -377,7 +391,7 @@
                   size="small" 
                   type="primary" 
                   @click="editCustomApiFromList(scope.row)"
-                  title="编辑"
+                  :title="t('aiConv.editBtn')"
                 >
                   <el-icon><Edit /></el-icon>
                 </el-button>
@@ -386,7 +400,7 @@
                   size="small" 
                   type="danger" 
                   @click="deleteCustomApi(scope.row.id)"
-                  title="删除"
+                  :title="t('aiConv.deleteBtn')"
                 >
                   <el-icon><Delete /></el-icon>
                 </el-button>
@@ -394,80 +408,80 @@
             </el-table-column>
           </el-table>
           
-          <el-empty v-if="apiSettings.customApis.length === 0" description="暂无自定义API配置，请到自定义标签页添加" style="margin-top: 40px;" />
+          <el-empty v-if="apiSettings.customApis.length === 0" :description="t('aiConv.noCustomApis')" style="margin-top: 40px;" />
         </el-tab-pane>
       </el-tabs>
 
       <template #footer>
-        <el-button @click="showSettingsDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveSettings">保存</el-button>
+        <el-button @click="showSettingsDialog = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveSettings">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 自定义API添加/编辑对话框 -->
     <el-dialog
       v-model="showCustomApiDialog"
-      :title="isEditingCustomApi ? '编辑自定义API' : '添加自定义API'"
+      :title="isEditingCustomApi ? t('aiConv.editCustomApi') : t('aiConv.addCustomApi')"
       width="600px"
     >
       <el-form :model="customApiForm" label-width="100px">
-        <el-form-item label="名称" required>
+        <el-form-item :label="t('aiConv.providerName')" required>
           <el-input
             v-model="customApiForm.name"
-            placeholder="例如：DeepSeek API"
+            :placeholder="t('aiConv.namePlaceholder')"
           />
         </el-form-item>
         <el-form-item label="API Key" required>
           <el-input
             v-model="customApiForm.apiKey"
-            placeholder="输入 API Key"
+            :placeholder="t('aiConv.apiKeyPlaceholder')"
             type="password"
             show-password
           />
         </el-form-item>
-        <el-form-item label="API 地址" required>
+        <el-form-item :label="t('aiConv.apiAddress')" required>
           <el-input
             v-model="customApiForm.baseUrl"
             placeholder="https://api.example.com/v1"
           />
           <span style="font-size: 12px; color: #909399;">
-            OpenAI 兼容接口地址，必须包含 /v1 路径
+            {{ t('aiConv.openaiCompatHint') }}
           </span>
         </el-form-item>
-        <el-form-item label="模型名称" required>
+        <el-form-item :label="t('aiConv.modelName')" required>
           <el-input
             v-model="customApiForm.model"
             placeholder="gpt-3.5-turbo"
           />
         </el-form-item>
-        <el-form-item label="流式输出">
+        <el-form-item :label="t('aiConv.streamOutput')">
           <el-switch v-model="customApiForm.stream" />
           <span style="font-size: 12px; color: #909399; margin-left: 8px;">
-            启用类似ChatGPT的打字效果
+            {{ t('aiConv.streamHint') }}
           </span>
         </el-form-item>
-        
+
         <!-- 测试按钮和结果 -->
         <el-form-item>
-          <el-button 
-            @click="testCustomApiForm" 
+          <el-button
+            @click="testCustomApiForm"
             :loading="testingApiForm"
             :disabled="!customApiForm.apiKey || !customApiForm.baseUrl || !customApiForm.model"
           >
             <el-icon v-if="!testingApiForm"><Connection /></el-icon>
-            测试连接
+            {{ t('aiConv.testConnection') }}
           </el-button>
           <span style="margin-left: 12px; font-size: 13px;">
             <el-tag v-if="customApiFormTestResult === 'success'" type="success" size="small">
-              ✓ 连接成功
+              ✓ {{ t('aiConv.connected') }}
             </el-tag>
             <el-tag v-else-if="customApiFormTestResult === 'failed'" type="danger" size="small">
               ✗ 连接失败
             </el-tag>
-            <span v-else style="color: #909399;">测试API是否配置正确</span>
+            <span v-else style="color: #909399;">{{ t('aiConv.testApiHint') }}</span>
           </span>
         </el-form-item>
-        
+
         <!-- 测试错误信息 -->
         <el-alert
           v-if="customApiFormTestError"
@@ -479,8 +493,8 @@
       </el-form>
 
       <template #footer>
-        <el-button @click="showCustomApiDialog = false">取消</el-button>
-        <el-button type="primary" @click="saveCustomApi">保存</el-button>
+        <el-button @click="showCustomApiDialog = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveCustomApi">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
@@ -496,6 +510,7 @@ import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 import Database from '@tauri-apps/plugin-sql'
+import { t } from '@/i18n'
 
 // 数据库实例
 let db = null
@@ -533,10 +548,10 @@ const md = new MarkdownIt({
   highlight: function (str, lang) {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return `<pre class="hljs-code-block"><div class="code-header"><span class="code-lang">${lang}</span><button class="copy-code-btn" onclick="copyCode(this)">复制</button></div><code class="hljs language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`
+        return `<pre class="hljs-code-block"><div class="code-header"><span class="code-lang">${lang}</span><button class="copy-code-btn" onclick="copyCode(this)">Copy</button></div><code class="hljs language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`
       } catch (e) {}
     }
-    return `<pre class="hljs-code-block"><div class="code-header"><button class="copy-code-btn" onclick="copyCode(this)">复制</button></div><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`
+    return `<pre class="hljs-code-block"><div class="code-header"><button class="copy-code-btn" onclick="copyCode(this)">Copy</button></div><code class="hljs">${md.utils.escapeHtml(str)}</code></pre>`
   }
 })
 
@@ -545,9 +560,9 @@ window.copyCode = function(button) {
   const codeBlock = button.closest('.hljs-code-block')
   const code = codeBlock.querySelector('code').textContent
   navigator.clipboard.writeText(code).then(() => {
-    button.textContent = '已复制!'
+    button.textContent = 'Copied!'
     setTimeout(() => {
-      button.textContent = '复制'
+      button.textContent = 'Copy'
     }, 2000)
   })
 }
@@ -575,8 +590,7 @@ const aiModels = computed(() => {
   const models = [
     { id: 'openai-gpt4', name: 'GPT-4', provider: 'OpenAI' },
     { id: 'openai-gpt35', name: 'GPT-3.5 Turbo', provider: 'OpenAI' },
-    { id: 'claude-opus', name: 'Claude 3 Opus', provider: 'Anthropic' },
-    { id: 'claude-sonnet', name: 'Claude 3 Sonnet', provider: 'Anthropic' }
+    { id: 'claude-opus', name: `Claude (${apiSettings.value.claude.model})`, provider: 'Anthropic' }
   ]
 
   // 添加所有自定义API配置
@@ -623,6 +637,11 @@ const testingApiId = ref('')
 const testingApiForm = ref(false)
 const customApiFormTestResult = ref('') // success | failed | ''
 const customApiFormTestError = ref('')
+
+// Claude 测试连接
+const testingClaude = ref(false)
+const claudeTestResult = ref('') // success | failed | ''
+const claudeTestError = ref('')
 
 // 当前模型信息
 const currentModelInfo = computed(() => {
@@ -744,7 +763,7 @@ const switchConversation = async (conversationId) => {
 
 // 删除对话（侧边栏）
 const deleteConversation = (id) => {
-  ElMessageBox.confirm('确定要删除这条对话记录吗？', '提示', {
+  ElMessageBox.confirm(t('aiConv.confirmDeleteConv'), t('aiConv.hint'), {
     type: 'warning'
   }).then(async () => {
     await deleteConversationFromDb(id)
@@ -761,7 +780,7 @@ const deleteConversation = (id) => {
         messages.value = []
       }
     }
-    ElMessage.success('对话已删除')
+    ElMessage.success(t('aiConv.convDeleted'))
   }).catch(() => {})
 }
 
@@ -820,7 +839,7 @@ const loadSettings = () => {
 // 保存设置
 const saveSettings = () => {
   localStorage.setItem('ai_api_settings', JSON.stringify(apiSettings.value))
-  ElMessage.success('设置已保存')
+  ElMessage.success(t('aiConv.settingsSaved'))
   showSettingsDialog.value = false
 }
 
@@ -829,7 +848,7 @@ const saveCustomApiFromTab = () => {
   // 验证表单
   if (!customApiForm.value.name || !customApiForm.value.apiKey ||
       !customApiForm.value.baseUrl || !customApiForm.value.model) {
-    ElMessage.warning('请填写所有必填项')
+    ElMessage.warning(t('aiConv.fillAllRequired'))
     return
   }
 
@@ -857,14 +876,14 @@ const saveCustomApiFromTab = () => {
       apiToSave.testStatus = apiSettings.value.customApis[index].testStatus
       apiToSave.lastTestTime = apiSettings.value.customApis[index].lastTestTime
       apiSettings.value.customApis[index] = apiToSave
-      ElMessage.success('配置已更新')
+      ElMessage.success(t('aiConv.configUpdated'))
       // 清空表单，退出编辑模式
       resetCustomApiForm()
     }
   } else {
     // 添加模式：添加新配置
     apiSettings.value.customApis.push(apiToSave)
-    ElMessage.success('配置已添加')
+    ElMessage.success(t('aiConv.configAdded'))
     // 清空表单
     resetCustomApiForm()
   }
@@ -880,13 +899,13 @@ const editCustomApiFromList = (api) => {
   customApiFormTestError.value = ''
   // 切换到自定义标签页
   activeSettingsTab.value = 'custom'
-  ElMessage.info('已切换到编辑模式')
+  ElMessage.info(t('aiConv.switchedToEdit'))
 }
 
 // 取消编辑
 const cancelEditCustomApi = () => {
   resetCustomApiForm()
-  ElMessage.info('已取消编辑')
+  ElMessage.info(t('aiConv.editCancelled'))
 }
 
 // 重置表单
@@ -906,13 +925,13 @@ const resetCustomApiForm = () => {
 
 // 删除自定义API
 const deleteCustomApi = (id) => {
-  ElMessageBox.confirm('确定要删除这个API配置吗？', '提示', {
+  ElMessageBox.confirm(t('aiConv.confirmDeleteApi'), t('aiConv.hint'), {
     type: 'warning'
   }).then(() => {
     const index = apiSettings.value.customApis.findIndex(api => api.id === id)
     if (index !== -1) {
       apiSettings.value.customApis.splice(index, 1)
-      ElMessage.success('删除成功')
+      ElMessage.success(t('aiConv.deleteSuccess'))
       saveSettings()
 
       // 如果删除的是当前选中的模型，清空选择
@@ -923,12 +942,65 @@ const deleteCustomApi = (id) => {
   }).catch(() => {})
 }
 
+// 测试 Claude API 连接
+const testClaudeApi = async () => {
+  testingClaude.value = true
+  claudeTestResult.value = ''
+  claudeTestError.value = ''
+
+  try {
+    const settings = apiSettings.value.claude
+    let baseUrl = settings.baseUrl.trim()
+
+    if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+      throw new Error('API 地址必须以 http:// 或 https:// 开头')
+    }
+
+    if (baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.slice(0, -1)
+    }
+
+    const response = await fetch(`${baseUrl}/v1/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': settings.apiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: settings.model,
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'Please reply with "ok" only.' }]
+      })
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 200)}`)
+    }
+
+    const data = await response.json()
+    if (!data?.content || !Array.isArray(data.content)) {
+      throw new Error('API 返回格式不正确')
+    }
+
+    claudeTestResult.value = 'success'
+    ElMessage.success('Claude 连接测试成功！')
+  } catch (error) {
+    claudeTestResult.value = 'failed'
+    claudeTestError.value = error.message.substring(0, 60)
+    ElMessage.error(`测试失败：${error.message}`)
+  } finally {
+    testingClaude.value = false
+  }
+}
+
 // 测试表单中的自定义API
 const testCustomApiForm = async () => {
   const form = customApiForm.value
 
   if (!form.apiKey || !form.baseUrl || !form.model) {
-    ElMessage.warning('请先填写完整配置')
+    ElMessage.warning(t('aiConv.fillCompleteConfig'))
     return
   }
 
@@ -955,7 +1027,7 @@ const testCustomApiForm = async () => {
       },
       body: JSON.stringify({
         model: form.model,
-        messages: [{ role: 'user', content: '你好' }],
+        messages: [{ role: 'user', content: 'Please reply with "ok" only.' }],
         max_tokens: 10
       })
     })
@@ -973,7 +1045,7 @@ const testCustomApiForm = async () => {
     }
 
     customApiFormTestResult.value = 'success'
-    ElMessage.success('连接测试成功！')
+    ElMessage.success(t('aiConv.connectionSuccess'))
   } catch (error) {
     customApiFormTestResult.value = 'failed'
     customApiFormTestError.value = error.message
@@ -1009,7 +1081,7 @@ const testCustomApiById = async (id) => {
       },
       body: JSON.stringify({
         model: api.model,
-        messages: [{ role: 'user', content: '你好' }],
+        messages: [{ role: 'user', content: 'Please reply with "ok" only.' }],
         max_tokens: 10
       })
     })
@@ -1059,7 +1131,7 @@ const onModelChange = () => {
 // 新建对话
 const newConversation = async () => {
   // 直接创建新对话
-  const id = await createConversation('新对话', selectedModel.value)
+  const id = await createConversation(t('aiConv.newConversation'), selectedModel.value)
   if (id) {
     currentConversationId.value = id
     messages.value = []
@@ -1069,11 +1141,11 @@ const newConversation = async () => {
 // 清空对话（删除当前对话的所有消息+记录）
 const clearMessages = () => {
   if (messages.value.length === 0 && !currentConversationId.value) {
-    ElMessage.warning('当前没有对话记录')
+    ElMessage.warning(t('aiConv.noConversationRecords'))
     return
   }
 
-  ElMessageBox.confirm('确定要清空当前对话吗？', '提示', {
+  ElMessageBox.confirm(t('aiConv.confirmClearConv'), t('aiConv.hint'), {
     type: 'warning'
   }).then(async () => {
     if (currentConversationId.value) {
@@ -1081,12 +1153,12 @@ const clearMessages = () => {
       await loadConversationList()
     }
     // 创建新空对话
-    const id = await createConversation('新对话', selectedModel.value)
+    const id = await createConversation(t('aiConv.newConversation'), selectedModel.value)
     if (id) {
       currentConversationId.value = id
       messages.value = []
     }
-    ElMessage.success('对话已清空')
+    ElMessage.success(t('aiConv.convCleared'))
   }).catch(() => {})
 }
 
@@ -1099,7 +1171,7 @@ const sendMessage = async () => {
   }
 
   if (!selectedModel.value) {
-    ElMessage.warning('请先选择 AI 模型')
+    ElMessage.warning(t('aiConv.selectModelFirst'))
     return
   }
 
@@ -1108,7 +1180,7 @@ const sendMessage = async () => {
     const title = content.substring(0, 20) + (content.length > 20 ? '...' : '')
     const id = await createConversation(title, selectedModel.value)
     if (!id) {
-      ElMessage.error('创建对话失败')
+      ElMessage.error(t('aiConv.createConvFailed'))
       return
     }
     currentConversationId.value = id
@@ -1236,7 +1308,7 @@ const callAIAPI = async (content) => {
     const apiId = modelId.replace('custom-', '')
     return await callCustomAPI(apiId, content, false)
   } else {
-    throw new Error('未知的模型类型')
+    throw new Error(t('aiConv.unknownModelType'))
   }
 }
 
@@ -1252,7 +1324,7 @@ const callAIAPIStream = async (content) => {
     const apiId = modelId.replace('custom-', '')
     return await callCustomAPI(apiId, content, true)
   } else {
-    throw new Error('未知的模型类型')
+    throw new Error(t('aiConv.unknownModelType'))
   }
 }
 
@@ -1261,7 +1333,7 @@ const callOpenAI = async (content, stream = false) => {
   const settings = apiSettings.value.openai
 
   if (!settings.apiKey) {
-    throw new Error('请先配置 OpenAI API Key')
+    throw new Error(t('aiConv.configOpenaiKey'))
   }
 
   const conversationHistory = messages.value
@@ -1329,14 +1401,20 @@ const callClaude = async (content, stream = false) => {
   const settings = apiSettings.value.claude
 
   if (!settings.apiKey) {
-    throw new Error('请先配置 Claude API Key')
+    throw new Error(t('aiConv.configClaudeKey'))
+  }
+
+  // 清理 baseUrl（与测试函数一致）
+  let baseUrl = settings.baseUrl.trim()
+  if (baseUrl.endsWith('/')) {
+    baseUrl = baseUrl.slice(0, -1)
   }
 
   const conversationHistory = messages.value
     .filter(m => m.role !== 'system')
     .map(m => ({ role: m.role, content: m.content }))
 
-  const response = await fetch(`${settings.baseUrl}/v1/messages`, {
+  const response = await fetch(`${baseUrl}/v1/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -1346,52 +1424,104 @@ const callClaude = async (content, stream = false) => {
     body: JSON.stringify({
       model: settings.model,
       max_tokens: 4096,
-      messages: [
-        ...conversationHistory,
-        { role: 'user', content }
-      ],
-      stream
+      messages: conversationHistory,
+      ...(stream ? { stream: true } : {})
     })
   })
 
   if (!response.ok) {
-    const error = await response.text()
-    throw new Error(`Claude API 错误: ${error}`)
+    const errorText = await response.text()
+    // 代理反测活拦截 → 友好提示
+    if (errorText.includes('反测活') || errorText.includes('content_security_policy_blocking')) {
+      throw new Error(`代理拦截了该消息（短问候/测试类内容会被过滤），请发送正常对话内容\n\n原始错误 (${response.status}): ${errorText.substring(0, 300)}`)
+    }
+    throw new Error(`Claude API 错误 (${response.status}): ${errorText.substring(0, 200)}`)
+  }
+
+  // 检查响应是否为 JSON（防止代理返回 HTML 错误页面）
+  const contentType = response.headers.get('content-type') || ''
+  const isJson = contentType.includes('application/json')
+  const isSSE = contentType.includes('text/event-stream')
+
+  // 解析非流式 JSON 响应（兼容 Anthropic / OpenAI 格式）
+  const parseJsonResponse = (data) => {
+    return data.content?.[0]?.text || data.choices?.[0]?.message?.content || ''
   }
 
   if (stream) {
+    // 如果响应不是 SSE 流（代理可能忽略 stream 参数，直接返回 JSON）
+    if (isJson || !response.body) {
+      const data = await response.json()
+      return parseJsonResponse(data)
+    }
+
+    // 非 JSON / 非 SSE（HTML 错误页面等）
+    if (!isSSE && !isJson) {
+      const text = await response.text()
+      throw new Error(`API 返回了非预期格式 (${contentType}): ${text.substring(0, 100)}`)
+    }
+
     const reader = response.body.getReader()
     const decoder = new TextDecoder()
+    let fullText = ''
 
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
 
-      const chunk = decoder.decode(value)
-      const lines = chunk.split('\n').filter(line => line.trim() !== '')
+      const chunk = decoder.decode(value, { stream: true })
+      fullText += chunk
 
+      // 解析 SSE 行
+      const lines = chunk.split('\n')
       for (const line of lines) {
         if (line.startsWith('data: ')) {
-          const data = line.slice(6)
+          const data = line.slice(6).trim()
+          if (data === '[DONE]') continue
 
           try {
             const parsed = JSON.parse(data)
+            let delta = ''
+            // Anthropic 原生格式
             if (parsed.type === 'content_block_delta') {
-              const delta = parsed.delta?.text || ''
-              if (delta) {
-                streamingContent.value += delta
-                scrollToBottom()
-              }
+              delta = parsed.delta?.text || ''
+            }
+            // OpenAI 兼容格式（第三方代理常用）
+            else if (parsed.choices?.[0]?.delta?.content) {
+              delta = parsed.choices[0].delta.content
+            }
+            if (delta) {
+              streamingContent.value += delta
+              scrollToBottom()
             }
           } catch (e) {}
         }
       }
     }
 
-    return streamingContent.value
+    // 流式解析成功
+    if (streamingContent.value) {
+      return streamingContent.value
+    }
+
+    // 流式未解析到内容 → 尝试把完整响应当作 JSON 解析
+    if (fullText.trim()) {
+      try {
+        const jsonData = JSON.parse(fullText)
+        const text = parseJsonResponse(jsonData)
+        if (text) return text
+      } catch (e) {}
+      throw new Error(t('aiConv.streamParseFailed'))
+    }
+
+    throw new Error('API 返回了空响应')
   } else {
+    if (!isJson) {
+      const text = await response.text()
+      throw new Error(`API 返回了非 JSON 格式 (${contentType}): ${text.substring(0, 100)}`)
+    }
     const data = await response.json()
-    return data.content[0].text
+    return parseJsonResponse(data)
   }
 }
 
@@ -1400,7 +1530,7 @@ const callCustomAPI = async (apiId, content, stream = false) => {
   const api = apiSettings.value.customApis.find(a => a.id === apiId)
 
   if (!api) {
-    throw new Error('自定义API配置不存在')
+    throw new Error(t('aiConv.customApiNotFound'))
   }
 
   let baseUrl = api.baseUrl.trim()

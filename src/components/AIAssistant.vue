@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="AI 智能助手"
+    :title="t('aiAssistant.dialogTitle')"
     width="700px"
     :close-on-click-modal="false"
     class="ai-assistant-dialog"
@@ -11,10 +11,10 @@
       <div class="messages-container" ref="messagesContainer">
         <div v-if="messages.length === 0" class="welcome-message">
           <el-icon class="welcome-icon"><MagicStick /></el-icon>
-          <h3>你好！我是AI助手</h3>
-          <p>我可以帮你快速创建和管理各种内容</p>
+          <h3>{{ t('aiAssistant.welcomeTitle') }}</h3>
+          <p>{{ t('aiAssistant.welcomeDesc') }}</p>
           <div class="example-commands">
-            <div class="example-title">试试这些指令：</div>
+            <div class="example-title">{{ t('aiAssistant.tryCommands') }}</div>
             <el-tag v-for="cmd in exampleCommands" :key="cmd" size="small" @click="sendExample(cmd)">
               {{ cmd }}
             </el-tag>
@@ -31,7 +31,7 @@
             <div v-if="msg.confirmation" class="confirmation-box">
               <div class="confirmation-info">
                 <el-icon><Warning /></el-icon>
-                <span>确认执行此操作？</span>
+                <span>{{ t('aiAssistant.confirmOperation') }}</span>
               </div>
               <div class="confirmation-details">
                 <div v-for="(value, key) in msg.confirmation.params" :key="key">
@@ -39,8 +39,8 @@
                 </div>
               </div>
               <div class="confirmation-actions">
-                <el-button type="primary" size="small" @click="confirmOperation(index)">确认</el-button>
-                <el-button size="small" @click="cancelOperation(index)">取消</el-button>
+                <el-button type="primary" size="small" @click="confirmOperation(index)">{{ t('aiAssistant.confirm') }}</el-button>
+                <el-button size="small" @click="cancelOperation(index)">{{ t('aiAssistant.cancel') }}</el-button>
               </div>
             </div>
             <div v-if="msg.result" class="result-box" :class="msg.result.status">
@@ -67,14 +67,14 @@
       <div class="input-container">
         <el-input
           v-model="userInput"
-          placeholder="输入指令，例如：帮我写一篇关于Vue的笔记"
+          :placeholder="t('aiAssistant.inputPlaceholder')"
           @keyup.enter="sendMessage"
           :disabled="isLoading"
           clearable
         >
           <template #append>
             <el-button :icon="Promotion" @click="sendMessage" :loading="isLoading" type="primary">
-              发送
+              {{ t('aiAssistant.send') }}
             </el-button>
           </template>
         </el-input>
@@ -84,13 +84,13 @@
       <div class="history-toggle">
         <el-button text size="small" @click="showHistory = !showHistory">
           <el-icon><Clock /></el-icon>
-          操作历史
+          {{ t('aiAssistant.operationHistory') }}
         </el-button>
       </div>
     </div>
 
     <!-- 操作历史侧边栏 -->
-    <el-drawer v-model="showHistory" title="操作历史" size="30%">
+    <el-drawer v-model="showHistory" :title="t('aiAssistant.historyTitle')" size="30%">
       <div class="history-list">
         <div v-for="(op, index) in operationHistory" :key="index" class="history-item">
           <div class="history-header">
@@ -101,7 +101,7 @@
           </div>
           <div class="history-content">{{ op.command }}</div>
         </div>
-        <el-empty v-if="operationHistory.length === 0" description="暂无操作历史" />
+        <el-empty v-if="operationHistory.length === 0" :description="t('aiAssistant.noHistory')" />
       </div>
     </el-drawer>
   </el-dialog>
@@ -115,6 +115,7 @@ import { recognizeIntent } from '@/utils/ai/intent'
 import { extractParams } from '@/utils/ai/parser'
 import { chatWithAI } from '@/services/aiService'
 import { executeOperation } from '@/utils/ai/operations'
+import { t } from '@/i18n'
 
 const props = defineProps({
   modelValue: Boolean
@@ -133,11 +134,11 @@ const conversationContext = ref([])
 
 // 示例命令
 const exampleCommands = [
-  '帮我写一篇关于Vue3的笔记',
-  '明天上午10点开会，提前5分钟提醒',
-  '保存QQ密码，用户名123456',
-  '收藏网站 www.baidu.com',
-  '创建任务：学习Vue、学习Tauri'
+  t('aiAssistant.exampleNote'),
+  t('aiAssistant.exampleEvent'),
+  t('aiAssistant.examplePassword'),
+  t('aiAssistant.exampleBookmark'),
+  t('aiAssistant.exampleTodo'),
 ]
 
 watch(() => props.modelValue, (val) => {
@@ -202,7 +203,7 @@ const sendMessage = async () => {
       // 3. 显示确认
       const assistantMsg = {
         role: 'assistant',
-        content: `我将为你${intent.description}`,
+        content: t('aiAssistant.willDoPrefix', { action: intent.description }),
         confirmation: {
           intent: intent.type,
           params: params,
@@ -214,7 +215,7 @@ const sendMessage = async () => {
   } catch (error) {
     messages.value.push({
       role: 'assistant',
-      content: '抱歉，处理请求时出错了。请稍后再试。'
+      content: t('aiAssistant.requestError')
     })
   } finally {
     isLoading.value = false
@@ -259,7 +260,7 @@ const confirmOperation = async (messageIndex) => {
   } catch (error) {
     message.result = {
       status: 'error',
-      message: error.message || '操作失败'
+      message: error.message || t('aiAssistant.operationFailed')
     }
 
     operationHistory.value.unshift({
@@ -270,7 +271,7 @@ const confirmOperation = async (messageIndex) => {
       error: error.message
     })
 
-    ElMessage.error(error.message || '操作失败')
+    ElMessage.error(error.message || t('aiAssistant.operationFailed'))
   } finally {
     isLoading.value = false
     scrollToBottom()
@@ -281,7 +282,7 @@ const confirmOperation = async (messageIndex) => {
 const cancelOperation = (messageIndex) => {
   const message = messages.value[messageIndex]
   message.confirmation = null
-  message.content += '\n\n(已取消)'
+  message.content += `\n\n${t('aiAssistant.cancelled')}`
 }
 
 // 滚动到底部

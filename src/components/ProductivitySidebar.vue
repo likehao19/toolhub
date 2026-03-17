@@ -6,11 +6,11 @@
       </el-button>
     </div>
 
-    <div class="sidebar-content">
-      <!-- 首页 -->
+    <!-- 工作台 — 固定顶部 -->
+    <div class="sidebar-top">
       <div class="menu-section">
         <el-tooltip
-          :content="'工作台'"
+          :content="t('sidebar.dashboard')"
           placement="right"
           :disabled="!isCollapsed"
         >
@@ -20,11 +20,13 @@
             @click="navigateTo('/')"
           >
             <el-icon><HomeFilled /></el-icon>
-            <span v-show="!isCollapsed">工作台</span>
+            <span v-show="!isCollapsed">{{ t('sidebar.dashboard') }}</span>
           </div>
         </el-tooltip>
       </div>
+    </div>
 
+    <div class="sidebar-content">
       <!-- 常用工具 -->
       <div class="menu-section">
         <div v-if="isCollapsed" class="section-divider"></div>
@@ -37,7 +39,7 @@
             <ArrowRight v-if="!favoritesExpanded" />
             <ArrowDown v-else />
           </el-icon>
-          <span>常用工具</span>
+          <span>{{ t('sidebar.favorites') }}</span>
         </div>
         <div class="section-items" v-show="favoritesExpanded || isCollapsed">
           <!-- 有收藏时显示列表 -->
@@ -62,7 +64,7 @@
           <!-- 空状态：与普通菜单项完全一致的样式 -->
           <el-tooltip
             v-else
-            content="去工具箱添加常用工具"
+            :content="t('sidebar.goToolbox')"
             placement="right"
             :disabled="!isCollapsed"
           >
@@ -72,7 +74,7 @@
               @click="navigateTo('/toolbox')"
             >
               <el-icon><Star /></el-icon>
-              <span>添加常用工具</span>
+              <span>{{ t('sidebar.addFavorite') }}</span>
             </div>
           </el-tooltip>
         </div>
@@ -82,22 +84,22 @@
       <div v-if="isCollapsed" class="section-divider"></div>
 
       <!-- 功能模块 -->
-      <div class="menu-section" v-for="(section, index) in menuSections" :key="section.name">
+      <div class="menu-section" v-for="(section, index) in menuSections" :key="section.key">
         <!-- 分割线 - 仅折叠时显示 -->
         <div v-if="isCollapsed && index > 0" class="section-divider"></div>
 
         <div
           v-show="!isCollapsed"
           class="section-header"
-          @click="toggleSection(section.name)"
+          @click="toggleSection(section.key)"
         >
           <el-icon>
-            <ArrowRight v-if="!section.expanded" />
+            <ArrowRight v-if="!sectionExpanded[section.key]" />
             <ArrowDown v-else />
           </el-icon>
           <span>{{ section.name }}</span>
         </div>
-        <div class="section-items" v-show="section.expanded || isCollapsed">
+        <div class="section-items" v-show="sectionExpanded[section.key] || isCollapsed">
           <el-tooltip
             v-for="item in section.items"
             :key="item.path"
@@ -117,13 +119,14 @@
         </div>
       </div>
 
-      <!-- 设置分割线 - 仅折叠时显示 -->
-      <div v-if="isCollapsed" class="section-divider"></div>
+    </div>
 
+    <!-- 底部固定区域 —— 不参与滚动 -->
+    <div class="sidebar-footer">
       <!-- 工具箱 -->
-      <div class="menu-section menu-section-bottom">
+      <div class="menu-section">
         <el-tooltip
-          :content="'工具箱'"
+          :content="t('sidebar.toolbox')"
           placement="right"
           :disabled="!isCollapsed"
         >
@@ -133,7 +136,7 @@
             @click="navigateTo('/toolbox')"
           >
             <el-icon><Briefcase /></el-icon>
-            <span v-show="!isCollapsed">工具箱</span>
+            <span v-show="!isCollapsed">{{ t('sidebar.toolbox') }}</span>
             <el-badge v-show="!isCollapsed" :value="enabledToolsCount" class="tools-badge" />
           </div>
         </el-tooltip>
@@ -142,7 +145,7 @@
       <!-- 设置 -->
       <div class="menu-section">
         <el-tooltip
-          :content="'系统设置'"
+          :content="t('sidebar.settings')"
           placement="right"
           :disabled="!isCollapsed"
         >
@@ -152,7 +155,7 @@
             @click="navigateTo('/settings')"
           >
             <el-icon><Setting /></el-icon>
-            <span v-show="!isCollapsed">系统设置</span>
+            <span v-show="!isCollapsed">{{ t('sidebar.settings') }}</span>
           </div>
         </el-tooltip>
       </div>
@@ -161,7 +164,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, markRaw } from 'vue'
+import { ref, reactive, computed, watch, markRaw } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import {
   Menu, Fold, HomeFilled, Setting, ArrowRight, ArrowDown,
@@ -169,6 +172,7 @@ import {
   Star, ChatRound
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
+import { t } from '@/i18n'
 import { useFavoriteTools } from '@/composables/useFavoriteTools'
 
 const router = useRouter()
@@ -191,7 +195,7 @@ const openFavoriteTool = (tool) => {
   if (path) {
     router.push(path)
   } else {
-    ElMessage.info(`${tool.name} 正在开发中，敬请期待...`)
+    ElMessage.info(`${tool.name} - ${t('common.comingSoon')}`)
   }
 }
 
@@ -209,34 +213,40 @@ const enabledToolsCount = computed(() => {
 })
 
 // 菜单结构 - 使用 ref 以支持深度响应式，图标用 markRaw 避免不必要的响应式转换
-const menuSections = ref([
+const menuSections = computed(() => [
   {
-    name: '知识管理',
+    name: t('sidebar.knowledge'),
+    key: 'knowledge',
     expanded: true,
     items: [
-      { title: '文档中心', path: '/notes', icon: markRaw(Document) },
-      { title: '凭据管理', path: '/passwords', icon: markRaw(Lock) },
-      { title: '资源收藏', path: '/bookmarks', icon: markRaw(Link) }
+      { title: t('sidebar.documents'), path: '/notes', icon: markRaw(Document) },
+      { title: t('sidebar.credentials'), path: '/passwords', icon: markRaw(Lock) },
+      { title: t('sidebar.bookmarks'), path: '/bookmarks', icon: markRaw(Link) }
     ]
   },
   {
-    name: '智能助理',
+    name: t('sidebar.ai'),
+    key: 'ai',
     expanded: true,
     items: [
-      { title: '智能对话', path: '/ai-conversation', icon: markRaw(ChatLineRound) },
-      { title: 'AI 问答', path: '/ai-chat', icon: markRaw(ChatDotRound) },
-      { title: '即时聊天', path: '/chat', icon: markRaw(ChatRound) }
+      { title: t('sidebar.aiConversation'), path: '/ai-conversation', icon: markRaw(ChatLineRound) },
+      { title: t('sidebar.aiChat'), path: '/ai-chat', icon: markRaw(ChatDotRound) },
+      { title: t('sidebar.chat'), path: '/chat', icon: markRaw(ChatRound) }
     ]
   },
   {
-    name: '协作效率',
+    name: t('sidebar.efficiency'),
+    key: 'efficiency',
     expanded: true,
     items: [
-      { title: '任务清单', path: '/todos', icon: markRaw(List) },
-      { title: '日程规划', path: '/calendar', icon: markRaw(Calendar) }
+      { title: t('sidebar.todos'), path: '/todos', icon: markRaw(List) },
+      { title: t('sidebar.calendar'), path: '/calendar', icon: markRaw(Calendar) }
     ]
   }
 ])
+
+// 分类展开状态
+const sectionExpanded = reactive({ knowledge: true, ai: true, efficiency: true })
 
 // 切换侧边栏折叠
 const toggleCollapse = () => {
@@ -244,11 +254,8 @@ const toggleCollapse = () => {
 }
 
 // 切换分类展开/收起
-const toggleSection = (sectionName) => {
-  const section = menuSections.value.find(s => s.name === sectionName)
-  if (section) {
-    section.expanded = !section.expanded
-  }
+const toggleSection = (key) => {
+  sectionExpanded[key] = !sectionExpanded[key]
 }
 
 // 导航
@@ -280,8 +287,8 @@ const navigateTo = async (path, item) => {
 watch(currentPath, (newPath) => {
   menuSections.value.forEach(section => {
     const hasActiveItem = section.items.some(item => item.path === newPath)
-    if (hasActiveItem && !section.expanded) {
-      section.expanded = true
+    if (hasActiveItem && !sectionExpanded[section.key]) {
+      sectionExpanded[section.key] = true
     }
   })
 })
@@ -314,6 +321,17 @@ watch(currentPath, (newPath) => {
   justify-content: flex-start;
 }
 
+/* 顶部固定区域 — 不参与滚动 */
+.sidebar-top {
+  flex-shrink: 0;
+  padding-bottom: var(--space-xs);
+  border-bottom: 0.5px solid var(--border-color);
+}
+
+.sidebar-top .menu-section {
+  margin-bottom: 0;
+}
+
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
@@ -341,12 +359,19 @@ watch(currentPath, (newPath) => {
   margin-bottom: var(--space-sm);
 }
 
-/* 底部固定区域 */
-.menu-section-bottom {
-  margin-top: auto;
-  margin-bottom: 0;
+/* 底部固定区域 — 不参与滚动 */
+.sidebar-footer {
+  flex-shrink: 0;
   padding-top: var(--space-sm);
   border-top: 0.5px solid var(--border-color);
+}
+
+.sidebar-footer .menu-section {
+  margin-bottom: 0;
+}
+
+.sidebar-footer .menu-section:last-child {
+  padding-bottom: var(--space-sm);
 }
 
 /* 分组标题 — macOS Settings 风格 */

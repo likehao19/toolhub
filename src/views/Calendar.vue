@@ -4,19 +4,19 @@
     <div class="header">
       <div class="header-left">
         <div class="breadcrumb">
-          <i class="fas fa-calendar-alt"></i> 日程管理
+          <i class="fas fa-calendar-alt"></i> {{ t('calendar.title') }}
         </div>
         <!-- 视图切换 -->
         <el-radio-group v-model="calendarView" size="small" style="margin-left: 16px;">
-          <el-radio-button value="month">月视图</el-radio-button>
-          <el-radio-button value="week">周视图</el-radio-button>
-          <el-radio-button value="day">日视图</el-radio-button>
-          <el-radio-button value="list">列表视图</el-radio-button>
+          <el-radio-button value="month">{{ t('calendar.monthView') }}</el-radio-button>
+          <el-radio-button value="week">{{ t('calendar.weekView') }}</el-radio-button>
+          <el-radio-button value="day">{{ t('calendar.dayView') }}</el-radio-button>
+          <el-radio-button value="list">{{ t('calendar.listView') }}</el-radio-button>
         </el-radio-group>
       </div>
       <div class="header-actions">
-        <el-select v-model="selectedCategory" placeholder="按分类筛选" clearable size="small" style="width: 150px; margin-right: 8px;">
-          <el-option label="全部" value="" />
+        <el-select v-model="selectedCategory" :placeholder="t('calendar.filterCategory')" clearable size="small" style="width: 150px; margin-right: 8px;">
+          <el-option :label="t('calendar.all')" value="" />
           <el-option
             v-for="category in categories"
             :key="category"
@@ -29,7 +29,7 @@
           circle
           size="small"
           @click="testReminders"
-          title="测试提醒（开发用）"
+          :title="t('calendar.testReminder')"
           style="margin-right: 4px;"
         />
         <el-button 
@@ -37,14 +37,14 @@
           circle
           size="small"
           @click="showImportDialog = true"
-          title="导入日程"
+          :title="t('calendar.importEvents')"
         />
         <el-button 
           :icon="Download" 
           circle
           size="small"
           @click="handleExport"
-          title="导出日程"
+          :title="t('calendar.exportEvents')"
         />
         <el-button 
           :icon="Plus" 
@@ -52,7 +52,7 @@
           size="small"
           type="primary"
           @click="showCreateDialog"
-          title="新建日程"
+          :title="t('calendar.newEvent')"
         />
       </div>
     </div>
@@ -76,7 +76,7 @@
               </div>
               <div v-if="getSolarTerm(data.day)" class="solar-term">{{ getSolarTerm(data.day) }}</div>
               <div v-if="isHoliday(data.day)" class="holiday-label">{{ getHolidayName(data.day) }}</div>
-              <div v-else-if="isCompDay(data.day)" class="comp-day-label">补班</div>
+              <div v-else-if="isCompDay(data.day)" class="comp-day-label">{{ t('calendar.compDay') }}</div>
               <div class="day-events">
                 <div
                   v-for="event in getDayEvents(data.day).slice(0, 3)"
@@ -126,7 +126,7 @@
     <div v-else-if="calendarView === 'day'" class="day-view">
       <div class="day-header">
         <h3>{{ formatSelectedDate() }}</h3>
-        <el-empty v-if="selectedDateEvents.length === 0" description="今天没有日程" :image-size="80" />
+        <el-empty v-if="selectedDateEvents.length === 0" :description="t('calendar.noEventsToday')" :image-size="80" />
         <div v-else class="day-events-list">
           <div
             v-for="event in selectedDateEvents"
@@ -157,9 +157,9 @@
         <el-date-picker
           v-model="listViewDateRange"
           type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          :range-separator="t('calendar.to')"
+          :start-placeholder="t('calendar.startDate')"
+          :end-placeholder="t('calendar.endDate')"
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           @change="handleListViewDateChange"
@@ -185,69 +185,35 @@
             </div>
           </div>
         </el-card>
-        <el-empty v-if="listViewEvents.length === 0" description="该时间段无日程" />
+        <el-empty v-if="listViewEvents.length === 0" :description="t('calendar.noEventsInRange')" />
       </div>
     </div>
 
-    <!-- 选中日期的日程列表（月视图） -->
-    <div v-if="calendarView === 'month'" class="events-section">
-      <h3>{{ formatSelectedDate() }} 的日程</h3>
-      <div class="event-list">
-        <div
-          v-for="event in selectedDateEvents"
-          :key="event.id"
-          class="event-item-card"
-          :style="{ '--event-color': getEventColor(event) }"
-          @click="viewEvent(event)"
-        >
-          <div class="event-item-body">
-            <div class="event-item-time">
-              {{ formatEventTime(event.start_time) }}
-              <span v-if="event.end_time"> - {{ formatEventTime(event.end_time) }}</span>
-            </div>
-            <div class="event-item-title">{{ event.title }}</div>
-            <div v-if="event.location" class="event-item-location">
-              <el-icon><Location /></el-icon>
-              {{ event.location }}
-            </div>
-          </div>
-          <div class="event-item-actions">
-            <el-button text size="small" @click.stop="editEvent(event)">
-              <el-icon><Edit /></el-icon>
-            </el-button>
-            <el-button text size="small" type="danger" @click.stop="deleteEvent(event)">
-              <el-icon><Delete /></el-icon>
-            </el-button>
-          </div>
-        </div>
-        <el-empty v-if="selectedDateEvents.length === 0" description="该日期无日程" :image-size="80" />
-      </div>
-    </div>
     </div>
 
     <!-- 创建/编辑对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="editingEvent ? '编辑日程' : '新建日程'"
+      :title="editingEvent ? t('calendar.editEvent') : t('calendar.newEventTitle')"
       width="650px"
       :close-on-click-modal="false"
     >
       <el-form :model="eventForm" label-width="70px" size="default">
         <el-row :gutter="12">
           <el-col :span="24">
-            <el-form-item label="标题" required>
-              <el-input v-model="eventForm.title" placeholder="日程标题" />
+            <el-form-item :label="t('calendar.titleLabel')" required>
+              <el-input v-model="eventForm.title" :placeholder="t('calendar.eventTitle')" />
             </el-form-item>
           </el-col>
         </el-row>
         
         <el-row :gutter="12">
           <el-col :span="12">
-            <el-form-item label="开始" required>
+            <el-form-item :label="t('calendar.startLabel')" required>
               <el-date-picker
                 v-model="eventForm.start_time"
                 type="datetime"
-                placeholder="开始时间"
+                :placeholder="t('calendar.startTime')"
                 format="YYYY-MM-DD HH:mm"
                 value-format="YYYY-MM-DDTHH:mm:ss"
                 style="width: 100%;"
@@ -255,11 +221,11 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="结束">
+            <el-form-item :label="t('calendar.endLabel')">
               <el-date-picker
                 v-model="eventForm.end_time"
                 type="datetime"
-                placeholder="结束时间"
+                :placeholder="t('calendar.endTime')"
                 format="YYYY-MM-DD HH:mm"
                 value-format="YYYY-MM-DDTHH:mm:ss"
                 style="width: 100%;"
@@ -270,17 +236,17 @@
 
         <el-row :gutter="12">
           <el-col :span="16">
-            <el-form-item label="地点">
-              <el-input v-model="eventForm.location" placeholder="地点" />
+            <el-form-item :label="t('calendar.location')">
+              <el-input v-model="eventForm.location" :placeholder="t('calendar.locationPlaceholder')" />
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item label="分类">
-              <el-select v-model="eventForm.category" placeholder="分类" style="width: 100%;">
-                <el-option label="工作" value="工作" />
-                <el-option label="个人" value="个人" />
-                <el-option label="会议" value="会议" />
-                <el-option label="其他" value="其他" />
+            <el-form-item :label="t('calendar.category')">
+              <el-select v-model="eventForm.category" :placeholder="t('calendar.category')" style="width: 100%;">
+                <el-option :label="t('calendar.catWork')" value="工作" />
+                <el-option :label="t('calendar.catPersonal')" value="个人" />
+                <el-option :label="t('calendar.catMeeting')" value="会议" />
+                <el-option :label="t('calendar.catOther')" value="其他" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -288,12 +254,12 @@
 
         <el-row :gutter="12">
           <el-col :span="24">
-            <el-form-item label="描述">
+            <el-form-item :label="t('calendar.description')">
               <el-input
                 v-model="eventForm.description"
                 type="textarea"
                 :rows="2"
-                placeholder="日程描述"
+                :placeholder="t('calendar.eventDesc')"
               />
             </el-form-item>
           </el-col>
@@ -301,13 +267,13 @@
 
         <el-row :gutter="12">
           <el-col :span="24">
-            <el-form-item label="提醒">
+            <el-form-item :label="t('calendar.reminder')">
               <el-checkbox-group v-model="eventForm.reminderRules">
-                <el-checkbox :value="5">5分钟</el-checkbox>
-                <el-checkbox :value="15">15分钟</el-checkbox>
-                <el-checkbox :value="30">30分钟</el-checkbox>
-                <el-checkbox :value="60">1小时</el-checkbox>
-                <el-checkbox :value="1440">1天</el-checkbox>
+                <el-checkbox :value="5">{{ t('calendar.min5') }}</el-checkbox>
+                <el-checkbox :value="15">{{ t('calendar.min15') }}</el-checkbox>
+                <el-checkbox :value="30">{{ t('calendar.min30') }}</el-checkbox>
+                <el-checkbox :value="60">{{ t('calendar.hour1') }}</el-checkbox>
+                <el-checkbox :value="1440">{{ t('calendar.day1') }}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-col>
@@ -315,23 +281,23 @@
 
         <el-row :gutter="12">
           <el-col :span="12">
-            <el-form-item label="重复">
-              <el-select v-model="eventForm.recurrenceType" placeholder="不重复" @change="handleRecurrenceChange" style="width: 100%;">
-                <el-option label="不重复" value="none" />
-                <el-option label="每天" value="daily" />
-                <el-option label="每周" value="weekly" />
-                <el-option label="每月" value="monthly" />
-                <el-option label="每年" value="yearly" />
+            <el-form-item :label="t('calendar.recurrence')">
+              <el-select v-model="eventForm.recurrenceType" :placeholder="t('calendar.noRepeat')" @change="handleRecurrenceChange" style="width: 100%;">
+                <el-option :label="t('calendar.noRepeat')" value="none" />
+                <el-option :label="t('calendar.daily')" value="daily" />
+                <el-option :label="t('calendar.weekly')" value="weekly" />
+                <el-option :label="t('calendar.monthly')" value="monthly" />
+                <el-option :label="t('calendar.yearly')" value="yearly" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="8" v-if="eventForm.recurrenceType && eventForm.recurrenceType !== 'none'">
-            <el-form-item label="间隔">
+            <el-form-item :label="t('calendar.interval')">
               <el-input-number v-model="eventForm.recurrenceInterval" :min="1" :max="365" style="width: 100%;" />
             </el-form-item>
           </el-col>
           <el-col :span="4">
-            <el-form-item label="颜色">
+            <el-form-item :label="t('calendar.color')">
               <el-color-picker v-model="eventForm.color" />
             </el-form-item>
           </el-col>
@@ -339,111 +305,111 @@
 
         <el-row :gutter="12" v-if="eventForm.recurrenceType === 'weekly'">
           <el-col :span="24">
-            <el-form-item label="星期">
+            <el-form-item :label="t('calendar.weekdayLabel')">
               <el-checkbox-group v-model="eventForm.recurrenceDaysOfWeek">
-                <el-checkbox label="0">日</el-checkbox>
-                <el-checkbox label="1">一</el-checkbox>
-                <el-checkbox label="2">二</el-checkbox>
-                <el-checkbox label="3">三</el-checkbox>
-                <el-checkbox label="4">四</el-checkbox>
-                <el-checkbox label="5">五</el-checkbox>
-                <el-checkbox label="6">六</el-checkbox>
+                <el-checkbox label="0">{{ t('calendar.weekSun') }}</el-checkbox>
+                <el-checkbox label="1">{{ t('calendar.weekMon') }}</el-checkbox>
+                <el-checkbox label="2">{{ t('calendar.weekTue') }}</el-checkbox>
+                <el-checkbox label="3">{{ t('calendar.weekWed') }}</el-checkbox>
+                <el-checkbox label="4">{{ t('calendar.weekThu') }}</el-checkbox>
+                <el-checkbox label="5">{{ t('calendar.weekFri') }}</el-checkbox>
+                <el-checkbox label="6">{{ t('calendar.weekSat') }}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveEvent">保存</el-button>
+        <el-button @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveEvent">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 查看日程对话框 -->
     <el-dialog
       v-model="viewDialogVisible"
-      title="日程详情"
+      :title="t('calendar.eventDetail')"
       width="500px"
     >
       <el-descriptions :column="1" border>
-        <el-descriptions-item label="标题">{{ viewingEvent?.title }}</el-descriptions-item>
-        <el-descriptions-item label="描述">{{ viewingEvent?.description || '无' }}</el-descriptions-item>
-        <el-descriptions-item label="开始时间">
+        <el-descriptions-item :label="t('calendar.titleLabel')">{{ viewingEvent?.title }}</el-descriptions-item>
+        <el-descriptions-item :label="t('calendar.description')">{{ viewingEvent?.description || t('calendar.noDesc') }}</el-descriptions-item>
+        <el-descriptions-item :label="t('calendar.startTime')">
           {{ formatEventTime(viewingEvent?.start_time) }}
         </el-descriptions-item>
-        <el-descriptions-item label="结束时间">
-          {{ viewingEvent?.end_time ? formatEventTime(viewingEvent.end_time) : '未设置' }}
+        <el-descriptions-item :label="t('calendar.endTime')">
+          {{ viewingEvent?.end_time ? formatEventTime(viewingEvent.end_time) : t('calendar.notSet') }}
         </el-descriptions-item>
-        <el-descriptions-item label="地点">
-          {{ viewingEvent?.location || '未设置' }}
+        <el-descriptions-item :label="t('calendar.location')">
+          {{ viewingEvent?.location || t('calendar.notSet') }}
         </el-descriptions-item>
-        <el-descriptions-item label="提醒">
-          {{ viewingEvent?.reminder_minutes ? `${viewingEvent.reminder_minutes}分钟前` : '不提醒' }}
+        <el-descriptions-item :label="t('calendar.reminder')">
+          {{ viewingEvent?.reminder_minutes ? `${viewingEvent.reminder_minutes}${t('calendar.minutesBefore')}` : t('calendar.noReminder') }}
         </el-descriptions-item>
-        <el-descriptions-item label="重复">
+        <el-descriptions-item :label="t('calendar.recurrence')">
           {{ getRecurrenceDisplayText(viewingEvent) }}
         </el-descriptions-item>
-        <el-descriptions-item label="分类">
-          {{ viewingEvent?.category || '未分类' }}
+        <el-descriptions-item :label="t('calendar.category')">
+          {{ viewingEvent?.category || t('calendar.uncategorized') }}
         </el-descriptions-item>
       </el-descriptions>
       <template #footer>
-        <el-button @click="viewDialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="editEvent(viewingEvent)">编辑</el-button>
+        <el-button @click="viewDialogVisible = false">{{ t('common.close') }}</el-button>
+        <el-button type="primary" @click="editEvent(viewingEvent)">{{ t('common.edit') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 自定义提醒对话框 -->
     <el-dialog
       v-model="showCustomReminderDialog"
-      title="自定义提醒"
+      :title="t('calendar.customReminder')"
       width="400px"
     >
       <el-form :model="customReminderForm" label-width="100px">
-        <el-form-item label="提前时间">
+        <el-form-item :label="t('calendar.advanceTime')">
           <el-input-number
             v-model="customReminderForm.minutes"
             :min="1"
             :max="10080"
-            placeholder="分钟数"
+            :placeholder="t('calendar.minutePlaceholder')"
           />
-          <span style="margin-left: 8px;">分钟前</span>
+          <span style="margin-left: 8px;">{{ t('calendar.minutesBefore2') }}</span>
         </el-form-item>
-        <el-form-item label="提醒方式">
+        <el-form-item :label="t('calendar.method')">
           <el-radio-group v-model="customReminderForm.type">
-            <el-radio value="notification">通知</el-radio>
-            <el-radio value="sound">声音</el-radio>
+            <el-radio value="notification">{{ t('calendar.notification') }}</el-radio>
+            <el-radio value="sound">{{ t('calendar.sound') }}</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="showCustomReminderDialog = false">取消</el-button>
-        <el-button type="primary" @click="addCustomReminder">添加</el-button>
+        <el-button @click="showCustomReminderDialog = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="addCustomReminder">{{ t('common.add') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 导入日程对话框 -->
     <el-dialog
       v-model="showImportDialog"
-      title="导入日程"
+      :title="t('calendar.importTitle')"
       width="500px"
       @close="importFile = null; importResult = null"
     >
       <div v-if="!importResult">
         <el-alert
-          title="支持导入 iCalendar (.ics)、JSON、CSV 格式文件"
+          :title="t('calendar.importHint')"
           type="info"
           :closable="false"
           style="margin-bottom: 16px;"
         />
         <el-button type="primary" @click="handleImportFileSelect" style="width: 100%;">
           <el-icon><Upload /></el-icon>
-          选择文件
+          {{ t('calendar.selectFile') }}
         </el-button>
       </div>
       <div v-else>
         <el-alert
-          :title="`解析到 ${importResult.total} 条日程`"
+          :title="t('calendar.parsedEvents', { count: importResult.total })"
           :type="importResult.total > 0 ? 'success' : 'warning'"
           :closable="false"
           style="margin-bottom: 16px;"
@@ -453,18 +419,18 @@
             {{ event.title }} - {{ event.start_time }}
           </div>
           <div v-if="importResult.total > 20" style="padding: 8px 0; color: var(--text-tertiary); font-size: 12px;">
-            ... 还有 {{ importResult.total - 20 }} 条
+            {{ t('calendar.moreEvents', { count: importResult.total - 20 }) }}
           </div>
         </div>
       </div>
       <template #footer>
-        <el-button @click="showImportDialog = false">取消</el-button>
+        <el-button @click="showImportDialog = false">{{ t('common.cancel') }}</el-button>
         <el-button
           type="primary"
           @click="executeImport"
           :disabled="!importResult || importResult.total === 0"
         >
-          导入（{{ importResult?.total || 0 }} 条）
+          {{ t('calendar.importBtn') }}（{{ importResult?.total || 0 }}）
         </el-button>
       </template>
     </el-dialog>
@@ -481,6 +447,7 @@ import Database from '@tauri-apps/plugin-sql'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { manualCheckReminders } from '@/utils/reminderService'
+import { t } from '@/i18n'
 import { generateRecurrenceRule, parseRecurrenceRule, getRecurrenceText, generateRecurrenceInstances, RECURRENCE_TYPES } from '@/utils/recurrence'
 import { isHoliday, getHolidayName, isCompDay } from '@/utils/holidays'
 import { getLunarDate, getSolarTerm, getDateInfo } from '@/utils/lunarCalendar'
@@ -531,7 +498,7 @@ const weekDays = computed(() => {
   const monday = new Date(current)
   monday.setDate(current.getDate() + mondayOffset)
 
-  const labels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+  const labels = t('calendar.weekLabels')
   const days = []
   for (let i = 0; i < 7; i++) {
     const date = new Date(monday)
@@ -648,7 +615,7 @@ const loadEvents = async () => {
     )
     events.value = result || []
   } catch (error) {
-    ElMessage.error('加载日程失败')
+    ElMessage.error(t('calendar.loadFailed'))
   }
 }
 
@@ -696,7 +663,7 @@ const handleExport = async () => {
     
     const filePath = await saveFile({
       filters: [{
-        name: 'JSON 文件',
+        name: t('calendar.jsonFile'),
         extensions: ['json']
       }],
       defaultPath: fileName
@@ -704,11 +671,11 @@ const handleExport = async () => {
     
     if (filePath) {
       await writeTextFile(filePath, jsonContent)
-      ElMessage.success('导出成功')
+      ElMessage.success(t('calendar.exportSuccess'))
     }
   } catch (error) {
     if (error !== 'cancelled' && error !== 'null') {
-      ElMessage.error('导出失败')
+      ElMessage.error(t('calendar.exportFailed'))
     }
   }
 }
@@ -717,9 +684,9 @@ const handleExport = async () => {
 const testReminders = async () => {
   try {
     await manualCheckReminders()
-    ElMessage.success('提醒检查完成，请查看控制台日志')
+    ElMessage.success(t('calendar.reminderCheckDone'))
   } catch (error) {
-    ElMessage.error('提醒检查失败: ' + error.message)
+    ElMessage.error(t('calendar.reminderCheckFailed') + ': ' + error.message)
   }
 }
 
@@ -838,10 +805,10 @@ const handleRecurrenceChange = () => {
 // 获取重复单位
 const getRecurrenceUnit = (type) => {
   const units = {
-    daily: '天',
-    weekly: '周',
-    monthly: '月',
-    yearly: '年'
+    daily: t('calendar.unitDay'),
+    weekly: t('calendar.unitWeek'),
+    monthly: t('calendar.unitMonth'),
+    yearly: t('calendar.unitYear')
   }
   return units[type] || ''
 }
@@ -849,7 +816,12 @@ const getRecurrenceUnit = (type) => {
 // 保存日程
 const saveEvent = async () => {
   if (!eventForm.value.title || !eventForm.value.start_time) {
-    ElMessage.warning('请填写标题和开始时间')
+    ElMessage.warning(t('calendar.titleAndStartRequired'))
+    return
+  }
+
+  if (eventForm.value.end_time && eventForm.value.end_time < eventForm.value.start_time) {
+    ElMessage.warning(t('calendar.endBeforeStart'))
     return
   }
 
@@ -898,7 +870,7 @@ const saveEvent = async () => {
           editingEvent.value.id
         ]
       )
-      ElMessage.success('日程更新成功')
+      ElMessage.success(t('calendar.updateSuccess'))
     } else {
       // 创建
       await db.execute(
@@ -919,30 +891,30 @@ const saveEvent = async () => {
           now
         ]
       )
-      ElMessage.success('日程创建成功')
+      ElMessage.success(t('calendar.createSuccess'))
     }
 
     dialogVisible.value = false
     await loadEvents()
   } catch (error) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('calendar.saveFailed'))
   }
 }
 
 // 删除日程
 const deleteEvent = async (event) => {
   try {
-    await ElMessageBox.confirm('确定要删除这个日程吗？', '确认删除', {
+    await ElMessageBox.confirm(t('calendar.confirmDeleteMsg'), t('calendar.confirmDeleteTitle'), {
       type: 'warning'
     })
 
     const db = await getDatabase()
     await db.execute('DELETE FROM calendar_events WHERE id = ?', [event.id])
-    ElMessage.success('删除成功')
+    ElMessage.success(t('calendar.deleteSuccess'))
     await loadEvents()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      ElMessage.error(t('calendar.deleteFailed'))
     }
   }
 }
@@ -999,11 +971,11 @@ const formatEventTime = (timeStr) => {
 // 获取重复规则显示文本
 const getRecurrenceDisplayText = (event) => {
   if (!event || !event.repeat_rule) {
-    return '不重复'
+    return t('calendar.noRepeat')
   }
-  
+
   const rule = parseRecurrenceRule(event.repeat_rule)
-  if (!rule) return '不重复'
+  if (!rule) return t('calendar.noRepeat')
   
   return getRecurrenceText(rule)
 }
@@ -1029,16 +1001,16 @@ const getEventReminders = (event) => {
 const formatReminder = (reminder) => {
   if (typeof reminder === 'number') {
     if (reminder < 60) {
-      return `${reminder}分钟前`
+      return `${reminder}${t('calendar.minutesBefore')}`
     } else if (reminder < 1440) {
-      return `${Math.floor(reminder / 60)}小时前`
+      return `${Math.floor(reminder / 60)}${t('calendar.hoursBefore')}`
     } else {
-      return `${Math.floor(reminder / 1440)}天前`
+      return `${Math.floor(reminder / 1440)}${t('calendar.daysBefore')}`
     }
   } else if (typeof reminder === 'object' && reminder.minutes) {
-    return `${reminder.minutes}分钟前 (${reminder.type === 'sound' ? '声音' : reminder.type === 'email' ? '邮件' : '通知'})`
+    return `${reminder.minutes}${t('calendar.minutesBefore')} (${reminder.type === 'sound' ? t('calendar.sound') : reminder.type === 'email' ? t('calendar.email') : t('calendar.notification')})`
   }
-  return '不提醒'
+  return t('calendar.noReminder')
 }
 
 // 添加自定义提醒
@@ -1057,7 +1029,7 @@ const addCustomReminder = () => {
 const handleImportFileSelect = async () => {
   try {
     const selected = await openFile({
-      filters: [{ name: '日程文件', extensions: ['ics', 'json', 'csv'] }]
+      filters: [{ name: t('calendar.calendarFile'), extensions: ['ics', 'json', 'csv'] }]
     })
     if (!selected) return
 
@@ -1071,13 +1043,13 @@ const handleImportFileSelect = async () => {
       parsedEvents = await importEventsFromCSV(content)
     } else if (name.endsWith('.json')) {
       parsedEvents = JSON.parse(content)
-      if (!Array.isArray(parsedEvents)) throw new Error('JSON 格式不正确')
+      if (!Array.isArray(parsedEvents)) throw new Error(t('calendar.invalidJsonFormat'))
     }
 
     importResult.value = { total: parsedEvents.length, events: parsedEvents }
   } catch (error) {
     if (error !== 'cancelled') {
-      ElMessage.error('解析文件失败: ' + (error.message || error))
+      ElMessage.error(t('calendar.parseFailed') + ': ' + (error.message || error))
     }
   }
 }
@@ -1106,13 +1078,13 @@ const executeImport = async () => {
       successCount++
     }
 
-    ElMessage.success(`导入完成：成功 ${successCount} 条`)
+    ElMessage.success(t('calendar.importSuccess', { count: successCount }))
     showImportDialog.value = false
     importFile.value = null
     importResult.value = null
     await loadEvents()
   } catch (error) {
-    ElMessage.error('导入失败: ' + (error.message || error))
+    ElMessage.error(t('calendar.importFailed') + ': ' + (error.message || error))
   }
 }
 onMounted(async () => {

@@ -5,15 +5,15 @@
       <div class="header-left">
         <div class="breadcrumb">
           <el-icon style="margin-right: 8px;"><Setting /></el-icon>
-          设置 / {{ currentMenuName }}
+          {{ t('settings.title') }} / {{ currentMenuName }}
         </div>
       </div>
       <div class="header-actions">
         <!-- 操作按钮组 -->
-        <el-button size="small" @click="handleSave" :loading="saving" type="primary" circle title="保存设置">
+        <el-button size="small" @click="handleSave" :loading="saving" type="primary" circle :title="t('settings.save')">
           <el-icon><Check /></el-icon>
         </el-button>
-        <el-button size="small" @click="handleReset" circle title="重置设置">
+        <el-button size="small" @click="handleReset" circle :title="t('settings.reset')">
           <el-icon><Refresh /></el-icon>
         </el-button>
       </div>
@@ -23,7 +23,7 @@
       <!-- 左侧菜单栏 -->
       <aside class="sidebar-left">
         <div class="sidebar-toolbar">
-          <span class="sidebar-title">设置菜单</span>
+          <span class="sidebar-title">{{ t('settings.title') }}</span>
         </div>
 
         <div class="menu-list">
@@ -46,30 +46,30 @@
       <main class="content-area">
         <!-- 通用设置 -->
         <div v-show="activeTab === 'general'" class="settings-section">
-          <h3 class="section-title">通用设置</h3>
+          <h3 class="section-title">{{ t('settings.general') }}</h3>
 
           <!-- 窗口与启动 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
-              <div class="card-header">窗口与启动</div>
+              <div class="card-header">{{ t('settings.windowStartup') }}</div>
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
-              <el-form-item label="窗口关闭行为">
+              <el-form-item :label="t('settings.closeAction')">
                 <el-radio-group v-model="settings.closeAction">
-                  <el-radio :value="'ask'">询问</el-radio>
-                  <el-radio :value="'minimize'">最小化到托盘</el-radio>
-                  <el-radio :value="'exit'">直接退出</el-radio>
+                  <el-radio :value="'ask'">{{ t('settings.closeAsk') }}</el-radio>
+                  <el-radio :value="'minimize'">{{ t('settings.closeMinimize') }}</el-radio>
+                  <el-radio :value="'exit'">{{ t('settings.closeExit') }}</el-radio>
                 </el-radio-group>
               </el-form-item>
 
-              <el-form-item label="开机自启">
+              <el-form-item :label="t('settings.autoStart')">
                 <el-switch
                   v-model="settings.autoStart"
                   @change="handleAutostartChange"
                   :loading="autostartLoading"
                 />
                 <span style="margin-left: 10px; color: #909399; font-size: 12px;">
-                  启用后，应用将在系统启动时自动运行
+                  {{ t('settings.autoStartHint') }}
                 </span>
               </el-form-item>
             </el-form>
@@ -78,18 +78,18 @@
           <!-- 外观与主题 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
-              <div class="card-header">外观与主题</div>
+              <div class="card-header">{{ t('settings.appearance') }}</div>
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
-              <el-form-item label="主题模式">
+              <el-form-item :label="t('settings.themeMode')">
                 <el-radio-group v-model="settings.theme" @change="applyTheme">
-                  <el-radio :value="'light'">亮色</el-radio>
-                  <el-radio :value="'dark'">暗色</el-radio>
-                  <el-radio :value="'auto'">跟随系统</el-radio>
+                  <el-radio :value="'light'">{{ t('settings.themeLight') }}</el-radio>
+                  <el-radio :value="'dark'">{{ t('settings.themeDark') }}</el-radio>
+                  <el-radio :value="'auto'">{{ t('settings.themeAuto') }}</el-radio>
                 </el-radio-group>
               </el-form-item>
 
-              <el-form-item label="字体大小">
+              <el-form-item :label="t('settings.fontSize')">
                 <el-slider
                   v-model="settings.fontSize"
                   :min="12"
@@ -97,13 +97,14 @@
                   :step="1"
                   show-stops
                   style="width: 300px"
+                  @change="applyFontSize"
                 />
                 <span style="margin-left: 10px">{{ settings.fontSize }}px</span>
               </el-form-item>
 
-              <el-form-item label="字体家族">
-                <el-select v-model="settings.fontFamily" style="width: 300px">
-                  <el-option label="系统默认" value="system" />
+              <el-form-item :label="t('settings.fontFamily')">
+                <el-select v-model="settings.fontFamily" style="width: 300px" @change="applyFontFamily">
+                  <el-option :label="t('settings.fontSystem')" value="system" />
                   <el-option label="微软雅黑" value="Microsoft YaHei" />
                   <el-option label="宋体" value="SimSun" />
                   <el-option label="Arial" value="Arial" />
@@ -111,8 +112,8 @@
                 </el-select>
               </el-form-item>
 
-              <el-form-item label="启用动画">
-                <el-switch v-model="settings.enableAnimations" />
+              <el-form-item :label="t('settings.enableAnimations')">
+                <el-switch v-model="settings.enableAnimations" @change="applyAnimations" />
               </el-form-item>
             </el-form>
           </el-card>
@@ -120,295 +121,112 @@
           <!-- 语言与区域 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
-              <div class="card-header">语言与区域</div>
+              <div class="card-header">{{ t('settings.language') }}</div>
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
-              <el-form-item label="语言">
-                <el-select v-model="settings.language" style="width: 200px">
+              <el-form-item :label="t('settings.langLabel')">
+                <el-select v-model="settings.language" style="width: 200px" @change="handleLanguageChange">
                   <el-option label="简体中文" value="zh-CN" />
                   <el-option label="English" value="en-US" />
                 </el-select>
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.langHint') }}
+                </div>
               </el-form-item>
             </el-form>
           </el-card>
 
           <!-- 通知与提醒 -->
-          <el-card shadow="never">
+          <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
-              <div class="card-header">通知与提醒</div>
+              <div class="card-header">{{ t('settings.notifications') }}</div>
             </template>
             <el-alert
-              title="提醒功能说明"
+              :title="t('settings.notifDesc')"
               type="info"
               :closable="false"
               style="margin-bottom: 16px;"
             >
-              <p style="margin: 8px 0;">📋 待办提醒：在待办管理中配置，可在开始日期、截止日期或过期时提醒</p>
-              <p style="margin: 8px 0;">📅 日程提醒：在日程管理中配置，可设置提前提醒时间和重复规则</p>
-              <p style="margin: 8px 0;">此处仅配置通知的显示方式</p>
+              <p style="margin: 8px 0;">📋 {{ t('settings.notifTodoHint') }}</p>
+              <p style="margin: 8px 0;">📅 {{ t('settings.notifCalendarHint') }}</p>
+              <p style="margin: 8px 0;">{{ t('settings.notifOnlyDisplay') }}</p>
             </el-alert>
             <el-form :model="reminderConfig" label-width="120px" label-position="left">
-              <el-form-item label="位置类型">
+              <el-form-item :label="t('settings.positionType')">
                 <el-radio-group v-model="reminderConfig.positionType">
-                  <el-radio value="window">软件内位置</el-radio>
-                  <el-radio value="screen">桌面窗口位置</el-radio>
+                  <el-radio value="window">{{ t('settings.positionWindow') }}</el-radio>
+                  <el-radio value="screen">{{ t('settings.positionScreen') }}</el-radio>
                 </el-radio-group>
                 <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  软件内位置:相对于应用窗口 | 桌面窗口位置:相对于整个屏幕
+                  {{ t('settings.positionTypeHint') }}
                 </div>
               </el-form-item>
 
-              <el-form-item label="显示位置">
+              <el-form-item :label="t('settings.displayPosition')">
                 <el-select v-model="reminderConfig.position" style="width: 200px;">
-                  <el-option label="右上角" value="topRight" />
-                  <el-option label="左上角" value="topLeft" />
-                  <el-option label="上中" value="topCenter" />
-                  <el-option label="右下角" value="bottomRight" />
-                  <el-option label="左下角" value="bottomLeft" />
-                  <el-option label="下中" value="bottomCenter" />
-                  <el-option label="右中" value="rightCenter" />
-                  <el-option label="左中" value="leftCenter" />
-                  <el-option label="中心" value="center" />
+                  <el-option :label="t('settings.posTopRight')" value="topRight" />
+                  <el-option :label="t('settings.posTopLeft')" value="topLeft" />
+                  <el-option :label="t('settings.posTopCenter')" value="topCenter" />
+                  <el-option :label="t('settings.posBottomRight')" value="bottomRight" />
+                  <el-option :label="t('settings.posBottomLeft')" value="bottomLeft" />
+                  <el-option :label="t('settings.posBottomCenter')" value="bottomCenter" />
+                  <el-option :label="t('settings.posRightCenter')" value="rightCenter" />
+                  <el-option :label="t('settings.posLeftCenter')" value="leftCenter" />
+                  <el-option :label="t('settings.posCenter')" value="center" />
                 </el-select>
               </el-form-item>
 
               <el-form-item>
-                <el-button type="primary" @click="saveReminderSettings">
-                  保存通知设置
-                </el-button>
                 <el-button @click="testNotification">
-                  测试通知
+                  {{ t('settings.testNotification') }}
                 </el-button>
               </el-form-item>
             </el-form>
           </el-card>
-        </div>
-
-        <!-- 工作空间 -->
-        <div v-show="activeTab === 'workspace'" class="settings-section">
-          <h3 class="section-title">工作空间</h3>
-
-          <!-- 笔记设置 -->
-          <el-card shadow="never" style="margin-bottom: 20px;">
-            <template #header>
-              <div class="card-header">笔记设置</div>
-            </template>
-            <el-form :model="settings" label-width="140px" label-position="left">
-              <el-form-item label="笔记存储位置">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <el-input v-model="settings.notesStoragePath" readonly style="flex: 1;" />
-                  <el-button @click="selectNotesStoragePath">更改</el-button>
-                </div>
-                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
-                  笔记文件将保存在此目录。更改路径时可以选择自动迁移现有笔记。
-                </div>
-              </el-form-item>
-
-              <el-form-item label="存储使用情况">
-                <el-descriptions :column="1" border>
-                  <el-descriptions-item label="笔记大小">
-                    {{ formatFileSize(storageStats.notesSize) }}
-                  </el-descriptions-item>
-                  <el-descriptions-item label="数据库大小">
-                    {{ formatFileSize(storageStats.databaseSize) }}
-                  </el-descriptions-item>
-                  <el-descriptions-item label="媒体文件大小">
-                    {{ formatFileSize(storageStats.mediaSize) }}
-                  </el-descriptions-item>
-                  <el-descriptions-item label="总大小">
-                    {{ formatFileSize(storageStats.totalSize) }}
-                  </el-descriptions-item>
-                </el-descriptions>
-              </el-form-item>
-            </el-form>
-          </el-card>
-
-          <!-- Markdown 主题 -->
-          <el-card shadow="never" style="margin-bottom: 20px;">
-            <template #header>
-              <div class="card-header">Markdown 主题</div>
-            </template>
-            <el-form :model="settings" label-width="140px" label-position="left">
-              <el-divider content-position="left">预览模式</el-divider>
-              <el-form-item label="预览主题">
-                <el-select v-model="settings.previewTheme" style="width: 300px">
-                  <el-option label="Default" value="default" />
-                  <el-option label="GitHub" value="github" />
-                  <el-option label="VuePress" value="vuepress" />
-                  <el-option label="MK Cute" value="mk-cute" />
-                  <el-option label="Smart Blue" value="smart-blue" />
-                  <el-option label="Cyanosis" value="cyanosis" />
-                </el-select>
-                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
-                  仅查看笔记时的主题样式
-                </div>
-              </el-form-item>
-
-              <el-form-item label="代码主题">
-                <el-select v-model="settings.previewCodeTheme" style="width: 300px">
-                  <el-option label="Atom" value="atom" />
-                  <el-option label="A11y" value="a11y" />
-                  <el-option label="GitHub" value="github" />
-                  <el-option label="Gradient" value="gradient" />
-                  <el-option label="Kimbie" value="kimbie" />
-                  <el-option label="Paraiso" value="paraiso" />
-                  <el-option label="Qt Creator" value="qtcreator" />
-                  <el-option label="Stack Overflow" value="stackoverflow" />
-                </el-select>
-                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
-                  仅查看笔记时的代码块样式
-                </div>
-              </el-form-item>
-
-              <el-divider content-position="left">编辑模式</el-divider>
-              <el-form-item label="预览主题">
-                <el-select v-model="settings.editorPreviewTheme" style="width: 300px">
-                  <el-option label="Default" value="default" />
-                  <el-option label="GitHub" value="github" />
-                  <el-option label="VuePress" value="vuepress" />
-                  <el-option label="MK Cute" value="mk-cute" />
-                  <el-option label="Smart Blue" value="smart-blue" />
-                  <el-option label="Cyanosis" value="cyanosis" />
-                </el-select>
-                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
-                  编辑笔记时预览区的主题样式
-                </div>
-              </el-form-item>
-
-              <el-form-item label="代码主题">
-                <el-select v-model="settings.editorCodeTheme" style="width: 300px">
-                  <el-option label="Atom" value="atom" />
-                  <el-option label="A11y" value="a11y" />
-                  <el-option label="GitHub" value="github" />
-                  <el-option label="Gradient" value="gradient" />
-                  <el-option label="Kimbie" value="kimbie" />
-                  <el-option label="Paraiso" value="paraiso" />
-                  <el-option label="Qt Creator" value="qtcreator" />
-                  <el-option label="Stack Overflow" value="stackoverflow" />
-                </el-select>
-                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
-                  编辑笔记时预览区的代码块样式
-                </div>
-              </el-form-item>
-            </el-form>
-          </el-card>
-        </div>
-
-        <!-- 安全与数据 -->
-        <div v-show="activeTab === 'security'" class="settings-section">
-          <h3 class="section-title">安全与数据</h3>
-
-          <!-- 密码管理 -->
-          <el-card shadow="never" style="margin-bottom: 20px;">
-            <template #header>
-              <div class="card-header">密码管理</div>
-            </template>
-            <el-form label-width="150px" label-position="left">
-              <el-form-item label="启动时验证密码">
-                <el-switch
-                  v-model="passwordSettings.requirePasswordOnStart"
-                  active-text="开启"
-                  inactive-text="关闭"
-                />
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  开启后，每次打开软件都需要输入主密码才能访问密码管理
-                </div>
-              </el-form-item>
-
-              <el-form-item label="自动锁定时间">
-                <el-select
-                  v-model="passwordSettings.autoLockTime"
-                  style="width: 200px;"
-                >
-                  <el-option label="5 分钟" :value="5" />
-                  <el-option label="10 分钟" :value="10" />
-                  <el-option label="15 分钟" :value="15" />
-                  <el-option label="30 分钟" :value="30" />
-                  <el-option label="从不" :value="0" />
-                </el-select>
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  无操作后自动锁定密码管理器
-                </div>
-              </el-form-item>
-
-              <el-form-item>
-                <el-button type="primary" @click="showChangePasswordDialog = true">
-                  修改主密码
-                </el-button>
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  修改用于解锁密码管理器的主密码
-                </div>
-              </el-form-item>
-
-              <el-divider />
-
-              <el-form-item label="密码库状态">
-                <el-descriptions :column="1" border>
-                  <el-descriptions-item label="密码数量">
-                    {{ passwordStats.totalPasswords }} 个
-                  </el-descriptions-item>
-                  <el-descriptions-item label="历史记录">
-                    {{ passwordStats.historyCount }} 条
-                  </el-descriptions-item>
-                  <el-descriptions-item label="回收站">
-                    {{ passwordStats.recycleBinCount }} 个
-                  </el-descriptions-item>
-                  <el-descriptions-item label="主密码状态">
-                    {{ passwordStats.hasMasterPassword ? '已设置' : '未设置' }}
-                  </el-descriptions-item>
-                </el-descriptions>
-              </el-form-item>
-            </el-form>
-          </el-card>
-        </div>
-
-        <!-- AI 与效率 -->
-        <div v-show="activeTab === 'ai'" class="settings-section">
-          <h3 class="section-title">AI 与效率</h3>
 
           <!-- AI 助手悬浮球 -->
-          <el-card shadow="never" style="margin-bottom: 20px;">
+          <el-card shadow="never">
             <template #header>
-              <div class="card-header">AI 助手悬浮球</div>
+              <div class="card-header">{{ t('settings.aiFloatingBall') }}</div>
             </template>
             <el-form :model="aiAssistantSettings" label-width="140px" label-position="left">
-              <el-form-item label="启用悬浮球">
+              <el-form-item :label="t('settings.enableBall')">
                 <el-switch
                   v-model="aiAssistantSettings.enableFloatingBall"
                   @change="handleFloatingBallToggle"
                 />
                 <div style="margin-left: 10px; color: #909399; font-size: 12px;">
-                  <div>开启后显示可拖拽的悬浮球（默认关闭）</div>
-                  <div style="margin-top: 4px;">关闭时可通过 Ctrl+K 快捷键打开 AI 助手</div>
+                  <div>{{ t('settings.enableBallHint') }}</div>
+                  <div style="margin-top: 4px;">{{ t('settings.enableBallShortcut') }}</div>
                 </div>
               </el-form-item>
 
-              <el-form-item label="悬浮球位置" v-if="aiAssistantSettings.enableFloatingBall">
+              <el-form-item :label="t('settings.ballPosition')" v-if="aiAssistantSettings.enableFloatingBall">
                 <el-radio-group
                   v-model="aiAssistantSettings.floatingBallMode"
                   @change="handleFloatingBallChange"
                 >
-                  <el-radio value="inApp">应用内悬浮</el-radio>
-                  <el-radio value="desktop">桌面窗口悬浮</el-radio>
+                  <el-radio value="inApp">{{ t('settings.ballInApp') }}</el-radio>
+                  <el-radio value="desktop">{{ t('settings.ballDesktop') }}</el-radio>
                 </el-radio-group>
                 <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  应用内：仅在应用窗口显示 | 桌面窗口：独立小窗口，可在桌面任意位置
+                  {{ t('settings.ballPositionHint') }}
                 </div>
               </el-form-item>
 
-              <el-form-item label="悬浮球样式" v-if="aiAssistantSettings.enableFloatingBall">
+              <el-form-item :label="t('settings.ballStyle')" v-if="aiAssistantSettings.enableFloatingBall">
                 <el-select
                   v-model="aiAssistantSettings.floatingBallStyle"
                   style="width: 200px;"
                   @change="handleFloatingBallChange"
                 >
-                  <el-option label="默认圆形" value="circle" />
-                  <el-option label="圆角方形" value="rounded" />
-                  <el-option label="胶囊形" value="capsule" />
+                  <el-option :label="t('settings.ballCircle')" value="circle" />
+                  <el-option :label="t('settings.ballRounded')" value="rounded" />
+                  <el-option :label="t('settings.ballCapsule')" value="capsule" />
                 </el-select>
               </el-form-item>
 
-              <el-form-item label="悬浮球大小" v-if="aiAssistantSettings.enableFloatingBall">
+              <el-form-item :label="t('settings.ballSize')" v-if="aiAssistantSettings.enableFloatingBall">
                 <el-slider
                   v-model="aiAssistantSettings.floatingBallSize"
                   :min="40"
@@ -421,54 +239,164 @@
               </el-form-item>
             </el-form>
           </el-card>
+        </div>
 
-          <!-- AI 配置 -->
+        <!-- 工作空间 -->
+        <div v-show="activeTab === 'workspace'" class="settings-section">
+          <h3 class="section-title">{{ t('settings.workspace') }}</h3>
+
+          <!-- 笔记设置 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
-              <div class="card-header">AI 助手配置</div>
+              <div class="card-header">{{ t('settings.notesSettings') }}</div>
             </template>
-            <el-form :model="aiSettings" label-width="140px" label-position="left">
-              <el-form-item label="API 地址">
-                <el-input
-                  v-model="aiSettings.baseUrl"
-                  placeholder="https://api.openai.com/v1"
-                  style="width: 400px;"
-                />
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  OpenAI 兼容接口地址，支持第三方服务（如 DeepSeek、通义千问等）
+            <el-form :model="settings" label-width="140px" label-position="left">
+              <el-form-item :label="t('settings.storagePath')">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <el-input v-model="settings.notesStoragePath" readonly style="flex: 1;" />
+                  <el-button @click="selectNotesStoragePath">{{ t('settings.changeBtn') }}</el-button>
+                </div>
+                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
+                  {{ t('settings.storagePathHint') }}
                 </div>
               </el-form-item>
 
-              <el-form-item label="API Key">
+              <el-form-item :label="t('settings.storageUsage')">
+                <el-descriptions :column="1" border>
+                  <el-descriptions-item :label="t('settings.notesSize')">
+                    {{ formatFileSize(storageStats.notesSize) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="t('settings.databaseSize')">
+                    {{ formatFileSize(storageStats.databaseSize) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="t('settings.mediaSize')">
+                    {{ formatFileSize(storageStats.mediaSize) }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="t('settings.totalSize')">
+                    {{ formatFileSize(storageStats.totalSize) }}
+                  </el-descriptions-item>
+                </el-descriptions>
+              </el-form-item>
+            </el-form>
+          </el-card>
+
+          <!-- Markdown 主题 -->
+          <el-card shadow="never" style="margin-bottom: 20px;">
+            <template #header>
+              <div class="card-header">{{ t('settings.markdownTheme') }}</div>
+            </template>
+            <el-form :model="settings" label-width="140px" label-position="left">
+              <el-divider content-position="left">{{ t('settings.previewMode') }}</el-divider>
+              <el-form-item :label="t('settings.previewTheme')">
+                <el-select v-model="settings.previewTheme" style="width: 300px">
+                  <el-option label="Default" value="default" />
+                  <el-option label="GitHub" value="github" />
+                  <el-option label="VuePress" value="vuepress" />
+                  <el-option label="MK Cute" value="mk-cute" />
+                  <el-option label="Smart Blue" value="smart-blue" />
+                  <el-option label="Cyanosis" value="cyanosis" />
+                </el-select>
+                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
+                  {{ t('settings.previewThemeHint') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item :label="t('settings.codeTheme')">
+                <el-select v-model="settings.previewCodeTheme" style="width: 300px">
+                  <el-option label="Atom" value="atom" />
+                  <el-option label="A11y" value="a11y" />
+                  <el-option label="GitHub" value="github" />
+                  <el-option label="Gradient" value="gradient" />
+                  <el-option label="Kimbie" value="kimbie" />
+                  <el-option label="Paraiso" value="paraiso" />
+                  <el-option label="Qt Creator" value="qtcreator" />
+                  <el-option label="Stack Overflow" value="stackoverflow" />
+                </el-select>
+                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
+                  {{ t('settings.codeThemeHint') }}
+                </div>
+              </el-form-item>
+
+              <el-divider content-position="left">{{ t('settings.editMode') }}</el-divider>
+              <el-form-item :label="t('settings.previewTheme')">
+                <el-select v-model="settings.editorPreviewTheme" style="width: 300px">
+                  <el-option label="Default" value="default" />
+                  <el-option label="GitHub" value="github" />
+                  <el-option label="VuePress" value="vuepress" />
+                  <el-option label="MK Cute" value="mk-cute" />
+                  <el-option label="Smart Blue" value="smart-blue" />
+                  <el-option label="Cyanosis" value="cyanosis" />
+                </el-select>
+                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
+                  {{ t('settings.editorPreviewHint') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item :label="t('settings.codeTheme')">
+                <el-select v-model="settings.editorCodeTheme" style="width: 300px">
+                  <el-option label="Atom" value="atom" />
+                  <el-option label="A11y" value="a11y" />
+                  <el-option label="GitHub" value="github" />
+                  <el-option label="Gradient" value="gradient" />
+                  <el-option label="Kimbie" value="kimbie" />
+                  <el-option label="Paraiso" value="paraiso" />
+                  <el-option label="Qt Creator" value="qtcreator" />
+                  <el-option label="Stack Overflow" value="stackoverflow" />
+                </el-select>
+                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
+                  {{ t('settings.editorCodeHint') }}
+                </div>
+              </el-form-item>
+            </el-form>
+          </el-card>
+
+          <!-- AI 助手配置 -->
+          <el-card shadow="never">
+            <template #header>
+              <div class="card-header">{{ t('settings.aiConfig') }}</div>
+            </template>
+            <el-form :model="aiSettings" label-width="140px" label-position="left">
+              <el-form-item :label="t('settings.apiUrl')">
+                <el-input
+                  v-model="aiSettings.baseUrl"
+                  :placeholder="t('settings.apiUrlPlaceholder')"
+                  style="width: 400px;"
+                />
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.apiUrlHint') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item :label="t('settings.apiKey')">
                 <el-input
                   v-model="aiSettings.apiKey"
                   type="password"
                   show-password
-                  placeholder="输入 API Key"
+                  :placeholder="t('settings.apiKeyPlaceholder')"
                   style="width: 400px;"
                 />
               </el-form-item>
 
-              <el-form-item label="模型">
+              <el-form-item :label="t('settings.model')">
                 <el-input
                   v-model="aiSettings.model"
-                  placeholder="例如：gpt-4、deepseek-chat、qwen-turbo"
+                  :placeholder="t('settings.modelPlaceholder')"
                   style="width: 400px;"
                 />
                 <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  输入模型名称，需与 API 服务支持的模型一致
+                  {{ t('settings.modelHint') }}
                 </div>
               </el-form-item>
 
               <el-form-item>
                 <el-button type="primary" @click="testAIConnection" :loading="testingAI">
-                  测试连接
+                  {{ t('settings.testConnection') }}
                 </el-button>
               </el-form-item>
 
               <el-alert
                 v-if="aiTestResult"
-                :title="aiTestResult.success ? '连接成功' : '连接失败'"
+                :title="aiTestResult.success ? t('settings.connectSuccess') : t('settings.connectFailed')"
                 :type="aiTestResult.success ? 'success' : 'error'"
                 :description="aiTestResult.message"
                 :closable="false"
@@ -478,56 +406,124 @@
           </el-card>
         </div>
 
+        <!-- 安全与数据 -->
+        <div v-show="activeTab === 'security'" class="settings-section">
+          <h3 class="section-title">{{ t('settings.security') }}</h3>
+
+          <!-- 密码管理 -->
+          <el-card shadow="never" style="margin-bottom: 20px;">
+            <template #header>
+              <div class="card-header">{{ t('settings.passwordMgmt') }}</div>
+            </template>
+            <el-form label-width="150px" label-position="left">
+              <el-form-item :label="t('settings.requirePwdOnStart')">
+                <el-switch
+                  v-model="passwordSettings.requirePasswordOnStart"
+                  :active-text="t('common.on')"
+                  :inactive-text="t('common.off')"
+                />
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.requirePwdHint') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item :label="t('settings.autoLockTime')">
+                <el-select
+                  v-model="passwordSettings.autoLockTime"
+                  style="width: 200px;"
+                >
+                  <el-option :label="t('common.time.min5')" :value="5" />
+                  <el-option :label="t('common.time.min10')" :value="10" />
+                  <el-option :label="t('common.time.min15')" :value="15" />
+                  <el-option :label="t('common.time.min30')" :value="30" />
+                  <el-option :label="t('common.never')" :value="0" />
+                </el-select>
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.autoLockHint') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item>
+                <el-button type="primary" @click="showChangePasswordDialog = true">
+                  {{ t('settings.changeMasterPwd') }}
+                </el-button>
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.changeMasterPwdHint') }}
+                </div>
+              </el-form-item>
+
+              <el-divider />
+
+              <el-form-item :label="t('settings.vaultStatus')">
+                <el-descriptions :column="1" border>
+                  <el-descriptions-item :label="t('settings.pwdCount')">
+                    {{ passwordStats.totalPasswords }} {{ t('common.unit') }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="t('settings.historyCount')">
+                    {{ passwordStats.historyCount }} {{ t('common.entries') }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="t('settings.recycleBin')">
+                    {{ passwordStats.recycleBinCount }} {{ t('common.unit') }}
+                  </el-descriptions-item>
+                  <el-descriptions-item :label="t('settings.masterPwdStatus')">
+                    {{ passwordStats.hasMasterPassword ? t('settings.masterPwdSet') : t('settings.masterPwdNotSet') }}
+                  </el-descriptions-item>
+                </el-descriptions>
+              </el-form-item>
+            </el-form>
+          </el-card>
+        </div>
+
         <!-- 帮助与反馈 -->
         <div v-show="activeTab === 'about'" class="settings-section">
-          <h3 class="section-title">帮助与反馈</h3>
+          <h3 class="section-title">{{ t('settings.help') }}</h3>
 
           <!-- 关于应用 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
-              <div class="card-header">关于应用</div>
+              <div class="card-header">{{ t('settings.aboutApp') }}</div>
             </template>
             <el-descriptions :column="1" border>
-              <el-descriptions-item label="应用名称">效率工具箱</el-descriptions-item>
-              <el-descriptions-item label="版本">v1.0.0</el-descriptions-item>
-              <el-descriptions-item label="构建时间">2026-02-01</el-descriptions-item>
-              <el-descriptions-item label="技术栈">Vue 3 + Tauri</el-descriptions-item>
+              <el-descriptions-item :label="t('settings.appNameLabel')">{{ t('settings.appName') }}</el-descriptions-item>
+              <el-descriptions-item :label="t('settings.version')">v1.0.0</el-descriptions-item>
+              <el-descriptions-item :label="t('settings.buildTime')">2026-02-01</el-descriptions-item>
+              <el-descriptions-item :label="t('settings.techStack')">Vue 3 + Tauri</el-descriptions-item>
             </el-descriptions>
           </el-card>
 
           <!-- 帮助与支持 -->
           <el-card shadow="never">
             <template #header>
-              <div class="card-header">帮助与支持</div>
+              <div class="card-header">{{ t('settings.helpSupport') }}</div>
             </template>
             <el-form label-width="100px">
-              <el-form-item label="反馈内容">
+              <el-form-item :label="t('settings.feedbackContent')">
                 <el-input
                   v-model="feedbackContent"
                   type="textarea"
                   :rows="6"
-                  placeholder="请描述您遇到的问题或建议..."
+                  :placeholder="t('settings.feedbackPlaceholder')"
                   maxlength="500"
                   show-word-limit
                 />
               </el-form-item>
-              <el-form-item label="联系方式">
+              <el-form-item :label="t('settings.feedbackContact')">
                 <el-input
                   v-model="feedbackContact"
-                  placeholder="选填：邮箱或其他联系方式"
+                  :placeholder="t('settings.feedbackContactPlaceholder')"
                 />
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="submitFeedback" :loading="submittingFeedback">
-                  提交反馈
+                  {{ t('settings.submitFeedback') }}
                 </el-button>
-                <el-button @click="clearFeedback">清空</el-button>
+                <el-button @click="clearFeedback">{{ t('settings.clearBtn') }}</el-button>
               </el-form-item>
               <el-divider />
-              <el-form-item label="软件更新">
+              <el-form-item :label="t('settings.softwareUpdate')">
                 <el-button @click="checkUpdate" :loading="checkingUpdate">
                   <el-icon><Refresh /></el-icon>
-                  检查更新
+                  {{ t('settings.checkUpdate') }}
                 </el-button>
                 <span v-if="updateInfo" style="margin-left: 12px; color: #67c23a;">
                   {{ updateInfo }}
@@ -536,7 +532,7 @@
               <el-divider />
               <el-form-item>
                 <el-button type="danger" @click="handleReset">
-                  重置应用设置
+                  {{ t('settings.resetAppSettings') }}
                 </el-button>
               </el-form-item>
             </el-form>
@@ -548,7 +544,7 @@
     <!-- 笔记迁移进度对话框 -->
     <el-dialog
       v-model="showMigrationDialog"
-      :title="migrateMode === 'move' ? '移动笔记文件' : '复制笔记文件'"
+      :title="migrateMode === 'move' ? t('settings.migrationDialogMove') : t('settings.migrationDialogCopy')"
       width="500px"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -562,44 +558,44 @@
         />
         <p style="color: #606266; margin-top: 12px;">{{ migrationStatus }}</p>
         <p v-if="migrateMode === 'move'" style="color: #909399; font-size: 12px; margin-top: 8px;">
-          {{ migrationProgress < 100 ? '正在移动文件，源文件将在完成后删除...' : '源文件已清理' }}
+          {{ migrationProgress < 100 ? t('settings.migrationMovingHint') : t('settings.migrationMoveDone') }}
         </p>
       </div>
     </el-dialog>
 
     <!-- 修改密码对话框 -->
-    <el-dialog v-model="showChangePasswordDialog" title="修改主密码" width="450px">
+    <el-dialog v-model="showChangePasswordDialog" :title="t('settings.changePwdTitle')" width="450px">
       <el-alert
-        title="请谨慎操作"
+        :title="t('settings.changePwdWarning')"
         type="warning"
         :closable="false"
         style="margin-bottom: 20px;"
       >
-        <p>修改主密码后，请务必记住新密码！</p>
+        <p>{{ t('settings.changePwdAlert') }}</p>
       </el-alert>
 
       <el-form label-width="100px">
-        <el-form-item label="旧密码">
+        <el-form-item :label="t('settings.oldPassword')">
           <el-input
             v-model="oldPasswordInput"
             type="password"
-            placeholder="请输入当前主密码"
+            :placeholder="t('settings.oldPasswordPlaceholder')"
             show-password
           />
         </el-form-item>
-        <el-form-item label="新密码">
+        <el-form-item :label="t('settings.newPassword')">
           <el-input
             v-model="newPasswordInput"
             type="password"
-            placeholder="至少6位"
+            :placeholder="t('settings.newPasswordPlaceholder')"
             show-password
           />
         </el-form-item>
-        <el-form-item label="确认新密码">
+        <el-form-item :label="t('settings.confirmPassword')">
           <el-input
             v-model="newPasswordConfirm"
             type="password"
-            placeholder="再次输入新密码"
+            :placeholder="t('settings.confirmPasswordPlaceholder')"
             show-password
             @keyup.enter="changePassword"
           />
@@ -607,8 +603,8 @@
       </el-form>
 
       <template #footer>
-        <el-button @click="showChangePasswordDialog = false">取消</el-button>
-        <el-button type="primary" @click="changePassword">确认修改</el-button>
+        <el-button @click="showChangePasswordDialog = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="changePassword">{{ t('settings.confirmChange') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -617,7 +613,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, Refresh, Setting, Brush, Folder, MagicStick, Lock, Bell } from '@element-plus/icons-vue'
+import { Check, Refresh, Setting, Brush, Folder, Lock, Bell } from '@element-plus/icons-vue'
+import { t, setLocale } from '@/i18n'
 import { loadConfig, saveConfig, resetConfig } from '@/utils/tauri/store'
 import { fetch } from '@tauri-apps/plugin-http'
 import { openPath } from '@tauri-apps/plugin-opener'
@@ -651,18 +648,17 @@ const configPath = ref('')
 const lastSaved = ref('')
 
 // 菜单项
-const menuItems = [
-  { key: 'general', label: '通用设置', icon: Setting },
-  { key: 'workspace', label: '工作空间', icon: Folder },
-  { key: 'security', label: '安全与数据', icon: Lock },
-  { key: 'ai', label: 'AI 与效率', icon: MagicStick },
-  { key: 'about', label: '帮助与反馈', icon: Bell }
-]
+const menuItems = computed(() => [
+  { key: 'general', label: t('settings.general'), icon: Setting },
+  { key: 'workspace', label: t('settings.workspace'), icon: Folder },
+  { key: 'security', label: t('settings.security'), icon: Lock },
+  { key: 'about', label: t('settings.help'), icon: Bell }
+])
 
 // 当前菜单名称
 const currentMenuName = computed(() => {
-  const menu = menuItems.find(m => m.key === activeTab.value)
-  return menu ? menu.label : '设置'
+  const menu = menuItems.value.find(m => m.key === activeTab.value)
+  return menu ? menu.label : t('settings.title')
 })
 
 // 设置数据
@@ -752,15 +748,53 @@ async function getDatabase() {
 
 // 应用主题
 const applyTheme = (theme) => {
-  if (theme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark')
-  } else if (theme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light')
-  } else {
-    // 跟随系统
+  document.documentElement.setAttribute('data-theme-setting', theme)
+  if (theme === 'auto') {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
     document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light')
+  } else {
+    document.documentElement.setAttribute('data-theme', theme)
   }
+}
+
+// 应用字体大小
+const applyFontSize = (size) => {
+  const base = Number(size) || 14
+  const root = document.documentElement
+  root.style.setProperty('--font-size-caption2', `${base - 3}px`)
+  root.style.setProperty('--font-size-caption',  `${base - 2}px`)
+  root.style.setProperty('--font-size-footnote', `${base - 1}px`)
+  root.style.setProperty('--font-size-body',     `${base}px`)
+  root.style.setProperty('--font-size-callout',  `${base + 1}px`)
+  root.style.setProperty('--font-size-headline', `${base + 2}px`)
+  root.style.setProperty('--font-size-title3',   `${base + 4}px`)
+  root.style.setProperty('--font-size-title2',   `${base + 8}px`)
+  root.style.setProperty('--font-size-title1',   `${base + 12}px`)
+  root.style.setProperty('--font-size-large',    `${base + 18}px`)
+}
+
+// 应用字体家族
+const applyFontFamily = (family) => {
+  const root = document.documentElement
+  if (!family || family === 'system') {
+    root.style.removeProperty('--font-family')
+  } else {
+    root.style.setProperty('--font-family', `"${family}", "PingFang SC", sans-serif`)
+  }
+}
+
+// 应用动画设置
+const applyAnimations = (enabled) => {
+  if (enabled) {
+    document.documentElement.classList.remove('no-animations')
+  } else {
+    document.documentElement.classList.add('no-animations')
+  }
+}
+
+// 切换语言
+const handleLanguageChange = (lang) => {
+  setLocale(lang)
 }
 
 /**
@@ -875,13 +909,14 @@ const handleSave = async () => {
       // 不中断主流程，只记录错误
     }
 
+    // 4. 保存提醒设置
+    saveReminderConfig(reminderConfig)
+
     originalSettings.value = JSON.parse(JSON.stringify(settings))
     hasChanges.value = false
     lastSaved.value = new Date().toLocaleString('zh-CN')
-    ElMessage.success('设置已保存')
   } catch (error) {
-
-    ElMessage.error('保存失败')
+    // 保存失败静默处理
   } finally {
     saving.value = false
   }
@@ -904,11 +939,11 @@ const selectNotesStoragePath = async () => {
       // 询问用户迁移模式
       try {
         const { value } = await ElMessageBox.confirm(
-          `请选择迁移方式：\n\n【移动】将文件从旧位置转移到新位置（删除源文件）\n【复制】将文件复制到新位置（保留源文件作为备份）\n【仅更改路径】不迁移文件，手动操作\n\n旧位置：${oldPath}\n新位置：${selected}`,
-          '选择迁移方式',
+          t('settings.migrateModeMsg', { oldPath, newPath: selected }),
+          t('settings.migrateModeTitle'),
           {
-            confirmButtonText: '移动',
-            cancelButtonText: '复制',
+            confirmButtonText: t('settings.migrateMoveBtn'),
+            cancelButtonText: t('settings.migrateCopyBtn'),
             distinguishCancelAndClose: true,
             showClose: true,
             closeOnClickModal: false,
@@ -930,11 +965,11 @@ const selectNotesStoragePath = async () => {
           // 显示"仅更改路径"确认
           try {
             await ElMessageBox.confirm(
-              '确定要仅更改路径而不迁移文件吗？\n\n您需要手动将笔记复制到新位置。',
-              '确认操作',
+              t('settings.migrateOnlyPathConfirm'),
+              t('settings.migrateOnlyPathTitle'),
               {
-                confirmButtonText: '仅更改路径',
-                cancelButtonText: '取消',
+                confirmButtonText: t('settings.migrateOnlyPathBtn'),
+                cancelButtonText: t('common.cancel'),
                 type: 'warning'
               }
             )
@@ -944,7 +979,7 @@ const selectNotesStoragePath = async () => {
             const { resetNotesDir } = await import('@/utils/notes')
             resetNotesDir()
             await handleSave()
-            ElMessage.warning('路径已更改，但未迁移文件。请手动复制笔记到新位置。')
+            ElMessage.warning(t('settings.migrateOnlyPathDone'))
           } catch {
             // 用户取消了"仅更改路径"
           }
@@ -954,7 +989,7 @@ const selectNotesStoragePath = async () => {
   } catch (error) {
     if (error !== 'cancel') {
 
-      ElMessage.error('选择路径失败')
+      ElMessage.error(t('settings.selectPathFailed'))
     }
   }
 }
@@ -965,7 +1000,7 @@ const selectNotesStoragePath = async () => {
 const performMigration = async (oldPath, newPath) => {
   showMigrationDialog.value = true
   migrationProgress.value = 0
-  migrationStatus.value = '正在准备迁移...'
+  migrationStatus.value = t('settings.migratePreparing')
 
   try {
     await migrateNotes(oldPath, newPath)
@@ -984,11 +1019,11 @@ const performMigration = async (oldPath, newPath) => {
     }))
 
     migrationStatus.value = migrateMode.value === 'move'
-      ? '迁移完成！文件已移动到新位置'
-      : '迁移完成！文件已复制到新位置（源文件已保留）'
+      ? t('settings.migrateDoneMove')
+      : t('settings.migrateDoneCopy')
 
     ElMessage.success({
-      message: migrateMode.value === 'move' ? '笔记已成功移动到新位置' : '笔记已成功复制到新位置',
+      message: migrateMode.value === 'move' ? t('settings.migrateSuccessMove') : t('settings.migrateSuccessCopy'),
       duration: 3000
     })
 
@@ -997,8 +1032,8 @@ const performMigration = async (oldPath, newPath) => {
     }, 2000)
   } catch (error) {
 
-    migrationStatus.value = '迁移失败：' + error.message
-    ElMessage.error('迁移失败：' + error.message)
+    migrationStatus.value = t('settings.migrateFailed', { msg: error.message })
+    ElMessage.error(t('settings.migrateFailed', { msg: error.message }))
   }
 }
 
@@ -1009,11 +1044,11 @@ const migrateNotes = async (oldPath, newPath) => {
   const { readDir, exists, mkdir, copyFile, remove } = await import('@tauri-apps/plugin-fs')
   const { join, sep } = await import('@tauri-apps/api/path')
 
-  migrationStatus.value = '正在检查源目录...'
+  migrationStatus.value = t('settings.migrateCheckSource')
 
   // 检查旧路径是否存在
   if (!(await exists(oldPath))) {
-    throw new Error('源目录不存在')
+    throw new Error(t('settings.migrateSourceNotExist'))
   }
 
   // 确保新路径存在
@@ -1022,12 +1057,12 @@ const migrateNotes = async (oldPath, newPath) => {
   }
 
   // 获取所有文件列表
-  migrationStatus.value = '正在扫描文件...'
+  migrationStatus.value = t('settings.migrateScanFiles')
   const allFiles = await getAllFiles(oldPath, oldPath)
 
   if (allFiles.length === 0) {
     migrationProgress.value = 100
-    migrationStatus.value = '没有文件需要迁移'
+    migrationStatus.value = t('settings.migrateNoFiles')
     return
   }
 
@@ -1046,7 +1081,9 @@ const migrateNotes = async (oldPath, newPath) => {
     }
 
     // 复制文件
-    migrationStatus.value = `正在${migrateMode.value === 'move' ? '移动' : '复制'}: ${relativePath}`
+    migrationStatus.value = migrateMode.value === 'move'
+      ? t('settings.migrateMoving', { file: relativePath })
+      : t('settings.migrateCopying', { file: relativePath })
     await copyFile(file, targetPath)
     copiedFiles.push(file)
 
@@ -1056,7 +1093,7 @@ const migrateNotes = async (oldPath, newPath) => {
 
   // 如果是移动模式，删除源文件
   if (migrateMode.value === 'move') {
-    migrationStatus.value = '正在清理源文件...'
+    migrationStatus.value = t('settings.migrateCleanSource')
 
     // 删除所有已复制的文件
     for (const file of copiedFiles) {
@@ -1070,9 +1107,9 @@ const migrateNotes = async (oldPath, newPath) => {
       await removeEmptyDirs(oldPath)
     } catch (e) { /* ignore */ }
 
-    migrationStatus.value = `移动完成！共移动 ${processedFiles} 个文件`
+    migrationStatus.value = t('settings.migrateMoveComplete', { count: processedFiles })
   } else {
-    migrationStatus.value = `复制完成！共复制 ${processedFiles} 个文件`
+    migrationStatus.value = t('settings.migrateCopyComplete', { count: processedFiles })
   }
 }
 
@@ -1147,18 +1184,11 @@ const getAllFiles = async (dir, baseDir) => {
  * 测试 AI 连接
  */
 const testAIConnection = async () => {
-  if (!aiSettings.apiKey) {
-    ElMessage.warning('请先输入 API Key')
-    return
-  }
-
-  if (!aiSettings.baseUrl) {
-    ElMessage.warning('请先输入 API 地址')
-    return
-  }
-
-  if (!aiSettings.model) {
-    ElMessage.warning('请先输入模型名称')
+  if (!aiSettings.apiKey || !aiSettings.baseUrl || !aiSettings.model) {
+    aiTestResult.value = {
+      success: false,
+      message: t('settings.fillApiFields')
+    }
     return
   }
 
@@ -1190,11 +1220,10 @@ const testAIConnection = async () => {
       if (data?.choices && Array.isArray(data.choices) && data.choices.length > 0) {
         aiTestResult.value = {
           success: true,
-          message: `AI 服务连接成功，模型 ${aiSettings.model} 可正常使用`
+          message: t('settings.aiConnectSuccess', { model: aiSettings.model })
         }
-        ElMessage.success('连接成功')
       } else {
-        throw new Error('API 返回格式不正确，请确认是否为 OpenAI 兼容接口。返回内容: ' + text.substring(0, 200))
+        throw new Error(t('settings.aiConnectFormatError', { content: text.substring(0, 200) }))
       }
     } else {
       const errorText = await response.text()
@@ -1203,9 +1232,8 @@ const testAIConnection = async () => {
   } catch (error) {
     aiTestResult.value = {
       success: false,
-      message: error.message || '连接失败，请检查 API 地址、API Key 和模型名称'
+      message: error.message || t('settings.aiConnectFail')
     }
-    ElMessage.error('连接失败')
   } finally {
     testingAI.value = false
   }
@@ -1266,7 +1294,7 @@ const loadStorageStats = async () => {
 
     // ElMessage.success('存储统计已更新') // 已移除提示，避免重复弹出
   } catch (error) {
-    ElMessage.error('加载存储统计失败：' + error.message)
+    ElMessage.error(t('settings.loadStatsFailed', { msg: error.message }))
   } finally {
     loadingStats.value = false
   }
@@ -1378,17 +1406,17 @@ const loadPasswordStats = async () => {
  */
 const changePassword = async () => {
   if (!oldPasswordInput.value) {
-    ElMessage.warning('请输入旧密码')
+    ElMessage.warning(t('settings.enterOldPwd'))
     return
   }
 
   if (!newPasswordInput.value || newPasswordInput.value.length < 6) {
-    ElMessage.warning('新密码长度至少为 6 位')
+    ElMessage.warning(t('settings.newPwdMinLength'))
     return
   }
 
   if (newPasswordInput.value !== newPasswordConfirm.value) {
-    ElMessage.warning('两次输入的新密码不一致')
+    ElMessage.warning(t('settings.newPwdMismatch'))
     return
   }
 
@@ -1397,7 +1425,7 @@ const changePassword = async () => {
     const result = await db.select('SELECT * FROM master_password LIMIT 1')
 
     if (!result || result.length === 0) {
-      ElMessage.error('未找到主密码记录')
+      ElMessage.error(t('settings.masterPwdNotFound'))
       return
     }
 
@@ -1406,7 +1434,7 @@ const changePassword = async () => {
     const isValid = verifyPassword(oldPasswordInput.value, password_hash, salt)
 
     if (!isValid) {
-      ElMessage.error('旧密码错误')
+      ElMessage.error(t('settings.oldPwdWrong'))
       return
     }
 
@@ -1420,14 +1448,14 @@ const changePassword = async () => {
       [newHash, newSalt, now]
     )
 
-    ElMessage.success('密码修改成功')
+    ElMessage.success(t('settings.pwdChangeSuccess'))
     showChangePasswordDialog.value = false
     oldPasswordInput.value = ''
     newPasswordInput.value = ''
     newPasswordConfirm.value = ''
   } catch (error) {
 
-    ElMessage.error('修改密码失败')
+    ElMessage.error(t('settings.pwdChangeFailed'))
   }
 }
 
@@ -1437,18 +1465,17 @@ const changePassword = async () => {
 const handleReset = async () => {
   try {
     await ElMessageBox.confirm(
-      '确定要重置所有设置为默认值吗？此操作不可恢复。',
-      '确认重置',
+      t('settings.confirmResetMsg'),
+      t('settings.confirmResetTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning'
       }
     )
 
     await resetConfig()
     await loadSettings()
-    ElMessage.success('设置已重置')
   } catch (error) {
     if (error !== 'cancel') {
 
@@ -1472,18 +1499,6 @@ const loadReminderSettings = async () => {
   } catch (e) { /* ignore */ }
 }
 
-/**
- * 保存提醒设置
- */
-const saveReminderSettings = () => {
-  try {
-    saveReminderConfig(reminderConfig)
-    ElMessage.success('通知设置已保存')
-  } catch (error) {
-
-    ElMessage.error('保存失败')
-  }
-}
 
 /**
  * 测试通知
@@ -1492,17 +1507,15 @@ const testNotification = async () => {
   try {
     const CustomNotification = await import('@/utils/tauri/customNotification')
     await CustomNotification.default.showCustomNotification({
-      title: '📢 测试通知',
-      message: '这是一条测试通知消息\n当前时间: ' + new Date().toLocaleString('zh-CN'),
+      title: t('settings.testNotifTitle'),
+      message: t('settings.testNotifMsg', { time: new Date().toLocaleString() }),
       type: 'info',
       duration: 10000,
       position: reminderConfig.position,
       positionType: reminderConfig.positionType
     })
-    ElMessage.success('测试通知已发送')
   } catch (error) {
-
-    ElMessage.error('发送失败: ' + error.message)
+    // 测试通知发送失败静默处理
   }
 }
 
@@ -1511,7 +1524,7 @@ const testNotification = async () => {
  */
 const submitFeedback = async () => {
   if (!feedbackContent.value.trim()) {
-    ElMessage.warning('请填写反馈内容')
+    ElMessage.warning(t('settings.fillFeedback'))
     return
   }
 
@@ -1535,12 +1548,12 @@ const submitFeedback = async () => {
       [feedbackContent.value.trim(), feedbackContact.value.trim(), now]
     )
 
-    ElMessage.success('感谢您的反馈！我们会认真处理')
+    ElMessage.success(t('settings.feedbackSuccess'))
     feedbackContent.value = ''
     feedbackContact.value = ''
   } catch (error) {
 
-    ElMessage.error('提交失败: ' + error.message)
+    ElMessage.error(t('settings.feedbackFailed', { msg: error.message }))
   } finally {
     submittingFeedback.value = false
   }
@@ -1557,53 +1570,37 @@ const clearFeedback = () => {
 /**
  * 处理悬浮球开关切换
  */
-const handleFloatingBallToggle = async (enabled) => {
-  try {
-    // 先保存配置
-    localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
+const handleFloatingBallToggle = (enabled) => {
+  // 保存配置到 localStorage（供实时预览使用）
+  localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
 
-    // 发送全局事件通知应用更新悬浮球状态
-    window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
-      detail: {
-        enabled,
-        mode: aiAssistantSettings.floatingBallMode,
-        style: aiAssistantSettings.floatingBallStyle,
-        size: aiAssistantSettings.floatingBallSize
-      }
-    }))
-
-    // 自动保存
-    await handleSave()
-  } catch (error) {
-
-    ElMessage.error('操作失败')
-  }
+  // 发送全局事件通知应用更新悬浮球状态
+  window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
+    detail: {
+      enabled,
+      mode: aiAssistantSettings.floatingBallMode,
+      style: aiAssistantSettings.floatingBallStyle,
+      size: aiAssistantSettings.floatingBallSize
+    }
+  }))
 }
 
 /**
  * 处理悬浮球配置变化（位置、样式、大小）
  */
-const handleFloatingBallChange = async () => {
-  try {
-    // 先保存配置到 localStorage
-    localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
+const handleFloatingBallChange = () => {
+  // 保存配置到 localStorage（供实时预览使用）
+  localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
 
-    // 发送全局事件通知应用更新悬浮球状态
-    window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
-      detail: {
-        enabled: aiAssistantSettings.enableFloatingBall,
-        mode: aiAssistantSettings.floatingBallMode,
-        style: aiAssistantSettings.floatingBallStyle,
-        size: aiAssistantSettings.floatingBallSize
-      }
-    }))
-
-    // 自动保存到配置文件
-    await handleSave()
-  } catch (error) {
-
-    ElMessage.error('操作失败')
-  }
+  // 发送全局事件通知应用更新悬浮球状态
+  window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
+    detail: {
+      enabled: aiAssistantSettings.enableFloatingBall,
+      mode: aiAssistantSettings.floatingBallMode,
+      style: aiAssistantSettings.floatingBallStyle,
+      size: aiAssistantSettings.floatingBallSize
+    }
+  }))
 }
 
 /**
@@ -1619,11 +1616,9 @@ const checkUpdate = async () => {
 
     // 这里可以集成 Tauri 的更新功能
     // 目前显示当前已是最新版本
-    updateInfo.value = '当前已是最新版本 v1.0.0'
-    ElMessage.success('当前已是最新版本')
+    updateInfo.value = t('settings.latestVersion')
   } catch (error) {
-
-    ElMessage.error('检查更新失败: ' + error.message)
+    updateInfo.value = t('settings.checkUpdateFailed')
   } finally {
     checkingUpdate.value = false
   }

@@ -2,10 +2,10 @@
   <div class="dashboard-wrapper">
     <!-- 顶部标题栏 -->
     <div class="dashboard-header">
-      <h1 class="dashboard-title">工作台</h1>
+      <h1 class="dashboard-title">{{ t('home.title') }}</h1>
       <div class="dashboard-actions">
-        <el-button type="primary" :icon="MagicStick" circle title="AI助手 (Ctrl+K)" @click="showAIAssistant = true" />
-        <el-button :icon="Refresh" circle @click="refreshAll" title="刷新所有数据" />
+        <el-button type="primary" :icon="MagicStick" circle :title="t('home.aiAssistantTitle')" @click="showAIAssistant = true" />
+        <el-button :icon="Refresh" circle @click="refreshAll" :title="t('home.refreshTitle')" />
       </div>
     </div>
 
@@ -19,7 +19,7 @@
         <template #header>
           <div class="card-header">
             <el-icon class="card-icon"><Calendar /></el-icon>
-            <span class="card-title">今日概览</span>
+            <span class="card-title">{{ t('home.todayOverview') }}</span>
           </div>
         </template>
         <div class="today-info">
@@ -35,13 +35,13 @@
         <template #header>
           <div class="card-header">
             <el-icon class="card-icon"><CircleCheck /></el-icon>
-            <span class="card-title">今日待办</span>
+            <span class="card-title">{{ t('home.todayTodos') }}</span>
             <span class="card-badge">{{ todayTodos.length }}</span>
           </div>
         </template>
         <div class="card-content">
-          <el-empty v-if="todayTodos.length === 0" description="暂无待办事项">
-            <el-button type="primary" size="small" @click="navigateTo('/todos')">添加待办</el-button>
+          <el-empty v-if="todayTodos.length === 0" :description="t('home.noTodos')">
+            <el-button type="primary" size="small" @click="navigateTo('/todos')">{{ t('home.addTodo') }}</el-button>
           </el-empty>
           <div v-else class="todos-list">
             <div v-for="todo in todayTodos.slice(0, 5)" :key="todo.id" class="todo-item">
@@ -49,7 +49,7 @@
               <span class="todo-text" :class="{ completed: todo.completed }">{{ todo.title }}</span>
             </div>
             <el-button v-if="todayTodos.length > 5" text type="primary" @click="navigateTo('/todos')">
-              查看全部 {{ todayTodos.length }} 项 →
+              {{ t('home.viewAllTodos', { n: todayTodos.length }) }}
             </el-button>
           </div>
         </div>
@@ -60,13 +60,13 @@
         <template #header>
           <div class="card-header">
             <el-icon class="card-icon"><Clock /></el-icon>
-            <span class="card-title">今日日程</span>
+            <span class="card-title">{{ t('home.todayEvents') }}</span>
             <span class="card-badge">{{ todayEvents.length }}</span>
           </div>
         </template>
         <div class="card-content">
-          <el-empty v-if="todayEvents.length === 0" description="今日无安排">
-            <el-button type="primary" size="small" @click="navigateTo('/calendar')">添加日程</el-button>
+          <el-empty v-if="todayEvents.length === 0" :description="t('home.noEvents')">
+            <el-button type="primary" size="small" @click="navigateTo('/calendar')">{{ t('home.addEvent') }}</el-button>
           </el-empty>
           <div v-else class="events-list">
             <div v-for="event in todayEvents.slice(0, 4)" :key="event.id" class="event-item">
@@ -74,7 +74,7 @@
               <div class="event-title">{{ event.title }}</div>
             </div>
             <el-button v-if="todayEvents.length > 4" text type="primary" @click="navigateTo('/calendar')">
-              查看全部 {{ todayEvents.length }} 项 →
+              {{ t('home.viewAllEvents', { n: todayEvents.length }) }}
             </el-button>
           </div>
         </div>
@@ -85,12 +85,12 @@
         <template #header>
           <div class="card-header">
             <el-icon class="card-icon"><Document /></el-icon>
-            <span class="card-title">最近笔记</span>
+            <span class="card-title">{{ t('home.recentNotes') }}</span>
           </div>
         </template>
         <div class="card-content">
-          <el-empty v-if="recentNotes.length === 0" description="暂无笔记">
-            <el-button type="primary" size="small" @click="navigateTo('/notes')">创建笔记</el-button>
+          <el-empty v-if="recentNotes.length === 0" :description="t('home.noNotes')">
+            <el-button type="primary" size="small" @click="navigateTo('/notes')">{{ t('home.createNote') }}</el-button>
           </el-empty>
           <div v-else class="notes-list">
             <div v-for="note in recentNotes.slice(0, 5)" :key="note.name" class="note-item" @click="openNote(note)">
@@ -99,7 +99,7 @@
               <span class="note-time">{{ formatDate(note.updated_at) }}</span>
             </div>
             <el-button text type="primary" @click="navigateTo('/notes')">
-              查看更多 →
+              {{ t('home.viewMore') }}
             </el-button>
           </div>
         </div>
@@ -110,12 +110,12 @@
         <template #header>
           <div class="card-header">
             <el-icon class="card-icon"><Link /></el-icon>
-            <span class="card-title">常用网站</span>
+            <span class="card-title">{{ t('home.frequentSites') }}</span>
           </div>
         </template>
         <div class="card-content">
-          <el-empty v-if="frequentBookmarks.length === 0" description="暂无收藏">
-            <el-button type="primary" size="small" @click="navigateTo('/bookmarks')">添加书签</el-button>
+          <el-empty v-if="frequentBookmarks.length === 0" :description="t('home.noBookmarks')">
+            <el-button type="primary" size="small" @click="navigateTo('/bookmarks')">{{ t('home.addBookmark') }}</el-button>
           </el-empty>
           <div v-else class="bookmarks-grid">
             <div v-for="bookmark in frequentBookmarks.slice(0, 6)" :key="bookmark.id" class="bookmark-item" @click="openBookmark(bookmark)">
@@ -132,26 +132,26 @@
         <template #header>
           <div class="card-header">
             <el-icon class="card-icon"><Lock /></el-icon>
-            <span class="card-title">密码安全</span>
+            <span class="card-title">{{ t('home.passwordSecurity') }}</span>
           </div>
         </template>
         <div class="card-content">
           <div class="password-stats">
             <div class="stat-item">
               <div class="stat-value">{{ passwordStats.total }}</div>
-              <div class="stat-label">总密码数</div>
+              <div class="stat-label">{{ t('home.totalPasswords') }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-value" style="color: #67c23a;">{{ passwordStats.strong }}</div>
-              <div class="stat-label">强密码</div>
+              <div class="stat-label">{{ t('home.strongPasswords') }}</div>
             </div>
             <div class="stat-item">
               <div class="stat-value" style="color: #f56c6c;">{{ passwordStats.weak }}</div>
-              <div class="stat-label">弱密码</div>
+              <div class="stat-label">{{ t('home.weakPasswords') }}</div>
             </div>
           </div>
           <el-button text type="primary" @click="navigateTo('/passwords')">
-            查看密码管理 →
+            {{ t('home.viewPasswordMgmt') }}
           </el-button>
         </div>
       </el-card>
@@ -166,6 +166,7 @@ import { Calendar, CircleCheck, Clock, Document, Link, Lock, MagicStick, Refresh
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
 import AIAssistant from '@/components/AIAssistant.vue'
+import { t } from '@/i18n'
 
 const router = useRouter()
 const showAIAssistant = ref(false)
@@ -197,7 +198,7 @@ const initTodayDate = () => {
   todayWeekday.value = now.toLocaleDateString('zh-CN', { weekday: 'long' })
   
   // 简单的农历显示（可以后续集成农历库）
-  lunarDate.value = `农历${now.getMonth() + 1}月${now.getDate()}日`
+  lunarDate.value = t('home.lunarDate', { m: now.getMonth() + 1, d: now.getDate() })
 }
 
 // 加载今日待办
@@ -299,7 +300,7 @@ const loadPasswordStats = async () => {
 
 // 刷新所有数据
 const refreshAll = async () => {
-  const loading = ElMessage.loading('刷新中...')
+  const loading = ElMessage.loading(t('home.refreshing'))
   try {
     await Promise.all([
       loadTodayTodos(),
@@ -309,10 +310,10 @@ const refreshAll = async () => {
       loadPasswordStats()
     ])
     loading.close()
-    ElMessage.success('数据已更新')
+    ElMessage.success(t('home.dataUpdated'))
   } catch (error) {
     loading.close()
-    ElMessage.error('刷新失败')
+    ElMessage.error(t('home.refreshFailed'))
   }
 }
 
@@ -325,10 +326,10 @@ const toggleTodo = async (todo) => {
       'UPDATE todos SET status = ?, updated_at = ?, completed_at = ? WHERE id = ?',
       [newStatus, new Date().toISOString(), todo.completed ? new Date().toISOString() : null, todo.id]
     )
-    ElMessage.success(todo.completed ? '已完成' : '已标记为未完成')
+    ElMessage.success(todo.completed ? t('home.completed') : t('home.markedUncomplete'))
   } catch (error) {
     todo.completed = !todo.completed // 回滚
-    ElMessage.error('更新失败')
+    ElMessage.error(t('home.updateFailed'))
   }
 }
 
@@ -347,9 +348,9 @@ const formatDate = (dateStr) => {
   const diff = now - date
   const days = Math.floor(diff / 86400000)
   
-  if (days === 0) return '今天'
-  if (days === 1) return '昨天'
-  if (days < 7) return `${days}天前`
+  if (days === 0) return t('home.today')
+  if (days === 1) return t('home.yesterday')
+  if (days < 7) return t('home.daysAgo', { n: days })
   return date.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric' })
 }
 

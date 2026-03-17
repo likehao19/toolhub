@@ -4,7 +4,6 @@
  */
 
 import { Store } from '@tauri-apps/plugin-store'
-import { ElMessage } from 'element-plus'
 
 // Store 文件名
 const STORE_FILE = 'settings.json'
@@ -76,7 +75,6 @@ export async function loadConfig() {
     
     return config
   } catch (error) {
-    ElMessage.error('加载配置失败，使用默认配置')
     return defaultConfig
   }
 }
@@ -101,9 +99,7 @@ export async function saveConfig(config) {
     // 持久化到磁盘
     await store.save()
     
-    ElMessage.success('配置已保存')
   } catch (error) {
-    ElMessage.error('保存配置失败')
     throw error
   }
 }
@@ -148,9 +144,7 @@ export async function resetConfig() {
     const store = await getStore()
     await store.clear()
     await store.save()
-    ElMessage.success('配置已重置为默认值')
   } catch (error) {
-    ElMessage.error('重置配置失败')
     throw error
   }
 }

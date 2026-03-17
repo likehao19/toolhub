@@ -4,17 +4,17 @@
     <header class="header">
       <div class="header-left">
         <!-- 折叠/展开侧边栏按钮 -->
-        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? '显示侧边栏' : '隐藏侧边栏'">
+        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('notes.showSidebar') : t('notes.hideSidebar')">
           <el-icon><ArrowLeft v-if="!hideSidebar" /><ArrowRight v-else /></el-icon>
         </el-button>
-        <div class="breadcrumb">知识库 / {{ currentFolderName || '全部笔记' }}</div>
+        <div class="breadcrumb">{{ t('notes.knowledgeBase') }} / {{ currentFolderName || t('notes.allNotes') }}</div>
       </div>
       <div class="header-actions">
         <!-- 文件名显示和编辑 -->
         <div v-if="selectedFile" class="file-name-editor">
           <template v-if="!isEditingFileName">
             <span class="file-name-display">{{ selectedFile.name }}</span>
-            <el-button size="small" text @click="startEditFileName" title="重命名">
+            <el-button size="small" text @click="startEditFileName" :title="t('notes.rename')">
               <el-icon><Edit /></el-icon>
             </el-button>
           </template>
@@ -33,23 +33,23 @@
 
         <!-- 预览模式：显示编辑和删除按钮 -->
         <template v-if="!isEditing && selectedFile">
-          <el-button size="small" circle @click="startEdit" title="编辑">
+          <el-button size="small" circle @click="startEdit" :title="t('notes.edit')">
             <el-icon><Edit /></el-icon>
           </el-button>
-          <el-button size="small" type="danger" circle @click="deleteCurrentNote" title="删除">
+          <el-button size="small" type="danger" circle @click="deleteCurrentNote" :title="t('notes.delete')">
             <el-icon><Delete /></el-icon>
           </el-button>
         </template>
 
         <!-- 编辑模式：显示所有操作按钮 -->
         <template v-if="isEditing">
-          <el-button size="small" circle @click="showVersionHistory" title="版本历史" v-if="currentFileType !== 'xlsx'">
+          <el-button size="small" circle @click="showVersionHistory" :title="t('notes.versionHistory')" v-if="currentFileType !== 'xlsx'">
             <el-icon><Clock /></el-icon>
           </el-button>
-          <el-button size="small" type="success" circle @click="saveNote" title="保存">
+          <el-button size="small" type="success" circle @click="saveNote" :title="t('notes.save')">
             <el-icon><Check /></el-icon>
           </el-button>
-          <el-button size="small" type="danger" circle @click="deleteCurrentNote" title="删除">
+          <el-button size="small" type="danger" circle @click="deleteCurrentNote" :title="t('notes.delete')">
             <el-icon><Delete /></el-icon>
           </el-button>
         </template>
@@ -57,7 +57,7 @@
         <!-- 未选择文件时显示模版管理按钮 -->
         <el-button v-if="!selectedFile" size="small" type="primary" @click="openTemplateManager">
           <el-icon><Tickets /></el-icon>
-          模版管理
+          {{ t('notes.templateMgmt') }}
         </el-button>
       </div>
     </header>
@@ -66,9 +66,9 @@
       <!-- 左侧文件夹树 -->
       <aside class="sidebar-left" v-show="!hideSidebar" :style="{ width: sidebarWidth + 'px' }">
         <div class="sidebar-toolbar">
-          <span class="sidebar-title">文件夹</span>
+          <span class="sidebar-title">{{ t('notes.folders') }}</span>
           <div class="actions">
-            <span class="sidebar-btn" title="新建根目录" @click="createRootFolder">
+            <span class="sidebar-btn" :title="t('notes.newRootFolder')" @click="createRootFolder">
               <i class="fa-solid fa-folder-plus"></i>
             </span>
           </div>
@@ -83,7 +83,7 @@
                 type="text"
                 class="new-folder-input"
                 :value="newFolderName"
-                placeholder="输入文件夹名称"
+                :placeholder="t('notes.folderPlaceholder')"
                 @input="updateNewFolderName"
                 @keyup.enter="confirmCreateFolder"
                 @keyup.esc="cancelCreateFolder"
@@ -143,7 +143,7 @@
         <!-- Loading 动画 -->
         <div v-if="isLoadingFile" class="loading-overlay">
           <el-icon class="loading-icon" :size="40"><Loading /></el-icon>
-          <div class="loading-text">加载中...</div>
+          <div class="loading-text">{{ t('notes.loading') }}</div>
         </div>
 
         <!-- Markdown 预览模式 - 使用 MdEditor + togglePreviewOnly -->
@@ -212,8 +212,8 @@
           <div class="preview-content">
             <el-empty>
               <template #description>
-                <p>{{ currentFileType.toUpperCase() }} 文件预览</p>
-                <el-button type="primary" @click="startEdit">开始编辑</el-button>
+                <p>{{ currentFileType.toUpperCase() }} {{ t('notes.filePreview') }}</p>
+                <el-button type="primary" @click="startEdit">{{ t('notes.startEdit') }}</el-button>
               </template>
             </el-empty>
           </div>
@@ -226,18 +226,18 @@
             <div class="action-cards">
               <div class="action-card" @click="createNewNote">
                 <el-icon :size="20"><DocumentAdd /></el-icon>
-                <span>新建笔记</span>
+                <span>{{ t('notes.newNote') }}</span>
               </div>
               <div class="action-card" @click="importNote">
                 <el-icon :size="20"><Upload /></el-icon>
-                <span>导入笔记</span>
+                <span>{{ t('notes.importNote') }}</span>
               </div>
             </div>
 
             <!-- 最近编辑 -->
             <div class="recent-section" v-if="recentFiles.length > 0">
               <div class="recent-header">
-                <h3>最近编辑</h3>
+                <h3>{{ t('notes.recentEdits') }}</h3>
               </div>
               <div class="recent-items">
                 <div
@@ -264,11 +264,11 @@
     <!-- 版本历史对话框 -->
     <el-dialog
       v-model="showVersionDialog"
-      title="版本历史"
+      :title="t('notes.versionHistory')"
       width="600px"
     >
       <div v-if="noteVersions.length === 0" class="version-empty">
-        <el-empty description="暂无版本历史" />
+        <el-empty :description="t('notes.noVersionHistory')" />
       </div>
       <div v-else class="version-list">
         <el-timeline>
@@ -281,7 +281,7 @@
             <el-card>
               <div class="version-item">
                 <div class="version-header">
-                  <span class="version-number">版本 {{ version.version_number }}</span>
+                  <span class="version-number">{{ t('notes.versionNumber') }} {{ version.version_number }}</span>
                   <el-tag v-if="version.change_summary" size="small" type="info">
                     {{ version.change_summary }}
                   </el-tag>
@@ -289,11 +289,11 @@
                 <div class="version-actions">
                   <el-button text size="small" type="primary" @click="compareWithVersion(version)">
                     <el-icon><View /></el-icon>
-                    对比
+                    {{ t('notes.compare') }}
                   </el-button>
                   <el-button text size="small" type="success" @click="restoreVersion(version)">
                     <el-icon><RefreshLeft /></el-icon>
-                    恢复
+                    {{ t('notes.restore') }}
                   </el-button>
                 </div>
               </div>
@@ -302,21 +302,21 @@
         </el-timeline>
       </div>
       <template #footer>
-        <el-button @click="showVersionDialog = false">关闭</el-button>
+        <el-button @click="showVersionDialog = false">{{ t('notes.close') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 版本对比对话框 -->
     <el-dialog
       v-model="showCompareDialog"
-      title="版本对比"
+      :title="t('notes.versionCompare')"
       width="90%"
       top="5vh"
     >
       <div class="version-compare">
         <div class="compare-panel">
           <div class="compare-header">
-            <h4>当前版本</h4>
+            <h4>{{ t('notes.currentVersion') }}</h4>
           </div>
           <div class="compare-content">
             <pre>{{ noteContent }}</pre>
@@ -324,7 +324,7 @@
         </div>
         <div class="compare-panel">
           <div class="compare-header">
-            <h4>版本 {{ compareVersion?.version_number }} ({{ formatVersionTime(compareVersion?.saved_at) }})</h4>
+            <h4>{{ t('notes.versionNumber') }} {{ compareVersion?.version_number }} ({{ formatVersionTime(compareVersion?.saved_at) }})</h4>
           </div>
           <div class="compare-content">
             <pre>{{ compareContent }}</pre>
@@ -332,40 +332,40 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="showCompareDialog = false">关闭</el-button>
-        <el-button type="success" @click="restoreCompareVersion">恢复到此版本</el-button>
+        <el-button @click="showCompareDialog = false">{{ t('notes.close') }}</el-button>
+        <el-button type="success" @click="restoreCompareVersion">{{ t('notes.restoreToVersion') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 模版管理对话框 -->
     <el-dialog
       v-model="showTemplateDialog"
-      title="模版管理"
+      :title="t('notes.templateMgmt')"
       width="800px"
     >
       <div class="template-manager">
         <el-button type="primary" @click="createTemplate" style="margin-bottom: 16px;">
           <el-icon><Plus /></el-icon>
-          新建模版
+          {{ t('notes.newTemplate') }}
         </el-button>
         <div class="template-table-container">
           <el-table :data="templates" style="width: 100%" max-height="450">
-            <el-table-column prop="name" label="模版名称" />
-            <el-table-column prop="type" label="类型">
+            <el-table-column prop="name" :label="t('notes.templateName')" />
+            <el-table-column prop="type" :label="t('notes.templateType')">
               <template #default="scope">
                 <el-tag>{{ scope.row.type.toUpperCase() }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" width="200">
+            <el-table-column :label="t('notes.templateOps')" width="200">
               <template #default="scope">
                 <el-button text type="primary" size="small" @click="useTemplate(scope.row)">
-                  使用
+                  {{ t('notes.use') }}
                 </el-button>
                 <el-button text type="warning" size="small" @click="editTemplate(scope.row)">
-                  编辑
+                  {{ t('notes.edit') }}
                 </el-button>
                 <el-button text type="danger" size="small" @click="deleteTemplate(scope.row)">
-                  删除
+                  {{ t('notes.delete') }}
                 </el-button>
               </template>
             </el-table-column>
@@ -373,14 +373,14 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="showTemplateDialog = false">关闭</el-button>
+        <el-button @click="showTemplateDialog = false">{{ t('notes.close') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 文件夹选择对话框（用于导入） - 树形结构 -->
     <el-dialog
       v-model="showFolderSelectDialog"
-      title="选择导入目标文件夹"
+      :title="t('notes.selectImportFolder')"
       width="500px"
     >
       <div class="folder-tree-select">
@@ -403,8 +403,8 @@
         </el-tree>
       </div>
       <template #footer>
-        <el-button @click="showFolderSelectDialog = false">取消</el-button>
-        <el-button type="primary" @click="confirmFolderSelect" :disabled="!selectedImportFolder">确定</el-button>
+        <el-button @click="showFolderSelectDialog = false">{{ t('notes.cancel') }}</el-button>
+        <el-button type="primary" @click="confirmFolderSelect" :disabled="!selectedImportFolder">{{ t('notes.confirm') }}</el-button>
       </template>
     </el-dialog>
 
@@ -423,6 +423,7 @@
 import {ref, computed, onMounted, onBeforeUnmount, nextTick, watch, defineAsyncComponent} from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import {ElMessage, ElMessageBox} from 'element-plus'
+import { t } from '@/i18n'
 import {Check, Edit, Close, Clock, Delete, ArrowLeft, ArrowRight, RefreshLeft, View, Loading, DocumentAdd, Upload, Document, Tickets, Plus, Folder} from '@element-plus/icons-vue'
 import {TauriFileManager} from '@/utils/tauri'
 import {join, appDataDir} from '@tauri-apps/api/path'
@@ -538,14 +539,14 @@ const onUploadImg = async (files, callback) => {
         urls.push(`./images/${fileName}`)
       } catch (error) {
 
-        ElMessage.error(`保存图片 ${file.name} 失败`)
+        ElMessage.error(t('notes.saveImageFailed', { name: file.name }))
       }
     }
 
     callback(urls)
   } catch (error) {
 
-    ElMessage.error('上传图片失败')
+    ElMessage.error(t('notes.uploadImageFailed'))
   }
 }
 
@@ -638,7 +639,7 @@ const handleNotesPathChanged = async (event) => {
   // 重新加载笔记树
   await loadNotesTree()
 
-  ElMessage.success('笔记路径已更新，已重新加载笔记列表')
+  ElMessage.success(t('notes.notesPathUpdated'))
 }
 
 // 加载主题设置的函数
@@ -748,7 +749,7 @@ const tryLoadXlsxIntoActiveEditor = async () => {
       lastXlsxLoadError.path !== selectedFile.value.path ||
       lastXlsxLoadError.bytes !== excelFileBytes.value
     ) {
-      ElMessage.error('加载Excel失败')
+      ElMessage.error(t('notes.loadExcelFailed'))
       lastXlsxLoadError = { mode, path: selectedFile.value.path, bytes: excelFileBytes.value }
     }
     return
@@ -806,7 +807,7 @@ const updateNewFolderName = (e) => {
 
 // 新建文件状态
 const creatingFileParent = ref(null)
-const newFileName = ref('未命名')
+const newFileName = ref('')
 const newFileType = ref('md') // md, txt, docx, xlsx
 
 // 更新新建文件名称
@@ -908,7 +909,7 @@ const loadNotesTree = async () => {
     // 用户需要手动点击文件夹查看内容
   } catch (error) {
 
-    ElMessage.error('加载笔记树失败')
+    ElMessage.error(t('notes.loadTreeFailed'))
   }
 }
 
@@ -1102,7 +1103,7 @@ const confirmCreateFolder = async () => {
 
     // 检查文件夹是否已存在
     if (await exists(newFolderPath)) {
-      ElMessage.warning('文件夹已存在')
+      ElMessage.warning(t('notes.folderExists'))
       // 不要取消创建状态，让用户可以重新输入
       return
     }
@@ -1134,13 +1135,13 @@ const confirmCreateFolder = async () => {
       folderFilesCache.value.set(newKey, [])
     }
 
-    ElMessage.success('文件夹创建成功')
+    ElMessage.success(t('notes.folderCreateSuccess'))
 
     // 清除创建状态
     cancelCreateFolder()
   } catch (error) {
 
-    ElMessage.error('创建文件夹失败')
+    ElMessage.error(t('notes.folderCreateFailed'))
     // 失败时也清除创建状态
     cancelCreateFolder()
   }
@@ -1175,15 +1176,15 @@ const startCreateFile = async (folder, fileType) => {
   // 自动生成不重复的文件名
   let baseName = ''
   if (fileType === 'md') {
-    baseName = '未命名笔记'
+    baseName = t('notes.untitledNote')
   } else if (fileType === 'txt') {
-    baseName = '未命名文本'
+    baseName = t('notes.untitledText')
   } else if (fileType === 'docx') {
-    baseName = '未命名文档'
+    baseName = t('notes.untitledDoc')
   } else if (fileType === 'xlsx') {
-    baseName = '未命名表格'
+    baseName = t('notes.untitledSheet')
   } else {
-    baseName = '未命名文档'
+    baseName = t('notes.untitledDoc')
   }
 
   // 检查文件是否存在，如果存在则添加数字后缀
@@ -1203,18 +1204,18 @@ const startCreateFile = async (folder, fileType) => {
     // 根据文件类型创建文件
     if (fileType === 'md') {
       await writeTextFile(filePath, '')
-      ElMessage.success('Markdown 文件创建成功')
+      ElMessage.success(t('notes.mdCreateSuccess'))
     } else if (fileType === 'txt') {
       await writeTextFile(filePath, '')
-      ElMessage.success('文本文件创建成功')
+      ElMessage.success(t('notes.txtCreateSuccess'))
     } else if (fileType === 'xlsx') {
       await createExcelFile(filePath, fileName)
-      ElMessage.success('Excel 文件创建成功')
+      ElMessage.success(t('notes.xlsxCreateSuccess'))
     } else if (fileType === 'docx') {
       await createWordFile(filePath, fileName)
-      ElMessage.success('Word 文件创建成功')
+      ElMessage.success(t('notes.docxCreateSuccess'))
     } else {
-      ElMessage.warning('不支持的文件类型')
+      ElMessage.warning(t('notes.unsupportedType'))
       return
     }
 
@@ -1238,7 +1239,7 @@ const startCreateFile = async (folder, fileType) => {
     }
   } catch (error) {
 
-    ElMessage.error('创建文件失败：' + error.message)
+    ElMessage.error(t('notes.createFileFailed') + error.message)
   }
 }
 
@@ -1249,7 +1250,7 @@ const getFileNameWithExt = (file) => {
     return `${file.name}.${file.extension}`
   }
   // 否则返回原始名称
-  return file.name || '未命名'
+  return file.name || t('notes.untitled')
 }
 
 const renameFolder = (folder) => {
@@ -1281,7 +1282,7 @@ const confirmRenameFolder = async (folder) => {
 
     // 目标文件夹已存在（Windows 会报 “目录不是空的”）
     if (await exists(newPath)) {
-      ElMessage.error('目标文件夹已存在')
+      ElMessage.error(t('notes.targetFolderExists'))
       // 保留重命名状态，让用户可以继续修改名称
       await nextTick()
       const input = document.querySelector('.rename-input')
@@ -1331,11 +1332,11 @@ const confirmRenameFolder = async (folder) => {
       }
     })
 
-    ElMessage.success('重命名成功')
+    ElMessage.success(t('notes.renameSuccess'))
     cancelRenameFolder()
   } catch (error) {
 
-    ElMessage.error('重命名失败')
+    ElMessage.error(t('notes.renameFailed'))
     // 出错时不自动 cancel，保留输入框便于用户继续修改
   }
 }
@@ -1347,9 +1348,9 @@ const cancelRenameFolder = () => {
 
 const deleteFolder = async (folder) => {
   try {
-    await ElMessageBox.confirm('确定要删除此文件夹及其内容吗？', '确认删除', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('notes.confirmDeleteFolder'), t('notes.confirmDelete'), {
+          confirmButtonText: t('notes.confirm'),
+          cancelButtonText: t('notes.cancel'),
           type: 'warning'
     })
 
@@ -1370,11 +1371,11 @@ const deleteFolder = async (folder) => {
       }
     }
 
-    ElMessage.success('文件夹已删除')
+    ElMessage.success(t('notes.folderDeleted'))
   } catch (error) {
     if (error !== 'cancel') {
 
-      ElMessage.error('删除失败')
+      ElMessage.error(t('notes.deleteFailed'))
     }
   }
 }
@@ -1469,7 +1470,7 @@ const openFile = async (file, shouldEdit = false) => {
     } else if (ext === 'docx') {
       await loadWordFile(file)
     } else {
-      ElMessage.warning('暂不支持该文件类型的编辑')
+      ElMessage.warning(t('notes.unsupportedEditType'))
       isLoadingFile.value = false
       return
     }
@@ -1516,7 +1517,7 @@ const openFile = async (file, shouldEdit = false) => {
     }
   } catch (error) {
 
-    ElMessage.error('打开文件失败')
+    ElMessage.error(t('notes.openFileFailed'))
     isLoadingFile.value = false
   }
 }
@@ -1531,7 +1532,7 @@ const loadExcelFile = async (file) => {
     excelFileBytes.value = fileData instanceof Uint8Array ? fileData : new Uint8Array(fileData)
   } catch (error) {
 
-    ElMessage.error('加载Excel文件失败: ' + error.message)
+    ElMessage.error(t('notes.loadExcelFileFailed') + ': ' + error.message)
     excelFileBytes.value = null
   }
 }
@@ -1560,8 +1561,8 @@ const loadWordFile = async (file) => {
     wordContent.value = result.value || '<p></p>'
   } catch (error) {
 
-    ElMessage.error('加载Word文件失败')
-    wordContent.value = '<p>无法加载Word文件</p>'
+    ElMessage.error(t('notes.loadWordFailed'))
+    wordContent.value = `<p>${t('notes.cannotLoadWord')}</p>`
   }
 }
 
@@ -1647,7 +1648,7 @@ const confirmEditFileName = async () => {
 
     // 检查新文件名是否已存在
     if (await exists(newPath)) {
-      ElMessage.error('文件名已存在')
+      ElMessage.error(t('notes.fileNameExists'))
       return
     }
 
@@ -1675,12 +1676,12 @@ const confirmEditFileName = async () => {
     // 更新最近文件列表
     await loadRecentFiles()
 
-    ElMessage.success('重命名成功')
+    ElMessage.success(t('notes.renameSuccess'))
     isEditingFileName.value = false
     editingFileName.value = ''
   } catch (error) {
 
-    ElMessage.error('重命名失败')
+    ElMessage.error(t('notes.renameFailed'))
   }
 }
 
@@ -1688,9 +1689,9 @@ const deleteCurrentNote = async () => {
   if (!selectedFile.value) return
 
   try {
-    await ElMessageBox.confirm(`确定删除 ${selectedFile.value.name || selectedFile.value.title} 吗?`, '确认删除', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('notes.confirmDeleteFile', { name: selectedFile.value.name || selectedFile.value.title }), t('notes.confirmDelete'), {
+      confirmButtonText: t('notes.confirm'),
+      cancelButtonText: t('notes.cancel'),
       type: 'warning'
     })
 
@@ -1723,13 +1724,13 @@ const deleteCurrentNote = async () => {
 
     selectedFile.value = null
     isEditing.value = false
-    ElMessage.success('文件已删除')
+    ElMessage.success(t('notes.fileDeleted'))
 
     // 更新最近文件列表
     await loadRecentFiles()
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      ElMessage.error(t('notes.deleteFailed'))
     }
   }
 }
@@ -1766,7 +1767,7 @@ const saveNote = async () => {
 
       // 保存版本历史（MD 和 TXT 文件）
       try {
-        await versionAPI.saveNoteVersion(selectedFile.value.name, contentToSave, '手动保存')
+        await versionAPI.saveNoteVersion(selectedFile.value.name, contentToSave, t('notes.manualSave'))
       } catch (e) { /* ignore */ }
     } else if (ext === 'xlsx') {
       // 保存Excel文件
@@ -1775,11 +1776,11 @@ const saveNote = async () => {
       // 保存Word文件
       await saveWordFile()
     } else {
-      ElMessage.warning('暂不支持该文件类型的保存')
+      ElMessage.warning(t('notes.unsupportedSaveType'))
       return
     }
 
-    ElMessage.success('保存成功')
+    ElMessage.success(t('notes.saveSuccess'))
 
     // 获取文件的真实修改时间
     try {
@@ -1849,7 +1850,7 @@ const saveNote = async () => {
     await loadRecentFiles()
   } catch (error) {
 
-    ElMessage.error('保存失败')
+    ElMessage.error(t('notes.saveFailed'))
   }
 }
 
@@ -1857,13 +1858,13 @@ const saveNote = async () => {
 const saveExcelFile = async () => {
   try {
     if (!selectedFile.value) {
-      ElMessage.error('未选择文件')
+      ElMessage.error(t('notes.noFileSelected'))
       return
     }
 
     const activeExcelEditor = excelEditorRef.value || window.excelEditorRef
     if (!activeExcelEditor || typeof activeExcelEditor.exportXlsx !== 'function') {
-      ElMessage.error('Excel 编辑器未就绪')
+      ElMessage.error(t('notes.excelEditorNotReady'))
       return
     }
 
@@ -1963,7 +1964,7 @@ const createWordFile = async (filePath, fileName) => {
 const saveWordFile = async () => {
   try {
     if (!wordEditorRef.value || !selectedFile.value) {
-      ElMessage.error('Word编辑器未加载')
+      ElMessage.error(t('notes.wordEditorNotLoaded'))
       return
     }
 
@@ -2048,7 +2049,7 @@ const htmlToDocxParagraphs = (html) => {
 // 显示版本历史
 const showVersionHistory = async () => {
   if (!selectedFile.value) {
-    ElMessage.warning('请先选择一篇笔记')
+    ElMessage.warning(t('notes.selectNoteFirst'))
     return
   }
 
@@ -2057,7 +2058,7 @@ const showVersionHistory = async () => {
     showVersionDialog.value = true
   } catch (error) {
 
-    ElMessage.error('加载版本历史失败')
+    ElMessage.error(t('notes.loadVersionFailed'))
   }
 }
 
@@ -2065,8 +2066,8 @@ const showVersionHistory = async () => {
 const restoreVersion = async (version) => {
   try {
     await ElMessageBox.confirm(
-        `确定要恢复到版本 ${version.version_number} 吗？当前内容将被覆盖。`,
-        '确认恢复',
+        t('notes.confirmRestoreMsg', { version: version.version_number }),
+        t('notes.confirmRestore'),
         { type: 'warning' }
     )
 
@@ -2086,12 +2087,12 @@ const restoreVersion = async (version) => {
       `恢复到版本 ${version.version_number}`
     )
 
-    ElMessage.success('版本恢复成功')
+    ElMessage.success(t('notes.restoreSuccess'))
     showVersionDialog.value = false
   } catch (error) {
     if (error !== 'cancel') {
 
-      ElMessage.error('恢复失败')
+      ElMessage.error(t('notes.restoreFailed'))
     }
   }
 }
@@ -2114,13 +2115,13 @@ const formatTime = (timestamp) => {
   const day = 24 * hour
 
   if (diff < minute) {
-    return '刚刚'
+    return t('notes.justNow')
   } else if (diff < hour) {
-    return `${Math.floor(diff / minute)} 分钟前`
+    return t('notes.minutesAgo', { n: Math.floor(diff / minute) })
   } else if (diff < day) {
-    return `${Math.floor(diff / hour)} 小时前`
+    return t('notes.hoursAgo', { n: Math.floor(diff / hour) })
   } else if (diff < 7 * day) {
-    return `${Math.floor(diff / day)} 天前`
+    return t('notes.daysAgo', { days: Math.floor(diff / day) })
   } else {
     return new Date(timestamp).toLocaleDateString('zh-CN')
   }
@@ -2196,20 +2197,20 @@ const loadTemplates = async () => {
 // 创建新模版
 const createTemplate = async () => {
   try {
-    const { value: name } = await ElMessageBox.prompt('请输入模版名称', '新建模版', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    const { value: name } = await ElMessageBox.prompt(t('notes.templateNamePrompt'), t('notes.newTemplate'), {
+      confirmButtonText: t('notes.confirm'),
+      cancelButtonText: t('notes.cancel'),
       inputPattern: /.+/,
-      inputErrorMessage: '模版名称不能为空'
+      inputErrorMessage: t('notes.templateNameEmpty')
     })
 
     if (!name) return
 
-    const { value: type } = await ElMessageBox.prompt('请选择模版类型（md/txt/docx/xlsx）', '选择类型', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+    const { value: type } = await ElMessageBox.prompt(t('notes.templateTypePrompt'), t('notes.templateType'), {
+      confirmButtonText: t('notes.confirm'),
+      cancelButtonText: t('notes.cancel'),
       inputPattern: /^(md|txt|docx|xlsx)$/,
-      inputErrorMessage: '请输入有效的类型',
+      inputErrorMessage: t('notes.templateTypeInvalid'),
       inputValue: 'md'
     })
 
@@ -2223,11 +2224,11 @@ const createTemplate = async () => {
 
     templates.value.push(template)
     localStorage.setItem('note_templates', JSON.stringify(templates.value))
-    ElMessage.success('模版创建成功')
+    ElMessage.success(t('notes.templateCreateSuccess'))
   } catch (error) {
     if (error !== 'cancel') {
 
-      ElMessage.error('创建模版失败')
+      ElMessage.error(t('notes.templateCreateFailed'))
     }
   }
 }
@@ -2235,14 +2236,14 @@ const createTemplate = async () => {
 // 使用模版
 const useTemplate = (template) => {
   // 这里可以基于模版创建新笔记
-  ElMessage.info(`使用模版: ${template.name}`)
+  ElMessage.info(`${t('notes.useTemplate')}: ${template.name}`)
   showTemplateDialog.value = false
   // TODO: 实现基于模版创建笔记的逻辑
 }
 
 // 编辑模版
 const editTemplate = (template) => {
-  ElMessage.info(`编辑模版: ${template.name}`)
+  ElMessage.info(`${t('notes.editTemplate')}: ${template.name}`)
   // TODO: 实现编辑模版的逻辑
 }
 
@@ -2250,18 +2251,18 @@ const editTemplate = (template) => {
 const deleteTemplate = async (template) => {
   try {
     await ElMessageBox.confirm(
-      `确定要删除模版 "${template.name}" 吗？`,
-      '确认删除',
+      t('notes.confirmDeleteTemplate', { name: template.name }),
+      t('notes.confirmDelete'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('notes.confirm'),
+        cancelButtonText: t('notes.cancel'),
         type: 'warning'
       }
     )
 
     templates.value = templates.value.filter(t => t.id !== template.id)
     localStorage.setItem('note_templates', JSON.stringify(templates.value))
-    ElMessage.success('模版已删除')
+    ElMessage.success(t('notes.templateDeleted'))
   } catch (error) {
     // 用户取消
   }
@@ -2271,7 +2272,7 @@ const deleteTemplate = async (template) => {
 const importNote = async () => {
   // 检查是否有文件夹
   if (rootFolders.value.length === 0) {
-    ElMessage.warning('请先创建一个文件夹')
+    ElMessage.warning(t('notes.createFolderFirst'))
     return
   }
 
@@ -2337,7 +2338,7 @@ const handleTreeNodeClick = (data) => {
 // 确认选择文件夹并开始导入
 const confirmFolderSelect = async () => {
   if (!selectedImportFolder.value) {
-    ElMessage.warning('请选择一个文件夹')
+    ElMessage.warning(t('notes.selectFolder'))
     return
   }
 
@@ -2348,7 +2349,7 @@ const confirmFolderSelect = async () => {
 
   const folder = findFolder(selectedImportFolder.value)
   if (!folder) {
-    ElMessage.error('找不到选中的文件夹')
+    ElMessage.error(t('notes.folderNotFound'))
     return
   }
 
@@ -2500,7 +2501,7 @@ const setupFileDrop = async () => {
 
       // 检查是否有文件夹
       if (rootFolders.value.length === 0) {
-        ElMessage.warning('请先创建一个文件夹')
+        ElMessage.warning(t('notes.createFolderFirst'))
         dropTargetFolder = null
         return
       }
@@ -2539,7 +2540,7 @@ const setupFileDrop = async () => {
 // 处理拖拽的文件
 const handleDroppedFiles = async (paths, autoOpen = false) => {
   if (!importTargetFolder.value) {
-    ElMessage.error('未选择目标文件夹')
+    ElMessage.error(t('notes.noTargetFolder'))
     return
   }
 
@@ -2550,7 +2551,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
       // 检查文件是否存在
       const fileExists = await exists(filePath)
       if (!fileExists) {
-        ElMessage.warning(`文件不存在: ${filePath}`)
+        ElMessage.warning(`${t('notes.fileNotExist')}: ${filePath}`)
         continue
       }
 
@@ -2560,7 +2561,7 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
 
       // 验证文件类型
       if (!['.md', '.txt', '.docx', '.xlsx'].includes(ext)) {
-        ElMessage.warning(`不支持的文件类型: ${fileName}`)
+        ElMessage.warning(`${t('notes.unsupportedFileType')}: ${fileName}`)
         continue
       }
 
@@ -2571,11 +2572,11 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
       if (await exists(targetPath)) {
         try {
           await ElMessageBox.confirm(
-            `文件 "${fileName}" 已存在，是否覆盖？`,
-            '确认',
+            t('notes.fileExistsOverwrite', { name: fileName }),
+            t('notes.confirmOverwrite'),
             {
-              confirmButtonText: '覆盖',
-              cancelButtonText: '跳过',
+              confirmButtonText: t('notes.overwrite'),
+              cancelButtonText: t('notes.skip'),
               type: 'warning'
             }
           )
@@ -2594,12 +2595,12 @@ const handleDroppedFiles = async (paths, autoOpen = false) => {
         await writeFile(targetPath, fileData)
       }
 
-      ElMessage.success(`导入成功: ${fileName}`)
+      ElMessage.success(`${t('notes.importSuccess')}: ${fileName}`)
       importedFiles.push(targetPath)
     } catch (error) {
 
       const fileName = filePath.split(/[/\\]/).pop()
-      ElMessage.error(`导入失败: ${fileName}`)
+      ElMessage.error(`${t('notes.importFailed')}: ${fileName}`)
     }
   }
 
@@ -2629,11 +2630,11 @@ const moveFolder = async (sourceFolder, targetFolder) => {
   try {
     // 确认操作
     await ElMessageBox.confirm(
-      `确定要将文件夹 "${sourceFolder.name}" 移动到 "${targetFolder.name}" 吗？`,
-      '确认移动',
+      t('notes.confirmMoveFolder', { source: sourceFolder.name, target: targetFolder.name }),
+      t('notes.confirmMove'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('notes.confirm'),
+        cancelButtonText: t('notes.cancel'),
         type: 'warning'
       }
     )
@@ -2646,7 +2647,7 @@ const moveFolder = async (sourceFolder, targetFolder) => {
 
     // 检查目标是否已存在
     if (await exists(newPath)) {
-      ElMessage.error('目标文件夹中已存在同名文件夹')
+      ElMessage.error(t('notes.targetExists'))
       return
     }
 
@@ -2691,7 +2692,7 @@ const moveFolder = async (sourceFolder, targetFolder) => {
     }
     await loadFolderFiles(targetFolder)
 
-    ElMessage.success('移动成功')
+    ElMessage.success(t('notes.moveSuccess'))
   } catch (error) {
     if (error !== 'cancel') {
 
@@ -2765,7 +2766,7 @@ const moveFile = async (sourceFile, targetFolder) => {
 
     }
 
-    ElMessage.success('移动成功')
+    ElMessage.success(t('notes.moveSuccess'))
 
   } catch (error) {
     if (error !== 'cancel') {
@@ -3025,7 +3026,7 @@ const createNewNote = async () => {
   }
 
   if (!targetFolder) {
-    ElMessage.warning('请先创建一个文件夹')
+    ElMessage.warning(t('notes.createFolderFirst'))
     return
   }
 

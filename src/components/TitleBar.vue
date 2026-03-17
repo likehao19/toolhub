@@ -7,13 +7,13 @@
       </div>
 
       <div class="title-bar-right">
-        <button class="title-bar-button minimize-button" @click="handleMinimize" title="最小化">
+        <button class="title-bar-button minimize-button" @click="handleMinimize" :title="t('titleBar.minimize')">
           <svg width="12" height="12" viewBox="0 0 12 12">
             <path d="M0 6h12" stroke="currentColor" stroke-width="1" />
           </svg>
         </button>
 
-        <button class="title-bar-button maximize-button" @click="handleToggleMaximize" :title="isMaximized ? '还原' : '最大化'">
+        <button class="title-bar-button maximize-button" @click="handleToggleMaximize" :title="isMaximized ? t('titleBar.restore') : t('titleBar.maximize')">
           <svg v-if="!isMaximized" width="12" height="12" viewBox="0 0 12 12">
             <rect x="1" y="1" width="10" height="10" stroke="currentColor" stroke-width="1" fill="none" />
           </svg>
@@ -23,7 +23,7 @@
           </svg>
         </button>
 
-        <button class="title-bar-button close-button" @click="handleClose" title="关闭">
+        <button class="title-bar-button close-button" @click="handleClose" :title="t('titleBar.close')">
           <svg width="12" height="12" viewBox="0 0 12 12">
             <path d="M1 1l10 10M11 1l-10 10" stroke="currentColor" stroke-width="1" />
           </svg>
@@ -36,6 +36,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { TauriWindow } from '@/utils/tauri'
+import { t } from '@/i18n'
 
 const props = defineProps({
   title: {
