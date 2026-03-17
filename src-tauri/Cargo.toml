@@ -58,3 +58,10 @@ tower = "0.4"
 tower-http = { version = "0.5", features = ["cors"] }
 reqwest = { version = "0.12", features = ["stream"] }
 
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.61", features = [
+    "Win32_Security_Credentials",
+    "Win32_Foundation",
+    "Win32_System_LibraryLoader",
+] }
+

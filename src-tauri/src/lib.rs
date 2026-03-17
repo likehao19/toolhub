@@ -92,6 +92,14 @@ pub fn run() {
             commands::chat::discover_lan_chat,
             commands::chat::start_lan_server,
             commands::chat::stop_lan_server,
+            commands::credential::list_credentials,
+            commands::credential::read_credential,
+            commands::credential::add_credential,
+            commands::credential::delete_credential,
+            commands::credential::open_passkey_settings,
+            commands::credential::list_passkeys,
+            commands::credential::delete_passkey,
+            commands::bookmark::fetch_website_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

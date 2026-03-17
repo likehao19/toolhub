@@ -7,3 +7,5 @@ pub mod file_ops;
 pub mod shell;
 pub mod database;
 pub mod chat;
+pub mod credential;
+pub mod bookmark;
