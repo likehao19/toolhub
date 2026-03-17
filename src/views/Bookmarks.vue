@@ -4,16 +4,16 @@
     <header class="header">
       <div class="header-left">
         <!-- 折叠/展开侧边栏按钮 -->
-        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? '显示侧边栏' : '隐藏侧边栏'">
+        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('common.showSidebar') : t('common.hideSidebar')">
           <el-icon><ArrowLeft v-if="!hideSidebar" /><ArrowRight v-else /></el-icon>
         </el-button>
-        <div class="breadcrumb">书签管理 / {{ currentCategoryName }}</div>
+        <div class="breadcrumb">{{ t('bookmarks.title') }} / {{ currentCategoryName }}</div>
       </div>
       <div class="header-actions">
         <!-- 搜索框 -->
         <el-input
           v-model="searchKeyword"
-          placeholder="搜索书签..."
+          :placeholder="t('bookmarks.searchPlaceholder')"
           clearable
           style="width: 250px;"
           size="small"
@@ -22,15 +22,15 @@
             <el-icon><Search /></el-icon>
           </template>
         </el-input>
-        
+
         <!-- 操作按钮组 -->
-        <el-button size="small" circle @click="openImportDialog" title="导入书签">
+        <el-button size="small" circle @click="openImportDialog" :title="t('bookmarks.importBookmarks')">
           <el-icon><Upload /></el-icon>
         </el-button>
-        <el-button size="small" circle @click="exportBookmarks" title="导出书签">
+        <el-button size="small" circle @click="exportBookmarks" :title="t('bookmarks.exportBookmarks')">
           <el-icon><Download /></el-icon>
         </el-button>
-        <el-button size="small" type="primary" circle @click="showCreateDialog" title="添加书签">
+        <el-button size="small" type="primary" circle @click="showCreateDialog" :title="t('bookmarks.addBookmark')">
           <el-icon><Plus /></el-icon>
         </el-button>
       </div>
@@ -40,40 +40,40 @@
       <!-- 左侧分类栏 -->
       <aside class="sidebar-left" v-show="!hideSidebar">
         <div class="sidebar-toolbar">
-          <span class="sidebar-title">分类</span>
+          <span class="sidebar-title">{{ t('common.category') }}</span>
           <div class="actions">
-            <span class="sidebar-btn" title="新建分类" @click="showAddCategoryDialog">
+            <span class="sidebar-btn" :title="t('common.newCategory')" @click="showAddCategoryDialog">
               <i class="fa-solid fa-plus"></i>
             </span>
           </div>
         </div>
-        
+
         <div class="category-list">
           <!-- 全部书签 -->
-          <div 
-            class="category-item" 
+          <div
+            class="category-item"
             :class="{ active: selectedCategory === null }"
             @click="selectCategory(null)"
           >
             <el-icon class="category-icon"><Folder /></el-icon>
-            <span class="category-name">全部书签</span>
+            <span class="category-name">{{ t('bookmarks.allBookmarks') }}</span>
             <span class="category-count">{{ bookmarks.length }}</span>
           </div>
-          
+
           <!-- 常用书签（收藏） -->
-          <div 
-            class="category-item category-favorite" 
+          <div
+            class="category-item category-favorite"
             :class="{ active: selectedCategory === 'favorite' }"
             @click="selectCategory('favorite')"
           >
             <el-icon class="category-icon favorite-icon"><StarFilled /></el-icon>
-            <span class="category-name">常用</span>
+            <span class="category-name">{{ t('bookmarks.favorites') }}</span>
             <span class="category-count">{{ getFavoriteCount() }}</span>
           </div>
-          
+
           <!-- 自定义分类 -->
-          <div 
-            v-for="category in categories" 
+          <div
+            v-for="category in categories"
             :key="category.id"
             class="category-item"
             :class="{ active: selectedCategory === category.id }"
@@ -85,8 +85,8 @@
             <span class="category-name">{{ category.name }}</span>
             <span class="category-count">{{ getCategoryCount(category.id) }}</span>
             <div class="category-actions" v-if="!category.is_default">
-              <i class="fa-solid fa-pen action-icon" @click.stop="editCategory(category)" title="编辑"></i>
-              <i class="fa-solid fa-trash action-icon del" @click.stop="deleteCategory(category)" title="删除"></i>
+              <i class="fa-solid fa-pen action-icon" @click.stop="editCategory(category)" :title="t('common.edit')"></i>
+              <i class="fa-solid fa-trash action-icon del" @click.stop="deleteCategory(category)" :title="t('common.delete')"></i>
             </div>
           </div>
         </div>
@@ -96,114 +96,58 @@
       <main class="content-area">
         <!-- 书签列表 -->
         <div class="bookmark-list" v-loading="loading">
-          <el-empty v-if="filteredBookmarks.length === 0" description="暂无书签" />
-          
+          <el-empty v-if="filteredBookmarks.length === 0" :description="t('bookmarks.noBookmarks')" />
+
           <div v-else class="bookmark-cards">
-            <div 
-              v-for="bookmark in filteredBookmarks" 
+            <div
+              v-for="bookmark in filteredBookmarks"
               :key="bookmark.id"
-              class="bookmark-card"
+              class="bookmark-row"
+              @dblclick="openBookmark(bookmark)"
+              @contextmenu.prevent="showContextMenu($event, bookmark)"
             >
-              <!-- 第一行：标题和操作按钮 -->
-              <div class="card-row card-header-row">
-                <!-- 左侧：图标和标题 -->
-                <div class="card-title-section">
-                  <!-- 网站图标 -->
-                  <div class="bookmark-favicon">
-                    <img
-                      v-if="bookmark.favicon_url"
-                      :src="bookmark.favicon_url"
-                      :data-url="bookmark.url"
-                      :alt="bookmark.title"
-                      @error="handleFaviconError"
-                    />
-                    <el-icon v-else class="card-icon" :style="{ color: getIconColor(bookmark.category_icon) }">
-                      <component :is="getCategoryIcon(bookmark.category_icon)" />
-                    </el-icon>
-                  </div>
-                  <h3 class="card-title" @click="openBookmark(bookmark)">{{ bookmark.title }}</h3>
-                  <!-- 收藏星标 -->
-                  <el-icon 
-                    class="favorite-star" 
-                    :class="{ 'is-favorite': bookmark.is_favorite }"
-                    @click.stop="toggleFavorite(bookmark)"
-                    title="标记为常用"
-                  >
-                    <StarFilled v-if="bookmark.is_favorite" />
-                    <Star v-else />
+              <!-- 单行紧凑布局：[favicon] [标题] [URL灰色] [hover操作按钮] -->
+              <div class="row-left" @click="openBookmark(bookmark)">
+                <!-- Favicon：优先 favicon_data > favicon_url > 默认图标 -->
+                <div class="bookmark-favicon">
+                  <img
+                    v-if="bookmark.favicon_data"
+                    :src="bookmark.favicon_data"
+                    :alt="bookmark.title"
+                  />
+                  <img
+                    v-else-if="bookmark.favicon_url"
+                    :src="bookmark.favicon_url"
+                    :data-url="bookmark.url"
+                    :alt="bookmark.title"
+                    @error="handleFaviconError"
+                  />
+                  <el-icon v-else class="default-favicon">
+                    <Link />
                   </el-icon>
-                  <!-- 预览图标按钮 -->
-                  <el-button 
-                    text 
-                    size="small"
-                    @click.stop="showPreview(bookmark)"
-                    title="查看预览"
-                    class="preview-btn"
-                  >
-                    <el-icon><View /></el-icon>
-                  </el-button>
                 </div>
-                
-                <!-- 右侧：操作按钮 -->
-                <div class="card-actions">
-                  <el-button 
-                    text 
-                    size="small"
-                    @click="openBookmark(bookmark)"
-                    title="打开书签"
-                  >
-                    <el-icon><Link /></el-icon>
-                  </el-button>
-                  <el-button 
-                    text 
-                    size="small"
-                    @click="copyToClipboard(bookmark.url, 'URL')"
-                    title="复制URL"
-                  >
-                    <el-icon><CopyDocument /></el-icon>
-                  </el-button>
-                  <el-button 
-                    text 
-                    size="small"
-                    @click="editBookmark(bookmark)"
-                    title="编辑"
-                  >
+                <span class="row-title">{{ bookmark.title }}</span>
+                <span class="row-url">{{ getDisplayUrl(bookmark.url) }}</span>
+              </div>
+
+              <!-- 右侧：收藏星标 + hover 操作按钮 -->
+              <div class="row-right">
+                <el-icon
+                  class="favorite-star"
+                  :class="{ 'is-favorite': bookmark.is_favorite }"
+                  @click.stop="toggleFavorite(bookmark)"
+                  :title="t('bookmarks.markFavorite')"
+                >
+                  <StarFilled v-if="bookmark.is_favorite" />
+                  <Star v-else />
+                </el-icon>
+                <div class="row-actions">
+                  <el-button text size="small" @click.stop="editBookmark(bookmark)" :title="t('common.edit')">
                     <el-icon><Edit /></el-icon>
                   </el-button>
-                  <el-button 
-                    text 
-                    type="danger"
-                    size="small"
-                    @click="deleteBookmark(bookmark)"
-                    title="删除"
-                  >
+                  <el-button text size="small" type="danger" @click.stop="deleteBookmark(bookmark)" :title="t('common.delete')">
                     <el-icon><Delete /></el-icon>
                   </el-button>
-                </div>
-              </div>
-              
-              <!-- 第二行：URL和标签 -->
-              <div class="card-row card-info-row">
-                <div class="card-url">
-                  <el-link :href="bookmark.url" target="_blank" underline="never" @click.prevent="openBookmark(bookmark)">
-                    {{ bookmark.url }}
-                  </el-link>
-                </div>
-                <div class="card-meta">
-                  <span v-if="bookmark.access_count > 0" class="visit-count">
-                    <i class="fa-solid fa-eye"></i>
-                    {{ bookmark.access_count }}
-                  </span>
-                  <div class="card-tags" v-if="getBookmarkTags(bookmark).length > 0">
-                    <el-tag 
-                      v-for="tag in getBookmarkTags(bookmark)" 
-                      :key="tag" 
-                      size="small" 
-                      type="info"
-                    >
-                      {{ tag }}
-                    </el-tag>
-                  </div>
                 </div>
               </div>
             </div>
@@ -212,29 +156,62 @@
       </main>
     </div>
 
+    <!-- 右键菜单 -->
+    <teleport to="body">
+      <div
+        v-if="contextMenu.visible"
+        class="context-menu"
+        :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
+        @click="contextMenu.visible = false"
+      >
+        <div class="context-menu-item" @click="openBookmark(contextMenu.bookmark)">
+          <el-icon><Link /></el-icon>
+          <span>{{ t('bookmarks.openBookmark') }}</span>
+        </div>
+        <div class="context-menu-item" @click="copyToClipboard(contextMenu.bookmark.url, 'URL')">
+          <el-icon><CopyDocument /></el-icon>
+          <span>{{ t('bookmarks.copyUrl') }}</span>
+        </div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" @click="editBookmark(contextMenu.bookmark)">
+          <el-icon><Edit /></el-icon>
+          <span>{{ t('common.edit') }}</span>
+        </div>
+        <div class="context-menu-item danger" @click="deleteBookmark(contextMenu.bookmark)">
+          <el-icon><Delete /></el-icon>
+          <span>{{ t('common.delete') }}</span>
+        </div>
+      </div>
+    </teleport>
+
     <!-- 添加/编辑书签对话框 -->
     <el-dialog
       v-model="dialogVisible"
-      :title="editingBookmark ? '编辑书签' : '添加书签'"
+      :title="editingBookmark ? t('bookmarks.editBookmark') : t('bookmarks.addBookmarkTitle')"
       width="500px"
     >
       <el-form :model="bookmarkForm" label-width="80px">
-        <el-form-item label="标题" required>
-          <el-input v-model="bookmarkForm.title" placeholder="书签标题" />
-        </el-form-item>
         <el-form-item label="URL" required>
-          <el-input v-model="bookmarkForm.url" placeholder="https://example.com" />
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <el-input v-model="bookmarkForm.url" placeholder="https://example.com" style="flex: 1;" @blur="onUrlBlur" />
+            <el-button :loading="fetchingInfo" @click="fetchWebsiteInfo" :disabled="!bookmarkForm.url">
+              {{ fetchingInfo ? t('bookmarks.fetching') : t('bookmarks.fetchInfo') }}
+            </el-button>
+          </div>
         </el-form-item>
-        <el-form-item label="描述">
+        <el-form-item :label="t('common.title')" required>
+          <el-input v-model="bookmarkForm.title" :placeholder="t('bookmarks.bookmarkTitle')" />
+        </el-form-item>
+        <el-form-item :label="t('common.description')">
           <el-input
             v-model="bookmarkForm.description"
             type="textarea"
             :rows="2"
-            placeholder="书签描述"
+            :placeholder="t('bookmarks.bookmarkDesc')"
           />
         </el-form-item>
-        <el-form-item label="分类">
-          <el-select v-model="bookmarkForm.category_id" placeholder="选择分类" clearable style="width: 100%;">
+        <el-form-item :label="t('common.category')">
+          <el-select v-model="bookmarkForm.category_id" :placeholder="t('bookmarks.selectCategory')" clearable style="width: 100%;">
             <el-option
               v-for="category in categories"
               :key="category.id"
@@ -248,14 +225,14 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="标签">
+        <el-form-item :label="t('bookmarks.tagLabel')">
           <el-select
             v-model="bookmarkForm.tagsArray"
             multiple
             filterable
             allow-create
             default-first-option
-            placeholder="选择或输入标签"
+            :placeholder="t('bookmarks.selectTags')"
             style="width: 100%;"
           >
             <el-option
@@ -268,23 +245,23 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveBookmark">保存</el-button>
+        <el-button @click="dialogVisible = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveBookmark">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 添加/编辑分类对话框 -->
     <el-dialog
       v-model="categoryDialogVisible"
-      :title="editingCategory ? '编辑分类' : '添加分类'"
+      :title="editingCategory ? t('bookmarks.editCategory') : t('bookmarks.addCategory')"
       width="400px"
     >
       <el-form :model="categoryForm" label-width="80px">
-        <el-form-item label="名称" required>
-          <el-input v-model="categoryForm.name" placeholder="分类名称" />
+        <el-form-item :label="t('common.title')" required>
+          <el-input v-model="categoryForm.name" :placeholder="t('bookmarks.categoryName')" />
         </el-form-item>
-        <el-form-item label="图标">
-          <el-select v-model="categoryForm.icon" placeholder="选择图标">
+        <el-form-item :label="t('bookmarks.selectIcon')">
+          <el-select v-model="categoryForm.icon" :placeholder="t('bookmarks.selectIcon')">
             <el-option
               v-for="icon in availableIcons"
               :key="icon.value"
@@ -300,72 +277,72 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="categoryDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveCategory">保存</el-button>
+        <el-button @click="categoryDialogVisible = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveCategory">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
 
     <!-- 导入书签对话框 -->
     <el-dialog
       v-model="showImportDialog"
-      title="导入书签"
+      :title="t('bookmarks.importTitle')"
       width="600px"
     >
       <div v-if="!importFile">
         <el-alert
-          title="支持的格式"
+          :title="t('bookmarks.supportedFormats')"
           type="info"
           :closable="false"
           style="margin-bottom: 16px;"
         >
           <ul style="margin: 8px 0 0 20px; padding: 0;">
-            <li>浏览器书签 HTML 文件（Chrome/Firefox/Edge）</li>
-            <li>CSV 格式文件</li>
+            <li>{{ t('bookmarks.browserHtml') }}</li>
+            <li>{{ t('bookmarks.csvFile') }}</li>
           </ul>
         </el-alert>
         <el-button type="primary" @click="handleBookmarkFileSelect" style="width: 100%;">
           <el-icon><Upload /></el-icon>
-          选择文件
+          {{ t('bookmarks.selectFile') }}
         </el-button>
       </div>
-      
+
       <div v-else>
         <el-alert
-          :title="`已选择文件：${importFile.name}`"
+          :title="`${t('bookmarks.fileSelected')}${importFile.name}`"
           type="success"
           :closable="false"
           style="margin-bottom: 16px;"
         />
-        
+
         <el-button @click="handleBookmarkFileSelect" style="margin-bottom: 16px;">
-          重新选择
+          {{ t('bookmarks.reselect') }}
         </el-button>
-        
+
         <div v-if="importResult">
           <el-divider />
           <div class="import-result">
             <div class="result-stat">
               <div class="stat-item">
-                <span class="stat-label">总计：</span>
+                <span class="stat-label">{{ t('bookmarks.total') }}</span>
                 <span class="stat-value">{{ importResult.total }}</span>
               </div>
               <div class="stat-item">
-                <span class="stat-label">有效：</span>
+                <span class="stat-label">{{ t('bookmarks.valid') }}</span>
                 <span class="stat-value success">{{ importResult.valid || importResult.total }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       <template #footer>
-        <el-button @click="showImportDialog = false">取消</el-button>
-        <el-button 
-          type="primary" 
+        <el-button @click="showImportDialog = false">{{ t('common.cancel') }}</el-button>
+        <el-button
+          type="primary"
           @click="executeBookmarkImport"
           :disabled="!importResult || importResult.total === 0"
         >
-          导入（{{ importResult?.total || 0 }} 条）
+          {{ t('bookmarks.importBtn') }}（{{ importResult?.total || 0 }}）
         </el-button>
       </template>
     </el-dialog>
@@ -373,7 +350,7 @@
     <!-- 网站预览对话框 -->
     <el-dialog
       v-model="showPreviewDialog"
-      :title="previewBookmark?.title || '网站预览'"
+      :title="previewBookmark?.title || t('bookmarks.previewTitle')"
       width="80%"
       top="5vh"
     >
@@ -382,8 +359,8 @@
           <div class="preview-info">
             <div class="preview-favicon">
               <img
-                v-if="previewBookmark.favicon_url"
-                :src="previewBookmark.favicon_url"
+                v-if="previewBookmark.favicon_data || previewBookmark.favicon_url"
+                :src="previewBookmark.favicon_data || previewBookmark.favicon_url"
                 :alt="previewBookmark.title"
               />
             </div>
@@ -396,26 +373,26 @@
           </div>
           <el-button type="primary" @click="openBookmark(previewBookmark)">
             <el-icon><Link /></el-icon>
-            在浏览器中打开
+            {{ t('bookmarks.openInBrowser') }}
           </el-button>
         </div>
-        
+
         <el-divider />
-        
+
         <div class="preview-image-container">
-          <img 
-            :src="getPreviewImage(previewBookmark.url)" 
+          <img
+            :src="getPreviewImage(previewBookmark.url)"
             :alt="previewBookmark.title"
             class="preview-image"
             @error="handlePreviewError"
           />
         </div>
-        
+
         <div v-if="previewBookmark.description" class="preview-description">
-          <h4>描述</h4>
+          <h4>{{ t('bookmarks.descriptionLabel') }}</h4>
           <p>{{ previewBookmark.description }}</p>
         </div>
-        
+
         <div class="preview-meta">
           <el-tag v-if="previewBookmark.category_id" size="small">
             <el-icon :style="{ color: getIconColor(previewBookmark.category_icon) }">
@@ -423,15 +400,15 @@
             </el-icon>
             {{ getCategoryName(previewBookmark.category_id) }}
           </el-tag>
-          <el-tag 
-            v-for="tag in getBookmarkTags(previewBookmark)" 
-            :key="tag" 
-            size="small" 
+          <el-tag
+            v-for="tag in getBookmarkTags(previewBookmark)"
+            :key="tag"
+            size="small"
             type="info"
           >
             {{ tag }}
           </el-tag>
-          <span class="meta-text">访问次数：{{ previewBookmark.access_count || 0 }}</span>
+          <span class="meta-text">{{ t('bookmarks.accessCount') }}{{ previewBookmark.access_count || 0 }}</span>
         </div>
       </div>
     </el-dialog>
@@ -439,12 +416,12 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { 
-  Plus, Search, Edit, Delete, Link, Upload, Download, Folder, 
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import {
+  Plus, Search, Edit, Delete, Link, Upload, Download, Folder,
   ArrowLeft, ArrowRight, Star, StarFilled, CopyDocument,
-  ChromeFilled, Document, FolderOpened, 
-  ShoppingCart, VideoCamera, Guide, 
+  ChromeFilled, Document, FolderOpened,
+  ShoppingCart, VideoCamera, Guide,
   Trophy, Picture, Tools, View
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -452,8 +429,10 @@ import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { TauriShell } from '@/utils/tauri'
 import Database from '@tauri-apps/plugin-sql'
 import { importBookmarkFile, exportBookmarksToHTML } from '@/utils/bookmarkImport'
+import { t } from '@/i18n'
 import { openFile, saveFile } from '@/utils/tauri/dialog'
 import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { invoke } from '@tauri-apps/api/core'
 
 const DB_PATH = 'sqlite:productivity.db'
 let dbInstance = null
@@ -481,6 +460,15 @@ const editingBookmark = ref(null)
 const editingCategory = ref(null)
 const showPreviewDialog = ref(false)
 const previewBookmark = ref(null)
+const fetchingInfo = ref(false)
+
+// 右键菜单
+const contextMenu = ref({
+  visible: false,
+  x: 0,
+  y: 0,
+  bookmark: null
+})
 
 const bookmarkForm = ref({
   title: '',
@@ -496,24 +484,24 @@ const categoryForm = ref({
 })
 
 // 可用图标列表
-const availableIcons = [
-  { label: '网站', value: 'ChromeFilled' },
-  { label: '文档', value: 'Document' },
-  { label: '文件夹', value: 'FolderOpened' },
-  { label: '购物', value: 'ShoppingCart' },
-  { label: '视频', value: 'VideoCamera' },
-  { label: '指南', value: 'Guide' },
-  { label: '奖杯', value: 'Trophy' },
-  { label: '图片', value: 'Picture' },
-  { label: '工具', value: 'Tools' }
-]
+const availableIcons = computed(() => [
+  { label: t('bookmarks.iconWebsite'), value: 'ChromeFilled' },
+  { label: t('bookmarks.iconDocument'), value: 'Document' },
+  { label: t('bookmarks.iconFolder'), value: 'FolderOpened' },
+  { label: t('bookmarks.iconShopping'), value: 'ShoppingCart' },
+  { label: t('bookmarks.iconVideo'), value: 'VideoCamera' },
+  { label: t('bookmarks.iconGuide'), value: 'Guide' },
+  { label: t('bookmarks.iconTrophy'), value: 'Trophy' },
+  { label: t('bookmarks.iconPicture'), value: 'Picture' },
+  { label: t('bookmarks.iconTools'), value: 'Tools' }
+])
 
 // 计算属性：当前分类名称
 const currentCategoryName = computed(() => {
-  if (selectedCategory.value === null) return '全部书签'
-  if (selectedCategory.value === 'favorite') return '常用'
+  if (selectedCategory.value === null) return t('bookmarks.allBookmarks')
+  if (selectedCategory.value === 'favorite') return t('bookmarks.favorites')
   const cat = categories.value.find(c => c.id === selectedCategory.value)
-  return cat ? cat.name : '未知分类'
+  return cat ? cat.name : t('bookmarks.unknownCategory')
 })
 
 // 获取所有标签（带统计）
@@ -558,7 +546,7 @@ const filteredBookmarks = computed(() => {
 const initDatabase = async () => {
   try {
     const db = await getDatabase()
-    
+
     // 创建书签分类表
     await db.execute(`
       CREATE TABLE IF NOT EXISTS bookmark_categories (
@@ -571,24 +559,20 @@ const initDatabase = async () => {
         updated_at TEXT NOT NULL
       )
     `)
-    
-    // 修改bookmarks表，添加category_id和is_favorite字段
-    try {
-      await db.execute('ALTER TABLE bookmarks ADD COLUMN category_id INTEGER')
-    } catch (e) {
-      // 列已存在
+
+    // 修改bookmarks表，添加category_id、is_favorite 和 favicon_data 字段
+    const alterColumns = [
+      'ALTER TABLE bookmarks ADD COLUMN category_id INTEGER',
+      'ALTER TABLE bookmarks ADD COLUMN is_favorite INTEGER DEFAULT 0',
+      'ALTER TABLE bookmarks ADD COLUMN favicon_data TEXT'
+    ]
+    for (const sql of alterColumns) {
+      try { await db.execute(sql) } catch (e) { /* 列已存在 */ }
     }
-    
-    try {
-      await db.execute('ALTER TABLE bookmarks ADD COLUMN is_favorite INTEGER DEFAULT 0')
-    } catch (e) {
-      // 列已存在
-    }
-    
+
     // 检查是否有默认分类
     const existingCategories = await db.select('SELECT * FROM bookmark_categories WHERE is_default = 1')
     if (!existingCategories || existingCategories.length === 0) {
-      // 创建默认分类
       const now = new Date().toISOString()
       const defaultCategories = [
         { name: '网站', icon: 'ChromeFilled', sort_order: 1 },
@@ -596,7 +580,7 @@ const initDatabase = async () => {
         { name: '学习资料', icon: 'Guide', sort_order: 3 },
         { name: '工具', icon: 'Tools', sort_order: 4 }
       ]
-      
+
       for (const cat of defaultCategories) {
         await db.execute(
           'INSERT INTO bookmark_categories (name, icon, is_default, sort_order, created_at, updated_at) VALUES (?, ?, 1, ?, ?, ?)',
@@ -615,37 +599,41 @@ const loadBookmarks = async () => {
     loading.value = true
     const db = await getDatabase()
     const result = await db.select(`
-      SELECT b.*, c.icon as category_icon
+      SELECT b.*, c.icon as category_icon, c.name as category_name
       FROM bookmarks b
       LEFT JOIN bookmark_categories c ON b.category_id = c.id
       ORDER BY b.is_favorite DESC, b.access_count DESC, b.updated_at DESC
     `)
     bookmarks.value = result || []
-    
-    // 自动更新缺失的favicon
-    await updateMissingFavicons()
+
+    // 自动更新缺失的favicon（后台静默执行）
+    updateMissingFavicons()
   } catch (error) {
     console.error('加载书签失败:', error)
-    ElMessage.error('加载书签失败')
+    ElMessage.error(t('bookmarks.loadFailed'))
   } finally {
     loading.value = false
   }
 }
 
-// 更新缺失的favicon
+// 更新缺失的favicon — 通过 Rust 命令获取并缓存 base64 数据
 const updateMissingFavicons = async () => {
   try {
     const db = await getDatabase()
-    const bookmarksNeedUpdate = bookmarks.value.filter(b => !b.favicon_url && b.url)
-    
-    for (const bookmark of bookmarksNeedUpdate) {
-      const favicon = getFavicon(bookmark.url)
-      if (favicon) {
-        await db.execute(
-          'UPDATE bookmarks SET favicon_url = ? WHERE id = ?',
-          [favicon, bookmark.id]
-        )
-        bookmark.favicon_url = favicon
+    const needUpdate = bookmarks.value.filter(b => !b.favicon_data && b.url)
+
+    for (const bookmark of needUpdate) {
+      try {
+        const info = await invoke('fetch_website_info', { url: bookmark.url })
+        if (info.favicon_base64) {
+          await db.execute(
+            'UPDATE bookmarks SET favicon_data = ? WHERE id = ?',
+            [info.favicon_base64, bookmark.id]
+          )
+          bookmark.favicon_data = info.favicon_base64
+        }
+      } catch (e) {
+        // 静默失败，不阻塞
       }
     }
   } catch (error) {
@@ -722,6 +710,16 @@ const getBookmarkTags = (bookmark) => {
   }
 }
 
+// 获取用于显示的简短 URL
+const getDisplayUrl = (url) => {
+  try {
+    const u = new URL(url)
+    return u.hostname + (u.pathname !== '/' ? u.pathname : '')
+  } catch {
+    return url
+  }
+}
+
 // 切换收藏状态
 const toggleFavorite = async (bookmark) => {
   try {
@@ -732,10 +730,10 @@ const toggleFavorite = async (bookmark) => {
       [newValue, new Date().toISOString(), bookmark.id]
     )
     await loadBookmarks()
-    ElMessage.success(newValue ? '已添加到常用' : '已从常用移除')
+    ElMessage.success(newValue ? t('bookmarks.addedToFavorites') : t('bookmarks.removedFromFavorites'))
   } catch (error) {
     console.error('更新收藏状态失败:', error)
-    ElMessage.error('操作失败')
+    ElMessage.error(t('bookmarks.operationFailed'))
   }
 }
 
@@ -743,10 +741,10 @@ const toggleFavorite = async (bookmark) => {
 const copyToClipboard = async (text, label) => {
   try {
     await writeText(text)
-    ElMessage.success(`${label}已复制`)
+    ElMessage.success(`${label}${t('bookmarks.copied')}`)
   } catch (error) {
     console.error('复制失败:', error)
-    ElMessage.error('复制失败')
+    ElMessage.error(t('common.copyFailed'))
   }
 }
 
@@ -754,7 +752,7 @@ const copyToClipboard = async (text, label) => {
 const openBookmark = async (bookmark) => {
   try {
     await TauriShell.openURL(bookmark.url)
-    
+
     // 更新访问次数
     const db = await getDatabase()
     await db.execute(
@@ -764,7 +762,7 @@ const openBookmark = async (bookmark) => {
     await loadBookmarks()
   } catch (error) {
     console.error('打开书签失败:', error)
-    ElMessage.error('打开失败')
+    ElMessage.error(t('bookmarks.openFailed'))
   }
 }
 
@@ -772,41 +770,82 @@ const openBookmark = async (bookmark) => {
 const handleFaviconError = (event) => {
   const img = event.target
   const currentSrc = img.src
-  
-  // 如果是Google的服务失败了，尝试icon.horse
+
   if (currentSrc.includes('google.com/s2/favicons')) {
     const url = img.getAttribute('data-url')
     if (url) {
       try {
         const urlObj = new URL(url)
-        const domain = urlObj.hostname
-        img.src = `https://icon.horse/icon/${domain}`
+        img.src = `https://icon.horse/icon/${urlObj.hostname}`
         return
       } catch (e) {
-        // 继续下面的隐藏逻辑
+        // 继续隐藏
       }
     }
   }
-  
-  // 如果icon.horse也失败了，隐藏图片
+
   img.style.display = 'none'
 }
 
-// 获取网站图标 - 使用多种方式
+// 获取网站图标 URL（在线备用）
 const getFavicon = (url) => {
   try {
     const urlObj = new URL(url)
-    const domain = urlObj.hostname
-    
-    // 优先使用Google的favicon服务（更可靠）
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
-    
-    // 备选方案：
-    // return `https://icon.horse/icon/${domain}`
-    // return `${urlObj.protocol}//${urlObj.host}/favicon.ico`
+    return `https://www.google.com/s2/favicons?domain=${urlObj.hostname}&sz=32`
   } catch (error) {
     return null
   }
+}
+
+// 自动获取网站信息（标题、描述、favicon）
+const fetchWebsiteInfo = async () => {
+  if (!bookmarkForm.value.url) return
+
+  fetchingInfo.value = true
+  try {
+    const info = await invoke('fetch_website_info', { url: bookmarkForm.value.url })
+
+    // 自动填充：仅在字段为空时填充
+    if (!bookmarkForm.value.title && info.title) {
+      bookmarkForm.value.title = info.title
+    }
+    if (!bookmarkForm.value.description && info.description) {
+      bookmarkForm.value.description = info.description
+    }
+    // 缓存 favicon_base64 到表单临时字段
+    if (info.favicon_base64) {
+      bookmarkForm.value._favicon_data = info.favicon_base64
+    }
+
+    ElMessage.success(t('bookmarks.fetchSuccess'))
+  } catch (error) {
+    console.error('获取网站信息失败:', error)
+    ElMessage.warning(t('bookmarks.fetchFailed'))
+  } finally {
+    fetchingInfo.value = false
+  }
+}
+
+// URL 失焦时自动获取（仅新建时且标题为空）
+const onUrlBlur = () => {
+  if (!editingBookmark.value && bookmarkForm.value.url && !bookmarkForm.value.title) {
+    fetchWebsiteInfo()
+  }
+}
+
+// 显示右键菜单
+const showContextMenu = (event, bookmark) => {
+  contextMenu.value = {
+    visible: true,
+    x: event.clientX,
+    y: event.clientY,
+    bookmark
+  }
+}
+
+// 点击外部关闭右键菜单
+const closeContextMenu = () => {
+  contextMenu.value.visible = false
 }
 
 // 显示创建对话框
@@ -817,7 +856,8 @@ const showCreateDialog = () => {
     url: '',
     description: '',
     category_id: null,
-    tagsArray: []
+    tagsArray: [],
+    _favicon_data: null
   }
   dialogVisible.value = true
 }
@@ -830,7 +870,8 @@ const editBookmark = (bookmark) => {
     url: bookmark.url || '',
     description: bookmark.description || '',
     category_id: bookmark.category_id || null,
-    tagsArray: getBookmarkTags(bookmark)
+    tagsArray: getBookmarkTags(bookmark),
+    _favicon_data: bookmark.favicon_data || null
   }
   dialogVisible.value = true
 }
@@ -838,7 +879,7 @@ const editBookmark = (bookmark) => {
 // 保存书签
 const saveBookmark = async () => {
   if (!bookmarkForm.value.title || !bookmarkForm.value.url) {
-    ElMessage.warning('请填写标题和URL')
+    ElMessage.warning(t('bookmarks.fillTitleAndUrl'))
     return
   }
 
@@ -847,11 +888,11 @@ const saveBookmark = async () => {
     const now = new Date().toISOString()
     const favicon = getFavicon(bookmarkForm.value.url)
     const tagsJson = JSON.stringify(bookmarkForm.value.tagsArray || [])
+    const faviconData = bookmarkForm.value._favicon_data || null
 
     if (editingBookmark.value) {
-      // 更新
       await db.execute(
-        'UPDATE bookmarks SET title = ?, url = ?, description = ?, category_id = ?, tags = ?, favicon_url = ?, updated_at = ? WHERE id = ?',
+        'UPDATE bookmarks SET title = ?, url = ?, description = ?, category_id = ?, tags = ?, favicon_url = ?, favicon_data = COALESCE(?, favicon_data), updated_at = ? WHERE id = ?',
         [
           bookmarkForm.value.title,
           bookmarkForm.value.url,
@@ -859,15 +900,15 @@ const saveBookmark = async () => {
           bookmarkForm.value.category_id,
           tagsJson,
           favicon,
+          faviconData,
           now,
           editingBookmark.value.id
         ]
       )
-      ElMessage.success('书签更新成功')
+      ElMessage.success(t('bookmarks.bookmarkUpdated'))
     } else {
-      // 创建
       await db.execute(
-        'INSERT INTO bookmarks (title, url, description, category_id, tags, favicon_url, is_favorite, created_at, updated_at, access_count) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 0)',
+        'INSERT INTO bookmarks (title, url, description, category_id, tags, favicon_url, favicon_data, is_favorite, created_at, updated_at, access_count) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 0)',
         [
           bookmarkForm.value.title,
           bookmarkForm.value.url,
@@ -875,36 +916,37 @@ const saveBookmark = async () => {
           bookmarkForm.value.category_id,
           tagsJson,
           favicon,
+          faviconData,
           now,
           now
         ]
       )
-      ElMessage.success('书签添加成功')
+      ElMessage.success(t('bookmarks.bookmarkAdded'))
     }
 
     dialogVisible.value = false
     await loadBookmarks()
   } catch (error) {
     console.error('保存书签失败:', error)
-    ElMessage.error('保存失败')
+    ElMessage.error(t('bookmarks.saveFailed'))
   }
 }
 
 // 删除书签
 const deleteBookmark = async (bookmark) => {
   try {
-    await ElMessageBox.confirm('确定要删除这个书签吗？', '确认删除', {
+    await ElMessageBox.confirm(t('bookmarks.confirmDeleteBookmark'), t('bookmarks.confirmDelete'), {
       type: 'warning'
     })
 
     const db = await getDatabase()
     await db.execute('DELETE FROM bookmarks WHERE id = ?', [bookmark.id])
-    ElMessage.success('删除成功')
+    ElMessage.success(t('bookmarks.deleteSuccess'))
     await loadBookmarks()
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除书签失败:', error)
-      ElMessage.error('删除失败')
+      ElMessage.error(t('bookmarks.deleteFailed'))
     }
   }
 }
@@ -932,7 +974,7 @@ const editCategory = (category) => {
 // 保存分类
 const saveCategory = async () => {
   if (!categoryForm.value.name) {
-    ElMessage.warning('请填写分类名称')
+    ElMessage.warning(t('bookmarks.fillCategoryName'))
     return
   }
 
@@ -941,50 +983,47 @@ const saveCategory = async () => {
     const now = new Date().toISOString()
 
     if (editingCategory.value) {
-      // 更新
       await db.execute(
         'UPDATE bookmark_categories SET name = ?, icon = ?, updated_at = ? WHERE id = ?',
         [categoryForm.value.name, categoryForm.value.icon, now, editingCategory.value.id]
       )
-      ElMessage.success('分类更新成功')
+      ElMessage.success(t('bookmarks.categoryUpdated'))
     } else {
-      // 创建
-      const maxOrder = categories.value.length > 0 
-        ? Math.max(...categories.value.map(c => c.sort_order || 0)) 
+      const maxOrder = categories.value.length > 0
+        ? Math.max(...categories.value.map(c => c.sort_order || 0))
         : 0
       await db.execute(
         'INSERT INTO bookmark_categories (name, icon, is_default, sort_order, created_at, updated_at) VALUES (?, ?, 0, ?, ?, ?)',
         [categoryForm.value.name, categoryForm.value.icon, maxOrder + 1, now, now]
       )
-      ElMessage.success('分类添加成功')
+      ElMessage.success(t('bookmarks.categoryAdded'))
     }
 
     categoryDialogVisible.value = false
     await loadCategories()
   } catch (error) {
     console.error('保存分类失败:', error)
-    ElMessage.error('保存失败')
+    ElMessage.error(t('bookmarks.saveFailed'))
   }
 }
 
 // 删除分类
 const deleteCategory = async (category) => {
   try {
-    await ElMessageBox.confirm('确定要删除此分类吗？分类内的书签不会被删除。', '确认删除', {
+    await ElMessageBox.confirm(t('bookmarks.confirmDeleteCategory'), t('bookmarks.confirmDelete'), {
       type: 'warning'
     })
-    
+
     const db = await getDatabase()
     await db.execute('DELETE FROM bookmark_categories WHERE id = ?', [category.id])
-    // 清除该分类下书签的分类关联
     await db.execute('UPDATE bookmarks SET category_id = NULL WHERE category_id = ?', [category.id])
     await loadCategories()
     await loadBookmarks()
-    ElMessage.success('分类已删除')
+    ElMessage.success(t('bookmarks.categoryDeleted'))
   } catch (error) {
     if (error !== 'cancel') {
       console.error('删除分类失败:', error)
-      ElMessage.error('删除失败')
+      ElMessage.error(t('bookmarks.deleteFailed'))
     }
   }
 }
@@ -1001,11 +1040,11 @@ const handleBookmarkFileSelect = async () => {
   try {
     const selected = await openFile({
       filters: [{
-        name: '书签文件',
+        name: t('bookmarks.bookmarkFiles'),
         extensions: ['html', 'csv']
       }]
     })
-    
+
     if (selected) {
       const content = await readTextFile(selected)
       importFile.value = {
@@ -1013,14 +1052,13 @@ const handleBookmarkFileSelect = async () => {
         name: selected.split(/[/\\]/).pop(),
         content
       }
-      
-      // 自动解析
+
       await parseBookmarkFile()
     }
   } catch (error) {
     if (error !== 'cancelled' && error !== 'null') {
       console.error('选择文件失败:', error)
-      ElMessage.error('选择文件失败')
+      ElMessage.error(t('bookmarks.selectFileFailed'))
     }
   }
 }
@@ -1028,13 +1066,13 @@ const handleBookmarkFileSelect = async () => {
 // 解析书签文件
 const parseBookmarkFile = async () => {
   if (!importFile.value) return
-  
+
   try {
     const result = await importBookmarkFile({
       name: importFile.value.name,
       content: importFile.value.content
     })
-    
+
     importResult.value = {
       total: result.total,
       valid: result.bookmarks.length,
@@ -1042,40 +1080,68 @@ const parseBookmarkFile = async () => {
     }
   } catch (error) {
     console.error('解析文件失败:', error)
-    ElMessage.error(error.message || '解析文件失败')
+    ElMessage.error(error.message || t('bookmarks.parseFailed'))
   }
 }
 
-// 执行书签导入
+// 执行书签导入 — 保留文件夹结构，自动创建分类
 const executeBookmarkImport = async () => {
   if (!importResult.value || importResult.value.total === 0) {
-    ElMessage.warning('没有有效的书签可导入')
+    ElMessage.warning(t('bookmarks.noValidBookmarks'))
     return
   }
-  
+
   try {
     const db = await getDatabase()
     const now = new Date().toISOString()
     let successCount = 0
     let failCount = 0
-    
-    // 获取"网站"分类ID
-    const websiteCategory = categories.value.find(c => c.name === '网站')
-    const defaultCategoryId = websiteCategory ? websiteCategory.id : null
-    
+    let newCategoryCount = 0
+
+    // 收集所有唯一的文件夹名称，创建对应分类
+    const folderNames = [...new Set(
+      importResult.value.bookmarks
+        .map(b => b.category)
+        .filter(Boolean)
+    )]
+
+    // 加载现有分类
+    await loadCategories()
+    const categoryMap = {}
+    for (const cat of categories.value) {
+      categoryMap[cat.name] = cat.id
+    }
+
+    // 为不存在的文件夹创建分类
+    for (const folderName of folderNames) {
+      if (!categoryMap[folderName]) {
+        const maxOrder = categories.value.length > 0
+          ? Math.max(...categories.value.map(c => c.sort_order || 0))
+          : 0
+        const result = await db.execute(
+          'INSERT INTO bookmark_categories (name, icon, is_default, sort_order, created_at, updated_at) VALUES (?, ?, 0, ?, ?, ?)',
+          [folderName, 'FolderOpened', maxOrder + 1 + newCategoryCount, now, now]
+        )
+        categoryMap[folderName] = result.lastInsertId
+        newCategoryCount++
+      }
+    }
+
     for (const bookmark of importResult.value.bookmarks) {
       try {
+        const categoryId = bookmark.category ? (categoryMap[bookmark.category] || null) : null
         const favicon = getFavicon(bookmark.url)
-        
+
         await db.execute(
-          'INSERT INTO bookmarks (title, url, description, category_id, tags, favicon_url, is_favorite, created_at, updated_at, access_count) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 0)',
+          'INSERT INTO bookmarks (title, url, description, category_id, tags, favicon_url, favicon_data, is_favorite, created_at, updated_at, access_count) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, 0)',
           [
             bookmark.title || bookmark.url,
             bookmark.url,
             bookmark.description || '',
-            defaultCategoryId,
+            categoryId,
             JSON.stringify(bookmark.tags || []),
             favicon,
+            bookmark.favicon_data || null,
             bookmark.created_at || now,
             now
           ]
@@ -1086,42 +1152,53 @@ const executeBookmarkImport = async () => {
         failCount++
       }
     }
-    
-    ElMessage.success(`导入完成：成功 ${successCount} 条，失败 ${failCount} 条`)
+
+    if (newCategoryCount > 0) {
+      ElMessage.success(
+        t('bookmarks.importedWithFolders')
+          .replace('{0}', successCount)
+          .replace('{1}', newCategoryCount)
+          .replace('{2}', failCount)
+      )
+    } else {
+      ElMessage.success(t('bookmarks.importSuccess').replace('{0}', successCount).replace('{1}', failCount))
+    }
     showImportDialog.value = false
+    await loadCategories()
     await loadBookmarks()
   } catch (error) {
     console.error('导入失败:', error)
-    ElMessage.error('导入失败')
+    ElMessage.error(t('bookmarks.importFailed'))
   }
 }
 
-// 导出书签
+// 导出书签 — 携带分类名称和 favicon_data
 const exportBookmarks = async () => {
   try {
     if (bookmarks.value.length === 0) {
-      ElMessage.warning('没有书签可导出')
+      ElMessage.warning(t('bookmarks.noBookmarksToExport'))
       return
     }
-    
+
+    // bookmarks 已经 JOIN 了 category_name，直接使用
     const htmlContent = exportBookmarksToHTML(bookmarks.value)
-    
+
     const filePath = await saveFile({
       defaultPath: `bookmarks_${new Date().toISOString().split('T')[0]}.html`,
       filters: [{
-        name: 'HTML 文件',
+        name: t('bookmarks.htmlFiles'),
         extensions: ['html']
       }]
     })
-    
+
     if (filePath) {
       await writeTextFile(filePath, htmlContent)
-      ElMessage.success('导出成功')
+      ElMessage.success(t('bookmarks.exportSuccess'))
     }
   } catch (error) {
     if (error !== 'cancelled' && error !== 'null') {
       console.error('导出失败:', error)
-      ElMessage.error('导出失败')
+      ElMessage.error(t('bookmarks.exportFailed'))
     }
   }
 }
@@ -1135,8 +1212,6 @@ const showPreview = (bookmark) => {
 // 获取网站预览图
 const getPreviewImage = (url) => {
   try {
-    // 使用 WordPress.com 的免费 mShots 截图服务
-    // 完全免费，无需API key，稳定可靠
     return `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url)}?w=1280&h=720`
   } catch (error) {
     return null
@@ -1152,15 +1227,21 @@ const handlePreviewError = (event) => {
 // 获取分类名称
 const getCategoryName = (categoryId) => {
   const cat = categories.value.find(c => c.id === categoryId)
-  return cat ? cat.name : '未分类'
+  return cat ? cat.name : t('bookmarks.uncategorized')
 }
 
 onMounted(async () => {
   await initDatabase()
   await loadCategories()
   await loadBookmarks()
-  // 默认选择"常用"分类
   selectedCategory.value = 'favorite'
+
+  // 全局点击关闭右键菜单
+  document.addEventListener('click', closeContextMenu)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeContextMenu)
 })
 </script>
 
@@ -1245,12 +1326,16 @@ onMounted(async () => {
   font-weight: var(--font-weight-semibold);
   color: var(--text-tertiary);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .sidebar-btn {
   cursor: pointer;
   color: var(--text-tertiary);
   font-size: var(--font-size-body);
+  transition: color var(--transition-fast);
+  padding: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .sidebar-btn:hover {
@@ -1260,6 +1345,7 @@ onMounted(async () => {
 .category-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-xs) var(--space-sm);
 }
 
@@ -1267,14 +1353,13 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-sm);
-  margin: 2px 0;
+  padding: var(--space-sm) var(--space-md);
+  margin: 1px 0;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background var(--transition-normal);
+  transition: all var(--transition-fast);
   font-size: var(--font-size-body);
   color: var(--text-primary);
-  position: relative;
 }
 
 .category-item:hover {
@@ -1307,27 +1392,31 @@ onMounted(async () => {
 .category-count {
   font-size: var(--font-size-caption);
   color: var(--text-tertiary);
-  min-width: 20px;
+  min-width: 16px;
   text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .category-actions {
   display: none;
-  gap: var(--space-xs);
-  position: absolute;
-  right: var(--space-sm);
+  gap: 2px;
+  flex-shrink: 0;
+  margin-left: 2px;
 }
 
-.category-item:hover .category-actions {
+.category-item:hover .category-actions,
+.category-item.active .category-actions {
   display: flex;
 }
 
 .action-icon {
-  font-size: var(--font-size-caption);
+  font-size: 11px;
   padding: 3px;
   cursor: pointer;
   transition: color var(--transition-fast);
-  color: var(--text-tertiary);
+  color: var(--text-quaternary);
+  border-radius: var(--radius-xs);
 }
 
 .action-icon:hover {
@@ -1353,54 +1442,50 @@ onMounted(async () => {
 .bookmark-list {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-2xl);
+  padding: 12px 16px;
+  background: var(--bg-secondary);
 }
 
 .bookmark-cards {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.bookmark-card {
   background: var(--bg-primary);
-  border-radius: var(--radius-md);
-  padding: var(--space-lg) var(--space-xl);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color-strong);
+  overflow: hidden;
 }
 
-.bookmark-card:hover {
-  box-shadow: var(--shadow-card-hover);
-}
-
-/* 卡片行 */
-.card-row {
+/* Chrome 风格紧凑行 */
+.bookmark-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-md);
+  padding: 6px 16px;
+  transition: background 0.12s;
+  cursor: default;
+  min-height: 36px;
 }
 
-/* 第一行：标题行 */
-.card-header-row {
-  padding-bottom: 0;
+.bookmark-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
 }
 
-.card-title-section {
+.bookmark-row:hover {
+  background: var(--accent-blue-bg);
+}
+
+.row-left {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 10px;
   flex: 1;
   min-width: 0;
+  cursor: pointer;
 }
 
 .bookmark-favicon {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -1408,38 +1493,50 @@ onMounted(async () => {
 }
 
 .bookmark-favicon img {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   object-fit: contain;
-  border-radius: var(--radius-xs);
+  border-radius: 2px;
 }
 
-.card-icon {
-  font-size: 20px;
+.default-favicon {
+  font-size: 14px;
+  color: var(--text-quaternary);
+}
+
+.row-title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 360px;
   flex-shrink: 0;
 }
 
-.card-title {
-  margin: 0;
-  font-size: var(--font-size-callout);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
+.row-url {
+  font-size: var(--font-size-footnote);
+  color: var(--text-quaternary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
   min-width: 0;
-  cursor: pointer;
-  transition: color var(--transition-fast);
 }
 
-.card-title:hover {
-  color: var(--accent-blue);
+.row-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
+/* 收藏星标 */
 .favorite-star {
-  font-size: 18px;
-  color: var(--text-tertiary);
+  font-size: 14px;
+  color: var(--text-quaternary);
   cursor: pointer;
   transition: color var(--transition-fast);
   flex-shrink: 0;
@@ -1453,61 +1550,59 @@ onMounted(async () => {
   color: var(--color-orange);
 }
 
-/* 操作按钮 */
-.card-actions {
+/* 操作按钮 — 默认隐藏，hover 时显示 */
+.row-actions {
+  display: none;
+  gap: 2px;
+}
+
+.bookmark-row:hover .row-actions {
   display: flex;
-  gap: var(--space-xs);
-  flex-shrink: 0;
 }
 
-.card-actions .el-button {
-  padding: var(--space-xs);
+.row-actions .el-button {
+  padding: 2px 4px;
 }
 
-/* 第二行：信息行 */
-.card-info-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xl);
-  flex-wrap: wrap;
+/* 右键菜单 */
+.context-menu {
+  position: fixed;
+  z-index: 9999;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color-strong);
+  border-radius: var(--radius-md);
+  padding: 4px 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  min-width: 160px;
 }
 
-.card-url {
-  flex: 1;
-  font-size: var(--font-size-footnote);
-  color: var(--text-tertiary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-}
-
-.card-meta {
+.context-menu-item {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-  flex-shrink: 0;
+  gap: 8px;
+  padding: 6px 14px;
+  font-size: var(--font-size-body);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.1s;
 }
 
-.visit-count {
-  font-size: var(--font-size-caption);
-  color: var(--text-tertiary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
+.context-menu-item:hover {
+  background: var(--accent-blue-bg);
 }
 
-.card-tags {
-  display: flex;
-  gap: var(--space-xs);
-  flex-wrap: wrap;
+.context-menu-item.danger {
+  color: var(--color-red);
 }
 
-/* 预览按钮 */
-.preview-btn {
-  margin-left: auto;
-  opacity: 1;
-  transition: opacity var(--transition-fast);
+.context-menu-item.danger:hover {
+  background: rgba(245, 108, 108, 0.1);
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
 }
 
 /* 预览对话框 */

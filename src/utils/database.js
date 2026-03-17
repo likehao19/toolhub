@@ -311,8 +311,8 @@ export async function runMigrations() {
   try {
     const db = await getDatabase()
     const currentVersion = await getDatabaseVersion()
-    const targetVersion = 3 // 目标版本
-    
+    const targetVersion = 4 // 目标版本
+
     if (currentVersion >= targetVersion) {
       return
     }
@@ -320,10 +320,15 @@ export async function runMigrations() {
     if (currentVersion < 2) {
       await migrateToVersion2(db)
     }
-    
+
     // 迁移到版本 3
     if (currentVersion < 3) {
       await migrateToVersion3(db)
+    }
+
+    // 迁移到版本 4
+    if (currentVersion < 4) {
+      await migrateToVersion4(db)
     }
   } catch (error) {
     throw error
@@ -535,6 +540,28 @@ async function migrateToVersion3(db) {
     // 如果版本 3 已存在，更新它
     try {
       await db.execute('UPDATE schema_version SET version = 3 WHERE version < 3')
+    } catch (e) { /* ignore */ }
+  }
+}
+
+/**
+ * 迁移到版本 4
+ * 为书签表添加 favicon_data 列（存储 base64 编码的 favicon 图片数据）
+ */
+async function migrateToVersion4(db) {
+  try {
+    await db.execute('ALTER TABLE bookmarks ADD COLUMN favicon_data TEXT')
+  } catch (error) {
+    if (!error.message?.includes('duplicate column')) {
+    }
+  }
+
+  // 更新版本号
+  try {
+    await db.execute('INSERT OR IGNORE INTO schema_version (version) VALUES (4)')
+  } catch (error) {
+    try {
+      await db.execute('UPDATE schema_version SET version = 4 WHERE version < 4')
     } catch (e) { /* ignore */ }
   }
 }
