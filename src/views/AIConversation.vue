@@ -261,6 +261,9 @@
               <el-tag v-if="claudeTestResult === 'success'" type="success" size="small" style="margin-left: 8px;">{{ t('aiConv.connected') }}</el-tag>
               <el-tag v-if="claudeTestResult === 'failed'" type="danger" size="small" style="margin-left: 8px;">{{ claudeTestError }}</el-tag>
             </el-form-item>
+            <el-form-item label="流式输出">
+              <el-switch v-model="apiSettings.claude.stream" />
+            </el-form-item>
           </el-form>
         </el-tab-pane>
 

@@ -376,6 +376,9 @@
                   :placeholder="t('settings.apiKeyPlaceholder')"
                   style="width: 400px;"
                 />
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  OpenAI 兼容接口地址，支持第三方服务（如 DeepSeek、通义千问等）
+                </div>
               </el-form-item>
 
               <el-form-item :label="t('settings.model')">
@@ -1369,6 +1372,16 @@ const testAIConnection = async () => {
       success: false,
       message: t('settings.fillApiFields')
     }
+    return
+  }
+
+  if (!aiSettings.baseUrl) {
+    ElMessage.warning('请先输入 API 地址')
+    return
+  }
+
+  if (!aiSettings.model) {
+    ElMessage.warning('请先输入模型名称')
     return
   }
 
