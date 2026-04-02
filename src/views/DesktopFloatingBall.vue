@@ -115,22 +115,41 @@ onUnmounted(() => {
 })
 </script>
 
-<style>
-/* ignore */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  background: transparent;
-}
-
-html, body, #app {
+<style scoped>
+:global(html), :global(body), :global(#app) {
   width: 100%;
   height: 100%;
   overflow: hidden;
   background: transparent !important;
   border: none !important;
   outline: none !important;
+}
+
+.ai-floating-ball,
+.ai-floating-ball * {
+  box-sizing: border-box;
+}
+
+.ai-floating-ball {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.ball-icon,
+.ball-icon * {
+  background: transparent;
+}
+
+.ball-tooltip,
+.ball-tooltip::after {
+  background: transparent;
+}
+
+.ball-tooltip {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.ball-tooltip::after {
+  border-left-color: rgba(0, 0, 0, 0.85);
 }
 
 /* ignore */

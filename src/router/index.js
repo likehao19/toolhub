@@ -246,6 +246,166 @@ const routes = [
     name: 'toolboxStickyNotes',
     component: () => import('@/views/ToolboxStickyNotes.vue'),
     meta: { title: '便签管理' }
+  },
+  {
+    path: '/toolbox/sdk-manager',
+    name: 'sdkManager',
+    component: () => import('@/views/SdkManager.vue'),
+    meta: { title: 'SDK版本管理' }
+  },
+  {
+    path: '/toolbox/port-manager',
+    name: 'portManager',
+    component: () => import('@/views/PortManager.vue'),
+    meta: { title: '端口管理' }
+  },
+  {
+    path: '/toolbox/code-formatter',
+    name: 'codeFormatter',
+    component: () => import('@/views/CodeFormatter.vue'),
+    meta: { title: '代码格式化' }
+  },
+  {
+    path: '/toolbox/git-manager',
+    name: 'gitManager',
+    component: () => import('@/views/GitManager.vue'),
+    meta: { title: 'Git管理' }
+  },
+  {
+    path: '/toolbox/git-daily-report',
+    name: 'gitDailyReport',
+    component: () => import('@/views/GitDailyReport.vue'),
+    meta: { title: 'Git日报' }
+  },
+  {
+    path: '/toolbox/file-diff',
+    name: 'fileDiff',
+    component: () => import('@/views/FileDiff.vue'),
+    meta: { title: '文件比对' }
+  },
+  {
+    path: '/toolbox/api-workbench',
+    redirect: '/toolbox/api-debug',
+  },
+  {
+    path: '/toolbox/api-debug',
+    name: 'apiDebug',
+    component: () => import('@/views/ApiDebug.vue'),
+    meta: { title: '接口调试' }
+  },
+  {
+    path: '/toolbox/api-docs',
+    name: 'apiDocs',
+    component: () => import('@/views/ApiDocs.vue'),
+    meta: { title: '接口文档' }
+  },
+  {
+    path: '/toolbox/mock-service',
+    name: 'mockService',
+    component: () => import('@/views/MockService.vue'),
+    meta: { title: 'Mock 服务' }
+  },
+  {
+    path: '/toolbox/perf-test',
+    name: 'perfTest',
+    component: () => import('@/views/PerfTest.vue'),
+    meta: { title: '性能测试' }
+  },
+  {
+    path: '/toolbox/auto-test',
+    name: 'autoTest',
+    component: () => import('@/views/AutoTest.vue'),
+    meta: { title: '自动化测试' }
+  },
+  {
+    path: '/toolbox/ebook-shelf',
+    name: 'ebookShelf',
+    component: () => import('@/views/EbookShelf.vue'),
+    meta: { title: '电子书' }
+  },
+  {
+    path: '/toolbox/ebook-reader/:id',
+    name: 'ebookReader',
+    component: () => import('@/views/EbookReader.vue'),
+    meta: { title: '阅读' }
+  },
+  {
+    path: '/toolbox/screenshot',
+    name: 'screenshotManager',
+    component: () => import('@/views/ScreenshotManager.vue'),
+    meta: { title: '截图工具' }
+  },
+  {
+    path: '/toolbox/redis-client',
+    name: 'redisClient',
+    component: () => import('@/views/RedisClient.vue'),
+    meta: { title: 'Redis 客户端' }
+  },
+  {
+    path: '/toolbox/image-to-base64',
+    name: 'imageToBase64',
+    component: () => import('@/views/ImageToBase64.vue'),
+    meta: { title: '图片Base64' }
+  },
+  {
+    path: '/toolbox/image-format-converter',
+    name: 'imageFormatConverter',
+    component: () => import('@/views/ImageFormatConverter.vue'),
+    meta: { title: '图片格式转换' }
+  },
+  {
+    path: '/toolbox/regex-tester',
+    name: 'regexTester',
+    component: () => import('@/views/RegexTester.vue'),
+    meta: { title: '正则测试' }
+  },
+  {
+    path: '/toolbox/crypto-tool',
+    name: 'cryptoTool',
+    component: () => import('@/views/CryptoTool.vue'),
+    meta: { title: '加密解密' }
+  },
+  {
+    path: '/toolbox/sqlite-manager',
+    name: 'sqliteManager',
+    component: () => import('@/views/SqliteManager.vue'),
+    meta: { title: 'SQLite 管理器' }
+  },
+  {
+    path: '/toolbox/maven-repo',
+    name: 'mavenRepo',
+    component: () => import('@/views/MavenRepo.vue'),
+    meta: { title: 'Maven 仓库' }
+  },
+  {
+    path: '/toolbox/wallpaper-manager',
+    name: 'wallpaperManager',
+    component: () => import('@/views/WallpaperManager.vue'),
+    meta: { title: '壁纸管理' }
+  },
+  {
+    path: '/toolbox/log-analyzer',
+    name: 'logAnalyzer',
+    component: () => import('@/views/LogAnalyzer.vue'),
+    meta: { title: '日志分析' }
+  },
+  {
+    path: '/screenshot-overlay',
+    name: 'screenshotOverlay',
+    component: () => import('@/views/ScreenshotOverlay.vue'),
+    meta: { title: '截图' }
+  },
+  {
+    path: '/screenshot-pin',
+    name: 'screenshotPin',
+    component: () => import('@/views/ScreenshotPin.vue'),
+    meta: { title: '贴图' }
+  },
+  {
+    path: '/screenshot-pin-toolbar',
+    name: 'screenshotPinToolbar',
+    component: () => import('@/views/ScreenshotPinToolbar.vue'),
+    meta: { title: '贴图工具栏' }
   }
 ]
 

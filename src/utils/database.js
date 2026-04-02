@@ -12,7 +12,7 @@ let dbInstance = null
 /**
  * 获取数据库实例
  */
-async function getDatabase() {
+export async function getDatabase() {
   if (!dbInstance) {
     dbInstance = await Database.load(DB_PATH)
   }
@@ -311,7 +311,7 @@ export async function runMigrations() {
   try {
     const db = await getDatabase()
     const currentVersion = await getDatabaseVersion()
-    const targetVersion = 4 // 目标版本
+    const targetVersion = 7 // 目标版本
 
     if (currentVersion >= targetVersion) {
       return
@@ -329,6 +329,21 @@ export async function runMigrations() {
     // 迁移到版本 4
     if (currentVersion < 4) {
       await migrateToVersion4(db)
+    }
+
+    // 迁移到版本 5
+    if (currentVersion < 5) {
+      await migrateToVersion5(db)
+    }
+
+    // 迁移到版本 6
+    if (currentVersion < 6) {
+      await migrateToVersion6(db)
+    }
+
+    // 迁移到版本 7
+    if (currentVersion < 7) {
+      await migrateToVersion7(db)
     }
   } catch (error) {
     throw error
@@ -562,6 +577,155 @@ async function migrateToVersion4(db) {
   } catch (error) {
     try {
       await db.execute('UPDATE schema_version SET version = 4 WHERE version < 4')
+    } catch (e) { /* ignore */ }
+  }
+}
+
+/**
+ * 迁移到版本 5
+ * 添加 SDK 版本管理表
+ */
+async function migrateToVersion5(db) {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS sdk_versions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sdk_type TEXT NOT NULL,
+        version TEXT,
+        path TEXT NOT NULL,
+        source TEXT NOT NULL DEFAULT 'manual',
+        added_at TEXT NOT NULL DEFAULT (datetime('now')),
+        UNIQUE(sdk_type, path)
+      )
+    `)
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_sdk_versions_type ON sdk_versions(sdk_type)')
+  } catch (error) {
+    if (!error.message?.includes('already exists')) {
+      console.warn('Migration v5 error:', error)
+    }
+  }
+
+  try {
+    await db.execute('INSERT OR IGNORE INTO schema_version (version) VALUES (5)')
+  } catch (error) {
+    try {
+      await db.execute('UPDATE schema_version SET version = 5 WHERE version < 5')
+    } catch (e) { /* ignore */ }
+  }
+}
+
+/**
+ * 迁移到版本 6
+ * 添加电子书相关表
+ */
+async function migrateToVersion6(db) {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS books (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        author TEXT DEFAULT '',
+        cover TEXT DEFAULT '',
+        format TEXT NOT NULL,
+        file_path TEXT NOT NULL UNIQUE,
+        file_size INTEGER DEFAULT 0,
+        total_pages INTEGER DEFAULT 0,
+        category TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        language TEXT DEFAULT '',
+        publisher TEXT DEFAULT '',
+        isbn TEXT DEFAULT '',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )
+    `)
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS reading_progress (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_id INTEGER NOT NULL UNIQUE,
+        current_page INTEGER DEFAULT 0,
+        current_cfi TEXT DEFAULT '',
+        progress REAL DEFAULT 0,
+        total_time INTEGER DEFAULT 0,
+        last_read TEXT DEFAULT (datetime('now')),
+        FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+      )
+    `)
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS book_bookmarks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_id INTEGER NOT NULL,
+        page INTEGER DEFAULT 0,
+        cfi TEXT DEFAULT '',
+        title TEXT DEFAULT '',
+        color TEXT DEFAULT '#409eff',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+      )
+    `)
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS book_highlights (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_id INTEGER NOT NULL,
+        page INTEGER DEFAULT 0,
+        cfi_range TEXT DEFAULT '',
+        text TEXT NOT NULL,
+        note TEXT DEFAULT '',
+        color TEXT DEFAULT '#ffeb3b',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE
+      )
+    `)
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_books_title ON books(title)')
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_reading_progress_book ON reading_progress(book_id)')
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_book_bookmarks_book ON book_bookmarks(book_id)')
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_book_highlights_book ON book_highlights(book_id)')
+  } catch (error) {
+    if (!error.message?.includes('already exists')) {
+      console.warn('Migration v6 error:', error)
+    }
+  }
+
+  try {
+    await db.execute('INSERT OR IGNORE INTO schema_version (version) VALUES (6)')
+  } catch (error) {
+    try {
+      await db.execute('UPDATE schema_version SET version = 6 WHERE version < 6')
+    } catch (e) { /* ignore */ }
+  }
+}
+
+/**
+ * 迁移到版本 7 — Redis 连接配置
+ */
+async function migrateToVersion7(db) {
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS redis_connections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        host TEXT NOT NULL DEFAULT '127.0.0.1',
+        port INTEGER NOT NULL DEFAULT 6379,
+        password TEXT DEFAULT '',
+        db_index INTEGER DEFAULT 0,
+        color TEXT DEFAULT '',
+        sort_order INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        last_used_at TEXT
+      )
+    `)
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_redis_connections_name ON redis_connections(name)')
+  } catch (error) {
+    if (!error.message?.includes('already exists')) {
+      console.warn('Migration v7 error:', error)
+    }
+  }
+
+  try {
+    await db.execute('INSERT OR IGNORE INTO schema_version (version) VALUES (7)')
+  } catch (error) {
+    try {
+      await db.execute('UPDATE schema_version SET version = 7 WHERE version < 7')
     } catch (e) { /* ignore */ }
   }
 }

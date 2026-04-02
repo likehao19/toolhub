@@ -187,6 +187,32 @@ export async function chatWithAI(messages, options = {}) {
 }
 
 /**
+ * 分析 Java 日志与源码上下文
+ */
+export async function analyzeJavaLogWithSources(payload) {
+  const messages = [
+    {
+      role: 'system',
+      content: '你是一个专业的 Java 日志分析与故障排查助手。请结合日志摘要、异常堆栈、根因链以及相关 Java 源码片段，判断最可能的问题根因，并给出涉及类/方法、排查步骤、修复建议和置信度。请使用清晰的中文分点输出。'
+    },
+    {
+      role: 'user',
+      content: `请分析以下 Java 日志与源码上下文：\n\n${JSON.stringify(payload, null, 2)}`
+    }
+  ]
+
+  try {
+    const result = await callAIAPI(messages, {
+      max_tokens: 1800,
+      temperature: 0.3
+    })
+    return result
+  } catch (error) {
+    throw new Error(`日志分析失败: ${error.message}`)
+  }
+}
+
+/**
  * 刷新 AI 配置
  */
 export async function refreshConfig() {
@@ -200,6 +226,7 @@ export default {
   generateNoteSummary,
   improveNote,
   answerQuestion,
+  analyzeJavaLogWithSources,
   refreshConfig
 }
 

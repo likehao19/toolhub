@@ -5,7 +5,6 @@
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { invoke } from '@tauri-apps/api/core'
 import { Command } from '@tauri-apps/plugin-shell'
-import { getCurrentWindow } from '@tauri-apps/api/window'
 import { platform } from '@tauri-apps/plugin-os'
 import { ElMessage } from 'element-plus'
 
@@ -14,40 +13,13 @@ import { ElMessage } from 'element-plus'
  * @param {string} url - URL 地址
  */
 export async function openURL(url) {
+  // 优先使用 Rust 命令打开 URL
   try {
-    // 检查当前窗口是否是主窗口
-    try {
-      const window = getCurrentWindow()
-      const label = window.label
-      
-      // 如果是子窗口，提示用户
-      if (label && label.startsWith('child-')) {
-        ElMessage.warning('子窗口无法打开外部 URL，请在主窗口中使用此功能')
-        return
-      }
-    } catch (e) {
-      // 如果无法获取窗口信息，继续尝试打开 URL
-    }
-    
-    // 优先使用 Rust 命令打开 URL，确保在主窗口上下文中执行
-    try {
-      await invoke('open_url_in_browser', { url })
-      ElMessage.success('URL 已打开')
-      return
-    } catch (rustError) {
-      // 如果 Rust 命令失败，回退到插件 API
-      await openUrl(url)
-      ElMessage.success('URL 已打开')
-    }
-  } catch (error) {
-    // 如果是权限错误，提供更友好的提示
-    const errorMsg = error.message || String(error)
-    if (errorMsg.includes('denied') || errorMsg.includes('not allowed')) {
-      ElMessage.error('打开 URL 失败: 权限被拒绝。请确保在主窗口中使用此功能，并检查权限配置。如果问题持续，请重启应用。')
-    } else {
-      ElMessage.error('打开 URL 失败: ' + errorMsg)
-    }
-    throw error
+    await invoke('open_url_in_browser', { url })
+    return
+  } catch (rustError) {
+    // 如果 Rust 命令失败，回退到插件 API
+    await openUrl(url)
   }
 }
 

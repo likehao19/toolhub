@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 target_dev2
+target2
+identifier.sqlite
 
 # Editor directories and files
 .vscode/*

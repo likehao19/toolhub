@@ -511,6 +511,7 @@ import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 import Database from '@tauri-apps/plugin-sql'
 import { t } from '@/i18n'
+import { loadConfig, saveConfig } from '@/utils/tauri/store'
 
 // 数据库实例
 let db = null

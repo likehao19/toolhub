@@ -72,9 +72,10 @@ const { toggleFavorite, isFavorite } = useFavoriteTools()
 // 笔记工具
 const noteTools = computed(() => [
   { id: 'sticky-notes', name: t('toolbox.tools.stickyNotes'), icon: '📌', type: 'window', enabled: true },
+  { id: 'ebook-shelf', name: t('toolbox.tools.ebookShelf'), icon: '📚', type: 'page', enabled: true },
   { id: 'whiteboard', name: t('toolbox.tools.whiteboard'), icon: '✏️', type: 'window', enabled: false },
   { id: 'code-snippet', name: t('toolbox.tools.codeSnippet'), icon: '📋', type: 'window', enabled: false },
-  { id: 'screenshot', name: t('toolbox.tools.screenshot'), icon: '📸', type: 'window', enabled: false },
+  { id: 'screenshot', name: t('toolbox.tools.screenshot'), icon: '📸', type: 'page', enabled: true },
   { id: 'markdown-editor', name: t('toolbox.tools.markdownEditor'), icon: '📝', type: 'window', enabled: false },
   { id: 'mind-map', name: t('toolbox.tools.mindMap'), icon: '🧠', type: 'window', enabled: false },
   { id: 'flowchart', name: t('toolbox.tools.flowchart'), icon: '📊', type: 'window', enabled: false },
@@ -83,13 +84,17 @@ const noteTools = computed(() => [
 
 // 开发工具
 const devTools = computed(() => [
+  { id: 'sdk-manager', name: t('toolbox.tools.sdkManager'), icon: '📦', type: 'page', enabled: true },
+  { id: 'redis-client', name: t('toolbox.tools.redisClient'), icon: '🔴', type: 'page', enabled: true },
+  { id: 'sqlite-manager', name: t('toolbox.tools.sqliteManager'), icon: '🗄️', type: 'page', enabled: true },
+  { id: 'maven-repo', name: t('toolbox.tools.mavenRepo'), icon: '☕', type: 'page', enabled: true },
   { id: 'json-formatter', name: t('toolbox.tools.jsonFormatter'), icon: '🔄', type: 'window', enabled: false },
   { id: 'json-diff', name: t('toolbox.tools.jsonDiff'), icon: '🔍', type: 'window', enabled: false },
   { id: 'json-to-ts', name: t('toolbox.tools.jsonToTs'), icon: '📦', type: 'window', enabled: false },
   { id: 'json-to-java', name: t('toolbox.tools.jsonToJava'), icon: '☕', type: 'window', enabled: false },
-  { id: 'regex-tester', name: t('toolbox.tools.regexTester'), icon: '🎨', type: 'window', enabled: false },
+  { id: 'regex-tester', name: t('toolbox.tools.regexTester'), icon: '🎨', type: 'page', enabled: true },
   { id: 'cron-parser', name: t('toolbox.tools.cronParser'), icon: '⏰', type: 'window', enabled: false },
-  { id: 'crypto', name: t('toolbox.tools.crypto'), icon: '🔐', type: 'window', enabled: false },
+  { id: 'crypto', name: t('toolbox.tools.crypto'), icon: '🔐', type: 'page', enabled: true },
   { id: 'hash-generator', name: t('toolbox.tools.hashGenerator'), icon: '#️⃣', type: 'window', enabled: false },
   { id: 'url-encoder', name: t('toolbox.tools.urlEncoder'), icon: '🌐', type: 'window', enabled: false },
   { id: 'base64', name: 'Base64', icon: '🔤', type: 'window', enabled: false },
@@ -126,7 +131,7 @@ const fileTools = computed(() => [
   { id: 'file-split', name: t('toolbox.tools.fileSplit'), icon: '✂️', type: 'window', enabled: false },
   { id: 'file-rename', name: t('toolbox.tools.fileRename'), icon: '📝', type: 'window', enabled: false },
   { id: 'duplicate-finder', name: t('toolbox.tools.duplicateFinder'), icon: '🔎', type: 'window', enabled: false },
-  { id: 'file-compare', name: t('toolbox.tools.fileCompare'), icon: '⚖️', type: 'window', enabled: false },
+  { id: 'file-compare', name: t('toolbox.tools.fileCompare'), icon: '⚖️', type: 'page', enabled: true },
   { id: 'csv-parser', name: t('toolbox.tools.csvParser'), icon: '📊', type: 'window', enabled: false },
   { id: 'excel-viewer', name: t('toolbox.tools.excelViewer'), icon: '📈', type: 'window', enabled: false },
   { id: 'pdf-tool', name: t('toolbox.tools.pdfTool'), icon: '📕', type: 'window', enabled: false },
@@ -138,11 +143,12 @@ const imageTools = computed(() => [
   { id: 'image-compress', name: t('toolbox.tools.imageCompress'), icon: '🗜️', type: 'window', enabled: false },
   { id: 'image-resize', name: t('toolbox.tools.imageResize'), icon: '📏', type: 'window', enabled: false },
   { id: 'image-crop', name: t('toolbox.tools.imageCrop'), icon: '✂️', type: 'window', enabled: false },
-  { id: 'image-format', name: t('toolbox.tools.imageFormat'), icon: '🔄', type: 'window', enabled: false },
+  { id: 'image-format', name: t('toolbox.tools.imageFormat'), icon: '🔄', type: 'page', enabled: true },
+  { id: 'wallpaper-manager', name: t('toolbox.tools.wallpaperManager'), icon: '🖼️', type: 'page', enabled: true },
   { id: 'image-watermark', name: t('toolbox.tools.imageWatermark'), icon: '💧', type: 'window', enabled: false },
   { id: 'icon-generator', name: t('toolbox.tools.iconGenerator'), icon: '🎨', type: 'window', enabled: false },
   { id: 'sprite-sheet', name: t('toolbox.tools.spriteSheet'), icon: '🖼️', type: 'window', enabled: false },
-  { id: 'image-to-base64', name: t('toolbox.tools.imageToBase64'), icon: '🔤', type: 'window', enabled: false }
+  { id: 'image-to-base64', name: t('toolbox.tools.imageToBase64'), icon: '🔤', type: 'page', enabled: true }
 ])
 
 // 实用工具
@@ -165,6 +171,8 @@ const utilityTools = computed(() => [
 
 // Git工具
 const gitTools = computed(() => [
+  { id: 'git-manager', name: t('toolbox.tools.gitManager'), icon: '🔀', type: 'page', enabled: true },
+  { id: 'git-daily-report', name: t('toolbox.tools.gitDailyReport'), icon: '📊', type: 'page', enabled: true },
   { id: 'git-graph', name: t('toolbox.tools.gitGraph'), icon: '🌳', type: 'window', enabled: false },
   { id: 'git-diff', name: t('toolbox.tools.gitDiff'), icon: '🔄', type: 'window', enabled: false },
   { id: 'git-ignore', name: t('toolbox.tools.gitIgnore'), icon: '🚫', type: 'window', enabled: false },
@@ -206,6 +214,7 @@ const efficiencyTools = computed(() => [
 
 // 网络工具
 const networkTools = computed(() => [
+  { id: 'port-manager', name: t('toolbox.tools.portManager'), icon: '🔌', type: 'page', enabled: true },
   { id: 'port-checker', name: t('toolbox.tools.portChecker'), icon: '🌍', type: 'window', enabled: false },
   { id: 'port-scanner', name: t('toolbox.tools.portScanner'), icon: '🔍', type: 'window', enabled: false },
   { id: 'ip-lookup', name: t('toolbox.tools.ipLookup'), icon: '📡', type: 'window', enabled: false },
@@ -246,10 +255,11 @@ const backendTools = computed(() => [
 
 // 测试工具
 const testTools = computed(() => [
-  { id: 'mock-data', name: t('toolbox.tools.mockData'), icon: '🎭', type: 'window', enabled: false },
-  { id: 'load-test', name: t('toolbox.tools.loadTest'), icon: '💪', type: 'window', enabled: false },
-  { id: 'api-mock', name: 'API Mock', icon: '🎯', type: 'window', enabled: false },
-  { id: 'test-case', name: t('toolbox.tools.testCase'), icon: '✅', type: 'window', enabled: false }
+  { id: 'api-debug', name: t('toolbox.tools.apiDebug'), icon: '🔗', type: 'page', enabled: true },
+  { id: 'api-docs-page', name: t('toolbox.tools.apiDocsPage'), icon: '📚', type: 'page', enabled: true },
+  { id: 'mock-service', name: t('toolbox.tools.mockService'), icon: '🎭', type: 'page', enabled: true },
+  { id: 'perf-test', name: t('toolbox.tools.perfTest'), icon: '💪', type: 'page', enabled: true },
+  { id: 'auto-test', name: t('toolbox.tools.autoTest'), icon: '✅', type: 'page', enabled: true },
 ])
 
 // 运维工具
@@ -326,7 +336,7 @@ const dataAnalysisTools = computed(() => [
   { id: 'data-visualization', name: t('toolbox.tools.dataVisualization'), icon: '📈', type: 'window', enabled: false },
   { id: 'pivot-table', name: t('toolbox.tools.pivotTable'), icon: '🔄', type: 'window', enabled: false },
   { id: 'sql-analyzer', name: t('toolbox.tools.sqlAnalyzer'), icon: '🔍', type: 'window', enabled: false },
-  { id: 'log-analyzer', name: t('toolbox.tools.logAnalyzer'), icon: '📜', type: 'window', enabled: false },
+  { id: 'log-analyzer', name: t('toolbox.tools.logAnalyzer'), icon: '📜', type: 'page', enabled: true },
   { id: 'json-analyzer', name: t('toolbox.tools.jsonAnalyzer'), icon: '📋', type: 'window', enabled: false },
   { id: 'csv-analyzer', name: t('toolbox.tools.csvAnalyzer'), icon: '📊', type: 'window', enabled: false },
   { id: 'statistics-tool', name: t('toolbox.tools.statisticsTool'), icon: '📐', type: 'window', enabled: false },
@@ -376,7 +386,7 @@ const browserTools = computed(() => [
 
 // 代码质量
 const codeQualityTools = computed(() => [
-  { id: 'code-formatter', name: t('toolbox.tools.codeFormatter'), icon: '✨', type: 'window', enabled: false },
+  { id: 'code-formatter', name: t('toolbox.tools.codeFormatter'), icon: '✨', type: 'page', enabled: true },
   { id: 'code-lint', name: t('toolbox.tools.codeLint'), icon: '🔍', type: 'window', enabled: false },
   { id: 'code-review', name: t('toolbox.tools.codeReview'), icon: '👀', type: 'window', enabled: false },
   { id: 'complexity-analyzer', name: t('toolbox.tools.complexityAnalyzer'), icon: '📊', type: 'window', enabled: false },
@@ -560,6 +570,97 @@ const openTool = async (tool) => {
 
   if (tool.id === 'sticky-notes') {
     router.push('/toolbox/sticky-notes')
+    return
+  }
+
+  if (tool.id === 'sdk-manager') {
+    router.push('/toolbox/sdk-manager')
+    return
+  }
+
+  if (tool.id === 'redis-client') {
+    router.push('/toolbox/redis-client')
+    return
+  }
+
+  if (tool.id === 'port-manager') {
+    router.push('/toolbox/port-manager')
+    return
+  }
+
+  if (tool.id === 'git-manager') {
+    router.push('/toolbox/git-manager')
+    return
+  }
+
+  if (tool.id === 'git-daily-report') {
+    router.push('/toolbox/git-daily-report')
+    return
+  }
+
+  if (tool.id === 'code-formatter') {
+    router.push('/toolbox/code-formatter')
+    return
+  }
+
+  if (tool.id === 'file-compare') {
+    router.push('/toolbox/file-diff')
+    return
+  }
+
+  if (tool.id === 'api-debug') { router.push('/toolbox/api-debug'); return }
+  if (tool.id === 'api-docs-page') { router.push('/toolbox/api-docs'); return }
+  if (tool.id === 'mock-service') { router.push('/toolbox/mock-service'); return }
+  if (tool.id === 'perf-test') { router.push('/toolbox/perf-test'); return }
+  if (tool.id === 'auto-test') { router.push('/toolbox/auto-test'); return }
+
+  if (tool.id === 'ebook-shelf') {
+    router.push('/toolbox/ebook-shelf')
+    return
+  }
+
+  if (tool.id === 'screenshot') {
+    router.push('/toolbox/screenshot')
+    return
+  }
+
+  if (tool.id === 'image-to-base64') {
+    router.push('/toolbox/image-to-base64')
+    return
+  }
+
+  if (tool.id === 'image-format') {
+    router.push('/toolbox/image-format-converter')
+    return
+  }
+
+  if (tool.id === 'regex-tester') {
+    router.push('/toolbox/regex-tester')
+    return
+  }
+
+  if (tool.id === 'crypto') {
+    router.push('/toolbox/crypto-tool')
+    return
+  }
+
+  if (tool.id === 'sqlite-manager') {
+    router.push('/toolbox/sqlite-manager')
+    return
+  }
+
+  if (tool.id === 'maven-repo') {
+    router.push('/toolbox/maven-repo')
+    return
+  }
+
+  if (tool.id === 'wallpaper-manager') {
+    router.push('/toolbox/wallpaper-manager')
+    return
+  }
+
+  if (tool.id === 'log-analyzer') {
+    router.push('/toolbox/log-analyzer')
     return
   }
 

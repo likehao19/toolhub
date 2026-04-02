@@ -7,7 +7,7 @@
     <template v-else>
       <!-- 启动画面 -->
       <div v-if="isLoading" class="splash-screen">
-        <div class="splash-content">
+        <div class="splash-content">9421
           <div class="splash-logo">
             <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M20 7H4C2.9 7 2 7.9 2 9V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V9C22 7.9 21.1 7 20 7Z" fill="white" opacity="0.9"/>
@@ -96,11 +96,12 @@ try {
 } catch (error) {
 }
 
-// 判断是否为独立窗口（包括所有便签窗口：sticky-notes, sticky-notes-1 ~ sticky-notes-9）
+// 判断是否为独立窗口（包括便签、截图等动态创建的窗口）
 const standaloneLabels = ['floating-ball', 'ai-assistant', 'sticky-notes']
 const isStickyNotesWindow = windowLabel === 'sticky-notes' || /^sticky-notes-\d+$/.test(windowLabel)
+const isScreenshotWindow = windowLabel.startsWith('screenshot-overlay-') || windowLabel.startsWith('pin-')
 const isStandaloneWindow = ref(
-  standaloneLabels.includes(windowLabel) || isStickyNotesWindow
+  standaloneLabels.includes(windowLabel) || isStickyNotesWindow || isScreenshotWindow
 )
 const appStore = useAppStore()
 const router = useRouter()
@@ -480,6 +481,8 @@ onMounted(async () => {
       // 应用动画设置
       if (config.enableAnimations === false) {
         document.documentElement.classList.add('no-animations')
+      } else {
+        document.documentElement.classList.remove('no-animations')
       }
 
       // 应用语言设置
@@ -795,6 +798,132 @@ onMounted(async () => {
   }
 })
 
+// ==================== 截图工具全局快捷键 ====================
+const initScreenshotShortcuts = (async () => {
+  let screenshotProcessing = false
+
+  const handleScreenshot = async () => {
+    if (screenshotProcessing) return
+    screenshotProcessing = true
+    try {
+      const { WebviewWindow, getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
+
+      // 防止重复打开覆盖层
+      const allWins = await getAllWebviewWindows()
+      const existing = allWins.find(w => w.label.startsWith('screenshot-overlay'))
+      if (existing) { await existing.setFocus(); return }
+
+      // 快速截图：写入临时 BMP 文件，只传元数据（不走 base64）
+      const screens = await invoke('capture_screen_fast')
+      if (!screens.length) return
+      localStorage.setItem('__screenshot_pre_capture', JSON.stringify(screens))
+
+      // 创建全屏透明覆盖窗口（先隐藏，图片加载完再显示，避免白屏闪烁）
+      const label = `screenshot-overlay-${Date.now()}`
+      new WebviewWindow(label, {
+        url: `${window.location.origin}/screenshot-overlay`,
+        title: '',
+        fullscreen: true,
+        transparent: true,
+        decorations: false,
+        alwaysOnTop: true,
+        skipTaskbar: true,
+        visible: false,
+      })
+    } catch (e) {
+      console.error('[截图] 快捷键处理失败:', e)
+    } finally {
+      setTimeout(() => { screenshotProcessing = false }, 600)
+    }
+  }
+
+  // 仅 main 窗口注册全局快捷键（pin/overlay 窗口跳过）
+  const { getCurrentWindow: getCurWin } = await import('@tauri-apps/api/window')
+  const curWinLabel = getCurWin().label
+  if (curWinLabel !== 'main') return
+
+  try {
+    const { register, isRegistered, unregister } = await import('@tauri-apps/plugin-global-shortcut')
+    const cfg = JSON.parse(localStorage.getItem('screenshot-settings') || '{}')
+
+    // F1 截图
+    const ssKey = cfg.hotkey || 'F1'
+    if (await isRegistered(ssKey)) await unregister(ssKey)
+    await register(ssKey, handleScreenshot)
+
+    // F3 贴图
+    const pinKey = 'F3'
+    if (await isRegistered(pinKey)) await unregister(pinKey)
+    let pinProcessing = false
+    await register(pinKey, async () => {
+      if (pinProcessing) return
+      pinProcessing = true
+      try {
+        const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
+        const allWins = await getAllWebviewWindows()
+        const overlayWin = allWins.find(w => w.label.startsWith('screenshot-overlay'))
+
+        if (overlayWin) {
+          // 截图覆盖层正在打开 → 通知它执行贴图
+          const { emitTo } = await import('@tauri-apps/api/event')
+          await emitTo(overlayWin.label, 'screenshot-do-pin')
+          return
+        }
+
+        // 无覆盖层 → 从剪贴板读取图片贴图
+        const { readImage } = await import('@tauri-apps/plugin-clipboard-manager')
+        const img = await readImage()
+        const rgba = await img.rgba()
+        if (!rgba.length) return
+
+        const w = typeof img.width === 'function' ? img.width() : img.width
+        const h = typeof img.height === 'function' ? img.height() : img.height
+        if (!w || !h) {
+          console.error('[贴图] 剪贴板图片尺寸无效:', w, h)
+          return
+        }
+
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        ctx.putImageData(new ImageData(new Uint8ClampedArray(rgba), w, h), 0, 0)
+        const dataUrl = canvas.toDataURL('image/png')
+        const base64 = dataUrl.split(',')[1]
+
+        const pinId = `pin-${Date.now()}`
+        const { invoke: inv } = await import('@tauri-apps/api/core')
+        const tmpDir = await inv('get_temp_dir')
+        const tmpPath = `${tmpDir}/toolhub-pin-${pinId}.png`
+        await inv('save_screenshot_file', { path: tmpPath, data: base64 })
+
+        const { WebviewWindow } = await import('@tauri-apps/api/webviewWindow')
+        new WebviewWindow(pinId, {
+          url: `${window.location.origin}/screenshot-pin?w=${w}&h=${h}&file=${encodeURIComponent(tmpPath)}`,
+          title: '', width: w, height: h,
+          decorations: false, transparent: true, alwaysOnTop: true, skipTaskbar: true,
+        })
+      } catch (e) {
+        console.error('[贴图] F3处理失败:', e)
+      } finally {
+        setTimeout(() => { pinProcessing = false }, 500)
+      }
+    })
+
+    console.log(`[截图] 全局快捷键已注册: ${ssKey}(截图) / F3(贴图)`)
+  } catch (e) {
+    console.error('[截图] 快捷键注册失败:', e)
+  }
+
+  // 监听设置变更
+  try {
+    const { listen } = await import('@tauri-apps/api/event')
+    await listen('screenshot-config-changed', async () => {
+      // 重新注册可在此扩展
+    })
+  } catch {}
+})()
+
 // 全局错误处理：静默处理 Tauri callback 相关的错误
 // 注意：这个处理已经在 onMounted 之前添加了
 
@@ -1003,14 +1132,27 @@ const handleCloseConfirm = async ({ action, remember }) => {
   box-sizing: border-box;
 }
 
-/* ===== 禁用动画 ===== */
-.no-animations,
-.no-animations *,
-.no-animations *::before,
-.no-animations *::after {
+/* ===== 禁用动画（仅作用于应用自定义过渡，不再粗暴影响第三方组件） ===== */
+.no-animations .fade-enter-active,
+.no-animations .fade-leave-active,
+.no-animations .slide-left-enter-active,
+.no-animations .slide-left-leave-active,
+.no-animations .slide-right-enter-active,
+.no-animations .slide-right-leave-active,
+.no-animations .slide-panel-enter-active,
+.no-animations .slide-panel-leave-active,
+.no-animations .tool-card,
+.no-animations .menu-item,
+.no-animations .content-card,
+.no-animations .image-card,
+.no-animations .card-overlay,
+.no-animations .favorite-btn,
+.no-animations .send-btn-round,
+.no-animations .action-card {
   transition-duration: 0s !important;
   animation-duration: 0s !important;
 }
+
 
 body {
   margin: 0;

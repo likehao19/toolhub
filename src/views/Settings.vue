@@ -9,8 +9,9 @@
         </div>
       </div>
       <div class="header-actions">
+        <span class="save-status" :class="saveStatusClass">{{ saveStatusText }}</span>
         <!-- 操作按钮组 -->
-        <el-button size="small" @click="handleSave" :loading="saving" type="primary" circle :title="t('settings.save')">
+        <el-button size="small" @click="handleSave" :loading="saving" :disabled="!manualHasChanges" :type="manualHasChanges ? 'primary' : 'default'" circle :title="t('settings.save')">
           <el-icon><Check /></el-icon>
         </el-button>
         <el-button size="small" @click="handleReset" circle :title="t('settings.reset')">
@@ -55,7 +56,7 @@
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
               <el-form-item :label="t('settings.closeAction')">
-                <el-radio-group v-model="settings.closeAction">
+                <el-radio-group v-model="settings.closeAction" @change="handleCloseActionChange">
                   <el-radio :value="'ask'">{{ t('settings.closeAsk') }}</el-radio>
                   <el-radio :value="'minimize'">{{ t('settings.closeMinimize') }}</el-radio>
                   <el-radio :value="'exit'">{{ t('settings.closeExit') }}</el-radio>
@@ -65,7 +66,7 @@
               <el-form-item :label="t('settings.autoStart')">
                 <el-switch
                   v-model="settings.autoStart"
-                  @change="handleAutostartChange"
+                  @change="handleAutoStartToggle"
                   :loading="autostartLoading"
                 />
                 <span style="margin-left: 10px; color: #909399; font-size: 12px;">
@@ -82,7 +83,7 @@
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
               <el-form-item :label="t('settings.themeMode')">
-                <el-radio-group v-model="settings.theme" @change="applyTheme">
+                <el-radio-group v-model="settings.theme" @change="handleThemeChange">
                   <el-radio :value="'light'">{{ t('settings.themeLight') }}</el-radio>
                   <el-radio :value="'dark'">{{ t('settings.themeDark') }}</el-radio>
                   <el-radio :value="'auto'">{{ t('settings.themeAuto') }}</el-radio>
@@ -103,7 +104,7 @@
               </el-form-item>
 
               <el-form-item :label="t('settings.fontFamily')">
-                <el-select v-model="settings.fontFamily" style="width: 300px" @change="applyFontFamily">
+                <el-select v-model="settings.fontFamily" style="width: 300px" @change="handleFontFamilyChange">
                   <el-option :label="t('settings.fontSystem')" value="system" />
                   <el-option label="微软雅黑" value="Microsoft YaHei" />
                   <el-option label="宋体" value="SimSun" />
@@ -113,7 +114,7 @@
               </el-form-item>
 
               <el-form-item :label="t('settings.enableAnimations')">
-                <el-switch v-model="settings.enableAnimations" @change="applyAnimations" />
+                <el-switch v-model="settings.enableAnimations" @change="handleAnimationsChange" />
               </el-form-item>
             </el-form>
           </el-card>
@@ -125,7 +126,7 @@
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
               <el-form-item :label="t('settings.langLabel')">
-                <el-select v-model="settings.language" style="width: 200px" @change="handleLanguageChange">
+                <el-select v-model="settings.language" style="width: 200px" @change="handleLanguageSettingChange">
                   <el-option label="简体中文" value="zh-CN" />
                   <el-option label="English" value="en-US" />
                 </el-select>
@@ -153,7 +154,7 @@
             </el-alert>
             <el-form :model="reminderConfig" label-width="120px" label-position="left">
               <el-form-item :label="t('settings.positionType')">
-                <el-radio-group v-model="reminderConfig.positionType">
+                <el-radio-group v-model="reminderConfig.positionType" @change="handleReminderSettingChange">
                   <el-radio value="window">{{ t('settings.positionWindow') }}</el-radio>
                   <el-radio value="screen">{{ t('settings.positionScreen') }}</el-radio>
                 </el-radio-group>
@@ -163,7 +164,7 @@
               </el-form-item>
 
               <el-form-item :label="t('settings.displayPosition')">
-                <el-select v-model="reminderConfig.position" style="width: 200px;">
+                <el-select v-model="reminderConfig.position" style="width: 200px;" @change="handleReminderSettingChange">
                   <el-option :label="t('settings.posTopRight')" value="topRight" />
                   <el-option :label="t('settings.posTopLeft')" value="topLeft" />
                   <el-option :label="t('settings.posTopCenter')" value="topCenter" />
@@ -193,7 +194,7 @@
               <el-form-item :label="t('settings.enableBall')">
                 <el-switch
                   v-model="aiAssistantSettings.enableFloatingBall"
-                  @change="handleFloatingBallToggle"
+                  @change="handleFloatingBallSettingChange"
                 />
                 <div style="margin-left: 10px; color: #909399; font-size: 12px;">
                   <div>{{ t('settings.enableBallHint') }}</div>
@@ -204,7 +205,7 @@
               <el-form-item :label="t('settings.ballPosition')" v-if="aiAssistantSettings.enableFloatingBall">
                 <el-radio-group
                   v-model="aiAssistantSettings.floatingBallMode"
-                  @change="handleFloatingBallChange"
+                  @change="handleFloatingBallSettingChange"
                 >
                   <el-radio value="inApp">{{ t('settings.ballInApp') }}</el-radio>
                   <el-radio value="desktop">{{ t('settings.ballDesktop') }}</el-radio>
@@ -218,7 +219,7 @@
                 <el-select
                   v-model="aiAssistantSettings.floatingBallStyle"
                   style="width: 200px;"
-                  @change="handleFloatingBallChange"
+                  @change="handleFloatingBallSettingChange"
                 >
                   <el-option :label="t('settings.ballCircle')" value="circle" />
                   <el-option :label="t('settings.ballRounded')" value="rounded" />
@@ -233,7 +234,7 @@
                   :max="80"
                   :step="5"
                   style="width: 200px"
-                  @change="handleFloatingBallChange"
+                  @change="handleFloatingBallSettingChange"
                 />
                 <span style="margin-left: 10px">{{ aiAssistantSettings.floatingBallSize }}px</span>
               </el-form-item>
@@ -410,6 +411,58 @@
         <div v-show="activeTab === 'security'" class="settings-section">
           <h3 class="section-title">{{ t('settings.security') }}</h3>
 
+          <el-card shadow="never" style="margin-bottom: 20px;">
+            <template #header>
+              <div class="card-header">{{ t('settings.systemPrivilegeTitle') }}</div>
+            </template>
+            <el-form label-width="150px" label-position="left">
+              <el-form-item :label="t('settings.sdkEnvScopeTitle')">
+                <el-radio-group v-model="systemPrivilege.envScope" @change="handleEnvScopeSettingChange" size="small">
+                  <el-radio value="system">{{ t('settings.sdkEnvScopeSystem') }}</el-radio>
+                  <el-radio value="user">{{ t('settings.sdkEnvScopeUser') }}</el-radio>
+                </el-radio-group>
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.sdkEnvScopeDesc') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item :label="t('settings.systemPrivilegeStatus')">
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                  <el-tag v-if="systemPrivilege.checking" type="info">{{ t('settings.systemPrivilegeChecking') }}</el-tag>
+                  <el-tag v-else-if="systemPrivilege.authorized" type="success">{{ t('settings.systemPrivilegeAuthorized') }}</el-tag>
+                  <el-tag v-else type="warning">{{ t('settings.systemPrivilegeUnauthorized') }}</el-tag>
+                  <el-button size="small" @click="loadSystemPrivilegeStatus" :loading="systemPrivilege.checking">
+                    {{ t('settings.systemPrivilegeRefresh') }}
+                  </el-button>
+                  <el-button
+                    v-if="systemPrivilege.envScope === 'system' && !systemPrivilege.authorized"
+                    size="small"
+                    type="primary"
+                    @click="handleSystemPrivilegeAuthorize"
+                    :loading="systemPrivilege.authorizing"
+                  >
+                    {{ t('settings.systemPrivilegeAuthorize') }}
+                  </el-button>
+                </div>
+                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.systemPrivilegeHint') }}
+                </div>
+                <div v-if="systemPrivilege.envScope === 'system'" style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.systemPrivilegeScopeHint') }}
+                </div>
+                <div v-else style="font-size: 12px; color: #909399; margin-top: 4px;">
+                  {{ t('settings.sdkEnvScopeUserHint') }}
+                </div>
+              </el-form-item>
+
+              <el-form-item v-if="systemPrivilege.envScope === 'system' && !systemPrivilege.authorized" :label="t('settings.systemPrivilegeActionTitle')">
+                <div style="font-size: 12px; color: #909399;">
+                  {{ t('settings.systemPrivilegeActionDesc') }}
+                </div>
+              </el-form-item>
+            </el-form>
+          </el-card>
+
           <!-- 密码管理 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -421,6 +474,7 @@
                   v-model="passwordSettings.requirePasswordOnStart"
                   :active-text="t('common.on')"
                   :inactive-text="t('common.off')"
+                  @change="handlePasswordSettingChange"
                 />
                 <div style="font-size: 12px; color: #909399; margin-top: 4px;">
                   {{ t('settings.requirePwdHint') }}
@@ -431,6 +485,7 @@
                 <el-select
                   v-model="passwordSettings.autoLockTime"
                   style="width: 200px;"
+                  @change="handlePasswordSettingChange"
                 >
                   <el-option :label="t('common.time.min5')" :value="5" />
                   <el-option :label="t('common.time.min10')" :value="10" />
@@ -611,7 +666,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Check, Refresh, Setting, Brush, Folder, Lock, Bell } from '@element-plus/icons-vue'
 import { t, setLocale } from '@/i18n'
@@ -625,8 +680,13 @@ import Database from '@tauri-apps/plugin-sql'
 import { hashPassword, verifyPassword, generateSalt } from '@/utils/masterPassword'
 import { saveReminderConfig } from '@/utils/reminderService'
 import { useAppStore } from '@/store/app'
+import { getPrivilegeStatus, ensureSystemPrivilege } from '@/utils/systemPrivilegeManager'
+import { getEnvScope, setEnvScope } from '@/utils/sdkManager'
+import { useRoute, useRouter } from 'vue-router'
 
 const appStore = useAppStore()
+const route = useRoute()
+const router = useRouter()
 
 const activeTab = ref('general')
 const saving = ref(false)
@@ -634,6 +694,11 @@ const autostartLoading = ref(false)
 const testingAI = ref(false)
 const aiTestResult = ref(null)
 const originalSettings = ref(null)
+const savedAiSettings = ref(null)
+const savedAiAssistantSettings = ref(null)
+const savedReminderConfig = ref(null)
+const savedPasswordSettings = ref(null)
+const autoSaving = ref(false)
 
 // 反馈相关
 const feedbackContent = ref('')
@@ -644,6 +709,7 @@ const submittingFeedback = ref(false)
 const checkingUpdate = ref(false)
 const updateInfo = ref('')
 const hasChanges = ref(false)
+const manualHasChanges = ref(false)
 const configPath = ref('')
 const lastSaved = ref('')
 
@@ -659,6 +725,25 @@ const menuItems = computed(() => [
 const currentMenuName = computed(() => {
   const menu = menuItems.value.find(m => m.key === activeTab.value)
   return menu ? menu.label : t('settings.title')
+})
+
+const saveStatusText = computed(() => {
+  if (saving.value || autoSaving.value) return t('settings.statusSaving')
+  if (manualHasChanges.value) return t('settings.statusUnsaved')
+  if (lastSaved.value) return `${t('settings.statusSaved')} · ${lastSaved.value}`
+  return t('settings.statusIdle')
+})
+
+const saveStatusClass = computed(() => {
+  if (saving.value || autoSaving.value) return 'saving'
+  if (manualHasChanges.value) return 'unsaved'
+  if (lastSaved.value) return 'saved'
+  return 'idle'
+})
+
+const formatSavedTime = () => new Date().toLocaleTimeString('zh-CN', {
+  hour: '2-digit',
+  minute: '2-digit'
 })
 
 // 设置数据
@@ -723,6 +808,14 @@ const showChangePasswordDialog = ref(false)
 const oldPasswordInput = ref('')
 const newPasswordInput = ref('')
 const newPasswordConfirm = ref('')
+
+// 系统权限
+const systemPrivilege = reactive({
+  authorized: false,
+  checking: false,
+  authorizing: false,
+  envScope: getEnvScope(),
+})
 
 // 提醒设置
 const reminderConfig = reactive({
@@ -797,6 +890,154 @@ const handleLanguageChange = (lang) => {
   setLocale(lang)
 }
 
+const syncSavedSnapshots = () => {
+  originalSettings.value = JSON.parse(JSON.stringify(settings))
+  savedAiSettings.value = JSON.parse(JSON.stringify(aiSettings))
+  savedAiAssistantSettings.value = JSON.parse(JSON.stringify(aiAssistantSettings))
+  savedReminderConfig.value = JSON.parse(JSON.stringify(reminderConfig))
+  savedPasswordSettings.value = JSON.parse(JSON.stringify(passwordSettings))
+  hasChanges.value = false
+  manualHasChanges.value = false
+}
+
+const restoreSavedSnapshots = () => {
+  if (originalSettings.value) Object.assign(settings, JSON.parse(JSON.stringify(originalSettings.value)))
+  if (savedAiSettings.value) Object.assign(aiSettings, JSON.parse(JSON.stringify(savedAiSettings.value)))
+  if (savedAiAssistantSettings.value) Object.assign(aiAssistantSettings, JSON.parse(JSON.stringify(savedAiAssistantSettings.value)))
+  if (savedReminderConfig.value) Object.assign(reminderConfig, JSON.parse(JSON.stringify(savedReminderConfig.value)))
+  if (savedPasswordSettings.value) Object.assign(passwordSettings, JSON.parse(JSON.stringify(savedPasswordSettings.value)))
+}
+
+const persistSettings = async ({ silent = true } = {}) => {
+  if (saving.value || autoSaving.value) return false
+
+  autoSaving.value = true
+  try {
+    const config = {
+      ...settings,
+      aiSettings: { ...aiSettings },
+      aiAssistantSettings: { ...aiAssistantSettings }
+    }
+    await saveConfig(config)
+
+    window.dispatchEvent(new CustomEvent('settings-config-saved', {
+      detail: { aiSettings: { ...aiSettings } }
+    }))
+    window.dispatchEvent(new CustomEvent('ai-config-changed', {
+      detail: { aiSettings: { ...aiSettings } }
+    }))
+
+    localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
+    localStorage.setItem('ai_config', JSON.stringify({
+      apiKey: aiSettings.apiKey,
+      baseURL: aiSettings.baseUrl,
+      model: aiSettings.model
+    }))
+
+    window.dispatchEvent(new CustomEvent('ai-floating-ball-settings-changed', {
+      detail: aiAssistantSettings
+    }))
+
+    if (settings.closeAction) {
+      appStore.setCloseAction(settings.closeAction)
+    }
+
+    await savePasswordSettings()
+    saveReminderConfig(reminderConfig)
+
+    syncSavedSnapshots()
+    lastSaved.value = formatSavedTime()
+
+    if (!silent) {
+      ElMessage.success(t('settings.saveSuccess'))
+    }
+    return true
+  } catch (error) {
+    restoreSavedSnapshots()
+    applyTheme(settings.theme)
+    applyFontSize(settings.fontSize)
+    applyFontFamily(settings.fontFamily)
+    applyAnimations(settings.enableAnimations)
+    setLocale(settings.language)
+    ElMessage.error(t('settings.saveFailed'))
+    return false
+  } finally {
+    autoSaving.value = false
+  }
+}
+
+const autoSaveWithSideEffect = async (effect, rollback) => {
+  if (typeof effect === 'function') {
+    effect()
+  }
+  const ok = await persistSettings()
+  if (!ok && typeof rollback === 'function') {
+    rollback()
+  }
+}
+
+const handleThemeChange = async (theme) => {
+  await autoSaveWithSideEffect(() => applyTheme(theme))
+}
+
+const handleFontFamilyChange = async (family) => {
+  await autoSaveWithSideEffect(() => applyFontFamily(family))
+}
+
+const handleAnimationsChange = async (enabled) => {
+  await autoSaveWithSideEffect(() => applyAnimations(enabled))
+}
+
+const handleFloatingBallSettingChange = async () => {
+  handleFloatingBallChange()
+  await persistSettings()
+}
+
+const handlePasswordSettingChange = async () => {
+  await persistSettings()
+}
+
+const handleReminderSettingChange = async () => {
+  await persistSettings()
+}
+
+const handleCloseActionChange = async () => {
+  await persistSettings()
+}
+
+const handleEnvScopeSettingChange = async (value) => {
+  handleEnvScopeChange(value)
+  await persistSettings()
+}
+
+const handleLanguageSettingChange = async (lang) => {
+  handleLanguageChange(lang)
+  await persistSettings()
+}
+
+const handleAutoStartToggle = async (enabled) => {
+  const previous = !enabled
+  autostartLoading.value = true
+  try {
+    const success = await TauriAutostart.toggleAutostart(enabled)
+    if (success) {
+      await persistSettings()
+    } else {
+      settings.autoStart = previous
+      ElMessage.error(t('settings.saveFailed'))
+    }
+  } catch (error) {
+    settings.autoStart = previous
+    ElMessage.error(t('settings.saveFailed'))
+  } finally {
+    autostartLoading.value = false
+  }
+}
+
+const handleSystemPrivilegeAuthorize = async () => {
+  await authorizeSystemPrivilege()
+}
+
 /**
  * 加载配置
  */
@@ -813,6 +1054,8 @@ const loadSettings = async () => {
       if (config.aiAssistantSettings) {
         Object.assign(aiAssistantSettings, config.aiAssistantSettings)
       }
+
+      applyAnimations(config.enableAnimations !== false)
 
       // 同步窗口关闭行为到 store
       if (config.closeAction) {
@@ -837,90 +1080,27 @@ const loadSettings = async () => {
     await loadStorageStats()
 
     // 保存原始设置用于比较
-    originalSettings.value = JSON.parse(JSON.stringify(settings))
-    hasChanges.value = false
+    syncSavedSnapshots()
   } catch (e) { /* ignore */ }
 }
 
 /**
  * 处理自动启动状态变化
  */
-const handleAutostartChange = async (enabled) => {
-  autostartLoading.value = true
-  try {
-    const success = await TauriAutostart.toggleAutostart(enabled)
-    if (success) {
-      // 更新配置
-      await saveConfig(settings)
-      originalSettings.value = JSON.parse(JSON.stringify(settings))
-      hasChanges.value = false
-    } else {
-      // 如果失败，恢复原状态
-      settings.autoStart = !enabled
-    }
-  } catch (error) {
-
-    // 恢复原状态
-    settings.autoStart = !enabled
-  } finally {
-    autostartLoading.value = false
-  }
-}
-
 /**
  * 保存配置
  */
 const handleSave = async () => {
   saving.value = true
   try {
-    // 1. 保存常规设置到配置文件
-    const config = {
-      ...settings,
-      aiSettings: { ...aiSettings },
-      aiAssistantSettings: { ...aiAssistantSettings }
-    }
-    await saveConfig(config)
-
-    // 同步 AI 助手设置到 localStorage（供桌面悬浮球使用）
-    localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
-
-    // 同步 AI 配置到 localStorage（供 api.js 使用）
-    localStorage.setItem('ai_config', JSON.stringify({
-      apiKey: aiSettings.apiKey,
-      baseURL: aiSettings.baseUrl,
-      model: aiSettings.model
-    }))
-
-    // 触发全局事件通知 AI 助手悬浮球设置已更改
-    window.dispatchEvent(new CustomEvent('ai-floating-ball-settings-changed', {
-      detail: aiAssistantSettings
-    }))
-
-    // 2. 同步窗口关闭行为到 store
-    if (settings.closeAction) {
-      appStore.setCloseAction(settings.closeAction)
-    }
-
-    // 3. 保存密码管理设置到数据库
-    try {
-      await savePasswordSettings()
-    } catch (error) {
-
-      // 不中断主流程，只记录错误
-    }
-
-    // 4. 保存提醒设置
-    saveReminderConfig(reminderConfig)
-
-    originalSettings.value = JSON.parse(JSON.stringify(settings))
-    hasChanges.value = false
-    lastSaved.value = new Date().toLocaleString('zh-CN')
-  } catch (error) {
-    // 保存失败静默处理
+    await persistSettings({ silent: false })
+    manualHasChanges.value = false
   } finally {
     saving.value = false
   }
 }
+
+const handleAutostartChange = handleAutoStartToggle
 
 /**
  * 选择笔记存储路径
@@ -1475,6 +1655,7 @@ const handleReset = async () => {
     )
 
     await resetConfig()
+    window.dispatchEvent(new CustomEvent('settings-reset'))
     await loadSettings()
   } catch (error) {
     if (error !== 'cancel') {
@@ -1585,6 +1766,82 @@ const handleFloatingBallToggle = (enabled) => {
   }))
 }
 
+watch(
+  () => [
+    settings.closeAction,
+    settings.theme,
+    settings.fontFamily,
+    settings.enableAnimations,
+    settings.language,
+    reminderConfig.positionType,
+    reminderConfig.position,
+    aiAssistantSettings.enableFloatingBall,
+    aiAssistantSettings.floatingBallMode,
+    aiAssistantSettings.floatingBallStyle,
+    passwordSettings.requirePasswordOnStart,
+    passwordSettings.autoLockTime,
+    systemPrivilege.envScope,
+  ],
+  () => {
+    if (!autoSaving.value) {
+      hasChanges.value = true
+    }
+  },
+  { deep: true }
+)
+
+watch(
+  () => [
+    aiSettings.baseUrl,
+    aiSettings.apiKey,
+    aiSettings.model,
+    settings.fontSize,
+  ],
+  () => {
+    hasChanges.value = true
+    manualHasChanges.value = true
+  },
+  { deep: true }
+)
+
+watch(
+  () => [
+    settings.notesStoragePath,
+  ],
+  () => {
+    hasChanges.value = true
+    manualHasChanges.value = true
+  }
+)
+
+watch(
+  () => aiAssistantSettings.floatingBallSize,
+  () => {
+    hasChanges.value = true
+    manualHasChanges.value = true
+  }
+)
+
+watch(
+  () => route.query.tab,
+  (tab) => {
+    if (typeof tab === 'string' && tab) {
+      activeTab.value = tab
+    }
+  },
+  { immediate: true }
+)
+
+watch(activeTab, (tab) => {
+  const nextQuery = { ...route.query }
+  if (tab === 'general') {
+    delete nextQuery.tab
+  } else {
+    nextQuery.tab = tab
+  }
+  router.replace({ query: nextQuery })
+})
+
 /**
  * 处理悬浮球配置变化（位置、样式、大小）
  */
@@ -1624,12 +1881,42 @@ const checkUpdate = async () => {
   }
 }
 
+const loadSystemPrivilegeStatus = async () => {
+  systemPrivilege.checking = true
+  try {
+    const status = await getPrivilegeStatus()
+    systemPrivilege.authorized = status.authorized
+  } finally {
+    systemPrivilege.checking = false
+  }
+}
+
+const authorizeSystemPrivilege = async () => {
+  systemPrivilege.authorizing = true
+  try {
+    const status = await ensureSystemPrivilege()
+    systemPrivilege.authorized = status.authorized
+    ElMessage.success(t('settings.systemPrivilegeAuthorizeSuccess'))
+  } catch (error) {
+    ElMessage.error(error?.message || t('settings.systemPrivilegeAuthorizeFailed'))
+  } finally {
+    systemPrivilege.authorizing = false
+    await loadSystemPrivilegeStatus()
+  }
+}
+
+const handleEnvScopeChange = (value) => {
+  setEnvScope(value)
+  systemPrivilege.envScope = value
+}
+
 // 组件挂载时加载配置
 onMounted(async () => {
   await loadSettings() // loadSettings 内部已经调用了 loadStorageStats
   await loadPasswordSettings()
   await loadPasswordStats()
   await loadReminderSettings()
+  await loadSystemPrivilegeStatus()
   // await loadStorageStats() // 已在 loadSettings 中调用，避免重复
 
   // 加载配置路径
@@ -1684,6 +1971,29 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+}
+
+.save-status {
+  font-size: 12px;
+  transition: color var(--transition-fast);
+  user-select: none;
+}
+
+.save-status.idle {
+  color: var(--text-quaternary);
+}
+
+.save-status.saved {
+  color: #67c23a;
+}
+
+.save-status.unsaved {
+  color: #e6a23c;
+  font-weight: 500;
+}
+
+.save-status.saving {
+  color: var(--accent-blue);
 }
 
 /* 主容器 */

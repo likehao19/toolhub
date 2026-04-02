@@ -160,15 +160,6 @@
               </div>
 
               <div class="row-right">
-                <el-icon
-                  class="favorite-star"
-                  :class="{ 'is-favorite': password.is_favorite }"
-                  @click.stop="toggleFavorite(password)"
-                  :title="t('passwords.markFavorite')"
-                >
-                  <StarFilled v-if="password.is_favorite" />
-                  <Star v-else />
-                </el-icon>
                 <div class="row-actions">
                   <el-button text size="small" @click.stop="copyToClipboard(password.username, t('passwords.username'))" :title="t('passwords.copyUsername')" :disabled="!password.username">
                     <el-icon><User /></el-icon>
@@ -186,6 +177,15 @@
                     <el-icon><Delete /></el-icon>
                   </el-button>
                 </div>
+                <el-icon
+                  class="favorite-star"
+                  :class="{ 'is-favorite': password.is_favorite }"
+                  @click.stop="toggleFavorite(password)"
+                  :title="t('passwords.markFavorite')"
+                >
+                  <StarFilled v-if="password.is_favorite" />
+                  <Star v-else />
+                </el-icon>
               </div>
             </div>
           </div>
@@ -1976,17 +1976,15 @@ const openWebsite = async (url) => {
 
 // 获取密码强度等级样式类
 const getStrengthClass = (strength) => {
-  if (!strength) return 'strength-weak'
-  if (strength >= 80) return 'strength-strong'
-  if (strength >= 50) return 'strength-medium'
+  if (strength >= 2) return 'strength-strong'
+  if (strength >= 1) return 'strength-medium'
   return 'strength-weak'
 }
 
 // 获取密码强度文本
 const getStrengthText = (strength) => {
-  if (!strength) return t('passwords.strengthWeak')
-  if (strength >= 80) return t('passwords.strengthStrong')
-  if (strength >= 50) return t('passwords.strengthMedium')
+  if (strength >= 2) return t('passwords.strengthStrong')
+  if (strength >= 1) return t('passwords.strengthMedium')
   return t('passwords.strengthWeak')
 }
 

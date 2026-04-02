@@ -130,8 +130,16 @@
                 <span class="row-url">{{ getDisplayUrl(bookmark.url) }}</span>
               </div>
 
-              <!-- 右侧：收藏星标 + hover 操作按钮 -->
+              <!-- 右侧：hover 操作按钮 + 收藏星标 -->
               <div class="row-right">
+                <div class="row-actions">
+                  <el-button text size="small" @click.stop="editBookmark(bookmark)" :title="t('common.edit')">
+                    <el-icon><Edit /></el-icon>
+                  </el-button>
+                  <el-button text size="small" type="danger" @click.stop="deleteBookmark(bookmark)" :title="t('common.delete')">
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
+                </div>
                 <el-icon
                   class="favorite-star"
                   :class="{ 'is-favorite': bookmark.is_favorite }"
@@ -141,14 +149,6 @@
                   <StarFilled v-if="bookmark.is_favorite" />
                   <Star v-else />
                 </el-icon>
-                <div class="row-actions">
-                  <el-button text size="small" @click.stop="editBookmark(bookmark)" :title="t('common.edit')">
-                    <el-icon><Edit /></el-icon>
-                  </el-button>
-                  <el-button text size="small" type="danger" @click.stop="deleteBookmark(bookmark)" :title="t('common.delete')">
-                    <el-icon><Delete /></el-icon>
-                  </el-button>
-                </div>
               </div>
             </div>
           </div>

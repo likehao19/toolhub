@@ -52,7 +52,8 @@
           @click="openBookmark(bm)"
           :title="bm.title + '\n' + bm.url"
         >
-          <img v-if="bm.favicon_url" :src="bm.favicon_url" class="qs-favicon" />
+          <img v-if="bm.favicon_data" :src="bm.favicon_data" class="qs-favicon" />
+          <img v-else-if="bm.favicon_url" :src="bm.favicon_url" class="qs-favicon" @error="$event.target.style.display='none'" />
           <el-icon v-else class="qs-favicon-fallback"><Link /></el-icon>
         </div>
       </div>
@@ -210,6 +211,7 @@ import { ArrowRight, Calendar, CircleCheck, Clock, Document, Key, Link, Lock, Ma
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
 import { decryptPassword } from '@/utils/encryption'
+import { TauriShell } from '@/utils/tauri'
 import AIAssistant from '@/components/AIAssistant.vue'
 import { t, locale } from '@/i18n'
 
@@ -395,7 +397,7 @@ const loadTopBookmarks = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const bookmarks = await db.select(
-      `SELECT id, title, url, favicon_url
+      `SELECT id, title, url, favicon_url, favicon_data
        FROM bookmarks
        ORDER BY access_count DESC, updated_at DESC
        LIMIT 8`
@@ -417,14 +419,14 @@ const loadTopPasswords = async () => {
          FROM passwords
          WHERE is_deleted = 0 OR is_deleted IS NULL
          ORDER BY is_favorite DESC, updated_at DESC
-         LIMIT 6`
+         LIMIT 3`
       )
     } catch {
       passwords = await db.select(
         `SELECT id, title, username, password, website
          FROM passwords
          ORDER BY updated_at DESC
-         LIMIT 6`
+         LIMIT 3`
       )
     }
     topPasswords.value = passwords || []
@@ -569,9 +571,21 @@ const openNote = (note) => {
   router.push(`/notes?note=${encodeURIComponent(note.name)}`)
 }
 
-// 打开书签
-const openBookmark = (bookmark) => {
-  window.open(bookmark.url, '_blank')
+// 打开书签（使用系统默认浏览器）
+const openBookmark = async (bookmark) => {
+  try {
+    await TauriShell.openURL(bookmark.url)
+  } catch (error) {
+    console.error('打开书签失败:', error)
+  }
+
+  // 更新访问次数（不阻塞）
+  Database.load('sqlite:productivity.db').then(db =>
+    db.execute(
+      'UPDATE bookmarks SET access_count = access_count + 1, last_accessed_at = ? WHERE id = ?',
+      [new Date().toISOString(), bookmark.id]
+    )
+  ).catch(() => {})
 }
 
 // 复制文本到剪贴板

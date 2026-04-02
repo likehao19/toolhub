@@ -5,31 +5,55 @@
 
 import OpenAI from 'openai'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
+import { loadConfig } from '@/utils/tauri/store'
 
 let openaiClient = null
+let cachedConfigKey = ''
+
+async function getAIConfig() {
+  const config = await loadConfig()
+  const aiSettings = config?.aiSettings || {}
+  return {
+    apiKey: aiSettings.apiKey || '',
+    baseURL: aiSettings.baseUrl || 'https://api.openai.com/v1',
+    model: aiSettings.model || 'gpt-3.5-turbo'
+  }
+}
+
+function invalidateClient() {
+  openaiClient = null
+  cachedConfigKey = ''
+}
 
 /**
  * 初始化OpenAI客户端
  */
-const initClient = () => {
-  if (openaiClient) return openaiClient
+const initClient = async () => {
+  const aiConfig = await getAIConfig()
+  const configKey = JSON.stringify(aiConfig)
 
-  // 从localStorage读取AI配置
-  const aiConfig = JSON.parse(localStorage.getItem('ai_config') || '{}')
-  
   if (!aiConfig.apiKey) {
     throw new Error('请先在设置中配置AI API')
   }
 
+  if (openaiClient && cachedConfigKey === configKey) {
+    return { client: openaiClient, aiConfig }
+  }
+
   openaiClient = new OpenAI({
     apiKey: aiConfig.apiKey,
-    baseURL: aiConfig.baseURL || 'https://api.openai.com/v1',
+    baseURL: aiConfig.baseURL,
     dangerouslyAllowBrowser: true,
     fetch: tauriFetch
   })
+  cachedConfigKey = configKey
 
-  return openaiClient
+  return { client: openaiClient, aiConfig }
 }
+
+window.addEventListener('settings-config-saved', invalidateClient)
+window.addEventListener('settings-reset', invalidateClient)
+window.addEventListener('ai-config-changed', invalidateClient)
 
 /**
  * 调用AI API
@@ -39,12 +63,11 @@ const initClient = () => {
  */
 export const callAI = async (messages, options = {}) => {
   try {
-    const client = initClient()
-    const aiConfig = JSON.parse(localStorage.getItem('ai_config') || '{}')
+    const { client, aiConfig } = await initClient()
 
     const response = await client.chat.completions.create({
       model: aiConfig.model || 'gpt-3.5-turbo',
-      messages: messages,
+      messages,
       temperature: options.temperature || 0.7,
       max_tokens: options.maxTokens || 2000,
       ...options
@@ -55,7 +78,7 @@ export const callAI = async (messages, options = {}) => {
     if (error.message?.includes('API')) {
       throw new Error('AI服务暂时不可用，请检查网络或API配置')
     }
-    
+
     throw error
   }
 }
@@ -68,12 +91,11 @@ export const callAI = async (messages, options = {}) => {
  */
 export const callAIStream = async (messages, onChunk, options = {}) => {
   try {
-    const client = initClient()
-    const aiConfig = JSON.parse(localStorage.getItem('ai_config') || '{}')
+    const { client, aiConfig } = await initClient()
 
     const stream = await client.chat.completions.create({
       model: aiConfig.model || 'gpt-3.5-turbo',
-      messages: messages,
+      messages,
       temperature: options.temperature || 0.7,
       max_tokens: options.maxTokens || 2000,
       stream: true,
@@ -99,13 +121,13 @@ export const callAIStream = async (messages, onChunk, options = {}) => {
  * 重置客户端（当配置变更时）
  */
 export const resetClient = () => {
-  openaiClient = null
+  invalidateClient()
 }
 
 /**
  * 检查AI配置是否完整
  */
-export const checkAIConfig = () => {
-  const aiConfig = JSON.parse(localStorage.getItem('ai_config') || '{}')
+export const checkAIConfig = async () => {
+  const aiConfig = await getAIConfig()
   return !!(aiConfig.apiKey && aiConfig.baseURL)
 }

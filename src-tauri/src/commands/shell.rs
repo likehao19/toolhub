@@ -5,6 +5,55 @@
 use serde::{Deserialize, Serialize};
 use std::process::Command as StdCommand;
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+#[cfg(target_os = "windows")]
+const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+#[cfg(target_os = "windows")]
+fn configure_windows_command(cmd: &mut StdCommand) {
+    cmd.creation_flags(CREATE_NO_WINDOW);
+}
+
+#[cfg(not(target_os = "windows"))]
+fn configure_windows_command(_cmd: &mut StdCommand) {}
+
+#[cfg(target_os = "windows")]
+fn decode_windows_output(bytes: &[u8]) -> String {
+    use encoding_rs::GBK;
+
+    if let Ok(utf8) = String::from_utf8(bytes.to_vec()) {
+        return utf8;
+    }
+
+    let (decoded, _, had_errors) = GBK.decode(bytes);
+    if had_errors {
+        String::from_utf8_lossy(bytes).to_string()
+    } else {
+        decoded.to_string()
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn decode_windows_output(bytes: &[u8]) -> String {
+    String::from_utf8_lossy(bytes).to_string()
+}
+
+pub(crate) fn hidden_command_owned(program: &str, args: &[String]) -> std::io::Result<std::process::Output> {
+    let mut cmd = StdCommand::new(program);
+    cmd.args(args);
+    configure_windows_command(&mut cmd);
+    cmd.output()
+}
+
+pub(crate) fn decode_command_output(bytes: &[u8]) -> String {
+    decode_windows_output(bytes)
+}
+
+pub(crate) use decode_command_output as decode_output;
+pub(crate) use hidden_command_owned as run_hidden_command_owned_ref;
+
 /// 命令执行结果
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CommandResult {
@@ -43,51 +92,16 @@ pub async fn execute_shell_command(
             // 设置环境变量，尝试让命令输出 UTF-8
             // 但 Windows 的 cmd.exe 默认使用系统代码页（通常是 GBK），所以我们需要在解码时处理
             cmd.env("PYTHONIOENCODING", "utf-8");
-            // 注意：chcp 65001 可以设置代码页为 UTF-8，但对于 dir 等内置命令可能无效
         }
 
+        configure_windows_command(&mut cmd);
         let output = cmd.output().map_err(|e| format!("执行命令失败: {}", e))?;
 
-        // 处理 Windows 编码问题
-        #[cfg(target_os = "windows")]
-        {
-            use encoding_rs::GBK;
-            
-            // 辅助函数：尝试解码 Windows 命令输出
-            fn decode_windows_output(bytes: &[u8]) -> String {
-                // 首先尝试 UTF-8
-                if let Ok(utf8) = String::from_utf8(bytes.to_vec()) {
-                    return utf8;
-                }
-                
-                // 如果不是有效的 UTF-8，尝试作为 GBK 解码
-                let (decoded, _, had_errors) = GBK.decode(bytes);
-                if had_errors {
-                    // 如果 GBK 解码也有错误，使用 lossy UTF-8 解码作为最后手段
-                    String::from_utf8_lossy(bytes).to_string()
-                } else {
-                    decoded.to_string()
-                }
-            }
-            
-            let stdout = decode_windows_output(&output.stdout);
-            let stderr = decode_windows_output(&output.stderr);
-
-            Ok(CommandResult {
-                code: output.status.code().unwrap_or(-1),
-                stdout,
-                stderr,
-            })
-        }
-
-        #[cfg(not(target_os = "windows"))]
-        {
-            Ok(CommandResult {
-                code: output.status.code().unwrap_or(-1),
-                stdout: String::from_utf8_lossy(&output.stdout).to_string(),
-                stderr: String::from_utf8_lossy(&output.stderr).to_string(),
-            })
-        }
+        Ok(CommandResult {
+            code: output.status.code().unwrap_or(-1),
+            stdout: decode_windows_output(&output.stdout),
+            stderr: decode_windows_output(&output.stderr),
+        })
     })
     .await
     .map_err(|e| format!("任务执行失败: {}", e))?;

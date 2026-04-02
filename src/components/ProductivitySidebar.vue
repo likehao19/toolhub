@@ -202,6 +202,28 @@ const openFavoriteTool = (tool) => {
 // 工具对应的路由路径，没有独立页面的返回 null（不参与 active 判断）
 const toolPathMap = {
   'sticky-notes': '/toolbox/sticky-notes',
+  'sdk-manager': '/toolbox/sdk-manager',
+  'redis-client': '/toolbox/redis-client',
+  'port-manager': '/toolbox/port-manager',
+  'git-manager': '/toolbox/git-manager',
+  'git-daily-report': '/toolbox/git-daily-report',
+  'code-formatter': '/toolbox/code-formatter',
+  'file-compare': '/toolbox/file-diff',
+  'api-debug': '/toolbox/api-debug',
+  'api-docs-page': '/toolbox/api-docs',
+  'mock-service': '/toolbox/mock-service',
+  'perf-test': '/toolbox/perf-test',
+  'auto-test': '/toolbox/auto-test',
+  'ebook-shelf': '/toolbox/ebook-shelf',
+  'screenshot': '/toolbox/screenshot',
+  'image-to-base64': '/toolbox/image-to-base64',
+  'image-format': '/toolbox/image-format-converter',
+  'regex-tester': '/toolbox/regex-tester',
+  'crypto': '/toolbox/crypto-tool',
+  'sqlite-manager': '/toolbox/sqlite-manager',
+  'maven-repo': '/toolbox/maven-repo',
+  'wallpaper-manager': '/toolbox/wallpaper-manager',
+  'log-analyzer': '/toolbox/log-analyzer',
 }
 
 const getToolPath = (tool) => toolPathMap[tool.id] ?? null

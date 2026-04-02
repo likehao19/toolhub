@@ -119,7 +119,8 @@
           </el-empty>
           <div v-else class="bookmarks-grid">
             <div v-for="bookmark in frequentBookmarks.slice(0, 6)" :key="bookmark.id" class="bookmark-item" @click="openBookmark(bookmark)">
-              <img v-if="bookmark.icon_url" :src="bookmark.icon_url" class="bookmark-icon" />
+              <img v-if="bookmark.favicon_data" :src="bookmark.favicon_data" class="bookmark-icon" />
+              <img v-else-if="bookmark.icon_url" :src="bookmark.icon_url" class="bookmark-icon" @error="$event.target.style.display='none'" />
               <el-icon v-else class="bookmark-icon-fallback"><Link /></el-icon>
               <span class="bookmark-name">{{ bookmark.name }}</span>
             </div>
@@ -165,6 +166,7 @@ import { useRouter } from 'vue-router'
 import { Calendar, CircleCheck, Clock, Document, Link, Lock, MagicStick, Refresh } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
+import { TauriShell } from '@/utils/tauri'
 import AIAssistant from '@/components/AIAssistant.vue'
 import { t } from '@/i18n'
 
@@ -263,10 +265,9 @@ const loadFrequentBookmarks = async () => {
   try {
     const db = await Database.load('sqlite:productivity.db')
     const bookmarks = await db.select(
-      `SELECT id, title as name, url, favicon_url as icon_url, access_count as visit_count 
-       FROM bookmarks 
-       WHERE access_count > 5 OR read_later = 1
-       ORDER BY access_count DESC 
+      `SELECT id, title as name, url, favicon_url as icon_url, favicon_data, access_count as visit_count
+       FROM bookmarks
+       ORDER BY access_count DESC, updated_at DESC
        LIMIT 6`
     )
     frequentBookmarks.value = bookmarks || []
@@ -364,9 +365,21 @@ const openNote = (note) => {
   router.push(`/notes?note=${encodeURIComponent(note.name)}`)
 }
 
-// 打开书签
-const openBookmark = (bookmark) => {
-  window.open(bookmark.url, '_blank')
+// 打开书签（使用系统默认浏览器）
+const openBookmark = async (bookmark) => {
+  try {
+    await TauriShell.openURL(bookmark.url)
+  } catch (error) {
+    console.error('打开书签失败:', error)
+  }
+
+  // 更新访问次数（不阻塞）
+  Database.load('sqlite:productivity.db').then(db =>
+    db.execute(
+      'UPDATE bookmarks SET access_count = access_count + 1, last_accessed_at = ? WHERE id = ?',
+      [new Date().toISOString(), bookmark.id]
+    )
+  ).catch(() => {})
 }
 
 // AI操作完成回调
