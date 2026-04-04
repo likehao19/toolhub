@@ -271,7 +271,7 @@ async function addRepo() {
   try {
     dialogOpen = (await import('@tauri-apps/plugin-dialog')).open
   } catch {
-    ElMessage.warning('Dialog API 不可用')
+    ElMessage.warning('Dialog API unavailable')
     return
   }
   const dir = await dialogOpen({ directory: true, title: t('gitReport.addRepo') })
@@ -333,7 +333,7 @@ async function generate() {
 
 async function optimizeAI() {
   if (!reportMarkdown.value) return
-  if (!checkAIConfig()) {
+  if (!(await checkAIConfig())) {
     ElMessage.warning(t('gitReport.aiNotConfigured'))
     return
   }
@@ -366,7 +366,7 @@ async function exportReport() {
     dialogSave = (await import('@tauri-apps/plugin-dialog')).save
     fsWriteTextFile = (await import('@tauri-apps/plugin-fs')).writeTextFile
   } catch {
-    ElMessage.warning('文件API不可用')
+    ElMessage.warning('File API unavailable')
     return
   }
   try {

@@ -351,62 +351,137 @@
             </el-form>
           </el-card>
 
-          <!-- AI 助手配置 -->
+          <!-- AI 服务配置（多 Provider） -->
           <el-card shadow="never">
             <template #header>
-              <div class="card-header">{{ t('settings.aiConfig') }}</div>
+              <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>{{ t('settings.aiProviders') }}</span>
+                <el-dropdown trigger="click" @command="addProvider">
+                  <el-button size="small" type="primary">+ {{ t('settings.addProvider') }}</el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item v-for="(preset, key) in PROVIDER_PRESETS" :key="key" :command="key">
+                        {{ preset.name }}
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
             </template>
-            <el-form :model="aiSettings" label-width="140px" label-position="left">
-              <el-form-item :label="t('settings.apiUrl')">
-                <el-input
-                  v-model="aiSettings.baseUrl"
-                  :placeholder="t('settings.apiUrlPlaceholder')"
-                  style="width: 400px;"
-                />
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  {{ t('settings.apiUrlHint') }}
+
+            <div style="margin-bottom:12px;font-size:12px;color:var(--text-quaternary);">
+              {{ t('settings.activeProviderUsageHint') }}
+            </div>
+
+            <div v-if="!aiSettings.providers?.length" style="text-align:center;padding:24px;color:var(--text-quaternary);font-size:13px;">
+              {{ t('settings.noProviders') }}
+            </div>
+
+            <div v-else class="ai-provider-list">
+              <div
+                v-for="(prov, idx) in aiSettings.providers"
+                :key="prov.id"
+                class="ai-provider-item"
+                :class="{ active: editingProviderId === prov.id }"
+              >
+                <div class="ai-provider-row" @click="handleProviderEdit(prov)">
+                  <span class="ai-prov-dot" :class="{ 'is-active': aiSettings.activeProviderId === prov.id }" />
+                  <span class="ai-prov-name">{{ prov.name || prov.provider }}</span>
+                  <span class="ai-prov-model">{{ prov.model }}</span>
+                  <el-tag v-if="aiSettings.activeProviderId === prov.id" size="small" type="success" effect="plain">{{ t('settings.activeProvider') }}</el-tag>
                 </div>
-              </el-form-item>
 
-              <el-form-item :label="t('settings.apiKey')">
-                <el-input
-                  v-model="aiSettings.apiKey"
-                  type="password"
-                  show-password
-                  :placeholder="t('settings.apiKeyPlaceholder')"
-                  style="width: 400px;"
-                />
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  OpenAI 兼容接口地址，支持第三方服务（如 DeepSeek、通义千问等）
+                <!-- Expanded edit form -->
+                <div v-if="editingProviderId === prov.id" class="ai-provider-form" @click.stop>
+                  <el-form label-width="100px" label-position="left" size="small">
+                    <el-form-item :label="t('settings.providerName')">
+                      <el-input v-model="prov.name" style="width:280px;" />
+                    </el-form-item>
+                    <el-form-item :label="t('settings.providerType')">
+                      <div style="display:flex;flex-direction:column;gap:6px;">
+                        <el-select v-model="prov.provider" style="width:280px;" @change="onProviderTypeChange(prov)">
+                          <el-option v-for="(preset, key) in PROVIDER_PRESETS" :key="key" :label="preset.name" :value="key" />
+                        </el-select>
+                        <div style="font-size:11px;color:var(--text-quaternary);">
+                          {{ t('settings.providerModelPresetHint') }}
+                        </div>
+                      </div>
+                    </el-form-item>
+                    <el-form-item :label="t('settings.apiUrl')">
+                      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+                        <el-input v-model="prov.baseUrl" :placeholder="t('settings.apiUrlPlaceholder')" style="width:380px;" />
+                        <div style="font-size:11px;color:var(--text-quaternary);">
+                          {{ prov.provider === 'claude' ? t('settings.claudeProviderHint') : t('settings.compatibleProviderHint') }}
+                        </div>
+                        <div style="font-size:11px;color:var(--text-quaternary);">
+                          {{ t('settings.providerBaseUrlHint') }}
+                        </div>
+                      </div>
+                    </el-form-item>
+                    <el-form-item :label="t('settings.apiKey')">
+                      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+                        <el-input v-model="prov.apiKey" type="password" show-password :placeholder="t('settings.apiKeyPlaceholder')" style="width:380px;" />
+                        <div style="font-size:11px;color:var(--text-quaternary);">
+                          {{ t('settings.providerApiKeyHint') }}
+                        </div>
+                      </div>
+                    </el-form-item>
+                    <el-form-item :label="t('settings.model')">
+                      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;">
+                        <div style="display:flex;gap:8px;align-items:flex-start;">
+                          <el-select
+                            v-model="prov.model"
+                            filterable
+                            allow-create
+                            default-first-option
+                            :placeholder="t('settings.modelPlaceholder')"
+                            style="width:280px;"
+                          >
+                            <el-option
+                              v-for="m in getProviderModelOptions(prov)"
+                              :key="m" :label="m" :value="m"
+                            />
+                          </el-select>
+                          <el-button
+                            size="small"
+                            @click="refreshProviderModels(prov)"
+                            :loading="loadingModelsProvId === prov.id"
+                          >{{ t('settings.refreshModels') }}</el-button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-quaternary);">{{ t('settings.modelHint') }}</div>
+                        <div style="font-size:11px;color:var(--text-quaternary);">{{ t('settings.modelDynamicHint') }}</div>
+                        <div v-if="providerModelErrors[prov.id]" style="font-size:11px;color:var(--el-color-warning);">{{ providerModelErrors[prov.id] }}</div>
+                      </div>
+                    </el-form-item>
+                    <el-form-item>
+                      <el-button type="primary" size="small" @click="testProviderConnection(prov)" :loading="testingAI && testingProvId === prov.id">
+                        {{ t('settings.testConnection') }}
+                      </el-button>
+                      <el-button size="small" @click="resetProviderDefaults(prov)">
+                        {{ t('settings.resetProviderDefaults') }}
+                      </el-button>
+                      <el-button
+                        v-if="aiSettings.activeProviderId !== prov.id"
+                        size="small" @click="setActiveProvider(prov.id)"
+                      >{{ t('settings.setActive') }}</el-button>
+                      <el-button
+                        v-if="aiSettings.providers.length > 1"
+                        size="small" type="danger" text @click="removeProvider(idx)"
+                      >{{ t('settings.deleteProvider') }}</el-button>
+                    </el-form-item>
+                  </el-form>
+
+                  <el-alert
+                    v-if="aiTestResult && testingProvId === prov.id"
+                    :title="aiTestResult.success ? t('settings.connectSuccess') : t('settings.connectFailed')"
+                    :type="aiTestResult.success ? 'success' : 'error'"
+                    :description="aiTestResult.message"
+                    :closable="false"
+                    style="margin-top:8px;"
+                  />
                 </div>
-              </el-form-item>
-
-              <el-form-item :label="t('settings.model')">
-                <el-input
-                  v-model="aiSettings.model"
-                  :placeholder="t('settings.modelPlaceholder')"
-                  style="width: 400px;"
-                />
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  {{ t('settings.modelHint') }}
-                </div>
-              </el-form-item>
-
-              <el-form-item>
-                <el-button type="primary" @click="testAIConnection" :loading="testingAI">
-                  {{ t('settings.testConnection') }}
-                </el-button>
-              </el-form-item>
-
-              <el-alert
-                v-if="aiTestResult"
-                :title="aiTestResult.success ? t('settings.connectSuccess') : t('settings.connectFailed')"
-                :type="aiTestResult.success ? 'success' : 'error'"
-                :description="aiTestResult.message"
-                :closable="false"
-                style="margin-top: 16px;"
-              />
-            </el-form>
+              </div>
+            </div>
           </el-card>
         </div>
 
@@ -682,6 +757,7 @@ import TauriAutostart from '@/utils/tauri/autostart'
 import Database from '@tauri-apps/plugin-sql'
 import { hashPassword, verifyPassword, generateSalt } from '@/utils/masterPassword'
 import { saveReminderConfig } from '@/utils/reminderService'
+import { resolveActiveProvider, PROVIDER_PRESETS, migrateOldAiSettings, generateProviderId } from '@/utils/aiProviders'
 import { useAppStore } from '@/store/app'
 import { getPrivilegeStatus, ensureSystemPrivilege } from '@/utils/systemPrivilegeManager'
 import { getEnvScope, setEnvScope } from '@/utils/sdkManager'
@@ -695,7 +771,12 @@ const activeTab = ref('general')
 const saving = ref(false)
 const autostartLoading = ref(false)
 const testingAI = ref(false)
+const testingProvId = ref('')
+const loadingModelsProvId = ref('')
+const editingProviderId = ref('')
 const aiTestResult = ref(null)
+const providerModelsMap = reactive({})
+const providerModelErrors = reactive({})
 const originalSettings = ref(null)
 const savedAiSettings = ref(null)
 const savedAiAssistantSettings = ref(null)
@@ -744,6 +825,18 @@ const saveStatusClass = computed(() => {
   return 'idle'
 })
 
+let persistAiSettingsTimer = null
+
+const schedulePersistAiSettings = () => {
+  if (persistAiSettingsTimer) {
+    clearTimeout(persistAiSettingsTimer)
+  }
+  persistAiSettingsTimer = setTimeout(async () => {
+    persistAiSettingsTimer = null
+    await persistSettings()
+  }, 300)
+}
+
 const formatSavedTime = () => new Date().toLocaleTimeString('zh-CN', {
   hour: '2-digit',
   minute: '2-digit'
@@ -768,9 +861,8 @@ const settings = reactive({
 
 // AI 设置
 const aiSettings = reactive({
-  apiKey: '',
-  baseUrl: 'https://api.openai.com/v1',
-  model: 'gpt-3.5-turbo'
+  providers: [],
+  activeProviderId: ''
 })
 
 // AI 助手悬浮球设置
@@ -893,6 +985,218 @@ const handleLanguageChange = (lang) => {
   setLocale(lang)
 }
 
+const createProviderFromPreset = (providerKey = 'custom') => {
+  const preset = PROVIDER_PRESETS[providerKey] || PROVIDER_PRESETS.custom
+  return {
+    id: generateProviderId(providerKey),
+    name: preset.name || 'Custom',
+    provider: providerKey,
+    baseUrl: preset.baseUrl || '',
+    apiKey: '',
+    model: preset.models?.[0] || ''
+  }
+}
+
+const getProviderModelOptions = (prov) => {
+  const remoteModels = providerModelsMap[prov.id] || []
+  if (remoteModels.length) return remoteModels
+  return PROVIDER_PRESETS[prov.provider]?.models || []
+}
+
+const fetchProviderModels = async (prov, { silent = true } = {}) => {
+  if (!prov?.id) return
+
+  const baseUrl = (prov.baseUrl || '').trim().replace(/\/$/, '')
+  if (!baseUrl) {
+    providerModelsMap[prov.id] = []
+    providerModelErrors[prov.id] = ''
+    return
+  }
+
+  loadingModelsProvId.value = prov.id
+  providerModelErrors[prov.id] = ''
+
+  try {
+    const headers = {}
+    if (prov.apiKey) {
+      const isClaude = prov.provider === 'claude' || /anthropic\.com/i.test(baseUrl)
+      if (isClaude) {
+        headers['x-api-key'] = prov.apiKey
+        headers['anthropic-version'] = '2023-06-01'
+      } else {
+        headers.Authorization = `Bearer ${prov.apiKey}`
+      }
+    }
+
+    const response = await fetch(`${baseUrl}/models`, {
+      method: 'GET',
+      headers
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    const rawModels = Array.isArray(data?.data)
+      ? data.data
+      : Array.isArray(data?.models)
+        ? data.models
+        : Array.isArray(data)
+          ? data
+          : []
+
+    const models = rawModels
+      .map(item => typeof item === 'string' ? item : (item?.id || item?.name || item?.model || ''))
+      .filter(Boolean)
+
+    providerModelsMap[prov.id] = [...new Set(models)]
+    if (!providerModelsMap[prov.id].length) {
+      providerModelErrors[prov.id] = t('settings.modelListEmpty')
+      if (!silent) {
+        ElMessage.warning(t('settings.modelListEmpty'))
+      }
+    }
+  } catch (error) {
+    providerModelsMap[prov.id] = []
+    providerModelErrors[prov.id] = t('settings.modelListFallback')
+    if (!silent) {
+      ElMessage.warning(error?.message || t('settings.modelListFallback'))
+    }
+  } finally {
+    if (loadingModelsProvId.value === prov.id) {
+      loadingModelsProvId.value = ''
+    }
+  }
+}
+
+const addProvider = async (providerKey) => {
+  const provider = createProviderFromPreset(providerKey)
+  aiSettings.providers.push(provider)
+  providerModelsMap[provider.id] = PROVIDER_PRESETS[provider.provider]?.models || []
+  providerModelErrors[provider.id] = ''
+  if (!aiSettings.activeProviderId) {
+    aiSettings.activeProviderId = provider.id
+  }
+  editingProviderId.value = provider.id
+  aiTestResult.value = null
+  testingProvId.value = ''
+  manualHasChanges.value = true
+  hasChanges.value = true
+  await persistSettings()
+}
+
+const handleProviderEdit = (prov) => {
+  editingProviderId.value = prov.id
+  if (!providerModelsMap[prov.id]) {
+    providerModelsMap[prov.id] = PROVIDER_PRESETS[prov.provider]?.models || []
+  }
+}
+
+const refreshProviderModels = async (prov) => {
+  await fetchProviderModels(prov, { silent: false })
+}
+
+const initProviderModelState = () => {
+  aiSettings.providers.forEach((prov) => {
+    if (!providerModelsMap[prov.id]) {
+      providerModelsMap[prov.id] = PROVIDER_PRESETS[prov.provider]?.models || []
+    }
+    if (!(prov.id in providerModelErrors)) {
+      providerModelErrors[prov.id] = ''
+    }
+  })
+}
+
+const trimProviderModelState = () => {
+  const ids = new Set(aiSettings.providers.map(item => item.id))
+  Object.keys(providerModelsMap).forEach((id) => {
+    if (!ids.has(id)) delete providerModelsMap[id]
+  })
+  Object.keys(providerModelErrors).forEach((id) => {
+    if (!ids.has(id)) delete providerModelErrors[id]
+  })
+}
+
+watch(
+  () => aiSettings.providers.map(item => `${item.id}|${item.provider}|${item.baseUrl}|${item.apiKey}`).join('||'),
+  () => {
+    initProviderModelState()
+    trimProviderModelState()
+  },
+  { immediate: true }
+)
+
+const setActiveProvider = async (providerId) => {
+  aiSettings.activeProviderId = providerId
+  manualHasChanges.value = true
+  hasChanges.value = true
+  await persistSettings()
+}
+
+const removeProvider = async (index) => {
+  const removed = aiSettings.providers[index]
+  if (!removed) return
+  if (aiSettings.providers.length <= 1) {
+    ElMessage.warning(t('settings.atLeastOneProvider'))
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(
+      t('settings.confirmDeleteProvider'),
+      t('common.confirm'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning'
+      }
+    )
+  } catch {
+    return
+  }
+
+  aiSettings.providers.splice(index, 1)
+  if (!aiSettings.providers.length) {
+    const fallback = createProviderFromPreset('openai')
+    aiSettings.providers.push(fallback)
+  }
+  if (!aiSettings.providers.some(item => item.id === aiSettings.activeProviderId)) {
+    aiSettings.activeProviderId = aiSettings.providers[0]?.id || ''
+  }
+  if (editingProviderId.value === removed.id) {
+    editingProviderId.value = aiSettings.providers[0]?.id || ''
+  }
+  if (loadingModelsProvId.value === removed.id) {
+    loadingModelsProvId.value = ''
+  }
+  if (testingProvId.value === removed.id) {
+    testingProvId.value = ''
+    aiTestResult.value = null
+  }
+  manualHasChanges.value = true
+  hasChanges.value = true
+  await persistSettings()
+}
+
+const resetProviderDefaults = (prov) => {
+  const preset = PROVIDER_PRESETS[prov.provider] || PROVIDER_PRESETS.custom
+  prov.baseUrl = preset.baseUrl || ''
+  prov.model = preset.models?.[0] || ''
+  if (!prov.name || Object.values(PROVIDER_PRESETS).some(item => item.name === prov.name)) {
+    prov.name = preset.name || prov.name
+  }
+  manualHasChanges.value = true
+  hasChanges.value = true
+}
+
+const onProviderTypeChange = async (prov) => {
+  resetProviderDefaults(prov)
+  providerModelsMap[prov.id] = PROVIDER_PRESETS[prov.provider]?.models || []
+  providerModelErrors[prov.id] = ''
+  await fetchProviderModels(prov)
+}
+
 const syncSavedSnapshots = () => {
   originalSettings.value = JSON.parse(JSON.stringify(settings))
   savedAiSettings.value = JSON.parse(JSON.stringify(aiSettings))
@@ -931,10 +1235,13 @@ const persistSettings = async ({ silent = true } = {}) => {
     }))
 
     localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
+    const activeProvider = resolveActiveProvider(aiSettings)
     localStorage.setItem('ai_config', JSON.stringify({
-      apiKey: aiSettings.apiKey,
-      baseURL: aiSettings.baseUrl,
-      model: aiSettings.model
+      apiKey: activeProvider.apiKey,
+      baseURL: activeProvider.baseUrl,
+      baseUrl: activeProvider.baseUrl,
+      model: activeProvider.model,
+      provider: activeProvider.provider || 'custom'
     }))
 
     window.dispatchEvent(new CustomEvent('ai-floating-ball-settings-changed', {
@@ -1052,7 +1359,14 @@ const loadSettings = async () => {
     if (config) {
       Object.assign(settings, config)
       if (config.aiSettings) {
-        Object.assign(aiSettings, config.aiSettings)
+        const migratedAiSettings = migrateOldAiSettings(config.aiSettings)
+        Object.assign(aiSettings, migratedAiSettings)
+        if (!aiSettings.providers.length) {
+          const fallback = createProviderFromPreset('openai')
+          aiSettings.providers = [fallback]
+          aiSettings.activeProviderId = fallback.id
+        }
+        editingProviderId.value = aiSettings.activeProviderId || aiSettings.providers[0]?.id || ''
       }
       if (config.aiAssistantSettings) {
         Object.assign(aiAssistantSettings, config.aiAssistantSettings)
@@ -1078,6 +1392,16 @@ const loadSettings = async () => {
       settings.notesStoragePath = await join(dataDir, 'notes')
 
     }
+
+    if (!aiSettings.providers.length) {
+      const fallback = createProviderFromPreset('openai')
+      aiSettings.providers = [fallback]
+      aiSettings.activeProviderId = fallback.id
+    }
+    if (!editingProviderId.value) {
+      editingProviderId.value = aiSettings.activeProviderId || aiSettings.providers[0]?.id || ''
+    }
+    initProviderModelState()
 
     // 加载存储统计
     await loadStorageStats()
@@ -1366,54 +1690,67 @@ const getAllFiles = async (dir, baseDir) => {
 /**
  * 测试 AI 连接
  */
-const testAIConnection = async () => {
-  if (!aiSettings.apiKey || !aiSettings.baseUrl || !aiSettings.model) {
+const testProviderConnection = async (provider) => {
+  if (!provider?.apiKey || !provider?.baseUrl || !provider?.model) {
     aiTestResult.value = {
       success: false,
       message: t('settings.fillApiFields')
     }
-    return
-  }
-
-  if (!aiSettings.baseUrl) {
-    ElMessage.warning('请先输入 API 地址')
-    return
-  }
-
-  if (!aiSettings.model) {
-    ElMessage.warning('请先输入模型名称')
+    testingProvId.value = provider?.id || ''
     return
   }
 
   testingAI.value = true
+  testingProvId.value = provider.id
   aiTestResult.value = null
 
   try {
-    let baseUrl = aiSettings.baseUrl.trim()
+    let baseUrl = provider.baseUrl.trim()
     if (baseUrl.endsWith('/')) {
       baseUrl = baseUrl.slice(0, -1)
     }
 
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${aiSettings.apiKey}`
-      },
-      body: JSON.stringify({
-        model: aiSettings.model,
-        messages: [{ role: 'user', content: 'Hello' }],
-        max_tokens: 10
-      })
-    })
+    const isClaude = provider.provider === 'claude' || /anthropic\.com/i.test(baseUrl)
+    const response = await fetch(
+      isClaude ? `${baseUrl}/messages` : `${baseUrl}/chat/completions`,
+      {
+        method: 'POST',
+        headers: isClaude
+          ? {
+              'Content-Type': 'application/json',
+              'x-api-key': provider.apiKey,
+              'anthropic-version': '2023-06-01'
+            }
+          : {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${provider.apiKey}`
+            },
+        body: JSON.stringify(
+          isClaude
+            ? {
+                model: provider.model,
+                max_tokens: 16,
+                messages: [{ role: 'user', content: 'Hello' }]
+              }
+            : {
+                model: provider.model,
+                messages: [{ role: 'user', content: 'Hello' }],
+                max_tokens: 10
+              }
+        )
+      }
+    )
 
     if (response.ok) {
       const text = await response.text()
       const data = JSON.parse(text)
-      if (data?.choices && Array.isArray(data.choices) && data.choices.length > 0) {
+      const ok = isClaude
+        ? Array.isArray(data?.content) && data.content.some(item => item?.text)
+        : data?.choices && Array.isArray(data.choices) && data.choices.length > 0
+      if (ok) {
         aiTestResult.value = {
           success: true,
-          message: t('settings.aiConnectSuccess', { model: aiSettings.model })
+          message: t('settings.aiConnectSuccess', { model: provider.model })
         }
       } else {
         throw new Error(t('settings.aiConnectFormatError', { content: text.substring(0, 200) }))
@@ -1667,7 +2004,12 @@ const handleReset = async () => {
       }
     )
 
+    if (persistAiSettingsTimer) {
+      clearTimeout(persistAiSettingsTimer)
+      persistAiSettingsTimer = null
+    }
     await resetConfig()
+    localStorage.removeItem('ai_config')
     window.dispatchEvent(new CustomEvent('settings-reset'))
     await loadSettings()
   } catch (error) {
@@ -1805,14 +2147,16 @@ watch(
 
 watch(
   () => [
-    aiSettings.baseUrl,
-    aiSettings.apiKey,
-    aiSettings.model,
+    JSON.stringify(aiSettings.providers),
+    aiSettings.activeProviderId,
     settings.fontSize,
   ],
-  () => {
+  async (_, oldValue) => {
     hasChanges.value = true
     manualHasChanges.value = true
+    if (oldValue) {
+      schedulePersistAiSettings()
+    }
   },
   { deep: true }
 )

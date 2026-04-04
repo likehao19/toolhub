@@ -2,6 +2,10 @@ function normalizeLine(line = '') {
   return String(line).replace(/\r$/, '')
 }
 
+const LARGE_LOG_LINE_THRESHOLD = 10000
+const LARGE_LOG_BLOCK_LIMIT = 120
+const LARGE_LOG_AI_BLOCK_LIMIT = 12
+
 function detectLevel(line) {
   const upper = line.toUpperCase()
   if (/\bERROR\b/.test(upper)) return 'ERROR'
@@ -18,7 +22,7 @@ function extractTimestamp(line) {
 }
 
 function isStackTraceLine(line) {
-  return /^\s+at\s+.+\(.+\)$/.test(line) || /^\s*\.\.\.\s+\d+\s+more$/.test(line)
+  return /^\s+at\s+[^()]+\([^()]+\)$/.test(line) || /^\s*\.\.\.\s+\d+\s+more$/.test(line)
 }
 
 function isCausedByLine(line) {
@@ -88,6 +92,8 @@ function escapeHtml(text = '') {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 function escapeRegExp(text = '') {
@@ -114,20 +120,99 @@ function collectHighlightTerms(block, keyword = '') {
     .sort((a, b) => b.length - a.length)
 }
 
+function countCausedByLines(lines = []) {
+  return lines.filter(isCausedByLine).length
+}
+
+function scoreStackFrame(frame = {}) {
+  let score = 0
+  const className = frame.fullClassName || ''
+  if (frame.lineNumber) score += 5
+  if (frame.fileName?.endsWith('.java')) score += 3
+  if (className && !/^(java|javax|sun|com\.sun|org\.springframework|org\.apache|io\.netty|reactor)\b/.test(className)) score += 4
+  if (className.includes('.')) score += 1
+  return score
+}
+
+function scoreRootCauseCandidate(block = {}, signatureCounts = {}) {
+  let score = 0
+  const causedByDepth = countCausedByLines(block.lines)
+  score += causedByDepth * 5
+  if (block.rootCauseLine) score += 4
+  if (block.exceptionType) score += 3
+  if (block.level === 'ERROR') score += 3
+  if (block.hasStackTrace) score += 2
+  score += Math.max(...(block.stackFrames || []).map(scoreStackFrame), 0)
+  score += Math.min(signatureCounts[block.signature] || 0, 3)
+  return score
+}
+
+function rankRootCauseCandidates(blocks = [], signatureCounts = {}) {
+  return blocks
+    .filter(block => block.rootCauseLine || block.exceptionType)
+    .map(block => ({ ...block, rootCauseScore: scoreRootCauseCandidate(block, signatureCounts) }))
+    .sort((a, b) => b.rootCauseScore - a.rootCauseScore || b.startLine - a.startLine)
+    .slice(0, 20)
+}
+
+function uniqueFrames(frames = []) {
+  const seen = new Set()
+  return frames.filter(frame => {
+    const key = `${frame.fullClassName || ''}:${frame.methodName || ''}:${frame.fileName || ''}:${frame.lineNumber || ''}`
+    if (seen.has(key)) return false
+    seen.add(key)
+    return true
+  })
+}
+
+function pickHighSignalBlocks(blocks = [], limit = LARGE_LOG_BLOCK_LIMIT) {
+  return [...blocks]
+    .map(block => ({
+      ...block,
+      signalScore: (block.rootCauseScore || 0) +
+        (block.level === 'ERROR' ? 4 : 0) +
+        (block.hasException ? 4 : 0) +
+        (block.hasStackTrace ? 3 : 0) +
+        Math.min(block.stackFrames?.length || 0, 5),
+    }))
+    .sort((a, b) => b.signalScore - a.signalScore || b.startLine - a.startLine)
+    .slice(0, limit)
+    .sort((a, b) => a.startLine - b.startLine)
+}
+
 export function highlightLogText(block, keyword = '') {
   let html = escapeHtml(block.rawText || '')
-  const terms = collectHighlightTerms(block, keyword)
 
+  // Phase 1: fixed patterns first (exception, level, caused by) with placeholder protection
+  const placeholders = []
+  function protect(match) {
+    const index = placeholders.length
+    placeholders.push(match)
+    return `\x00HL${index}\x00`
+  }
+
+  html = html.replace(/\b([\w.$]+(?:Exception|Error))\b/g, (m) => protect(`<mark class="log-hl exception">${m}</mark>`))
+  html = html.replace(/(Caused by:)/g, (m) => protect(`<mark class="log-hl cause">${m}</mark>`))
+  html = html.replace(/\b(ERROR|WARN|INFO|DEBUG|TRACE)\b/g, (m) => protect(`<mark class="log-hl level">${m}</mark>`))
+
+  // Phase 2: keyword / term highlights — only on unprotected text
+  const terms = collectHighlightTerms(block, keyword)
   terms.forEach(term => {
-    const pattern = new RegExp(escapeRegExp(escapeHtml(term)), 'gi')
-    html = html.replace(pattern, '<mark class="log-hl">$&</mark>')
+    const escaped = escapeRegExp(escapeHtml(term))
+    const pattern = new RegExp(escaped, 'gi')
+    html = html.replace(pattern, (m) => {
+      // skip if already inside a placeholder region
+      return protect(`<mark class="log-hl">${m}</mark>`)
+    })
   })
 
-  html = html.replace(/(Caused by:)/g, '<mark class="log-hl cause">$1</mark>')
-  html = html.replace(/\b(ERROR|WARN|INFO|DEBUG|TRACE)\b/g, '<mark class="log-hl level">$1</mark>')
-  html = html.replace(/\b([\w.$]+(?:Exception|Error))\b/g, '<mark class="log-hl exception">$1</mark>')
+  // Phase 3: restore placeholders
+  let result = html
+  for (let i = placeholders.length - 1; i >= 0; i--) {
+    result = result.replace(`\x00HL${i}\x00`, placeholders[i])
+  }
 
-  return html
+  return result
 }
 
 export function parseLogFile(content, fileName = '') {
@@ -219,32 +304,44 @@ export function parseLogFile(content, fileName = '') {
     signatureCounts[block.signature] = (signatureCounts[block.signature] || 0) + 1
   })
 
-  const rootCauseCandidates = blocks
-    .filter(block => block.rootCauseLine || block.exceptionType)
-    .sort((a, b) => {
-      const scoreA = (a.rootCauseLine ? 3 : 0) + (a.stackFrames.length ? 2 : 0) + (a.level === 'ERROR' ? 1 : 0)
-      const scoreB = (b.rootCauseLine ? 3 : 0) + (b.stackFrames.length ? 2 : 0) + (b.level === 'ERROR' ? 1 : 0)
-      return scoreB - scoreA
-    })
-    .slice(0, 20)
+  const rootCauseCandidates = rankRootCauseCandidates(blocks, signatureCounts)
+  const isLargeFile = lines.length > LARGE_LOG_LINE_THRESHOLD
+  let displayBlocks = blocks
+  if (isLargeFile) {
+    const candidateIds = new Set(rootCauseCandidates.map(b => b.id))
+    const dedupInput = rootCauseCandidates.length
+      ? rootCauseCandidates.concat(blocks.filter(b => !candidateIds.has(b.id)))
+      : blocks
+    displayBlocks = pickHighSignalBlocks(dedupInput, LARGE_LOG_BLOCK_LIMIT)
+  }
 
   return {
     fileName,
     totalLines: lines.length,
     blocks,
+    displayBlocks,
     exceptionCounts,
     signatureCounts,
     referencedClasses: Array.from(new Set(blocks.flatMap(block => block.referencedClasses))),
     stackFrames: blocks.flatMap(block => block.stackFrames),
     rootCauseCandidates,
+    meta: {
+      isLargeFile,
+      displayBlockLimit: LARGE_LOG_BLOCK_LIMIT,
+      aiBlockLimit: LARGE_LOG_AI_BLOCK_LIMIT,
+      hasMoreBlocks: blocks.length > displayBlocks.length,
+      displayedBlockCount: displayBlocks.length,
+      totalBlockCount: blocks.length,
+    },
   }
 }
 
 export function filterLogBlocks(parsed, options = {}) {
   const mode = options.mode || 'issues'
   const matcher = buildKeywordMatcher(options.keyword)
+  const blocks = parsed?.meta?.isLargeFile ? (parsed?.displayBlocks || []) : (parsed?.blocks || [])
 
-  return (parsed?.blocks || []).filter(block => {
+  return blocks.filter(block => {
     const matchesKeyword = !matcher || matcher.test(block.rawText)
     if (!matchesKeyword) return false
 
@@ -281,6 +378,7 @@ export function summarizeLogAnalysis(parsed) {
     topExceptions,
     frequentBlocks,
     rootCauseCandidates: (parsed?.rootCauseCandidates || []).slice(0, 5),
+    meta: parsed?.meta || {},
   }
 }
 
@@ -289,14 +387,31 @@ export function extractReferencedClasses(parsed) {
 }
 
 export function extractRelevantStackFrames(parsed, limit = 30) {
-  return (parsed?.stackFrames || []).slice(0, limit)
+  const prioritized = uniqueFrames((parsed?.rootCauseCandidates || []).flatMap(block => block.stackFrames || []))
+    .sort((a, b) => scoreStackFrame(b) - scoreStackFrame(a))
+
+  if (prioritized.length >= limit) {
+    return prioritized.slice(0, limit)
+  }
+
+  const remainder = uniqueFrames(parsed?.stackFrames || []).filter(frame => !prioritized.some(item => (
+    item.fullClassName === frame.fullClassName &&
+    item.methodName === frame.methodName &&
+    item.fileName === frame.fileName &&
+    item.lineNumber === frame.lineNumber
+  )))
+
+  return prioritized.concat(remainder).slice(0, limit)
 }
 
 export function buildLogAiPayload(parsed, selectedSourceContexts = [], options = {}) {
+  const maxBlocks = options.maxBlocks || (parsed?.meta?.isLargeFile ? LARGE_LOG_AI_BLOCK_LIMIT : 20)
   const blocks = filterLogBlocks(parsed, {
     mode: options.mode || 'issues',
     keyword: options.keyword || '',
-  }).slice(0, options.maxBlocks || 20)
+  }).slice(0, maxBlocks)
+
+  const prioritizedRootCauseBlocks = (parsed?.rootCauseCandidates || []).slice(0, Math.min(maxBlocks, 5))
 
   return {
     fileName: parsed?.fileName || '',
@@ -305,7 +420,7 @@ export function buildLogAiPayload(parsed, selectedSourceContexts = [], options =
     mode: options.mode || 'issues',
     referencedClasses: extractReferencedClasses(parsed).slice(0, 50),
     stackFrames: extractRelevantStackFrames(parsed, 20),
-    keyBlocks: blocks.map(block => ({
+    keyBlocks: (prioritizedRootCauseBlocks.length ? prioritizedRootCauseBlocks : blocks).map(block => ({
       startLine: block.startLine,
       endLine: block.endLine,
       level: block.level,
@@ -314,7 +429,9 @@ export function buildLogAiPayload(parsed, selectedSourceContexts = [], options =
       rootCauseLine: block.rootCauseLine,
       stackFrames: block.stackFrames.slice(0, 10),
       rawText: block.rawText.slice(0, 4000),
+      rootCauseScore: block.rootCauseScore || 0,
     })),
     sourceContexts: selectedSourceContexts.slice(0, options.maxSources || 8),
+    analysisMeta: parsed?.meta || {},
   }
 }

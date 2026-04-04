@@ -5,6 +5,7 @@ use base64::Engine;
 use image::imageops::FilterType;
 use image::GenericImageView;
 use serde::Serialize;
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
 
@@ -13,6 +14,9 @@ const IMAGE_EXTS: &[&str] = &["jpg", "jpeg", "png", "bmp", "webp", "gif"];
 
 /// 缩略图最大边长
 const THUMB_SIZE: u32 = 320;
+
+/// Bing 默认市场
+const DEFAULT_MARKETS: &[&str] = &["zh-CN", "en-US", "ja-JP", "de-DE"];
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,6 +34,16 @@ pub struct BingImage {
     pub title: String,
     pub copyright: String,
     pub date: String,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WallhavenImage {
+    pub id: String,
+    pub url: String,
+    pub thumb_url: String,
+    pub resolution: String,
+    pub source: String,
 }
 
 /// 获取当前桌面壁纸路径
@@ -156,16 +170,57 @@ pub fn scan_images(dir_path: String) -> Result<Vec<ImageEntry>, String> {
     Ok(entries)
 }
 
-/// 获取 Bing 每日壁纸列表
+/// 扫描已下载壁纸目录（自动创建目录）
+#[tauri::command]
+pub fn scan_downloaded_wallpapers(dir_path: String) -> Result<Vec<ImageEntry>, String> {
+    let dir = Path::new(&dir_path);
+    if !dir.exists() {
+        std::fs::create_dir_all(dir).map_err(|e| format!("Failed to create dir: {}", e))?;
+        return Ok(Vec::new());
+    }
+    scan_images(dir_path)
+}
+
+/// 获取 Bing 每日壁纸列表（多 market 合并去重）
 #[tauri::command]
 pub async fn fetch_bing_wallpapers(count: Option<u8>) -> Result<Vec<BingImage>, String> {
     let n = count.unwrap_or(8).min(8);
-    let url = format!(
-        "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={}&mkt=zh-CN",
-        n
-    );
+    let markets: Vec<&str> = DEFAULT_MARKETS.to_vec();
 
-    let resp = reqwest::get(&url)
+    let client = reqwest::Client::new();
+    let mut handles = Vec::new();
+
+    for mkt in &markets {
+        let url = format!(
+            "https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={}&mkt={}",
+            n, mkt
+        );
+        let c = client.clone();
+        handles.push(tokio::spawn(async move {
+            fetch_bing_market(&c, &url).await.unwrap_or_default()
+        }));
+    }
+
+    let mut seen_urls = HashSet::new();
+    let mut result = Vec::new();
+
+    for handle in handles {
+        if let Ok(images) = handle.await {
+            for img in images {
+                if seen_urls.insert(img.url.clone()) {
+                    result.push(img);
+                }
+            }
+        }
+    }
+
+    Ok(result)
+}
+
+async fn fetch_bing_market(client: &reqwest::Client, url: &str) -> Result<Vec<BingImage>, String> {
+    let resp = client
+        .get(url)
+        .send()
         .await
         .map_err(|e| format!("Request failed: {}", e))?;
 
@@ -191,6 +246,71 @@ pub async fn fetch_bing_wallpapers(count: Option<u8>) -> Result<Vec<BingImage>, 
     Ok(result)
 }
 
+/// 获取 Wallhaven 壁纸列表
+#[tauri::command]
+pub async fn fetch_wallhaven_wallpapers(
+    query: Option<String>,
+    page: Option<u32>,
+) -> Result<Vec<WallhavenImage>, String> {
+    let q = query.unwrap_or_default();
+    let p = page.unwrap_or(1).max(1);
+
+    let url = if q.is_empty() {
+        format!(
+            "https://wallhaven.cc/api/v1/search?categories=100&purity=100&sorting=toplist&topRange=1M&page={}",
+            p
+        )
+    } else {
+        format!(
+            "https://wallhaven.cc/api/v1/search?q={}&categories=100&purity=100&sorting=relevance&page={}",
+            urlencoding::encode(&q),
+            p
+        )
+    };
+
+    let resp = reqwest::get(&url)
+        .await
+        .map_err(|e| format!("Wallhaven request failed: {}", e))?;
+
+    let json: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("Wallhaven parse failed: {}", e))?;
+
+    let data = json["data"]
+        .as_array()
+        .ok_or("Invalid Wallhaven API response")?;
+
+    let result: Vec<WallhavenImage> = data
+        .iter()
+        .filter_map(|item| {
+            let id = item["id"].as_str().unwrap_or("").to_string();
+            let url = item["path"].as_str().unwrap_or("").to_string();
+            let thumb_url = item["thumbs"]["small"]
+                .as_str()
+                .or_else(|| item["thumbs"]["original"].as_str())
+                .unwrap_or("")
+                .to_string();
+            let resolution = item["resolution"].as_str().unwrap_or("").to_string();
+            let source = item["source"].as_str().unwrap_or("").to_string();
+
+            if url.is_empty() {
+                None
+            } else {
+                Some(WallhavenImage {
+                    id,
+                    url,
+                    thumb_url,
+                    resolution,
+                    source,
+                })
+            }
+        })
+        .collect();
+
+    Ok(result)
+}
+
 /// 下载在线壁纸到本地并设为桌面壁纸
 #[tauri::command]
 pub async fn download_and_set_wallpaper(url: String, save_dir: String) -> Result<String, String> {
@@ -199,13 +319,8 @@ pub async fn download_and_set_wallpaper(url: String, save_dir: String) -> Result
         std::fs::create_dir_all(save_path).map_err(|e| e.to_string())?;
     }
 
-    // 从 URL 提取文件名
-    let file_name = url
-        .split('?')
-        .next()
-        .and_then(|u| u.rsplit('/').next())
-        .unwrap_or("bing_wallpaper.jpg")
-        .to_string();
+    // 从 URL 提取文件名（兼容 Bing ?id= 格式）
+    let file_name = extract_filename_from_url(&url);
 
     let dest = save_path.join(&file_name);
 
@@ -226,6 +341,25 @@ pub async fn download_and_set_wallpaper(url: String, save_dir: String) -> Result
     let applied_path = set_wallpaper(dest_str)?;
 
     Ok(applied_path)
+}
+
+/// 从 URL 提取文件名（兼容 Bing ?id= 格式）
+fn extract_filename_from_url(url: &str) -> String {
+    // Bing: ?id=OHR.Name_EN-US123_1920x1080.jpg
+    if let Some(pos) = url.find("id=") {
+        let after_id = &url[pos + 3..];
+        let end = after_id.find('&').unwrap_or(after_id.len());
+        let name = &after_id[..end];
+        if !name.is_empty() {
+            return urlencoding::decode(name).unwrap_or_else(|_| name.into()).to_string();
+        }
+    }
+    // Generic: last path segment before query
+    url.split('?')
+        .next()
+        .and_then(|u| u.rsplit('/').next())
+        .unwrap_or("wallpaper.jpg")
+        .to_string()
 }
 
 fn prepare_wallpaper_file(path: &Path) -> Result<PathBuf, String> {

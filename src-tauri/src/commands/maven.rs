@@ -1082,3 +1082,74 @@ pub async fn maven_repo_stats(repo_path: String) -> Result<RepoStats, String> {
         top_groups,
     })
 }
+
+// ============ 项目目录扫描 ============
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProjectPomEntry {
+    pub path: String,
+    pub relative_path: String,
+    pub group_id: String,
+    pub artifact_id: String,
+    pub version: String,
+    pub packaging: String,
+    pub modules: Vec<String>,
+    pub is_root: bool,
+    pub dep_count: usize,
+}
+
+/// 递归扫描项目目录下所有 pom.xml，返回每个 POM 的基本信息
+#[tauri::command]
+pub async fn maven_scan_project_poms(root_dir: String) -> Result<Vec<ProjectPomEntry>, String> {
+    tokio::task::spawn_blocking(move || {
+        let root = Path::new(&root_dir);
+        if !root.is_dir() {
+            return Err(format!("Not a directory: {}", root_dir));
+        }
+
+        let mut entries = Vec::new();
+        let skip_dirs: HashSet<&str> = ["target", "node_modules", ".git", ".idea", ".mvn", "build", ".gradle"].into_iter().collect();
+
+        for entry in WalkDir::new(root)
+            .into_iter()
+            .filter_entry(|e| {
+                let name = e.file_name().to_str().unwrap_or("");
+                !skip_dirs.contains(name) || e.depth() == 0
+            })
+            .filter_map(|e| e.ok())
+        {
+            let path = entry.path();
+            if !path.is_file() { continue; }
+            if path.file_name().and_then(|n| n.to_str()) != Some("pom.xml") { continue; }
+
+            let relative = path.strip_prefix(root)
+                .map(|r| r.to_string_lossy().to_string())
+                .unwrap_or_default();
+            let is_root = relative == "pom.xml";
+
+            match parse_pom(path) {
+                Ok(pom) => {
+                    entries.push(ProjectPomEntry {
+                        path: path.to_string_lossy().to_string(),
+                        relative_path: relative,
+                        group_id: pom.group_id,
+                        artifact_id: pom.artifact_id,
+                        version: pom.version,
+                        packaging: pom.packaging,
+                        modules: pom.modules,
+                        is_root,
+                        dep_count: pom.dependencies.len(),
+                    });
+                }
+                Err(_) => continue,
+            }
+        }
+
+        // Root first, then alphabetical by relative path
+        entries.sort_by(|a, b| b.is_root.cmp(&a.is_root).then(a.relative_path.cmp(&b.relative_path)));
+        Ok(entries)
+    })
+    .await
+    .map_err(|e| format!("Task error: {}", e))?
+}

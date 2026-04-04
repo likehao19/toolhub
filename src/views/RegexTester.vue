@@ -176,8 +176,17 @@ const regexError = computed(() => {
   }
 })
 
-const matches = computed(() => {
-  if (!pattern.value || !testText.value || regexError.value) return []
+const REGEX_TIMEOUT_MS = 2000
+
+const matches = ref([])
+let matchTimer = null
+
+function runMatch() {
+  if (!pattern.value || !testText.value || regexError.value) {
+    matches.value = []
+    execTime.value = null
+    return
+  }
 
   try {
     const re = new RegExp(pattern.value, flagsStr.value)
@@ -188,7 +197,7 @@ const matches = computed(() => {
       let m
       let safety = 0
       while ((m = re.exec(testText.value)) !== null && safety < 10000) {
-        // prevent infinite loop on zero-length matches
+        if (performance.now() - t0 > REGEX_TIMEOUT_MS) break
         if (m[0].length === 0) { re.lastIndex++; safety++; continue }
         const groups = []
         for (let i = 1; i < m.length; i++) {
@@ -209,11 +218,16 @@ const matches = computed(() => {
     }
 
     execTime.value = (performance.now() - t0).toFixed(1)
-    return results
+    matches.value = results
   } catch {
-    return []
+    matches.value = []
   }
-})
+}
+
+watch([pattern, () => testText.value, flagsStr], () => {
+  clearTimeout(matchTimer)
+  matchTimer = setTimeout(runMatch, 300)
+}, { immediate: true })
 
 const highlightedHtml = computed(() => {
   const text = testText.value

@@ -374,7 +374,7 @@ const scrollToBottom = () => {
 const startDiscussion = async () => {
   if (!topic.value.trim()) return
 
-  if (!checkAIConfig()) {
+  if (!(await checkAIConfig())) {
     ElMessage.warning(t('agentTeam.configWarning'))
     return
   }
@@ -391,7 +391,7 @@ const continueDiscussion = async () => {
   const followUp = followUpInput.value.trim()
   if (!followUp) return
 
-  if (!checkAIConfig()) {
+  if (!(await checkAIConfig())) {
     ElMessage.warning(t('agentTeam.configWarningShort'))
     return
   }

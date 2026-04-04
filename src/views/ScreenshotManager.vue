@@ -122,7 +122,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Briefcase, Setting } from '@element-plus/icons-vue'
@@ -221,10 +221,16 @@ async function startFullscreen() {
   }
 }
 
+let delayTimer = null
+
 function startDelayed() {
   ElMessage.info(t('screenshot.delayStarting'))
-  setTimeout(() => startScreenshot(), 3000)
+  delayTimer = setTimeout(() => startScreenshot(), 3000)
 }
+
+onBeforeUnmount(() => {
+  clearTimeout(delayTimer)
+})
 
 function startColorPicker() {
   startScreenshot('colorPicker')

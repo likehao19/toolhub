@@ -361,6 +361,7 @@ const mediaTools = computed(() => [
 // 系统工具
 const systemTools = computed(() => [
   { id: 'disk-cleaner', name: t('toolbox.tools.diskCleaner'), icon: '🧹', type: 'window', enabled: false },
+  { id: 'hardware-info', name: t('toolbox.tools.hardwareInfo'), icon: '🖥️', type: 'page', enabled: true },
   { id: 'disk-analyzer', name: t('toolbox.tools.diskAnalyzer'), icon: '💾', type: 'window', enabled: false },
   { id: 'registry-cleaner', name: t('toolbox.tools.registryCleaner'), icon: '🔧', type: 'window', enabled: false },
   { id: 'startup-manager', name: t('toolbox.tools.startupManager'), icon: '🚀', type: 'window', enabled: false },
@@ -661,6 +662,11 @@ const openTool = async (tool) => {
 
   if (tool.id === 'log-analyzer') {
     router.push('/toolbox/log-analyzer')
+    return
+  }
+
+  if (tool.id === 'hardware-info') {
+    router.push('/toolbox/hardware-info')
     return
   }
 

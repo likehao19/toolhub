@@ -43,7 +43,8 @@
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
       "Bash(cargo doc:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(npx eslint:*)"
     ]
   }
 }

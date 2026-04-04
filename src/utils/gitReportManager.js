@@ -205,7 +205,7 @@ export async function aggregateRepos(repoPaths, options = {}) {
  * @returns {Promise<string>} AI 优化后的日报
  */
 export async function optimizeWithAI(rawReport) {
-  if (!checkAIConfig()) {
+  if (!(await checkAIConfig())) {
     throw new Error('请先在系统设置中配置 AI API')
   }
 
@@ -234,7 +234,7 @@ export async function optimizeWithAI(rawReport) {
  * 使用 AI 生成周报摘要
  */
 export async function generateWeeklySummary(dailyReports) {
-  if (!checkAIConfig()) {
+  if (!(await checkAIConfig())) {
     throw new Error('请先在系统设置中配置 AI API')
   }
 

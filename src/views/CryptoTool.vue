@@ -544,7 +544,11 @@ function doDecrypt() {
     }
 
     // === Encoding (decode) ===
-    if (algo === 'base64') { outputText.value = decodeURIComponent(escape(atob(text))); return }
+    if (algo === 'base64') {
+      const bytes = Uint8Array.from(atob(text), c => c.charCodeAt(0))
+      outputText.value = new TextDecoder().decode(bytes)
+      return
+    }
     if (algo === 'base32') { outputText.value = base32Decode(text); return }
     if (algo === 'hex') { outputText.value = new TextDecoder().decode(new Uint8Array(text.trim().split(/\s+/).map(h => parseInt(h, 16)))); return }
     if (algo === 'url') { outputText.value = decodeURIComponent(text); return }
@@ -563,15 +567,19 @@ function doDecrypt() {
 
 // ========== Helper 函数 ==========
 function htmlEncode(str) {
-  const div = document.createElement('div')
-  div.textContent = str
-  return div.innerHTML
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 function htmlDecode(str) {
-  const div = document.createElement('div')
-  div.innerHTML = str
-  return div.textContent || ''
+  const entities = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&#x27;': "'", '&#x2F;': '/', '&nbsp;': ' ' }
+  return str.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+    .replace(/&\w+;/g, m => entities[m] || m)
 }
 
 const BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'

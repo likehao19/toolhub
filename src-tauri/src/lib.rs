@@ -157,11 +157,15 @@ pub fn run() {
             commands::maven::maven_parse_pom,
             commands::maven::maven_dep_tree,
             commands::maven::maven_repo_stats,
+            commands::maven::maven_scan_project_poms,
             commands::wallpaper::get_current_wallpaper,
             commands::wallpaper::set_wallpaper,
             commands::wallpaper::scan_images,
             commands::wallpaper::fetch_bing_wallpapers,
             commands::wallpaper::download_and_set_wallpaper,
+            commands::wallpaper::fetch_wallhaven_wallpapers,
+            commands::wallpaper::scan_downloaded_wallpapers,
+            commands::hardware::get_hardware_info,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -6,17 +6,21 @@
 import OpenAI from 'openai'
 import { fetch as tauriFetch } from '@tauri-apps/plugin-http'
 import { loadConfig } from '@/utils/tauri/store'
+import { resolveActiveProvider } from '@/utils/aiProviders'
+
+const CLAUDE_API_VERSION = '2023-06-01'
 
 let openaiClient = null
 let cachedConfigKey = ''
 
 async function getAIConfig() {
   const config = await loadConfig()
-  const aiSettings = config?.aiSettings || {}
+  const resolved = resolveActiveProvider(config?.aiSettings)
   return {
-    apiKey: aiSettings.apiKey || '',
-    baseURL: aiSettings.baseUrl || 'https://api.openai.com/v1',
-    model: aiSettings.model || 'gpt-3.5-turbo'
+    apiKey: resolved.apiKey || '',
+    baseURL: resolved.baseUrl || 'https://api.openai.com/v1',
+    model: resolved.model || 'gpt-3.5-turbo',
+    provider: resolved.provider || 'custom'
   }
 }
 
@@ -63,10 +67,40 @@ window.addEventListener('ai-config-changed', invalidateClient)
  */
 export const callAI = async (messages, options = {}) => {
   try {
-    const { client, aiConfig } = await initClient()
+    const aiConfig = await getAIConfig()
+    const isClaude = aiConfig.provider === 'claude' || /anthropic\.com/i.test(aiConfig.baseURL || '')
 
+    if (isClaude) {
+      const systemMessage = messages.find(item => item.role === 'system')?.content || ''
+      const userMessages = messages.filter(item => item.role !== 'system')
+      const response = await tauriFetch(`${aiConfig.baseURL.replace(/\/$/, '')}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': aiConfig.apiKey,
+          'anthropic-version': CLAUDE_API_VERSION
+        },
+        body: JSON.stringify({
+          model: aiConfig.model,
+          system: systemMessage,
+          messages: userMessages,
+          temperature: options.temperature || 0.7,
+          max_tokens: options.maxTokens || 2000
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: { message: response.statusText } }))
+        throw new Error(error.error?.message || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      return data.content?.map(item => item.text || '').join('') || ''
+    }
+
+    const { client, aiConfig: clientConfig } = await initClient()
     const response = await client.chat.completions.create({
-      model: aiConfig.model || 'gpt-3.5-turbo',
+      model: clientConfig.model || 'gpt-3.5-turbo',
       messages,
       temperature: options.temperature || 0.7,
       max_tokens: options.maxTokens || 2000,
@@ -91,10 +125,68 @@ export const callAI = async (messages, options = {}) => {
  */
 export const callAIStream = async (messages, onChunk, options = {}) => {
   try {
-    const { client, aiConfig } = await initClient()
+    const aiConfig = await getAIConfig()
+    const isClaude = aiConfig.provider === 'claude' || /anthropic\.com/i.test(aiConfig.baseURL || '')
 
+    if (isClaude) {
+      const systemMessage = messages.find(item => item.role === 'system')?.content || ''
+      const userMessages = messages.filter(item => item.role !== 'system')
+      const response = await tauriFetch(`${aiConfig.baseURL.replace(/\/$/, '')}/messages`, {
+        method: 'POST',
+        responseType: 3,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': aiConfig.apiKey,
+          'anthropic-version': CLAUDE_API_VERSION,
+          'accept': 'text/event-stream'
+        },
+        body: JSON.stringify({
+          model: aiConfig.model,
+          system: systemMessage,
+          messages: userMessages,
+          temperature: options.temperature || 0.7,
+          max_tokens: options.maxTokens || 2000,
+          stream: true
+        })
+      })
+
+      if (!response.ok) {
+        const errorText = typeof response.data === 'string' ? response.data : ''
+        throw new Error(errorText || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const rawText = typeof response.data === 'string'
+        ? response.data
+        : new TextDecoder().decode(response.data)
+      const events = rawText.split('\n\n')
+      let fullContent = ''
+
+      for (const eventBlock of events) {
+        const lines = eventBlock.split('\n')
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue
+          const payload = line.slice(6).trim()
+          if (!payload || payload === '[DONE]') continue
+          let parsed
+          try {
+            parsed = JSON.parse(payload)
+          } catch {
+            continue
+          }
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            const chunk = parsed.delta.text
+            fullContent += chunk
+            onChunk(chunk, fullContent)
+          }
+        }
+      }
+
+      return fullContent
+    }
+
+    const { client, aiConfig: clientConfig } = await initClient()
     const stream = await client.chat.completions.create({
-      model: aiConfig.model || 'gpt-3.5-turbo',
+      model: clientConfig.model || 'gpt-3.5-turbo',
       messages,
       temperature: options.temperature || 0.7,
       max_tokens: options.maxTokens || 2000,

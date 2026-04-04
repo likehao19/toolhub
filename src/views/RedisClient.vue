@@ -32,7 +32,7 @@
             @click="connectTo(conn)"
             @contextmenu.prevent="showConnCtxMenu($event, conn)"
           >
-            <span class="conn-dot" :style="{ background: conn.color || (activeConnId === conn.id ? '#67c23a' : '#909399') }"></span>
+            <span class="conn-dot" :class="{ connected: activeConnId === conn.id }" :style="conn.color ? { background: conn.color } : {}"></span>
             <span class="conn-name">{{ conn.name }}</span>
             <span class="conn-host">{{ conn.host }}:{{ conn.port }}</span>
           </div>
@@ -1024,7 +1024,8 @@ watch(showRenameDialog, (v) => {
 }
 .conn-item:hover { background: var(--bg-tertiary); }
 .conn-item.active { background: rgba(64,158,255,0.1); }
-.conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-quaternary); }
+.conn-dot.connected { background: var(--color-green, #67c23a); }
 .conn-name { font-weight: 600; color: var(--text-primary); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conn-host { font-size: 10px; color: var(--text-quaternary); }
 .conn-empty { text-align: center; padding: 24px 12px; font-size: 12px; color: var(--text-quaternary); }
@@ -1133,12 +1134,12 @@ watch(showRenameDialog, (v) => {
   text-transform: uppercase;
   flex-shrink: 0;
 }
-.type-string { background: #e8f5e9; color: #2e7d32; }
-.type-hash { background: #e3f2fd; color: #1565c0; }
-.type-list { background: #fff3e0; color: #e65100; }
-.type-set { background: #fce4ec; color: #c62828; }
-.type-zset { background: #f3e5f5; color: #7b1fa2; }
-.type-stream { background: #e0f7fa; color: #00838f; }
+.type-string { background: rgba(103, 194, 58, 0.12); color: var(--color-green, #67c23a); }
+.type-hash { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue, #409eff); }
+.type-list { background: rgba(230, 162, 60, 0.12); color: var(--color-orange, #e6a23c); }
+.type-set { background: rgba(245, 108, 108, 0.12); color: var(--color-red, #f56c6c); }
+.type-zset { background: rgba(191, 90, 242, 0.12); color: var(--color-purple, #bf5af2); }
+.type-stream { background: rgba(100, 210, 255, 0.12); color: var(--color-teal, #64d2ff); }
 .detail-meta {
   display: flex;
   align-items: center;
@@ -1216,8 +1217,8 @@ watch(showRenameDialog, (v) => {
   height: 28px;
   flex-shrink: 0;
 }
-.status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #909399; margin-right: 6px; }
-.status-dot.connected { background: #67c23a; }
+.status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text-quaternary); margin-right: 6px; }
+.status-dot.connected { background: var(--color-green, #67c23a); }
 .status-right { margin-left: auto; }
 
 /* Context menu */
@@ -1233,5 +1234,5 @@ watch(showRenameDialog, (v) => {
 }
 .ctx-item { padding: 6px 16px; font-size: 13px; color: var(--text-primary); cursor: pointer; }
 .ctx-item:hover { background: var(--bg-tertiary); }
-.ctx-danger { color: #f56c6c; }
+.ctx-danger { color: var(--color-red, #f56c6c); }
 </style>

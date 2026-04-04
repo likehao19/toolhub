@@ -471,8 +471,9 @@ async function selectFile(f) {
       // 统一对比 HEAD → 工作区，AM/MM 等双状态文件也能看到完整变更
       diffText.value = await git.getFileDiffFull(repoPath.value, f.path)
     }
-  } catch {
+  } catch (e) {
     diffText.value = ''
+    ElMessage.error(e?.message || String(e))
   }
 }
 

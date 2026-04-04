@@ -224,6 +224,7 @@ const toolPathMap = {
   'maven-repo': '/toolbox/maven-repo',
   'wallpaper-manager': '/toolbox/wallpaper-manager',
   'log-analyzer': '/toolbox/log-analyzer',
+  'hardware-info': '/toolbox/hardware-info',
 }
 
 const getToolPath = (tool) => toolPathMap[tool.id] ?? null

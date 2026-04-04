@@ -18,3 +18,4 @@ pub mod sqlite;
 pub mod image_convert;
 pub mod maven;
 pub mod wallpaper;
+pub mod hardware;

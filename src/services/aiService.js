@@ -5,23 +5,29 @@
 
 import { loadConfig } from '@/utils/tauri/store'
 import { fetch } from '@tauri-apps/plugin-http'
+import { locale } from '@/i18n'
+import { resolveActiveProvider } from '@/utils/aiProviders'
 
 let aiConfig = null
 
+function invalidateAIConfig() {
+  aiConfig = null
+}
+
 /**
- * 加载 AI 配置
+ * 加载 AI 配置（支持新多 provider 格式和旧单配置格式）
  */
 async function loadAIConfig() {
   if (!aiConfig) {
     const config = await loadConfig()
-    aiConfig = config?.aiSettings || {
-      apiKey: '',
-      baseUrl: 'https://api.openai.com/v1',
-      model: 'gpt-3.5-turbo'
-    }
+    aiConfig = resolveActiveProvider(config?.aiSettings)
   }
   return aiConfig
 }
+
+window.addEventListener('settings-config-saved', invalidateAIConfig)
+window.addEventListener('settings-reset', invalidateAIConfig)
+window.addEventListener('ai-config-changed', invalidateAIConfig)
 
 /**
  * 调用 AI API（OpenAI 兼容接口）
@@ -38,22 +44,48 @@ async function callAIAPI(messages, options = {}) {
     baseUrl = baseUrl.slice(0, -1)
   }
 
-  const url = `${baseUrl}/chat/completions`
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${config.apiKey}`
-  }
-  const body = {
-    model: config.model || 'gpt-3.5-turbo',
-    messages: messages,
-    ...options
-  }
+  const isClaude = config.provider === 'claude' || /anthropic\.com/i.test(baseUrl)
 
   try {
-    const response = await fetch(url, {
+    if (isClaude) {
+      const systemMessage = messages.find(item => item.role === 'system')?.content || ''
+      const userMessages = messages.filter(item => item.role !== 'system')
+      const response = await fetch(`${baseUrl}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': config.apiKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: config.model || 'claude-sonnet-4-20250514',
+          system: systemMessage,
+          messages: userMessages,
+          max_tokens: options.max_tokens || 2000,
+          temperature: options.temperature ?? 0.7
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: { message: response.statusText } }))
+        throw new Error(error.error?.message || `HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      return data.content?.map(item => item.text || '').join('') || ''
+    }
+
+    const response = await fetch(`${baseUrl}/chat/completions`, {
       method: 'POST',
-      headers,
-      body: JSON.stringify(body)
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.apiKey}`
+      },
+      body: JSON.stringify({
+        model: config.model || 'gpt-3.5-turbo',
+        messages,
+        ...options
+      })
     })
 
     if (!response.ok) {
@@ -174,9 +206,6 @@ export async function answerQuestion(noteContent, question) {
 
 /**
  * 通用 AI 对话
- * @param {Array} messages - 对话消息数组
- * @param {Object} options - 额外选项
- * @returns {Promise<string>} AI 响应内容
  */
 export async function chatWithAI(messages, options = {}) {
   return await callAIAPI(messages, {
@@ -190,15 +219,17 @@ export async function chatWithAI(messages, options = {}) {
  * 分析 Java 日志与源码上下文
  */
 export async function analyzeJavaLogWithSources(payload) {
+  const isZh = locale.value?.startsWith('zh')
+  const systemPrompt = isZh
+    ? '你是一个专业的 Java 日志分析与故障排查助手。请结合日志摘要、异常堆栈、根因链以及相关 Java 源码片段，判断最可能的问题根因，并给出涉及类/方法、排查步骤、修复建议和置信度。请使用清晰的中文分点输出。'
+    : 'You are a professional Java log analysis and troubleshooting assistant. Based on the log summary, exception stack traces, root cause chains, and related Java source code snippets, determine the most likely root cause and provide the involved classes/methods, troubleshooting steps, fix recommendations, and confidence level. Use clear bullet points.'
+  const userPrompt = isZh
+    ? `请分析以下 Java 日志与源码上下文：\n\n${JSON.stringify(payload)}`
+    : `Please analyze the following Java log and source context:\n\n${JSON.stringify(payload)}`
+
   const messages = [
-    {
-      role: 'system',
-      content: '你是一个专业的 Java 日志分析与故障排查助手。请结合日志摘要、异常堆栈、根因链以及相关 Java 源码片段，判断最可能的问题根因，并给出涉及类/方法、排查步骤、修复建议和置信度。请使用清晰的中文分点输出。'
-    },
-    {
-      role: 'user',
-      content: `请分析以下 Java 日志与源码上下文：\n\n${JSON.stringify(payload, null, 2)}`
-    }
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userPrompt }
   ]
 
   try {
@@ -208,7 +239,8 @@ export async function analyzeJavaLogWithSources(payload) {
     })
     return result
   } catch (error) {
-    throw new Error(`日志分析失败: ${error.message}`)
+    const msg = isZh ? '日志分析失败' : 'Log analysis failed'
+    throw new Error(`${msg}: ${error.message}`)
   }
 }
 
@@ -229,4 +261,3 @@ export default {
   analyzeJavaLogWithSources,
   refreshConfig
 }
-

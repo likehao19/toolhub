@@ -11,7 +11,9 @@
         </div>
       </div>
       <div class="header-actions">
-        <el-input v-model="searchText" :placeholder="t('ebookShelf.search')" prefix-icon="Search" size="small" clearable class="search-input" />
+        <el-input v-model="searchText" :placeholder="t('ebookShelf.search')" size="small" clearable class="search-input">
+          <template #prefix><el-icon><Search /></el-icon></template>
+        </el-input>
         <el-select v-model="filterStatus" size="small" class="filter-select">
           <el-option :label="t('ebookShelf.all')" value="all" />
           <el-option :label="t('ebookShelf.reading')" value="reading" />
@@ -137,7 +139,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Reading, FolderAdd, Setting, Loading } from '@element-plus/icons-vue'
+import { Reading, FolderAdd, Setting, Loading, Search } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { t } from '@/i18n'
 import * as ebook from '@/utils/ebookManager'

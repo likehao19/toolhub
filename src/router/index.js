@@ -390,6 +390,12 @@ const routes = [
     meta: { title: '日志分析' }
   },
   {
+    path: '/toolbox/hardware-info',
+    name: 'hardwareInfo',
+    component: () => import('@/views/HardwareInfo.vue'),
+    meta: { title: '硬件信息' }
+  },
+  {
     path: '/screenshot-overlay',
     name: 'screenshotOverlay',
     component: () => import('@/views/ScreenshotOverlay.vue'),

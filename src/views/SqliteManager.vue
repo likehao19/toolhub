@@ -354,8 +354,8 @@ async function loadTableData() {
   try {
     const result = await sqliteQuery(
       connId.value,
-      `SELECT * FROM "${tbl}" LIMIT ${pageSize.value} OFFSET ${offset}`,
-      []
+      `SELECT * FROM "${tbl}" LIMIT ? OFFSET ?`,
+      [pageSize.value, offset]
     )
     // Convert rows array to objects
     tableData.value = result.rows.map(row => {
