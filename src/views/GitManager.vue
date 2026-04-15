@@ -3,11 +3,14 @@
     <!-- 顶部工具栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Monitor /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('gitManager.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Monitor /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('gitManager.title') }}</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -80,7 +83,8 @@
     </div>
 
     <!-- 主内容区 -->
-    <div class="main-content" v-if="repoPath">
+    <div class="workspace-shell" v-if="repoPath">
+      <div class="main-content">
       <!-- 左侧：文件列表 -->
       <div class="file-panel">
         <div class="panel-header">
@@ -112,8 +116,17 @@
 
         <!-- 文件列表滚动区 -->
         <div class="file-list-scroll">
+          <div v-if="loading" class="file-list-skeleton" aria-hidden="true">
+            <div class="skeleton-section-label"></div>
+            <div v-for="idx in 8" :key="`skeleton-${idx}`" class="skeleton-file-item">
+              <span class="skeleton-check"></span>
+              <span class="skeleton-status"></span>
+              <span class="skeleton-name"></span>
+            </div>
+          </div>
+
           <!-- 更改（所有已跟踪的变动文件） -->
-          <div class="file-section" v-if="trackedFiles.length">
+          <div class="file-section" v-if="!loading && trackedFiles.length">
             <div class="section-label">{{ t('gitManager.changes') }} ({{ trackedFiles.length }})</div>
             <template v-for="node in stagedTree" :key="'s-' + node.key">
               <div v-if="node.isDir" class="dir-item" @click="toggleDir('staged', node.key)">
@@ -140,7 +153,7 @@
           </div>
 
           <!-- 未跟踪文件 -->
-          <div class="file-section" v-if="untrackedFiles.length">
+          <div class="file-section" v-if="!loading && untrackedFiles.length">
             <div class="section-label">{{ t('gitManager.untracked') }} ({{ untrackedFiles.length }})</div>
             <template v-for="node in untrackedTree" :key="'t-' + node.key">
               <div v-if="node.isDir" class="dir-item" @click="toggleDir('untracked', node.key)">
@@ -191,13 +204,17 @@
           </div>
         </div>
         <div class="diff-empty" v-else>
-          <span>{{ t('gitManager.selectFileToView') }}</span>
+          <div class="diff-empty-card">
+            <div class="diff-empty-icon">⟂</div>
+            <div class="diff-empty-title">{{ t('gitManager.diffPreview') }}</div>
+            <div class="diff-empty-text">{{ t('gitManager.selectFileToView') }}</div>
+          </div>
         </div>
       </div>
-    </div>
+      </div>
 
-    <!-- 底部操作栏 -->
-    <div class="bottom-bar" v-if="repoPath">
+      <!-- 底部操作栏 -->
+      <div class="bottom-bar">
       <div class="commit-area">
         <el-input
           v-model="commitMessage"
@@ -230,6 +247,7 @@
         <el-button size="small" @click="showLogDialog = true">
           {{ t('gitManager.log') }}
         </el-button>
+      </div>
       </div>
     </div>
 
@@ -368,6 +386,23 @@ function repoDisplayName(path) {
   return path.replace(/[/\\]+$/, '').split(/[/\\]/).pop() || path
 }
 
+function getGitUserHint(message, scope) {
+  const text = String(message || '')
+  const lower = text.toLowerCase()
+
+  if (lower.includes('not allowed')) {
+    return t(`${scope}.gitPermissionHint`)
+  }
+  if (
+    lower.includes('not found') ||
+    text.includes('系统找不到指定的文件') ||
+    text.includes('No such file or directory')
+  ) {
+    return t(`${scope}.gitMissingHint`)
+  }
+  return text
+}
+
 async function scanRepos() {
   scanning.value = true
   try {
@@ -385,7 +420,7 @@ async function scanRepos() {
     }
     ElMessage.success(t('gitManager.foundRepos', { count: repos.length }))
   } catch (e) {
-    ElMessage.error(e.message)
+    ElMessage.error(getGitUserHint(e.message, 'gitManager'))
   } finally {
     scanning.value = false
   }
@@ -622,7 +657,7 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 /* ---- 顶栏 ---- */
@@ -630,25 +665,43 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-lg);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 42px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
+  backdrop-filter: blur(18px);
 }
 
-.header-left { display: flex; align-items: center; }
+.header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page-eyebrow {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
+}
 
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--font-size-footnote);
-  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--text-secondary); }
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
@@ -663,9 +716,9 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 16px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.42);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   flex-shrink: 0;
 }
 
@@ -724,31 +777,51 @@ onMounted(() => {
 .empty-text { color: var(--text-tertiary); font-size: 14px; }
 
 /* ---- 主内容区 ---- */
+.workspace-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 14px 18px 0;
+  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px 18px 0 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+
 .main-content {
   flex: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
   overflow: hidden;
   min-height: 0;
+  padding: 20px;
+  gap: 18px;
 }
 
 /* ---- 文件面板 ---- */
 .file-panel {
-  width: 320px;
+  width: auto;
   min-width: 260px;
-  border-right: 1px solid var(--border-color);
-  background: var(--bg-primary);
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.92);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.05);
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(15,23,42,0.06);
   flex-shrink: 0;
+  background: rgba(247,249,252,0.68);
 }
 
 .panel-title {
@@ -763,8 +836,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(15,23,42,0.06);
   flex-shrink: 0;
 }
 
@@ -792,6 +865,77 @@ onMounted(() => {
   padding-bottom: 4px;
 }
 
+.file-list-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 8px 12px;
+}
+
+.skeleton-section-label,
+.skeleton-check,
+.skeleton-status,
+.skeleton-name {
+  position: relative;
+  overflow: hidden;
+  background: rgba(226, 232, 240, 0.82);
+}
+
+.skeleton-section-label::after,
+.skeleton-check::after,
+.skeleton-status::after,
+.skeleton-name::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.78), transparent);
+  animation: git-list-skeleton 1.15s ease-in-out infinite;
+}
+
+.skeleton-section-label {
+  width: 108px;
+  height: 12px;
+  border-radius: 999px;
+  margin: 2px 4px 4px;
+}
+
+.skeleton-file-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+}
+
+.skeleton-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.skeleton-status {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.skeleton-name {
+  height: 12px;
+  border-radius: 999px;
+  flex: 1;
+}
+
+.skeleton-file-item:nth-child(2n) .skeleton-name {
+  max-width: 72%;
+}
+
+.skeleton-file-item:nth-child(3n) .skeleton-name {
+  max-width: 56%;
+}
+
 .section-label {
   position: sticky;
   top: 0;
@@ -800,7 +944,7 @@ onMounted(() => {
   font-weight: 600;
   color: var(--text-tertiary);
   padding: 8px 12px 4px;
-  background: var(--bg-primary);
+  background: rgba(255,255,255,0.92);
   letter-spacing: 0.3px;
 }
 
@@ -808,31 +952,36 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 12px;
+  padding: 5px 12px;
   cursor: pointer;
   font-size: 12px;
   transition: background var(--transition-fast);
-  border-radius: 4px;
-  margin: 0 4px;
+  border-radius: 10px;
+  margin: 0 6px 4px;
+  border: 1px solid transparent;
 }
-.file-item:hover { background: var(--bg-tertiary); }
-.file-item.active { background: rgba(64, 158, 255, 0.08); }
+.file-item:hover { background: rgba(255,255,255,0.58); }
+.file-item.active {
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  border-color: rgba(10,132,255,0.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+}
 
 .dir-item {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 12px;
+  padding: 5px 12px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-secondary);
   transition: background var(--transition-fast);
   user-select: none;
-  border-radius: 4px;
-  margin: 0 4px;
+  border-radius: 10px;
+  margin: 0 6px 4px;
 }
-.dir-item:hover { background: var(--bg-tertiary); }
+.dir-item:hover { background: rgba(255,255,255,0.58); }
 
 .dir-arrow {
   width: 14px;
@@ -892,7 +1041,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-primary);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15,23,42,0.05);
 }
 
 .diff-content {
@@ -901,7 +1053,7 @@ onMounted(() => {
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 12px;
   line-height: 1.6;
-  padding: 4px 0;
+  padding: 6px 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(144, 147, 153, 0.25) transparent;
 }
@@ -942,8 +1094,53 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-quaternary);
-  font-size: 13px;
+  padding: 24px;
+}
+
+.diff-empty-card {
+  width: min(320px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 24px;
+  border: 1px dashed rgba(148, 163, 184, 0.34);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.88), rgba(241, 245, 249, 0.76));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+.diff-empty-icon {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.diff-empty-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.diff-empty-text {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@keyframes git-list-skeleton {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* ---- 底部操作栏 ---- */
@@ -951,9 +1148,9 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.42);
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
   gap: 12px;
   flex-shrink: 0;
 }

@@ -3,7 +3,15 @@
     <!-- 顶部栏 -->
     <header class="header">
       <div class="header-left">
-        <span class="page-title">{{ t('credential.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Security Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Key /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('credential.title') }}</span>
+          </div>
+        </div>
       </div>
       <div class="header-actions">
         <el-input
@@ -425,37 +433,56 @@ onMounted(loadCredentials)
   flex-direction: column;
   overflow: hidden;
   color: var(--text-primary);
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
   height: 100%;
   width: 100%;
   position: relative;
 }
 
-/* 顶部导航 */
 .header {
-  height: 48px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  min-height: 58px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-lg);
+  gap: 16px;
+  padding: 0 18px;
   flex-shrink: 0;
   z-index: 2;
   position: relative;
+  backdrop-filter: blur(18px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  min-width: 0;
+  flex: 1;
 }
 
-.page-title {
-  font-size: var(--font-size-body);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-regular);
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
+.breadcrumb-link:hover { text-decoration: underline; }
+.breadcrumb-sep { color: var(--text-tertiary); }
 
 .header-actions {
   display: flex;
@@ -464,7 +491,7 @@ onMounted(loadCredentials)
 }
 
 .header-search {
-  width: 200px;
+  width: 220px;
 }
 
 .main-tabs {
@@ -472,19 +499,27 @@ onMounted(loadCredentials)
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
+  padding: 14px 18px 0;
 }
 
 .cred-tabs {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px 18px 0 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
 :deep(.cred-tabs > .el-tabs__header) {
-  padding: 0 var(--space-lg);
+  padding: 0 16px;
   margin-bottom: 0;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  background: rgba(255,255,255,0.78);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 :deep(.cred-tabs > .el-tabs__content) {
@@ -498,47 +533,44 @@ onMounted(loadCredentials)
   flex-direction: column;
 }
 
-/* 列表区域 */
 .list-wrapper {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 20px;
-  background: var(--bg-secondary);
+  padding: 16px;
+  background: transparent;
 }
 
-/* 卡片容器 */
 .card-list {
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color-strong);
+  background: rgba(255,255,255,0.76);
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
 }
 
-/* 卡片项 */
 .card-item {
   padding: 13px 20px;
   transition: background 0.15s;
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 .card-item:not(:last-child) {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .card-item:nth-child(even) {
-  background: var(--bg-grouped);
+  background: rgba(248,250,252,0.72);
 }
 
 .card-item:hover {
-  background: var(--accent-blue-bg);
+  background: rgba(64,158,255,0.08);
 }
 
-/* 卡片行 */
 .card-row {
   display: flex;
   align-items: center;
@@ -576,7 +608,6 @@ onMounted(loadCredentials)
   min-width: 0;
 }
 
-/* 操作按钮 */
 .card-actions {
   display: flex;
   gap: var(--space-xs);
@@ -587,7 +618,6 @@ onMounted(loadCredentials)
   padding: var(--space-xs);
 }
 
-/* 信息行 */
 .card-info-row {
   display: flex;
   align-items: center;
@@ -614,7 +644,6 @@ onMounted(loadCredentials)
   color: var(--text-quaternary);
 }
 
-/* Passkey fallback */
 .passkey-fallback {
   display: flex;
   flex-direction: column;
@@ -623,6 +652,9 @@ onMounted(loadCredentials)
   padding: 60px 20px;
   text-align: center;
   gap: 8px;
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.5);
 }
 
 .fallback-title {
@@ -639,13 +671,12 @@ onMounted(loadCredentials)
   margin: 0 0 12px;
 }
 
-/* 详情网格 */
 .detail-grid {
   display: flex;
   flex-direction: column;
   gap: 0;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  background: rgba(248,250,252,0.86);
+  border-radius: 14px;
   padding: 4px 16px;
 }
 
@@ -654,7 +685,7 @@ onMounted(loadCredentials)
   align-items: center;
   gap: 12px;
   padding: 12px 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .detail-row:last-child {
@@ -688,7 +719,7 @@ onMounted(loadCredentials)
 }
 
 .detail-value.copyable:hover {
-  background: var(--bg-primary);
+  background: rgba(255,255,255,0.8);
 }
 
 .copy-icon {
@@ -700,5 +731,15 @@ onMounted(loadCredentials)
 .toggle-pwd {
   padding: 0;
   margin: 0;
+}
+
+@media (max-width: 860px) {
+  .header {
+    padding: 12px 14px;
+    align-items: flex-start;
+  }
+  .main-tabs { padding: 14px 14px 0; }
+  .header-actions { width: 100%; justify-content: flex-end; flex-wrap: wrap; }
+  .header-search { width: 100%; }
 }
 </style>

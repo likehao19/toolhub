@@ -14,6 +14,7 @@ dist-ssr
 target_dev2
 target2
 identifier.sqlite
+.tauri-dev-config.json
 
 # Editor directories and files
 .vscode/*

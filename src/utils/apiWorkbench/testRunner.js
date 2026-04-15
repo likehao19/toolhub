@@ -4,6 +4,7 @@
 import { load, save, STORAGE_KEYS, buildUrl, buildAuthHeader, getNestedValue } from './shared'
 import { resolveVariables } from './environment'
 import { sendRequest } from './httpEngine'
+import { findApiById } from './collections'
 
 export function loadTestSuites() {
   return load(STORAGE_KEYS.testSuites, [])
@@ -61,14 +62,11 @@ export function extractVariables(extractors, response) {
 export async function runTestSuite(suite, collections, envVars = {}, onStepDone) {
   const runtimeVars = { ...envVars }
   const stepResults = []
+  const suiteStartAt = Date.now()
 
   for (let i = 0; i < suite.steps.length; i++) {
     const step = suite.steps[i]
-    let apiDef = null
-    for (const col of collections) {
-      apiDef = col.items.find(item => item.id === step.apiRef)
-      if (apiDef) break
-    }
+    let apiDef = findApiById(collections, step.apiRef)
     if (!apiDef) {
       stepResults.push({ step, status: 'skipped', reason: 'API not found' })
       if (onStepDone) onStepDone(stepResults[stepResults.length - 1], i)
@@ -124,6 +122,6 @@ export async function runTestSuite(suite, collections, envVars = {}, onStepDone)
     errors: stepResults.filter(r => r.status === 'error').length,
     skipped: stepResults.filter(r => r.status === 'skipped').length,
     results: stepResults,
-    duration: 0,
+    duration: Date.now() - suiteStartAt,
   }
 }

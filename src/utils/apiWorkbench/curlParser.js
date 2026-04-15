@@ -1,47 +1,148 @@
 /**
- * API Workbench — cURL parser + code generator
+ * API Workbench - cURL parser + code generator
  */
+
+function tokenizeCommand(input) {
+  const tokens = []
+  let current = ''
+  let quote = null
+  let escaping = false
+
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i]
+
+    if (escaping) {
+      current += ch
+      escaping = false
+      continue
+    }
+
+    if (ch === '\\') {
+      escaping = true
+      continue
+    }
+
+    if (quote) {
+      if (ch === quote) {
+        quote = null
+      } else {
+        current += ch
+      }
+      continue
+    }
+
+    if (ch === '"' || ch === "'") {
+      quote = ch
+      continue
+    }
+
+    if (/\s/.test(ch)) {
+      if (current) {
+        tokens.push(current)
+        current = ''
+      }
+      continue
+    }
+
+    current += ch
+  }
+
+  if (current) tokens.push(current)
+  return tokens
+}
+
+function normalizeCurlUrl(rawUrl = '') {
+  if (!rawUrl) return ''
+  if (/^[a-zA-Z][\w+.-]*:\/\//.test(rawUrl)) return rawUrl
+  if (/^(localhost|\d{1,3}(?:\.\d{1,3}){3})(:\d+)?([/?#]|$)/.test(rawUrl)) {
+    return `http://${rawUrl}`
+  }
+  if (/^[\w.-]+\.[a-zA-Z]{2,}(:\d+)?([/?#]|$)/.test(rawUrl)) {
+    return `https://${rawUrl}`
+  }
+  return rawUrl
+}
 
 export function parseCurl(curlStr) {
   if (!curlStr || typeof curlStr !== 'string') return null
-  const str = curlStr.replace(/\\\n/g, ' ').replace(/\\\r\n/g, ' ').trim()
+  const tokens = tokenizeCommand(curlStr.replace(/\\\r?\n/g, ' ').trim())
+  if (!tokens.length || tokens[0].toLowerCase() !== 'curl') return null
 
   let method = 'GET'
   let url = ''
   const headers = []
   let bodyContent = ''
+  let auth = { type: 'none' }
 
-  const urlMatch = str.match(/curl\s+(?:.*?\s+)?['"]?(https?:\/\/[^\s'"]+)['"]?/) ||
-                   str.match(/--url\s+['"]?([^\s'"]+)['"]?/)
-  if (urlMatch) url = urlMatch[1]
+  for (let i = 1; i < tokens.length; i++) {
+    const token = tokens[i]
+    const next = tokens[i + 1]
 
-  const methodMatch = str.match(/-X\s+(\w+)/)
-  if (methodMatch) method = methodMatch[1].toUpperCase()
+    if ((token === '-X' || token === '--request') && next) {
+      method = next.toUpperCase()
+      i += 1
+      continue
+    }
 
-  const headerRegex = /-H\s+['"]([^'"]+)['"]/g
-  let hm
-  while ((hm = headerRegex.exec(str)) !== null) {
-    const [key, ...valueParts] = hm[1].split(':')
-    if (key) {
-      headers.push({ key: key.trim(), value: valueParts.join(':').trim(), enabled: true })
+    if ((token === '-H' || token === '--header') && next) {
+      const idx = next.indexOf(':')
+      if (idx > -1) {
+        headers.push({
+          key: next.slice(0, idx).trim(),
+          value: next.slice(idx + 1).trim(),
+          enabled: true,
+        })
+      }
+      i += 1
+      continue
+    }
+
+    if ((token === '-d' || token === '--data' || token === '--data-raw' || token === '--data-binary' || token === '--data-ascii') && next) {
+      bodyContent = next
+      if (method === 'GET') method = 'POST'
+      i += 1
+      continue
+    }
+
+    if ((token === '--url' || token === '--location-url') && next) {
+      url = next
+      i += 1
+      continue
+    }
+
+    if ((token === '-u' || token === '--user') && next) {
+      const idx = next.indexOf(':')
+      if (idx > -1) {
+        auth = {
+          type: 'basic',
+          username: next.slice(0, idx),
+          password: next.slice(idx + 1),
+        }
+      }
+      i += 1
+      continue
+    }
+
+    if (!token.startsWith('-') && !url) {
+      url = token
     }
   }
 
-  const bodyMatch = str.match(/(?:-d|--data|--data-raw|--data-binary)\s+['"](.+?)['"]/s) ||
-                    str.match(/(?:-d|--data|--data-raw|--data-binary)\s+(\S+)/)
-  if (bodyMatch) {
-    bodyContent = bodyMatch[1]
-    if (method === 'GET') method = 'POST'
-  }
-
-  const authMatch = str.match(/-u\s+['"]?([^'":\s]+):([^'":\s]+)['"]?/)
-  const auth = authMatch
-    ? { type: 'basic', username: authMatch[1], password: authMatch[2] }
-    : { type: 'none' }
+  url = normalizeCurlUrl(url)
 
   let bodyType = 'none'
   if (bodyContent) {
-    try { JSON.parse(bodyContent); bodyType = 'json' } catch { bodyType = 'raw' }
+    const contentTypeHeader = headers.find(h => h.key.toLowerCase() === 'content-type')?.value?.toLowerCase() || ''
+    if (contentTypeHeader.includes('application/x-www-form-urlencoded')) {
+      bodyType = 'form'
+    } else {
+      try {
+        JSON.parse(bodyContent)
+        bodyType = 'json'
+      } catch {
+        bodyType = 'raw'
+      }
+    }
   }
 
   return {

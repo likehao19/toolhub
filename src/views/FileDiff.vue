@@ -3,11 +3,14 @@
     <!-- 顶栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Document /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('fileDiff.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Document /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('fileDiff.title') }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -68,8 +71,9 @@
       </div>
     </div>
 
-    <!-- 文件名栏 -->
-    <div class="file-name-bar">
+    <div class="workspace-shell">
+      <!-- 文件名栏 -->
+      <div class="file-name-bar">
       <div class="file-name left" @click="openFile('left')">
         <span class="file-tag removed-tag">{{ t('fileDiff.original') }}</span>
         <span class="file-label">{{ leftPath ? getFileName(leftPath) : '—' }}</span>
@@ -107,8 +111,8 @@
       </div>
     </div>
 
-    <!-- 底栏 -->
-    <div class="status-bar">
+      <!-- 底栏 -->
+      <div class="status-bar">
       <template v-if="diffBlocks.length">
         <span class="status-badge badge-total">{{ t('fileDiff.diffCount', { count: diffBlocks.length }) }}</span>
         <span v-if="addedCount" class="status-badge badge-added">{{ t('fileDiff.added', { count: addedCount }) }}</span>
@@ -118,6 +122,7 @@
       <span v-else-if="hasContent && leftText && rightText" class="status-same">{{ t('fileDiff.noDiff') }}</span>
       <span class="status-spacer"></span>
       <span class="status-hint">Alt+↑↓ {{ t('fileDiff.navHint') }}　Ctrl+S {{ t('fileDiff.saveHint') }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -720,60 +725,78 @@ function getFileName(path) {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 /* ---- Header ---- */
 .header {
   display: flex;
   align-items: center;
-  padding: 0 var(--space-lg);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 46px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
+}
+.header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-semibold);
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 16px; color: var(--text-secondary); }
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link {
   cursor: pointer;
   color: var(--accent-blue);
   transition: opacity var(--transition-fast);
 }
 .breadcrumb-link:hover { text-decoration: underline; opacity: 0.85; }
-.breadcrumb-sep { color: var(--text-quaternary); margin: 0 2px; }
+.breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
 
 /* ---- Toolbar ---- */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 16px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  margin: 18px 18px 0;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
 }
 .toolbar-group {
   display: flex;
   align-items: center;
   gap: 6px;
 }
+.toolbar :deep(.el-button) {
+  --el-button-border-radius: 10px;
+}
 .toolbar-sep {
   width: 1px;
   height: 20px;
-  background: var(--border-color);
+  background: rgba(15, 23, 42, 0.08);
   margin: 0 4px;
 }
 .toolbar-sep-sm {
   width: 1px;
   height: 16px;
-  background: var(--border-color);
+  background: rgba(15, 23, 42, 0.08);
   margin: 0 2px;
 }
 .toolbar-spacer { flex: 1; }
@@ -788,6 +811,9 @@ function getFileName(path) {
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.05);
 }
 
 .merge-tb-btn {
@@ -797,35 +823,50 @@ function getFileName(path) {
   min-width: 28px;
 }
 
+/* ---- Workspace shell ---- */
+.workspace-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 14px 18px 18px;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
 /* ---- File name bar ---- */
 .file-name-bar {
   display: flex;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  margin: 0 20px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px 16px 0 0;
 }
 .file-name {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 16px;
+  padding: 8px 16px;
   font-size: var(--font-size-caption);
   color: var(--text-secondary);
   cursor: pointer;
   transition: background var(--transition-fast);
   user-select: none;
 }
-.file-name:hover { background: var(--bg-tertiary); }
-.file-name.left { border-right: 1px solid var(--border-color); }
+.file-name:hover { background: rgba(239, 246, 255, 0.72); }
+.file-name.left { border-right: 1px solid rgba(15, 23, 42, 0.08); }
 
 .file-tag {
   display: inline-flex;
   align-items: center;
-  padding: 1px 7px;
-  border-radius: 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
   font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   flex-shrink: 0;
 }
@@ -862,14 +903,19 @@ function getFileName(path) {
   flex: 1;
   display: flex;
   overflow: hidden;
+  min-height: 0;
+  margin: 0 20px;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
 }
 .editor-pane {
   flex: 1;
   overflow: hidden;
-  background: var(--bg-primary);
+  background: rgba(255,255,255,0.92);
 }
-.left-pane { border-right: 1px solid var(--border-color); }
-.right-pane { border-left: 1px solid var(--border-color); }
+.left-pane { border-right: 1px solid rgba(15, 23, 42, 0.08); }
+.right-pane { border-left: 1px solid rgba(15, 23, 42, 0.08); }
 
 .editor-mount {
   height: 100%;
@@ -906,10 +952,10 @@ function getFileName(path) {
   position: relative;
   width: 36px;
   min-width: 36px;
-  background: var(--bg-secondary);
+  background: rgba(248, 250, 252, 0.94);
   overflow: hidden;
-  border-left: 1px solid var(--border-color);
-  border-right: 1px solid var(--border-color);
+  border-left: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .merge-btn-pair {
@@ -931,9 +977,9 @@ function getFileName(path) {
   justify-content: center;
   width: 22px;
   height: 18px;
-  border: 1px solid var(--border-color);
-  border-radius: 3px;
-  background: var(--bg-primary);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.94);
   color: var(--text-tertiary);
   font-size: 13px;
   font-weight: 700;
@@ -974,25 +1020,28 @@ function getFileName(path) {
   align-items: center;
   gap: 8px;
   padding: 0 16px;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+  margin: 0 20px 20px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: none;
+  border-radius: 0 0 16px 16px;
   font-size: 11.5px;
   color: var(--text-tertiary);
-  height: 30px;
+  height: 34px;
   box-sizing: border-box;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 1px 8px;
-  border-radius: 9px;
+  padding: 2px 8px;
+  border-radius: 999px;
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
 .badge-total {
-  background: var(--bg-tertiary);
+  background: rgba(15, 23, 42, 0.06);
   color: var(--text-primary);
 }
 .badge-added {
@@ -1013,8 +1062,17 @@ function getFileName(path) {
   font-weight: 500;
 }
 .status-spacer { flex: 1; }
-.status-hint {
-  color: var(--text-quaternary);
-  font-size: 10.5px;
+@media (max-width: 1100px) {
+  .toolbar,
+  .file-name-bar,
+  .editor-container,
+  .status-bar { margin-left: 14px; margin-right: 14px; }
+}
+
+@media (max-width: 860px) {
+  .header { padding: 0 14px; }
+  .breadcrumb { font-size: 14px; }
+  .toolbar { margin-top: 14px; padding: 10px 12px; }
+  .merge-gutter { width: 30px; min-width: 30px; }
 }
 </style>

@@ -3,11 +3,17 @@
     <!-- 顶部工具栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <i class="fas fa-calendar-alt"></i> {{ t('calendar.title') }}
+        <div class="page-title-block">
+          <div class="page-eyebrow">Productivity</div>
+          <div class="breadcrumb">
+            <i class="fas fa-calendar-alt"></i>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('calendar.title') }}</span>
+          </div>
         </div>
         <!-- 视图切换 -->
-        <el-radio-group v-model="calendarView" size="small" style="margin-left: 16px;">
+        <el-radio-group v-model="calendarView" size="small" class="view-switcher">
           <el-radio-button value="month">{{ t('calendar.monthView') }}</el-radio-button>
           <el-radio-button value="week">{{ t('calendar.weekView') }}</el-radio-button>
           <el-radio-button value="day">{{ t('calendar.dayView') }}</el-radio-button>
@@ -15,7 +21,7 @@
         </el-radio-group>
       </div>
       <div class="header-actions">
-        <el-select v-model="selectedCategory" :placeholder="t('calendar.filterCategory')" clearable size="small" style="width: 150px; margin-right: 8px;">
+        <el-select v-model="selectedCategory" :placeholder="t('calendar.filterCategory')" clearable size="small" class="category-filter">
           <el-option :label="t('calendar.all')" value="" />
           <el-option
             v-for="category in categories"
@@ -24,41 +30,45 @@
             :value="category"
           />
         </el-select>
-        <el-button 
-          :icon="Bell" 
+        <el-button
+          :icon="Bell"
           circle
           size="small"
           @click="testReminders"
           :title="t('calendar.testReminder')"
-          style="margin-right: 4px;"
+          class="toolbar-btn"
         />
-        <el-button 
-          :icon="Upload" 
+        <el-button
+          :icon="Upload"
           circle
           size="small"
           @click="showImportDialog = true"
           :title="t('calendar.importEvents')"
+          class="toolbar-btn"
         />
-        <el-button 
-          :icon="Download" 
+        <el-button
+          :icon="Download"
           circle
           size="small"
           @click="handleExport"
           :title="t('calendar.exportEvents')"
+          class="toolbar-btn"
         />
-        <el-button 
-          :icon="Plus" 
+        <el-button
+          :icon="Plus"
           circle
           size="small"
           type="primary"
           @click="showCreateDialog"
           :title="t('calendar.newEvent')"
+          class="toolbar-btn"
         />
       </div>
     </div>
 
     <!-- 主内容区 -->
     <div class="content-container">
+      <div class="calendar-workspace">
     <div v-if="calendarView === 'month'" class="calendar-container">
       <el-config-provider :locale="locale">
         <el-calendar v-model="selectedDate">
@@ -189,6 +199,7 @@
       </div>
     </div>
 
+      </div>
     </div>
 
     <!-- 创建/编辑对话框 -->
@@ -206,7 +217,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        
+
         <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item :label="t('calendar.startLabel')" required>
@@ -1120,58 +1131,137 @@ onMounted(async () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-md) var(--space-xl);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 50px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 14px;
+  min-width: 0;
+  flex: 1;
+}
+
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page-eyebrow {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
 .breadcrumb {
-  font-size: var(--font-size-body);
-  color: var(--text-secondary);
-  font-weight: 400;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 8px;
 }
 
 .breadcrumb i {
   color: var(--accent-blue);
 }
 
+.breadcrumb-link {
+  color: var(--accent-blue);
+  cursor: pointer;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-sep {
+  color: var(--text-tertiary);
+}
+
+.view-switcher {
+  margin-left: 8px;
+}
+
+.category-filter {
+  width: 150px;
+}
+
 .header-actions {
   display: flex;
   gap: var(--space-sm);
   align-items: center;
+  flex-shrink: 0;
+}
+
+.toolbar-btn {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 251, 0.95));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .content-container {
   flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 14px 18px 18px;
+  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.calendar-workspace {
+  flex: 1;
   overflow-y: auto;
-  padding: var(--space-xl);
-  background: var(--bg-secondary);
+  min-height: 0;
+  padding: 20px;
+}
+
+.calendar-workspace::-webkit-scrollbar {
+  width: 6px;
+}
+
+.calendar-workspace::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.calendar-workspace::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.24);
+  border-radius: 999px;
+}
+
+.calendar-workspace::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.36);
 }
 
 /* ===== 月视图 - el-calendar 覆写 ===== */
 .calendar-container {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-card);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .calendar-container :deep(.el-calendar) {
@@ -1417,10 +1507,11 @@ onMounted(async () => {
 
 /* ===== 周视图 ===== */
 .week-view {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-card);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .week-header {
@@ -1528,10 +1619,11 @@ onMounted(async () => {
 
 /* ===== 日视图 ===== */
 .day-view {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-card);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .day-header h3 {
@@ -1603,10 +1695,11 @@ onMounted(async () => {
 
 /* ===== 列表视图 ===== */
 .list-view {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-card);
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .list-toolbar {

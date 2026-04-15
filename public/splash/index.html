@@ -1,311 +1,290 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" style="background:#eaf1fb;">
 <head>
+  <meta name="theme-color" content="#eaf1fb">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loading...</title>
+  <title>ToolHub Loading</title>
   <style>
+    :root {
+      color-scheme: light;
+      --bg-start: #eef4ff;
+      --bg-end: #e7eef8;
+      --card-bg: rgba(255, 255, 255, 0.72);
+      --card-border: rgba(148, 163, 184, 0.16);
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-tertiary: #94a3b8;
+      --accent: #4f7cff;
+      --accent-soft: rgba(79, 124, 255, 0.14);
+      --skeleton-base: rgba(148, 163, 184, 0.16);
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+    }
+
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
-    }
-
-    body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
       margin: 0;
       padding: 0;
     }
 
-    /* 背景动画粒子 */
-    .particles {
-      position: absolute;
+    html, body {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      z-index: 1;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
     }
 
-    .particle {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.15);
-      animation: float 10s infinite;
-      clip-path: polygon(
-        50% 0%,
-        61% 35%,
-        98% 35%,
-        68% 57%,
-        79% 91%,
-        50% 70%,
-        21% 91%,
-        32% 57%,
-        2% 35%,
-        39% 35%
-      );
-    }
-
-    .particle:nth-child(2n) {
-      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
-    }
-
-    .particle:nth-child(3n) {
-      clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
-    }
-
-    .particle:nth-child(4n) {
-      clip-path: polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%);
-    }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0) translateX(0) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(-100vh) translateX(50px) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    /* 主容器 */
-    .splash-container {
+    body {
       position: relative;
-      z-index: 2;
-      text-align: center;
-      animation: fadeIn 0.6s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    /* Logo 区域 */
-    .logo {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 30px;
-      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: pulse 2s ease-in-out infinite;
+      background:
+        radial-gradient(circle at top left, rgba(79, 124, 255, 0.16), transparent 42%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.12), transparent 40%),
+        linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 100%);
+      color: var(--text-primary);
     }
 
-    @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
-      }
-      50% {
-        transform: scale(1.1);
-        filter: drop-shadow(0 0 40px rgba(255, 255, 255, 0.8));
-      }
-    }
-
-    .logo-icon {
-      font-size: 64px;
-      color: white;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    /* 应用名称 */
-    .app-name {
-      font-size: 32px;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 10px;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      letter-spacing: 1px;
-    }
-
-    /* 版本信息 */
-    .version {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.8);
-      margin-bottom: 40px;
-    }
-
-    /* 加载动画 */
-    .loader-container {
-      margin: 40px auto;
-    }
-
-    .spinner {
-      width: 50px;
-      height: 50px;
-      margin: 0 auto 20px;
-      border: 4px solid rgba(255, 255, 255, 0.2);
-      border-top: 4px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* 进度条 */
-    .progress-bar {
-      width: 300px;
-      height: 4px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 2px;
-      overflow: hidden;
-      margin: 0 auto 20px;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.8));
-      border-radius: 2px;
-      width: 0%;
-      animation: progress 2.5s ease-in-out infinite;
-    }
-
-    @keyframes progress {
-      0% { width: 0%; }
-      50% { width: 70%; }
-      100% { width: 100%; }
-    }
-
-    /* 加载文本 */
-    .loading-text {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.9);
-      margin-bottom: 5px;
-    }
-
-    .loading-status {
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.7);
-      min-height: 18px;
-      animation: fadeInOut 1.5s ease-in-out infinite;
-    }
-
-    @keyframes fadeInOut {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
-    }
-
-    /* 版权信息 */
-    .copyright {
+    body::before,
+    body::after {
+      content: "";
       position: absolute;
-      bottom: 30px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0.8;
     }
+
+    body::before {
+      width: 240px;
+      height: 240px;
+      top: -60px;
+      left: -30px;
+      background: rgba(79, 124, 255, 0.12);
+    }
+
+    body::after {
+      width: 220px;
+      height: 220px;
+      right: -40px;
+      bottom: -70px;
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    main {
+      display: block;
+    }
+
+    .splash-shell {
+      position: relative;
+      width: min(420px, calc(100vw - 48px));
+      padding: 28px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: var(--shadow);
+      opacity: 1;
+      transform: none;
+    }
+
+    @supports (backdrop-filter: blur(22px)) {
+      .splash-shell {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        backdrop-filter: blur(22px);
+      }
+    }
+
+    @supports not (backdrop-filter: blur(22px)) {
+      .splash-shell {
+        background: rgba(255, 255, 255, 0.94);
+      }
+    }
+
+    .brand-row,
+    .status-card,
+    .footnote {
+      opacity: 1;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .brand-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #5b8cff 0%, #60a5fa 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 14px 28px rgba(79, 124, 255, 0.22);
+      flex-shrink: 0;
+    }
+
+    .brand-logo::before {
+      content: "";
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow:
+        10px 0 0 -7px rgba(255, 255, 255, 0.92),
+        -10px 0 0 -7px rgba(255, 255, 255, 0.92);
+    }
+
+    .brand-copy {
+      min-width: 0;
+    }
+
+    .brand-title {
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+    }
+
+    .brand-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .status-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(255, 255, 255, 0.52);
+    }
+
+    .status-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .status-title::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px var(--accent-soft);
+      flex-shrink: 0;
+    }
+
+    .status-text {
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      transition: opacity 160ms ease;
+    }
+
+    .skeleton-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .skeleton-row {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--skeleton-base);
+    }
+
+    .skeleton-row::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 30%,
+        rgba(255, 255, 255, 0.18) 50%,
+        rgba(255, 255, 255, 0.1) 70%,
+        transparent 100%
+      );
+    }
+
+    .skeleton-row.wide { width: 100%; }
+    .skeleton-row.mid { width: 76%; }
+    .skeleton-row.short { width: 54%; }
+
+    .footnote {
+      margin-top: 16px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+
   </style>
 </head>
-<body>
-  <!-- 背景粒子 -->
-  <div class="particles" id="particles"></div>
-
-  <!-- 主容器 -->
-  <div class="splash-container">
-    <!-- Logo -->
-    <div class="logo">
-      <div class="logo-icon">🚀</div>
-    </div>
-
-    <!-- 应用名称 -->
-    <h1 class="app-name">Vue3 Tauri Desktop</h1>
-    <div class="version">v0.1.0</div>
-
-    <!-- 加载动画 -->
-    <div class="loader-container">
-      <div class="spinner"></div>
-      <div class="progress-bar">
-        <div class="progress-fill"></div>
+<body style="background:#eaf1fb;">
+  <main class="splash-shell">
+    <section class="brand-row">
+      <div class="brand-logo" aria-hidden="true"></div>
+      <div class="brand-copy">
+        <h1 class="brand-title">ToolHub</h1>
+        <p class="brand-subtitle">启动中，正在准备你的工作台与常用工具。</p>
       </div>
-      <div class="loading-text">正在启动应用...</div>
-      <div class="loading-status" id="status">初始化中</div>
-    </div>
-  </div>
+    </section>
 
-  <!-- 版权信息 -->
-  <div class="copyright">
-    © 2025 Vue3 Tauri Template. All rights reserved.
-  </div>
+    <section class="status-card">
+      <div class="status-title">正在启动应用</div>
+      <div class="status-text" id="status">初始化中</div>
+      <div class="skeleton-stack" aria-hidden="true">
+        <div class="skeleton-row wide"></div>
+        <div class="skeleton-row mid"></div>
+        <div class="skeleton-row short"></div>
+      </div>
+    </section>
+
+    <div class="footnote">Loading workspace resources</div>
+  </main>
 
   <script>
-    // 创建背景粒子
-    function createParticles() {
-      const container = document.getElementById('particles');
-      const particleCount = 15;
+    const statuses = ['初始化中', '加载配置', '准备资源', '启动服务', '即将完成']
+    let currentStatus = 0
 
-      for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-
-        const size = Math.random() * 60 + 20;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.bottom = '-' + size + 'px';
-        particle.style.animationDelay = Math.random() * 10 + 's';
-        particle.style.animationDuration = (Math.random() * 5 + 8) + 's';
-
-        container.appendChild(particle);
-      }
-    }
-
-    // 更新加载状态
-    const statuses = [
-      '初始化中',
-      '加载配置',
-      '准备资源',
-      '启动服务',
-      '即将完成'
-    ];
-
-    let currentStatus = 0;
     function updateStatus() {
-      const statusEl = document.getElementById('status');
-      if (currentStatus < statuses.length) {
-        statusEl.textContent = statuses[currentStatus];
-        currentStatus++;
-        setTimeout(updateStatus, 500);
+      const statusEl = document.getElementById('status')
+      if (statusEl && currentStatus < statuses.length) {
+        statusEl.textContent = statuses[currentStatus]
+        currentStatus += 1
+        setTimeout(updateStatus, 520)
       }
     }
 
-    // 初始化
-    window.addEventListener('DOMContentLoaded', () => {
-      createParticles();
-      setTimeout(updateStatus, 300);
-    });
+    function startSplashContent() {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setTimeout(updateStatus, 120)
+        })
+      })
+    }
 
-    // 监听来自主窗口的关闭信号
+    window.addEventListener('DOMContentLoaded', startSplashContent)
+    window.addEventListener('splash-page-ready', startSplashContent)
+
     window.addEventListener('message', (event) => {
       if (event.data === 'close-splash') {
-        document.body.style.opacity = '0';
-        document.body.style.transition = 'opacity 0.3s';
+        document.body.style.opacity = '0'
+        document.body.style.transition = 'opacity 0.22s ease'
       }
-    });
+    })
   </script>
 </body>
 </html>

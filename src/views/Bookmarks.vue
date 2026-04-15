@@ -3,11 +3,17 @@
     <!-- 顶部导航 -->
     <header class="header">
       <div class="header-left">
-        <!-- 折叠/展开侧边栏按钮 -->
-        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('common.showSidebar') : t('common.hideSidebar')">
+        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('common.showSidebar') : t('common.hideSidebar')" class="sidebar-toggle-btn">
           <el-icon><ArrowLeft v-if="!hideSidebar" /><ArrowRight v-else /></el-icon>
         </el-button>
-        <div class="breadcrumb">{{ t('bookmarks.title') }} / {{ currentCategoryName }}</div>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Knowledge Vault</div>
+          <div class="breadcrumb">
+            <span>{{ t('bookmarks.title') }}</span>
+            <span class="breadcrumb-divider">/</span>
+            <span>{{ currentCategoryName }}</span>
+          </div>
+        </div>
       </div>
       <div class="header-actions">
         <!-- 搜索框 -->
@@ -36,7 +42,7 @@
       </div>
     </header>
 
-    <div class="main-container">
+    <div class="main-container" :class="{ 'sidebar-hidden': hideSidebar }">
       <!-- 左侧分类栏 -->
       <aside class="sidebar-left" v-show="!hideSidebar">
         <div class="sidebar-toolbar">
@@ -1251,7 +1257,7 @@ onUnmounted(() => {
   flex-direction: column;
   overflow: hidden;
   color: var(--text-primary);
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
   height: 100%;
   width: 100%;
   position: relative;
@@ -1259,28 +1265,63 @@ onUnmounted(() => {
 
 /* 顶部导航 */
 .header {
-  height: 48px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  min-height: 58px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-lg);
+  gap: 16px;
+  padding: 0 18px;
   flex-shrink: 0;
   z-index: 2;
   position: relative;
+  backdrop-filter: blur(18px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar-toggle-btn {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(242, 246, 251, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page-eyebrow {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
 .breadcrumb {
-  font-size: var(--font-size-body);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-regular);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.breadcrumb-divider {
+  color: var(--text-quaternary);
+  font-weight: 400;
 }
 
 .header-actions {
@@ -1289,21 +1330,28 @@ onUnmounted(() => {
   gap: var(--space-sm);
 }
 
-/* 主布局 */
 .main-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  padding: 5px 5px 0;
+  gap: 0;
+}
+
+.main-container.sidebar-hidden {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* 左侧分类栏 */
 .sidebar-left {
-  width: 220px;
-  min-width: 220px;
+  min-width: 0;
   flex-shrink: 0;
-  background-color: var(--bg-primary);
-  border-right: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -1311,65 +1359,70 @@ onUnmounted(() => {
   height: 100%;
   position: relative;
   z-index: 1;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .sidebar-toolbar {
-  padding: var(--space-sm) var(--space-lg);
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .sidebar-title {
-  font-size: var(--font-size-caption);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-quaternary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
 }
 
 .sidebar-btn {
   cursor: pointer;
   color: var(--text-tertiary);
   font-size: var(--font-size-body);
-  transition: color var(--transition-fast);
-  padding: 2px;
-  border-radius: var(--radius-xs);
+  transition: color var(--transition-fast), background var(--transition-fast);
+  padding: 4px 6px;
+  border-radius: 8px;
 }
 
 .sidebar-btn:hover {
   color: var(--accent-blue);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .category-list {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: var(--space-xs) var(--space-sm);
+  padding: 8px;
 }
 
 .category-item {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
-  margin: 1px 0;
-  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  margin: 0 0 4px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
   font-size: var(--font-size-body);
   color: var(--text-primary);
+  border: 1px solid transparent;
 }
 
 .category-item:hover {
-  background-color: var(--bg-tertiary);
+  background-color: rgba(255, 255, 255, 0.58);
 }
 
 .category-item.active {
-  background-color: var(--accent-blue-bg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
   color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
+  border-color: rgba(10, 132, 255, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(15, 23, 42, 0.05);
 }
 
 .category-icon {
@@ -1430,29 +1483,69 @@ onUnmounted(() => {
 /* 内容区域 */
 .content-area {
   flex: 1;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
   min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0 18px 18px 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.main-container.sidebar-hidden .content-area {
+  border-radius: 18px;
 }
 
 /* 书签列表 */
 .bookmark-list {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 16px;
-  background: var(--bg-secondary);
+  padding: 16px 20px 22px;
+  background: transparent;
+}
+
+.bookmark-list :deep(.el-empty) {
+  min-height: 320px;
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
 }
 
 .bookmark-cards {
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color-strong);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.bookmark-cards::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.88), rgba(255,255,255,0.24));
+}
+
+.bookmark-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bookmark-list::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.24);
+  border-radius: 999px;
+}
+
+.bookmark-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.36);
+}
+
+.bookmark-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* Chrome 风格紧凑行 */
@@ -1460,18 +1553,18 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 16px;
+  padding: 8px 16px;
   transition: background 0.12s;
   cursor: default;
-  min-height: 36px;
+  min-height: 40px;
 }
 
 .bookmark-row:not(:last-child) {
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .bookmark-row:hover {
-  background: var(--accent-blue-bg);
+  background: rgba(239, 246, 255, 0.72);
 }
 
 .row-left {

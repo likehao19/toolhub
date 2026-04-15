@@ -3,11 +3,14 @@
     <!-- 顶栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Brush /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('codeFormatter.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Brush /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('codeFormatter.title') }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -27,10 +30,10 @@
       </div>
 
       <div class="toolbar-group">
-        <el-button size="small" type="primary" @click="doFormat" :loading="formatting" :disabled="!canFormat">
+        <el-button size="small" type="primary" class="toolbar-primary-btn" @click="doFormat" :loading="formatting" :disabled="!canFormat">
           {{ t('codeFormatter.format') }}
         </el-button>
-        <el-button size="small" @click="doMinify" :disabled="!canMinify">
+        <el-button size="small" class="toolbar-secondary-btn" @click="doMinify" :disabled="!canMinify">
           {{ t('codeFormatter.minify') }}
         </el-button>
       </div>
@@ -38,10 +41,10 @@
       <div class="toolbar-spacer"></div>
 
       <div class="toolbar-group">
-        <el-button size="small" text @click="doCopy" :disabled="!code.trim()">
+        <el-button size="small" text class="toolbar-icon-btn" @click="doCopy" :disabled="!code.trim()">
           <el-icon><CopyDocument /></el-icon>
         </el-button>
-        <el-button size="small" text @click="doClear" :disabled="!code.trim()">
+        <el-button size="small" text class="toolbar-icon-btn" @click="doClear" :disabled="!code.trim()">
           <el-icon><Delete /></el-icon>
         </el-button>
       </div>
@@ -273,100 +276,177 @@ function doClear() {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
-/* ---- 顶栏 ---- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-lg);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 46px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
-.header-left { display: flex; align-items: center; }
+
+.header-left { display: flex; align-items: center; min-width: 0; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
 .breadcrumb {
-  display: flex; align-items: center; gap: 8px;
-  font-size: var(--font-size-body); font-weight: var(--font-weight-semibold); color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 16px; color: var(--text-secondary); }
+
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); transition: opacity 0.15s; }
 .breadcrumb-link:hover { text-decoration: underline; opacity: 0.85; }
 .breadcrumb-sep { color: var(--text-quaternary); margin: 0 2px; }
 
-/* ---- 工具栏 ---- */
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  margin: 14px 18px 0;
+  padding: 10px 12px;
+  flex-wrap: wrap;
+  min-height: 52px;
+  box-sizing: border-box;
+  background: rgba(255,255,255,0.58);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 22px rgba(15,23,42,0.03);
 }
 
 .toolbar-group {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
+.toolbar-group :deep(.el-button),
+.toolbar-group :deep(.el-select) { --el-border-radius-base: 10px; }
+.toolbar-group :deep(.el-select__wrapper) {
+  background: rgba(248,250,252,0.92);
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+.toolbar-group :deep(.el-select__wrapper.is-focused) {
+  box-shadow: inset 0 0 0 1px rgba(64, 158, 255, 0.7);
+}
+.toolbar-primary-btn :deep(span),
+.toolbar-secondary-btn :deep(span) {
+  font-weight: 600;
+}
+.toolbar-secondary-btn:not(.is-disabled) {
+  background: rgba(248,250,252,0.9);
+  border-color: rgba(15, 23, 42, 0.08);
+  color: var(--text-primary);
+}
+.toolbar-icon-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 10px;
+  color: var(--text-secondary);
+  background: rgba(248,250,252,0.9);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+.toolbar-icon-btn:hover:not(.is-disabled) {
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.96);
+  border-color: rgba(15, 23, 42, 0.1);
+}
 .toolbar-spacer { flex: 1; }
-
 .lang-select { width: 136px; }
 .tab-select { width: 104px; }
 
-/* ---- 编辑器 ---- */
 .editor-area {
   flex: 1;
   overflow: hidden;
-  background: var(--bg-primary);
+  margin: 14px 18px 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: none;
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
 }
 
 .editor-area :deep(.cm-editor) {
   height: 100%;
   outline: none !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.36), rgba(248,250,252,0.18));
+  border-radius: 18px 18px 0 0;
 }
 
-.editor-area :deep(.cm-editor.cm-focused) {
-  outline: none !important;
-}
-
+.editor-area :deep(.cm-editor.cm-focused) { outline: none !important; }
 .editor-area :deep(.cm-scroller) {
   scrollbar-width: thin;
   scrollbar-color: var(--text-quaternary) transparent;
 }
-
 .editor-area :deep(.cm-scroller::-webkit-scrollbar) { width: 7px; height: 7px; }
 .editor-area :deep(.cm-scroller::-webkit-scrollbar-track) { background: transparent; }
 .editor-area :deep(.cm-scroller::-webkit-scrollbar-thumb) {
-  background: var(--text-quaternary); border-radius: 4px;
+  background: var(--text-quaternary);
+  border-radius: 4px;
 }
-.editor-area :deep(.cm-scroller::-webkit-scrollbar-thumb:hover) {
-  background: var(--text-tertiary);
-}
+.editor-area :deep(.cm-scroller::-webkit-scrollbar-thumb:hover) { background: var(--text-tertiary); }
+.editor-area :deep(.cm-gutters) { padding-left: 4px; }
 
-.editor-area :deep(.cm-gutters) {
-  padding-left: 4px;
-}
-
-/* ---- 底栏 ---- */
 .status-bar {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: 0 18px 18px;
   padding: 0 16px;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(247,249,252,0.9));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: none;
+  border-radius: 0 0 18px 18px;
   font-size: 11.5px;
   color: var(--text-tertiary);
-  height: 28px;
+  height: 32px;
   box-sizing: border-box;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
 }
-.status-lang { font-weight: 600; color: var(--text-secondary); }
+
+.status-lang {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  background: rgba(248,250,252,0.94);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
 .status-sep { color: var(--border-color); }
+.status-msg {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  background: rgba(248,250,252,0.9);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
 .status-msg.ok { color: #67c23a; }
 .status-msg.err { color: #f56c6c; }
 .status-spacer { flex: 1; }

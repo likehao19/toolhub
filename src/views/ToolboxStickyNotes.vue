@@ -3,11 +3,14 @@
     <!-- 顶部工具栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Briefcase /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">工具箱</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>便签管理</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Desktop Assets</div>
+          <div class="breadcrumb">
+            <el-icon><Briefcase /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">工具箱</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>便签管理</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -488,87 +491,67 @@ const openStickyNotes = async () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #f7f9fb;
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e4e7ed;
-  height: 50px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+.header-left { display: flex; align-items: center; min-width: 0; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
-
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 15px;
   font-weight: 600;
-  color: #303133;
+  color: var(--text-primary);
 }
-
-.breadcrumb .el-icon {
-  font-size: 18px;
-  color: #ff9800;
-}
-
-.breadcrumb-link {
-  cursor: pointer;
-  color: #909399;
-  transition: color 0.2s;
-}
-
-.breadcrumb-link:hover {
-  color: #409eff;
-}
-
-.breadcrumb-sep {
-  color: #c0c4cc;
-  font-weight: 400;
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-}
+.breadcrumb .el-icon { font-size: 15px; color: #ff9800; }
+.breadcrumb-link { cursor: pointer; color: var(--accent-blue); transition: color 0.2s; }
+.breadcrumb-link:hover { color: var(--accent-blue); text-decoration: underline; }
+.breadcrumb-sep { color: #c0c4cc; font-weight: 400; }
+.header-actions { display: flex; gap: 8px; }
+.header-actions :deep(.el-button) { --el-button-border-radius: 10px; }
 
 .content-area {
   flex: 1;
   overflow-y: auto;
-  padding: 20px;
+  padding: 14px 18px 0;
   scrollbar-gutter: stable;
 }
-
-.content-area::-webkit-scrollbar {
-  width: 6px;
-}
-.content-area::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-.content-area::-webkit-scrollbar-thumb {
-  background: #dcdfe6;
-  border-radius: 3px;
-}
-.content-area::-webkit-scrollbar-thumb:hover {
-  background: #c0c4cc;
-}
+.content-area::-webkit-scrollbar { width: 6px; }
+.content-area::-webkit-scrollbar-track { background: transparent; border-radius: 3px; }
+.content-area::-webkit-scrollbar-thumb { background: #dcdfe6; border-radius: 3px; }
+.content-area::-webkit-scrollbar-thumb:hover { background: #c0c4cc; }
 
 .settings-section {
-  margin-bottom: 24px;
-  max-width: 680px;
+  margin-bottom: 18px;
+  max-width: 760px;
+  padding: 16px 18px 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
 }
-
 .section-header {
   display: flex;
   align-items: center;
@@ -576,20 +559,14 @@ const openStickyNotes = async () => {
   font-size: 13px;
   font-weight: 600;
   color: #606266;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
 }
-
-.section-icon {
-  font-size: 15px;
-  color: #909399;
-}
-
+.section-icon { font-size: 15px; color: #909399; }
 .settings-group {
-  background: #fff;
-  border-radius: 8px;
-  border: 1px solid #ebeef5;
+  background: rgba(255,255,255,0.82);
+  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
-
 .setting-row {
   display: flex;
   align-items: center;
@@ -597,15 +574,8 @@ const openStickyNotes = async () => {
   padding: 14px 16px;
   transition: background 0.15s;
 }
-
-.setting-row:not(:last-child) {
-  border-bottom: 1px solid #f2f3f5;
-}
-
-.setting-row:hover {
-  background: #fafbfc;
-}
-
+.setting-row:not(:last-child) { border-bottom: 1px solid rgba(15, 23, 42, 0.05); }
+.setting-row:hover { background: rgba(248,250,252,0.8); }
 .setting-label {
   display: flex;
   flex-direction: column;
@@ -613,31 +583,10 @@ const openStickyNotes = async () => {
   flex: 1;
   min-width: 0;
 }
-
-.label-text {
-  font-size: 13px;
-  color: #303133;
-  font-weight: 500;
-}
-
-.label-desc {
-  font-size: 12px;
-  color: #a8abb2;
-  line-height: 1.4;
-}
-
-.setting-control {
-  flex-shrink: 0;
-  margin-left: 24px;
-}
-
-/* 快捷键 */
-.shortcut-control {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
+.label-text { font-size: 13px; color: #303133; font-weight: 500; }
+.label-desc { font-size: 12px; color: #a8abb2; line-height: 1.4; }
+.setting-control { flex-shrink: 0; margin-left: 24px; }
+.shortcut-control { display: flex; align-items: center; gap: 6px; }
 .shortcut-input {
   min-width: 140px;
   height: 32px;
@@ -646,23 +595,15 @@ const openStickyNotes = async () => {
   justify-content: center;
   gap: 4px;
   border: 1px solid #dcdfe6;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0 12px;
   cursor: pointer;
   background: #fff;
   transition: border-color 0.2s, box-shadow 0.2s;
   user-select: none;
 }
-
-.shortcut-input:hover {
-  border-color: #c0c4cc;
-}
-
-.shortcut-input.recording {
-  border-color: #409eff;
-  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15);
-}
-
+.shortcut-input:hover { border-color: #c0c4cc; }
+.shortcut-input.recording { border-color: #409eff; box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15); }
 .keycap {
   display: inline-flex;
   align-items: center;
@@ -681,64 +622,14 @@ const openStickyNotes = async () => {
   line-height: 1;
   white-space: nowrap;
 }
-
-.keycap.active {
-  color: #409eff;
-  border-color: #a0cfff;
-  background: linear-gradient(180deg, #ecf5ff 0%, #d9ecff 100%);
-}
-
-.keycap-sep {
-  font-size: 11px;
-  color: #c0c4cc;
-  margin: 0 1px;
-}
-
-.shortcut-clear {
-  font-size: 16px;
-  color: #c0c4cc;
-  cursor: pointer;
-  line-height: 1;
-  transition: color 0.2s;
-}
-
-.shortcut-clear:hover {
-  color: #f56c6c;
-}
-
-.shortcut-placeholder {
-  font-size: 12px;
-  color: #c0c4cc;
-}
-
-.recording-hint {
-  font-size: 12px;
-  color: #909399;
-  animation: blink 1s ease-in-out infinite;
-}
-
-.recording-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #409eff;
-  animation: blink 0.8s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-/* 文件夹下拉选项 */
-.folder-option {
-  display: inline-flex;
-  align-items: center;
-  font-size: 13px;
-}
-
-.folder-indent {
-  color: #c0c4cc;
-  margin-right: 2px;
-}
+.keycap.active { color: #409eff; border-color: #a0cfff; background: linear-gradient(180deg, #ecf5ff 0%, #d9ecff 100%); }
+.keycap-sep { font-size: 11px; color: #c0c4cc; margin: 0 1px; }
+.shortcut-clear { font-size: 16px; color: #c0c4cc; cursor: pointer; line-height: 1; transition: color 0.2s; }
+.shortcut-clear:hover { color: #f56c6c; }
+.shortcut-placeholder { font-size: 12px; color: #c0c4cc; }
+.recording-hint { font-size: 12px; color: #909399; animation: blink 1s ease-in-out infinite; }
+.recording-dot { width: 6px; height: 6px; border-radius: 50%; background: #409eff; animation: blink 0.8s ease-in-out infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.folder-option { display: inline-flex; align-items: center; font-size: 13px; }
+.folder-indent { color: #c0c4cc; margin-right: 2px; }
 </style>

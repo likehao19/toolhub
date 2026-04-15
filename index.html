@@ -21,7 +21,35 @@
     <meta http-equiv="X-Frame-Options" content="ALLOWALL" />
     
     <title>Tauri + Vue 3 App</title>
-    
+    <style>
+      :root {
+        color-scheme: light dark;
+        background: linear-gradient(180deg, #f6f8fb 0%, #f1f5f9 100%);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          background: linear-gradient(180deg, #101114 0%, #17191d 100%);
+        }
+      }
+      html, body, #app {
+        margin: 0;
+        min-height: 100%;
+        background: inherit;
+      }
+      body {
+        overflow: hidden;
+      }
+    </style>
+
+    <script>
+      (function() {
+        try {
+          const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        } catch (_) {}
+      })();
+    </script>
+
     <script>
       // 全局错误过滤器 - 必须在所有脚本加载前设置
       (function() {

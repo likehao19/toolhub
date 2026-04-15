@@ -109,15 +109,14 @@ pub async fn handle_close_action(app: AppHandle, action: String) -> Result<(), S
 /// * `Err(String)` - 失败时返回错误信息
 #[tauri::command]
 pub async fn close_splashscreen(window: Window) -> Result<(), String> {
-    // 关闭启动窗口
-    if let Some(splashscreen) = window.get_webview_window(window::SPLASH_WINDOW_LABEL) {
-        splashscreen.close().map_err(|e| e.to_string())?;
-    }
-
-    // 显示并聚焦主窗口
     if let Some(main) = window.get_webview_window(window::MAIN_WINDOW_LABEL) {
         main.show().map_err(|e| e.to_string())?;
-        main.set_focus().map_err(|e| e.to_string())?;
+        let _ = main.set_focus();
+        std::thread::sleep(std::time::Duration::from_millis(120));
+    }
+
+    if let Some(splashscreen) = window.get_webview_window(window::SPLASH_WINDOW_LABEL) {
+        splashscreen.close().map_err(|e| e.to_string())?;
     }
 
     Ok(())

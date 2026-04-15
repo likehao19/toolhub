@@ -1,31 +1,39 @@
 <template>
   <div class="settings-page-wrapper">
-    <!-- 顶部导航 -->
     <header class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon style="margin-right: 8px;"><Setting /></el-icon>
-          {{ t('settings.title') }} / {{ currentMenuName }}
+        <div class="page-title-block">
+          <div class="page-eyebrow">System Settings</div>
+          <div class="breadcrumb">
+            <el-icon><Setting /></el-icon>
+            <span>{{ t('settings.title') }}</span>
+            <span class="breadcrumb-divider">/</span>
+            <span>{{ currentMenuName }}</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
         <span class="save-status" :class="saveStatusClass">{{ saveStatusText }}</span>
-        <!-- 操作按钮组 -->
-        <el-button size="small" @click="handleSave" :loading="saving" :disabled="!manualHasChanges" :type="manualHasChanges ? 'primary' : 'default'" circle :title="t('settings.save')">
-          <el-icon><Check /></el-icon>
-        </el-button>
-        <el-button size="small" @click="handleReset" circle :title="t('settings.reset')">
+        <el-button size="small" @click="handleReset" circle :title="t('settings.reset')" class="toolbar-btn">
           <el-icon><Refresh /></el-icon>
+        </el-button>
+        <el-button size="small" @click="handleSave" :loading="saving" :disabled="!manualHasChanges" :type="manualHasChanges ? 'primary' : 'default'" circle :title="t('settings.save')" class="toolbar-btn primary-when-active">
+          <el-icon><Check /></el-icon>
         </el-button>
       </div>
     </header>
 
     <div class="main-container">
-      <!-- 左侧菜单栏 -->
       <aside class="sidebar-left">
         <div class="sidebar-toolbar">
-          <span class="sidebar-title">{{ t('settings.title') }}</span>
+          <div class="sidebar-toolbar-main">
+            <span class="sidebar-title">{{ t('settings.title') }}</span>
+            <span class="sidebar-subtitle">Preference panes</span>
+          </div>
+          <span class="sidebar-caption">macOS style</span>
         </div>
+
+        <div class="sidebar-section-label">Navigation</div>
 
         <div class="menu-list">
           <div
@@ -35,19 +43,24 @@
             :class="{ active: activeTab === menu.key }"
             @click="activeTab = menu.key"
           >
-            <el-icon class="menu-icon">
-              <component :is="menu.icon" />
-            </el-icon>
-            <span class="menu-name">{{ menu.label }}</span>
+            <span class="menu-active-indicator" />
+            <span class="menu-icon-shell">
+              <el-icon class="menu-icon">
+                <component :is="menu.icon" />
+              </el-icon>
+            </span>
+            <span class="menu-copy">
+              <span class="menu-name">{{ menu.label }}</span>
+              <span class="menu-desc">{{ menu.description }}</span>
+            </span>
+            <span class="menu-chevron">›</span>
           </div>
         </div>
       </aside>
 
-      <!-- 右侧内容区域 -->
       <main class="content-area">
-        <!-- 通用设置 -->
         <div v-show="activeTab === 'general'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.general') }}</h3>
+          <h3 class="group-title">{{ t('settings.general') }}</h3>
 
           <!-- 窗口与启动 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
@@ -98,7 +111,7 @@
                   :step="1"
                   show-stops
                   style="width: 300px"
-                  @change="applyFontSize"
+                  @change="handleFontSizeChange"
                 />
                 <span style="margin-left: 10px">{{ settings.fontSize }}px</span>
               </el-form-item>
@@ -242,9 +255,8 @@
           </el-card>
         </div>
 
-        <!-- 工作空间 -->
         <div v-show="activeTab === 'workspace'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.workspace') }}</h3>
+          <h3 class="group-title">{{ t('settings.workspace') }}</h3>
 
           <!-- 笔记设置 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
@@ -253,11 +265,11 @@
             </template>
             <el-form :model="settings" label-width="140px" label-position="left">
               <el-form-item :label="t('settings.storagePath')">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  <el-input v-model="settings.notesStoragePath" readonly style="flex: 1;" />
+                <div class="inline-control-row">
+                  <el-input v-model="settings.notesStoragePath" readonly class="fill-control" />
                   <el-button @click="selectNotesStoragePath">{{ t('settings.changeBtn') }}</el-button>
                 </div>
-                <div style="margin-top: 8px; font-size: 12px; color: #909399;">
+                <div class="form-hint-block">
                   {{ t('settings.storagePathHint') }}
                 </div>
               </el-form-item>
@@ -289,7 +301,7 @@
             <el-form :model="settings" label-width="140px" label-position="left">
               <el-divider content-position="left">{{ t('settings.previewMode') }}</el-divider>
               <el-form-item :label="t('settings.previewTheme')">
-                <el-select v-model="settings.previewTheme" style="width: 300px">
+                <el-select v-model="settings.previewTheme" style="width: 300px" @change="handleMarkdownThemeChange">
                   <el-option label="Default" value="default" />
                   <el-option label="GitHub" value="github" />
                   <el-option label="VuePress" value="vuepress" />
@@ -303,7 +315,7 @@
               </el-form-item>
 
               <el-form-item :label="t('settings.codeTheme')">
-                <el-select v-model="settings.previewCodeTheme" style="width: 300px">
+                <el-select v-model="settings.previewCodeTheme" style="width: 300px" @change="handleMarkdownThemeChange">
                   <el-option label="Atom" value="atom" />
                   <el-option label="A11y" value="a11y" />
                   <el-option label="GitHub" value="github" />
@@ -320,7 +332,7 @@
 
               <el-divider content-position="left">{{ t('settings.editMode') }}</el-divider>
               <el-form-item :label="t('settings.previewTheme')">
-                <el-select v-model="settings.editorPreviewTheme" style="width: 300px">
+                <el-select v-model="settings.editorPreviewTheme" style="width: 300px" @change="handleMarkdownThemeChange">
                   <el-option label="Default" value="default" />
                   <el-option label="GitHub" value="github" />
                   <el-option label="VuePress" value="vuepress" />
@@ -334,7 +346,7 @@
               </el-form-item>
 
               <el-form-item :label="t('settings.codeTheme')">
-                <el-select v-model="settings.editorCodeTheme" style="width: 300px">
+                <el-select v-model="settings.editorCodeTheme" style="width: 300px" @change="handleMarkdownThemeChange">
                   <el-option label="Atom" value="atom" />
                   <el-option label="A11y" value="a11y" />
                   <el-option label="GitHub" value="github" />
@@ -485,9 +497,8 @@
           </el-card>
         </div>
 
-        <!-- 安全与数据 -->
         <div v-show="activeTab === 'security'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.security') }}</h3>
+          <h3 class="group-title">{{ t('settings.security') }}</h3>
 
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
@@ -495,41 +506,45 @@
             </template>
             <el-form label-width="150px" label-position="left">
               <el-form-item :label="t('settings.sdkEnvScopeTitle')">
-                <el-radio-group v-model="systemPrivilege.envScope" @change="handleEnvScopeSettingChange" size="small">
-                  <el-radio value="system">{{ t('settings.sdkEnvScopeSystem') }}</el-radio>
-                  <el-radio value="user">{{ t('settings.sdkEnvScopeUser') }}</el-radio>
-                </el-radio-group>
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  {{ t('settings.sdkEnvScopeDesc') }}
+                <div class="stacked-control-group">
+                  <el-radio-group v-model="systemPrivilege.envScope" @change="handleEnvScopeSettingChange" size="small">
+                    <el-radio value="system">{{ t('settings.sdkEnvScopeSystem') }}</el-radio>
+                    <el-radio value="user">{{ t('settings.sdkEnvScopeUser') }}</el-radio>
+                  </el-radio-group>
+                  <div class="form-hint-block compact">
+                    {{ t('settings.sdkEnvScopeDesc') }}
+                  </div>
                 </div>
               </el-form-item>
 
               <el-form-item :label="t('settings.systemPrivilegeStatus')">
-                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                  <el-tag v-if="systemPrivilege.checking" type="info">{{ t('settings.systemPrivilegeChecking') }}</el-tag>
-                  <el-tag v-else-if="systemPrivilege.authorized" type="success">{{ t('settings.systemPrivilegeAuthorized') }}</el-tag>
-                  <el-tag v-else type="warning">{{ t('settings.systemPrivilegeUnauthorized') }}</el-tag>
-                  <el-button size="small" @click="loadSystemPrivilegeStatus" :loading="systemPrivilege.checking">
-                    {{ t('settings.systemPrivilegeRefresh') }}
-                  </el-button>
-                  <el-button
-                    v-if="systemPrivilege.envScope === 'system' && !systemPrivilege.authorized"
-                    size="small"
-                    type="primary"
-                    @click="handleSystemPrivilegeAuthorize"
-                    :loading="systemPrivilege.authorizing"
-                  >
-                    {{ t('settings.systemPrivilegeAuthorize') }}
-                  </el-button>
-                </div>
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  {{ t('settings.systemPrivilegeHint') }}
-                </div>
-                <div v-if="systemPrivilege.envScope === 'system'" style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  {{ t('settings.systemPrivilegeScopeHint') }}
-                </div>
-                <div v-else style="font-size: 12px; color: #909399; margin-top: 4px;">
-                  {{ t('settings.sdkEnvScopeUserHint') }}
+                <div class="stacked-control-group">
+                  <div class="inline-control-row wrap">
+                    <el-tag v-if="systemPrivilege.checking" type="info">{{ t('settings.systemPrivilegeChecking') }}</el-tag>
+                    <el-tag v-else-if="systemPrivilege.authorized" type="success">{{ t('settings.systemPrivilegeAuthorized') }}</el-tag>
+                    <el-tag v-else type="warning">{{ t('settings.systemPrivilegeUnauthorized') }}</el-tag>
+                    <el-button size="small" @click="loadSystemPrivilegeStatus" :loading="systemPrivilege.checking">
+                      {{ t('settings.systemPrivilegeRefresh') }}
+                    </el-button>
+                    <el-button
+                      v-if="systemPrivilege.envScope === 'system' && !systemPrivilege.authorized"
+                      size="small"
+                      type="primary"
+                      @click="handleSystemPrivilegeAuthorize"
+                      :loading="systemPrivilege.authorizing"
+                    >
+                      {{ t('settings.systemPrivilegeAuthorize') }}
+                    </el-button>
+                  </div>
+                  <div class="form-hint-block compact">
+                    {{ t('settings.systemPrivilegeHint') }}
+                  </div>
+                  <div v-if="systemPrivilege.envScope === 'system'" class="form-hint-block compact">
+                    {{ t('settings.systemPrivilegeScopeHint') }}
+                  </div>
+                  <div v-else class="form-hint-block compact">
+                    {{ t('settings.sdkEnvScopeUserHint') }}
+                  </div>
                 </div>
               </el-form-item>
 
@@ -607,9 +622,8 @@
           </el-card>
         </div>
 
-        <!-- 帮助与反馈 -->
         <div v-show="activeTab === 'about'" class="settings-section">
-          <h3 class="section-title">{{ t('settings.help') }}</h3>
+          <h3 class="group-title">{{ t('settings.help') }}</h3>
 
           <!-- 关于应用 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
@@ -746,7 +760,7 @@
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, Refresh, Setting, Brush, Folder, Lock, Bell } from '@element-plus/icons-vue'
+import { Check, Refresh, Setting, Folder, Lock, Bell } from '@element-plus/icons-vue'
 import { t, setLocale } from '@/i18n'
 import { loadConfig, saveConfig, resetConfig } from '@/utils/tauri/store'
 import { fetch } from '@tauri-apps/plugin-http'
@@ -761,6 +775,7 @@ import { resolveActiveProvider, PROVIDER_PRESETS, migrateOldAiSettings, generate
 import { useAppStore } from '@/store/app'
 import { getPrivilegeStatus, ensureSystemPrivilege } from '@/utils/systemPrivilegeManager'
 import { getEnvScope, setEnvScope } from '@/utils/sdkManager'
+import { applyAnimations, applyAppearance, applyFontFamily, applyFontSize, applyThemeMode } from '@/utils/appearance'
 import { useRoute, useRouter } from 'vue-router'
 
 const appStore = useAppStore()
@@ -783,6 +798,7 @@ const savedAiAssistantSettings = ref(null)
 const savedReminderConfig = ref(null)
 const savedPasswordSettings = ref(null)
 const autoSaving = ref(false)
+const initializing = ref(true)
 
 // 反馈相关
 const feedbackContent = ref('')
@@ -799,16 +815,41 @@ const lastSaved = ref('')
 
 // 菜单项
 const menuItems = computed(() => [
-  { key: 'general', label: t('settings.general'), icon: Setting },
-  { key: 'workspace', label: t('settings.workspace'), icon: Folder },
-  { key: 'security', label: t('settings.security'), icon: Lock },
-  { key: 'about', label: t('settings.help'), icon: Bell }
+  {
+    key: 'general',
+    label: t('settings.general'),
+    description: '窗口、外观、语言与通知',
+    icon: Setting
+  },
+  {
+    key: 'workspace',
+    label: t('settings.workspace'),
+    description: '笔记目录、Markdown 与 AI 配置',
+    icon: Folder
+  },
+  {
+    key: 'security',
+    label: t('settings.security'),
+    description: '系统权限、主密码与保护策略',
+    icon: Lock
+  },
+  {
+    key: 'about',
+    label: t('settings.help'),
+    description: '应用信息、反馈与更新支持',
+    icon: Bell
+  }
 ])
 
 // 当前菜单名称
 const currentMenuName = computed(() => {
   const menu = menuItems.value.find(m => m.key === activeTab.value)
   return menu ? menu.label : t('settings.title')
+})
+
+const currentMenuDescription = computed(() => {
+  const menu = menuItems.value.find(m => m.key === activeTab.value)
+  return menu?.description || '集中管理当前应用的关键偏好与日常使用设置'
 })
 
 const saveStatusText = computed(() => {
@@ -824,6 +865,14 @@ const saveStatusClass = computed(() => {
   if (lastSaved.value) return 'saved'
   return 'idle'
 })
+
+const validTabKeys = computed(() => menuItems.value.map(item => item.key))
+const normalizeTab = (tab) => {
+  if (typeof tab !== 'string' || !tab) {
+    return 'general'
+  }
+  return validTabKeys.value.includes(tab) ? tab : 'general'
+}
 
 let persistAiSettingsTimer = null
 
@@ -932,52 +981,6 @@ async function getDatabase() {
     dbInstance = await Database.load(DB_PATH)
   }
   return dbInstance
-}
-
-// 应用主题
-const applyTheme = (theme) => {
-  document.documentElement.setAttribute('data-theme-setting', theme)
-  if (theme === 'auto') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light')
-  } else {
-    document.documentElement.setAttribute('data-theme', theme)
-  }
-}
-
-// 应用字体大小
-const applyFontSize = (size) => {
-  const base = Number(size) || 14
-  const root = document.documentElement
-  root.style.setProperty('--font-size-caption2', `${base - 3}px`)
-  root.style.setProperty('--font-size-caption',  `${base - 2}px`)
-  root.style.setProperty('--font-size-footnote', `${base - 1}px`)
-  root.style.setProperty('--font-size-body',     `${base}px`)
-  root.style.setProperty('--font-size-callout',  `${base + 1}px`)
-  root.style.setProperty('--font-size-headline', `${base + 2}px`)
-  root.style.setProperty('--font-size-title3',   `${base + 4}px`)
-  root.style.setProperty('--font-size-title2',   `${base + 8}px`)
-  root.style.setProperty('--font-size-title1',   `${base + 12}px`)
-  root.style.setProperty('--font-size-large',    `${base + 18}px`)
-}
-
-// 应用字体家族
-const applyFontFamily = (family) => {
-  const root = document.documentElement
-  if (!family || family === 'system') {
-    root.style.removeProperty('--font-family')
-  } else {
-    root.style.setProperty('--font-family', `"${family}", "PingFang SC", sans-serif`)
-  }
-}
-
-// 应用动画设置
-const applyAnimations = (enabled) => {
-  if (enabled) {
-    document.documentElement.classList.remove('no-animations')
-  } else {
-    document.documentElement.classList.add('no-animations')
-  }
 }
 
 // 切换语言
@@ -1216,7 +1219,7 @@ const restoreSavedSnapshots = () => {
 }
 
 const persistSettings = async ({ silent = true } = {}) => {
-  if (saving.value || autoSaving.value) return false
+  if (initializing.value || saving.value || autoSaving.value) return false
 
   autoSaving.value = true
   try {
@@ -1264,12 +1267,9 @@ const persistSettings = async ({ silent = true } = {}) => {
     return true
   } catch (error) {
     restoreSavedSnapshots()
-    applyTheme(settings.theme)
-    applyFontSize(settings.fontSize)
-    applyFontFamily(settings.fontFamily)
-    applyAnimations(settings.enableAnimations)
+    applyAppearance(settings)
     setLocale(settings.language)
-    ElMessage.error(t('settings.saveFailed'))
+    ElMessage.error(`${t('settings.saveFailed')}: ${error?.message || error || 'unknown error'}`)
     return false
   } finally {
     autoSaving.value = false
@@ -1287,11 +1287,15 @@ const autoSaveWithSideEffect = async (effect, rollback) => {
 }
 
 const handleThemeChange = async (theme) => {
-  await autoSaveWithSideEffect(() => applyTheme(theme))
+  await autoSaveWithSideEffect(() => applyThemeMode(theme))
 }
 
 const handleFontFamilyChange = async (family) => {
   await autoSaveWithSideEffect(() => applyFontFamily(family))
+}
+
+const handleFontSizeChange = async (size) => {
+  await autoSaveWithSideEffect(() => applyFontSize(size))
 }
 
 const handleAnimationsChange = async (enabled) => {
@@ -1312,6 +1316,10 @@ const handleReminderSettingChange = async () => {
 }
 
 const handleCloseActionChange = async () => {
+  await persistSettings()
+}
+
+const handleMarkdownThemeChange = async () => {
   await persistSettings()
 }
 
@@ -1372,7 +1380,7 @@ const loadSettings = async () => {
         Object.assign(aiAssistantSettings, config.aiAssistantSettings)
       }
 
-      applyAnimations(config.enableAnimations !== false)
+      applyAppearance(config)
 
       // 同步窗口关闭行为到 store
       if (config.closeAction) {
@@ -1509,18 +1517,27 @@ const performMigration = async (oldPath, newPath) => {
   migrationProgress.value = 0
   migrationStatus.value = t('settings.migratePreparing')
 
+  const previousPath = settings.notesStoragePath
+
   try {
-    await migrateNotes(oldPath, newPath)
+    const migrationResult = await migrateNotes(oldPath, newPath)
     settings.notesStoragePath = newPath
 
-    // 重置笔记目录缓存
     const { resetNotesDir } = await import('@/utils/notes')
     resetNotesDir()
 
-    // 自动保存配置
-    await handleSave()
+    try {
+      await handleSave()
+    } catch (error) {
+      settings.notesStoragePath = previousPath
+      resetNotesDir()
+      throw error
+    }
 
-    // 触发全局事件，通知其他组件笔记路径已更改
+    if (migrationResult?.cleanupSource) {
+      await migrationResult.cleanupSource()
+    }
+
     window.dispatchEvent(new CustomEvent('notes-path-changed', {
       detail: { newPath }
     }))
@@ -1538,7 +1555,6 @@ const performMigration = async (oldPath, newPath) => {
       showMigrationDialog.value = false
     }, 2000)
   } catch (error) {
-
     migrationStatus.value = t('settings.migrateFailed', { msg: error.message })
     ElMessage.error(t('settings.migrateFailed', { msg: error.message }))
   }
@@ -1548,32 +1564,28 @@ const performMigration = async (oldPath, newPath) => {
  * 迁移笔记文件
  */
 const migrateNotes = async (oldPath, newPath) => {
-  const { readDir, exists, mkdir, copyFile, remove } = await import('@tauri-apps/plugin-fs')
+  const { exists, mkdir, copyFile, remove } = await import('@tauri-apps/plugin-fs')
   const { join, sep } = await import('@tauri-apps/api/path')
 
   migrationStatus.value = t('settings.migrateCheckSource')
 
-  // 检查旧路径是否存在
   if (!(await exists(oldPath))) {
     throw new Error(t('settings.migrateSourceNotExist'))
   }
 
-  // 确保新路径存在
   if (!(await exists(newPath))) {
     await mkdir(newPath, { recursive: true })
   }
 
-  // 获取所有文件列表
   migrationStatus.value = t('settings.migrateScanFiles')
   const allFiles = await getAllFiles(oldPath, oldPath)
 
   if (allFiles.length === 0) {
     migrationProgress.value = 100
     migrationStatus.value = t('settings.migrateNoFiles')
-    return
+    return { cleanupSource: null }
   }
 
-  // 复制文件
   let processedFiles = 0
   const copiedFiles = []
 
@@ -1581,13 +1593,11 @@ const migrateNotes = async (oldPath, newPath) => {
     const relativePath = file.replace(oldPath, '').replace(/^[/\\]/, '')
     const targetPath = await join(newPath, relativePath)
 
-    // 确保目标目录存在
     const targetDir = targetPath.substring(0, targetPath.lastIndexOf(sep()))
     if (!(await exists(targetDir))) {
       await mkdir(targetDir, { recursive: true })
     }
 
-    // 复制文件
     migrationStatus.value = migrateMode.value === 'move'
       ? t('settings.migrateMoving', { file: relativePath })
       : t('settings.migrateCopying', { file: relativePath })
@@ -1598,26 +1608,27 @@ const migrateNotes = async (oldPath, newPath) => {
     migrationProgress.value = Math.round((processedFiles / allFiles.length) * 100)
   }
 
-  // 如果是移动模式，删除源文件
   if (migrateMode.value === 'move') {
-    migrationStatus.value = t('settings.migrateCleanSource')
+    return {
+      cleanupSource: async () => {
+        migrationStatus.value = t('settings.migrateCleanSource')
+        for (const file of copiedFiles) {
+          try {
+            await remove(file)
+          } catch (e) { /* ignore */ }
+        }
 
-    // 删除所有已复制的文件
-    for (const file of copiedFiles) {
-      try {
-        await remove(file)
-      } catch (e) { /* ignore */ }
+        try {
+          await removeEmptyDirs(oldPath)
+        } catch (e) { /* ignore */ }
+
+        migrationStatus.value = t('settings.migrateMoveComplete', { count: processedFiles })
+      }
     }
-
-    // 尝试删除空目录（从深层到浅层）
-    try {
-      await removeEmptyDirs(oldPath)
-    } catch (e) { /* ignore */ }
-
-    migrationStatus.value = t('settings.migrateMoveComplete', { count: processedFiles })
-  } else {
-    migrationStatus.value = t('settings.migrateCopyComplete', { count: processedFiles })
   }
+
+  migrationStatus.value = t('settings.migrateCopyComplete', { count: processedFiles })
+  return { cleanupSource: null }
 }
 
 /**
@@ -1779,6 +1790,12 @@ const loadStorageStats = async () => {
     const { stat, exists, readDir } = await import('@tauri-apps/plugin-fs')
     const { join, appDataDir } = await import('@tauri-apps/api/path')
 
+    // 先清零，避免部分失败时残留旧值
+    storageStats.notesSize = 0
+    storageStats.databaseSize = 0
+    storageStats.mediaSize = 0
+    storageStats.totalSize = 0
+
     // 计算笔记文件大小
     const notesDir = await getNotesDir()
     storageStats.notesSize = await calculateDirectorySize(notesDir)
@@ -1789,8 +1806,6 @@ const loadStorageStats = async () => {
     if (await exists(dbPath)) {
       const dbStat = await stat(dbPath)
       storageStats.databaseSize = dbStat.size || 0
-    } else {
-      storageStats.databaseSize = 0
     }
 
     // 计算媒体文件大小（images, videos 文件夹）
@@ -1824,7 +1839,12 @@ const loadStorageStats = async () => {
 
     // ElMessage.success('存储统计已更新') // 已移除提示，避免重复弹出
   } catch (error) {
-    ElMessage.error(t('settings.loadStatsFailed', { msg: error.message }))
+    // 安装包环境下自定义路径、权限或目录瞬态异常会导致这里频繁报错
+    // 保持页面静默并展示 0，避免每次进入设置页都弹错误提示
+    storageStats.notesSize = 0
+    storageStats.databaseSize = 0
+    storageStats.mediaSize = 0
+    storageStats.totalSize = 0
   } finally {
     loadingStats.value = false
   }
@@ -1895,10 +1915,36 @@ const loadPasswordSettings = async () => {
 const savePasswordSettings = async () => {
   try {
     const db = await getDatabase()
-    await db.execute(
-      'UPDATE master_password SET require_password_on_start = ? WHERE id = 1',
-      [passwordSettings.requirePasswordOnStart ? 1 : 0]
-    )
+    const now = new Date().toISOString()
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS master_password (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        password_hash TEXT NOT NULL,
+        salt TEXT NOT NULL,
+        require_password_on_start INTEGER DEFAULT 1,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    `)
+    try {
+      await db.execute(`
+        ALTER TABLE master_password ADD COLUMN require_password_on_start INTEGER DEFAULT 1
+      `)
+    } catch (e) { /* ignore */ }
+
+    const result = await db.select('SELECT id FROM master_password ORDER BY id ASC LIMIT 1')
+    if (result && result.length > 0) {
+      await db.execute(
+        'UPDATE master_password SET require_password_on_start = ?, updated_at = ? WHERE id = ?',
+        [passwordSettings.requirePasswordOnStart ? 1 : 0, now, result[0].id]
+      )
+    } else {
+      // Keep settings persistence independent from whether a master password exists.
+      await db.execute(
+        'INSERT INTO master_password (password_hash, salt, require_password_on_start, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+        ['', '', passwordSettings.requirePasswordOnStart ? 1 : 0, now, now]
+      )
+    }
     // 移除单独的成功提示，由 handleSave 统一提示
   } catch (error) {
 
@@ -2008,6 +2054,8 @@ const handleReset = async () => {
       clearTimeout(persistAiSettingsTimer)
       persistAiSettingsTimer = null
     }
+
+    initializing.value = true
     await resetConfig()
     localStorage.removeItem('ai_config')
     window.dispatchEvent(new CustomEvent('settings-reset'))
@@ -2016,6 +2064,9 @@ const handleReset = async () => {
     if (error !== 'cancel') {
 
     }
+  } finally {
+    syncSavedSnapshots()
+    initializing.value = false
   }
 }
 
@@ -2138,6 +2189,9 @@ watch(
     systemPrivilege.envScope,
   ],
   () => {
+    if (initializing.value) {
+      return
+    }
     if (!autoSaving.value) {
       hasChanges.value = true
     }
@@ -2152,6 +2206,9 @@ watch(
     settings.fontSize,
   ],
   async (_, oldValue) => {
+    if (initializing.value) {
+      return
+    }
     hasChanges.value = true
     manualHasChanges.value = true
     if (oldValue) {
@@ -2166,6 +2223,9 @@ watch(
     settings.notesStoragePath,
   ],
   () => {
+    if (initializing.value) {
+      return
+    }
     hasChanges.value = true
     manualHasChanges.value = true
   }
@@ -2174,6 +2234,9 @@ watch(
 watch(
   () => aiAssistantSettings.floatingBallSize,
   () => {
+    if (initializing.value) {
+      return
+    }
     hasChanges.value = true
     manualHasChanges.value = true
   }
@@ -2182,19 +2245,37 @@ watch(
 watch(
   () => route.query.tab,
   (tab) => {
-    if (typeof tab === 'string' && tab) {
-      activeTab.value = tab
+    const normalizedTab = normalizeTab(tab)
+    if (activeTab.value !== normalizedTab) {
+      activeTab.value = normalizedTab
+      return
+    }
+
+    if (tab !== normalizedTab && !(normalizedTab === 'general' && (tab == null || tab === ''))) {
+      const nextQuery = { ...route.query }
+      if (normalizedTab === 'general') {
+        delete nextQuery.tab
+      } else {
+        nextQuery.tab = normalizedTab
+      }
+      router.replace({ query: nextQuery })
     }
   },
   { immediate: true }
 )
 
 watch(activeTab, (tab) => {
+  const normalizedTab = normalizeTab(tab)
+  if (tab !== normalizedTab) {
+    activeTab.value = normalizedTab
+    return
+  }
+
   const nextQuery = { ...route.query }
-  if (tab === 'general') {
+  if (normalizedTab === 'general') {
     delete nextQuery.tab
   } else {
-    nextQuery.tab = tab
+    nextQuery.tab = normalizedTab
   }
   router.replace({ query: nextQuery })
 })
@@ -2269,18 +2350,24 @@ const handleEnvScopeChange = (value) => {
 
 // 组件挂载时加载配置
 onMounted(async () => {
-  await loadSettings() // loadSettings 内部已经调用了 loadStorageStats
-  await loadPasswordSettings()
-  await loadPasswordStats()
-  await loadReminderSettings()
-  await loadSystemPrivilegeStatus()
-  // await loadStorageStats() // 已在 loadSettings 中调用，避免重复
-
-  // 加载配置路径
+  initializing.value = true
   try {
-    const dataDir = await appDataDir()
-    configPath.value = await join(dataDir, 'config.json')
-  } catch (e) { /* ignore */ }
+    await loadSettings() // loadSettings 内部已经调用了 loadStorageStats
+    await loadPasswordSettings()
+    await loadPasswordStats()
+    await loadReminderSettings()
+    await loadSystemPrivilegeStatus()
+    // await loadStorageStats() // 已在 loadSettings 中调用，避免重复
+
+    // 加载配置路径
+    try {
+      const dataDir = await appDataDir()
+      configPath.value = await join(dataDir, 'config.json')
+    } catch (e) { /* ignore */ }
+  } finally {
+    syncSavedSnapshots()
+    initializing.value = false
+  }
 })
 </script>
 
@@ -2288,147 +2375,245 @@ onMounted(async () => {
 .settings-page-wrapper {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  font-family: var(--font-family);
-  color: var(--text-primary);
-  background-color: var(--bg-grouped);
+  min-height: 100%;
   height: 100%;
-  width: 100%;
+  overflow: hidden;
+  color: var(--text-primary);
+  background: linear-gradient(180deg, #eef1f5 0%, #e8edf3 100%);
 }
 
-/* 顶部导航 */
 .header {
-  height: 50px;
-  background-color: var(--bg-primary);
-  border-bottom: 0.5px solid var(--border-color-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-lg);
+  gap: 16px;
+  min-height: 58px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
   flex-shrink: 0;
-  z-index: 2;
-  position: relative;
 }
 
 .header-left {
+  min-width: 0;
+  flex: 1;
+}
+
+.page-title-block {
   display: flex;
-  align-items: center;
-  gap: var(--space-md);
+  flex-direction: column;
+  gap: 3px;
+}
+
+.page-eyebrow {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
 .breadcrumb {
-  font-size: var(--font-size-body);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
   display: flex;
   align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.breadcrumb :deep(.el-icon) {
+  font-size: 15px;
+  color: var(--accent-blue);
+}
+
+.breadcrumb-divider {
+  color: var(--text-quaternary);
+  font-weight: 400;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .save-status {
-  font-size: 12px;
-  transition: color var(--transition-fast);
-  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid transparent;
 }
 
 .save-status.idle {
   color: var(--text-quaternary);
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(15, 23, 42, 0.06);
 }
 
 .save-status.saved {
-  color: #67c23a;
+  color: #1f8a52;
+  background: rgba(46, 204, 113, 0.12);
+  border-color: rgba(46, 204, 113, 0.16);
 }
 
 .save-status.unsaved {
-  color: #e6a23c;
-  font-weight: 500;
+  color: #b26a00;
+  background: rgba(255, 179, 71, 0.15);
+  border-color: rgba(255, 179, 71, 0.16);
 }
 
 .save-status.saving {
   color: var(--accent-blue);
+  background: rgba(10, 132, 255, 0.12);
+  border-color: rgba(10, 132, 255, 0.14);
 }
 
-/* 主容器 */
+.toolbar-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 251, 0.95));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.toolbar-btn:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(238, 243, 249, 1));
+}
+
 .main-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 0;
   flex: 1;
-  overflow: hidden;
   min-height: 0;
+  padding: 5px 5px 0;
 }
 
-/* 左侧设置菜单 */
 .sidebar-left {
-  width: 200px;
-  min-width: 200px;
-  flex-shrink: 0;
-  background-color: var(--bg-primary);
-  border-right: 0.5px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  user-select: none;
-  overflow: hidden;
-  height: 100%;
-  position: relative;
-  z-index: 1;
-  padding: var(--space-sm);
+  min-height: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .sidebar-toolbar {
-  padding: var(--space-sm) var(--space-md);
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.sidebar-toolbar-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .sidebar-title {
-  font-size: var(--font-size-caption2);
-  font-weight: var(--font-weight-semibold);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.sidebar-subtitle {
+  font-size: 11px;
+  line-height: 1.4;
   color: var(--text-tertiary);
+}
+
+.sidebar-caption {
+  font-size: 10px;
+  line-height: 1;
+  padding: 4px 7px;
+  border-radius: 999px;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.08em;
+  color: var(--text-quaternary);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.sidebar-section-label {
+  padding: 10px 14px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
 .menu-list {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: var(--space-xs);
-  margin: 0;
   min-height: 0;
+  overflow-y: auto;
+  padding: 8px;
 }
 
 .menu-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: 6px 10px;
-  margin: 1px 0;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background var(--transition-fast);
-  font-size: var(--font-size-footnote);
-  color: var(--text-primary);
   position: relative;
+  display: grid;
+  grid-template-columns: 3px 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 9px 10px 9px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  border: 1px solid transparent;
 }
 
 .menu-item:hover {
-  background-color: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .menu-item.active {
-  background-color: var(--accent-blue-bg);
-  color: var(--accent-blue);
-  font-weight: var(--font-weight-medium);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
+  border-color: rgba(10, 132, 255, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(15, 23, 42, 0.05);
+}
+
+.menu-active-indicator {
+  width: 3px;
+  height: 26px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.menu-item.active .menu-active-indicator {
+  background: linear-gradient(180deg, #4da3ff, #0a84ff);
+}
+
+.menu-icon-shell {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .menu-icon {
-  font-size: 16px;
-  flex-shrink: 0;
+  font-size: 15px;
   color: var(--text-secondary);
 }
 
@@ -2436,59 +2621,419 @@ onMounted(async () => {
   color: var(--accent-blue);
 }
 
+.menu-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
 .menu-name {
-  flex: 1;
-  font-size: var(--font-size-footnote);
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.menu-desc {
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* 右侧内容区域 */
+.menu-chevron {
+  align-self: center;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text-quaternary);
+  opacity: 0.7;
+}
+
+.menu-item.active .menu-chevron {
+  color: var(--accent-blue);
+  opacity: 1;
+}
+
 .content-area {
-  flex: 1;
+  min-width: 0;
+  min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
-  background-color: var(--bg-grouped);
-  padding: var(--space-xl);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0 18px 18px 0;
+  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-/* 设置区块 */
+.content-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-area::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.24);
+  border-radius: 999px;
+}
+
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.36);
+}
+
+.content-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .settings-section {
-  max-width: 680px;
-  margin: 0 auto;
+  padding: 20px 22px 26px;
 }
 
-.section-title {
-  font-size: var(--font-size-title3);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  margin-bottom: var(--space-xl);
+.group-title {
+  margin: 0 0 8px;
+  padding: 0 2px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
-/* 设置分组卡片 */
 .settings-section :deep(.el-card) {
-  border-radius: var(--radius-lg);
-  border: 0.5px solid var(--border-color);
+  margin-bottom: 10px !important;
+  border-radius: 0;
+  border: none;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(255, 255, 255, 0.78);
   box-shadow: none;
+  overflow: hidden;
+}
+
+.settings-section :deep(.el-card__header) {
+  padding: 12px 16px 8px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  background: rgba(247, 249, 252, 0.62);
+}
+
+.settings-section :deep(.el-card__body) {
+  padding: 0 16px 2px;
 }
 
 .card-header {
-  font-size: var(--font-size-callout);
-  font-weight: var(--font-weight-semibold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 700;
   color: var(--text-primary);
 }
 
-/* 表单行 */
 .settings-section :deep(.el-form-item) {
-  margin-bottom: var(--space-lg);
-  border-bottom: 0.5px solid var(--divider);
-  padding-bottom: var(--space-lg);
+  margin-bottom: 0;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  align-items: flex-start;
+}
+
+.settings-section :deep(.el-form-item__label) {
+  display: inline-flex;
+  align-items: flex-start;
+  min-height: 30px;
+  padding-right: 18px;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.settings-section :deep(.el-form-item__content) {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: 30px;
+  color: var(--text-secondary);
+}
+
+.settings-section :deep(.el-radio-group) {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.settings-section :deep(.el-radio) {
+  min-height: 30px;
+  margin-right: 0;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(248, 250, 252, 0.82);
+}
+
+.inline-control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.inline-control-row.wrap {
+  flex-wrap: wrap;
+}
+
+.fill-control {
+  flex: 1;
+  min-width: 0;
+}
+
+.stacked-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.form-hint-block {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+.form-hint-block.compact {
+  margin-top: 0;
+}
+
+.settings-section :deep(.el-form) {
+  --settings-label-width: 220px;
+}
+
+.settings-section :deep(.el-form--label-left .el-form-item) {
+  display: grid;
+  grid-template-columns: minmax(180px, var(--settings-label-width)) minmax(0, 1fr);
+  column-gap: 18px;
+}
+
+.settings-section :deep(.el-form--label-left .el-form-item__label) {
+  width: auto !important;
+  justify-content: flex-start;
+}
+
+.settings-section :deep(.el-form--label-left .el-form-item__content) {
+  min-width: 0;
+  margin-left: 0 !important;
 }
 
 .settings-section :deep(.el-form-item:last-child) {
-  margin-bottom: 0;
   border-bottom: none;
-  padding-bottom: 0;
+}
+
+.settings-section :deep(.el-form-item__content > *) {
+  max-width: 100%;
+}
+
+.settings-section :deep(.el-switch + span),
+.settings-section :deep(.el-radio-group + div),
+.settings-section :deep(.el-select + div),
+.settings-section :deep(.el-button + div) {
+  flex-basis: 100%;
+}
+
+.settings-section :deep(.el-input),
+.settings-section :deep(.el-select),
+.settings-section :deep(.el-slider),
+.settings-section :deep(.el-textarea),
+.settings-section :deep(.el-radio-group),
+.settings-section :deep(.el-descriptions) {
+  max-width: 100%;
+}
+
+.settings-section :deep(.el-form-item__content .el-input[style*='width: 300px']),
+.settings-section :deep(.el-form-item__content .el-select[style*='width: 300px']) {
+  width: min(320px, 100%) !important;
+}
+
+.settings-section :deep(.el-form-item__content .el-input[style*='width: 380px']) {
+  width: min(420px, 100%) !important;
+}
+
+.settings-section :deep(.el-form-item__content .el-select[style*='width: 280px']) {
+  width: min(300px, 100%) !important;
+}
+
+.settings-section :deep(.el-form-item__content .el-select[style*='width: 200px']),
+.settings-section :deep(.el-form-item__content .el-input[style*='width: 200px']),
+.settings-section :deep(.el-form-item__content .el-slider[style*='width: 200px']) {
+  width: min(240px, 100%) !important;
+}
+
+.settings-section :deep(.el-form-item__content .el-slider[style*='width: 300px']) {
+  width: min(320px, 100%) !important;
+}
+
+@media (max-width: 960px) {
+  .settings-section :deep(.el-form--label-left .el-form-item) {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .settings-section :deep(.el-form--label-left .el-form-item__label) {
+    padding-right: 0;
+  }
+}
+
+.settings-section :deep(.el-switch) {
+  --el-switch-on-color: var(--accent-blue);
+}
+
+.settings-section :deep(.el-input__wrapper),
+.settings-section :deep(.el-select__wrapper),
+.settings-section :deep(.el-textarea__inner) {
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) inset;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.settings-section :deep(.el-descriptions) {
+  width: 100%;
+}
+
+.settings-section :deep(.el-descriptions__table) {
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.settings-section :deep(.el-descriptions__label),
+.settings-section :deep(.el-descriptions__content) {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.settings-section :deep(.el-divider) {
+  margin: 14px 0;
+}
+
+.settings-section :deep(.el-divider__text) {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.settings-section :deep(.el-alert) {
+  border-radius: 8px;
+  margin-bottom: 10px !important;
+}
+
+.ai-provider-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ai-provider-item {
+  border-radius: 0;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 250, 252, 0.62);
+  overflow: hidden;
+}
+
+.ai-provider-item.active {
+  border-color: rgba(10, 132, 255, 0.14);
+  background: rgba(244, 248, 255, 0.86);
+}
+
+.ai-provider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.ai-provider-form {
+  padding: 0 12px 10px;
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.ai-prov-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-quaternary);
+  flex-shrink: 0;
+}
+
+.ai-prov-dot.is-active {
+  background: #30d158;
+  box-shadow: 0 0 0 5px rgba(48, 209, 88, 0.14);
+}
+
+.ai-prov-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ai-prov-model {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 1100px) {
+  .main-container {
+    grid-template-columns: 250px minmax(0, 1fr);
+    padding: 14px;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 820px) {
+  .main-container {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .sidebar-left {
+    border-right: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+  }
+
+  .content-area {
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    min-height: 64px;
+    padding: 10px 14px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .settings-section-header,
+  .settings-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .settings-section :deep(.el-form-item) {
+    display: block;
+  }
+
+  .settings-section :deep(.el-form-item__label) {
+    margin-bottom: 8px;
+  }
+
+  .settings-section :deep(.el-form-item__content) {
+    width: 100%;
+  }
 }
 </style>

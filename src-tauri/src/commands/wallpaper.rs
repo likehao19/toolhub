@@ -311,6 +311,42 @@ pub async fn fetch_wallhaven_wallpapers(
     Ok(result)
 }
 
+fn ensure_parent_dir(path: &Path) -> Result<(), String> {
+    if let Some(parent) = path.parent() {
+        std::fs::create_dir_all(parent).map_err(|e| format!("Failed to create dir: {}", e))?;
+    }
+    Ok(())
+}
+
+async fn download_wallpaper_to_path(url: &str, dest: &Path) -> Result<(), String> {
+    ensure_parent_dir(dest)?;
+
+    let resp = reqwest::get(url)
+        .await
+        .map_err(|e| format!("Download failed: {}", e))?;
+
+    let status = resp.status();
+    if !status.is_success() {
+        return Err(format!("Download failed with status: {}", status));
+    }
+
+    let bytes = resp
+        .bytes()
+        .await
+        .map_err(|e| format!("Read failed: {}", e))?;
+
+    std::fs::write(dest, &bytes).map_err(|e| format!("Save failed: {}", e))?;
+    Ok(())
+}
+
+/// 下载在线壁纸到指定完整路径
+#[tauri::command]
+pub async fn download_wallpaper(url: String, save_path: String) -> Result<String, String> {
+    let dest = PathBuf::from(save_path);
+    download_wallpaper_to_path(&url, &dest).await?;
+    Ok(dest.to_string_lossy().to_string())
+}
+
 /// 下载在线壁纸到本地并设为桌面壁纸
 #[tauri::command]
 pub async fn download_and_set_wallpaper(url: String, save_dir: String) -> Result<String, String> {
@@ -319,25 +355,12 @@ pub async fn download_and_set_wallpaper(url: String, save_dir: String) -> Result
         std::fs::create_dir_all(save_path).map_err(|e| e.to_string())?;
     }
 
-    // 从 URL 提取文件名（兼容 Bing ?id= 格式）
     let file_name = extract_filename_from_url(&url);
-
     let dest = save_path.join(&file_name);
 
-    let resp = reqwest::get(&url)
-        .await
-        .map_err(|e| format!("Download failed: {}", e))?;
-
-    let bytes = resp
-        .bytes()
-        .await
-        .map_err(|e| format!("Read failed: {}", e))?;
-
-    std::fs::write(&dest, &bytes).map_err(|e| format!("Save failed: {}", e))?;
+    download_wallpaper_to_path(&url, &dest).await?;
 
     let dest_str = dest.to_string_lossy().to_string();
-
-    // 设为壁纸
     let applied_path = set_wallpaper(dest_str)?;
 
     Ok(applied_path)

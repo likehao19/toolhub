@@ -3,11 +3,14 @@
     <!-- Header -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Connection /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('mockService.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Connection /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('mockService.title') }}</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -212,60 +215,113 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .mock-service-wrapper {
-  display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden;
-  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 .header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 0 var(--space-lg); background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color); height: 46px; box-sizing: border-box; flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  backdrop-filter: blur(18px);
 }
-.header-left { display: flex; align-items: center; gap: var(--space-xl); }
+.header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
 .breadcrumb {
-  display: flex; align-items: center; gap: var(--space-sm);
-  font-size: var(--font-size-body); font-weight: var(--font-weight-semibold);
+  display: flex; align-items: center; gap: 6px;
+  font-size: 15px; font-weight: 600;
   color: var(--text-primary); white-space: nowrap;
 }
-.breadcrumb .el-icon { font-size: 16px; color: var(--text-secondary); }
-.breadcrumb-link { cursor: pointer; color: var(--text-secondary); }
-.breadcrumb-link:hover { color: var(--accent-blue); }
-.breadcrumb-sep { color: var(--text-quaternary); }
-.header-actions { display: flex; align-items: center; gap: 8px; }
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
+.breadcrumb-link:hover { text-decoration: underline; }
+.breadcrumb-sep { color: var(--text-tertiary); }
+.header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-.content-area { flex: 1; overflow: hidden; }
-.mock-layout { flex: 1; display: flex; height: 100%; overflow: hidden; }
-.mock-rules-panel { width: 280px; border-right: 1px solid var(--border-color); overflow-y: auto; background: var(--bg-primary); }
-.panel-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-bottom: 1px solid var(--border-color); }
-.mock-rule-item { display: flex; align-items: center; gap: 6px; padding: 6px 12px; cursor: pointer; font-size: 12px; }
-.mock-rule-item:hover { background: var(--bg-tertiary); }
-.mock-rule-item.active { background: rgba(64,158,255,0.08); }
+.content-area { flex: 1; overflow: hidden; padding: 14px 18px 0; min-height: 0; }
+.mock-layout { flex: 1; display: flex; height: 100%; overflow: hidden; min-height: 0; }
+.mock-rules-panel {
+  width: 300px;
+  min-width: 260px;
+  overflow-y: auto;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+}
+.panel-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.mock-rule-item { display: flex; align-items: center; gap: 6px; padding: 10px 12px; cursor: pointer; font-size: 12px; border-bottom: 1px solid rgba(15, 23, 42, 0.05); }
+.mock-rule-item:hover { background: rgba(255,255,255,0.62); }
+.mock-rule-item.active { background: rgba(64,158,255,0.1); }
 .mock-rule-item .kv-delete { display: none; }
 .mock-rule-item:hover .kv-delete { display: block; }
-.mock-edit-panel { flex: 1; overflow-y: auto; padding: 16px; background: var(--bg-primary); display: flex; flex-direction: column; }
-.expectation-card { border: 1px solid var(--border-color); border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+.mock-edit-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0 18px 18px 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.expectation-card { border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 14px; padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.72); }
 
 .mock-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #909399; }
 .mock-status-dot.running { background: #67C23A; box-shadow: 0 0 6px #67C23A; }
 
-.mock-log-section { border-top: 1px solid var(--border-color); padding: 0 16px 8px; flex-shrink: 0; }
+.mock-log-section { border-top: 1px solid rgba(15, 23, 42, 0.08); padding: 0 0 8px; flex-shrink: 0; margin-top: 12px; }
 .mock-log-list { max-height: 180px; overflow-y: auto; }
-.mock-log-item { display: flex; align-items: center; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--border-color); }
+.mock-log-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
 
 .method-tag { font-size: 10px; font-weight: 700; flex-shrink: 0; width: 40px; }
 .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
-.empty-hint { text-align: center; color: var(--text-quaternary); font-size: 12px; padding: 24px; }
+.empty-hint { text-align: center; color: var(--text-quaternary); font-size: 12px; padding: 24px; border: 1px dashed rgba(15, 23, 42, 0.08); border-radius: 14px; background: rgba(255,255,255,0.5); }
 .kv-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .kv-delete { flex-shrink: 0; font-size: 14px; color: var(--text-quaternary); cursor: pointer; }
 .kv-delete:hover { color: var(--el-color-danger); }
 .body-textarea {
-  width: 100%; min-height: 120px; max-height: 200px; padding: 8px;
-  border: 1px solid var(--border-color); border-radius: 4px;
-  background: var(--bg-secondary); color: var(--text-primary);
+  width: 100%; min-height: 120px; max-height: 200px; padding: 10px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 12px;
+  background: rgba(255,255,255,0.74); color: var(--text-primary);
   font-family: 'Consolas', 'Monaco', monospace; font-size: 12px;
   resize: vertical; outline: none; box-sizing: border-box;
 }
 .body-textarea:focus { border-color: var(--accent-blue); }
-.status-badge { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.status-badge { font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
 .status-badge.ok { color: #67C23A; background: rgba(103,194,58,0.1); }
 .status-badge.err { color: #F56C6C; background: rgba(245,108,108,0.1); }
+
+@media (max-width: 960px) {
+  .content-area { padding: 14px 14px 0; }
+  .mock-layout { flex-direction: column; }
+  .mock-rules-panel {
+    width: 100%;
+    min-width: 0;
+    border-right: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px 18px 0 0;
+    max-height: 300px;
+  }
+  .mock-edit-panel { border-radius: 0 0 18px 18px; }
+}
 </style>

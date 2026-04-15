@@ -3,11 +3,13 @@
     <!-- 顶部导航 -->
     <header class="header">
       <div class="header-left">
-        <!-- 折叠/展开侧边栏按钮 -->
-        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('notes.showSidebar') : t('notes.hideSidebar')">
+        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('notes.showSidebar') : t('notes.hideSidebar')" class="sidebar-toggle-btn">
           <el-icon><ArrowLeft v-if="!hideSidebar" /><ArrowRight v-else /></el-icon>
         </el-button>
-        <div class="breadcrumb">{{ t('notes.knowledgeBase') }} / {{ currentFolderName || t('notes.allNotes') }}</div>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Knowledge Vault</div>
+          <div class="breadcrumb">{{ t('notes.knowledgeBase') }} / {{ currentFolderName || t('notes.allNotes') }}</div>
+        </div>
       </div>
       <div class="header-actions">
         <!-- 文件名显示和编辑 -->
@@ -62,7 +64,7 @@
       </div>
     </header>
 
-    <div class="main-container">
+    <div class="main-container" :class="{ 'sidebar-hidden': hideSidebar }">
       <!-- 左侧文件夹树 -->
       <aside class="sidebar-left" v-show="!hideSidebar" :style="{ width: sidebarWidth + 'px' }">
         <div class="sidebar-toolbar">
@@ -3108,38 +3110,68 @@ const formatFileTime = (time) => {
   overflow: hidden;
   font-family: "PingFang SC";
   color: var(--text-primary);
-  background-color: var(--bg-body);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
   height: 100%;
   width: 100%;
 }
 
 /* ignore */
 .header {
-  height: 50px;
-  background-color: var(--bg-content);
-  border-bottom: 1px solid var(--border-color);
+  min-height: 58px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 15px;
+  gap: 16px;
+  padding: 0 18px;
   flex-shrink: 0;
   z-index: 2;
   position: relative;
+  backdrop-filter: blur(18px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar-toggle-btn {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(242,246,251,0.92));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+}
+
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page-eyebrow {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
 .breadcrumb {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  background: #f0f2f5;
-  padding: 6px 12px;
-  border-radius: 4px;
-  font-weight: 500;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-actions {
@@ -3152,9 +3184,10 @@ const formatFileTime = (time) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 12px;
-  background: #f5f7fa;
-  border-radius: 6px;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.74);
+  border: 1px solid rgba(15,23,42,0.06);
+  border-radius: 999px;
   margin-right: 12px;
 }
 
@@ -3197,10 +3230,17 @@ const formatFileTime = (time) => {
 
 /* ignore */
 .main-container {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(260px, auto) 4px minmax(0, 1fr);
   flex: 1;
   overflow: hidden;
   min-height: 0;
+  padding: 5px 5px 0;
+  gap: 0;
+}
+
+.main-container.sidebar-hidden {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* ignore */
@@ -3208,8 +3248,9 @@ const formatFileTime = (time) => {
   min-width: 260px;
   max-width: 600px;
   flex-shrink: 0;
-  background-color: var(--bg-sidebar);
-  border-right: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(248,250,252,0.94), rgba(241,245,249,0.98));
+  border: 1px solid rgba(15,23,42,0.08);
+  border-right: none;
   display: flex;
   flex-direction: column;
   user-select: none;
@@ -3217,6 +3258,8 @@ const formatFileTime = (time) => {
   height: 100%;
   position: relative;
   z-index: 1;
+  border-radius: 18px 0 0 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
 }
 
 .resize-handle {
@@ -3229,26 +3272,27 @@ const formatFileTime = (time) => {
 }
 
 .resize-handle:hover {
-  background-color: #409eff;
+  background-color: #60a5fa;
 }
 
 .resize-handle.resizing {
-  background-color: #409eff;
+  background-color: #3b82f6;
 }
 
 .sidebar-toolbar {
-  padding: 10px 15px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(15,23,42,0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .sidebar-title {
-  font-size: 0.8rem;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-quaternary);
   text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .sidebar-btn {
@@ -3266,7 +3310,7 @@ const formatFileTime = (time) => {
   overflow-y: auto;
   overflow-x: hidden;
   flex: 1;
-  padding: 5px 10px 20px 10px;
+  padding: 8px 10px 20px 10px;
   margin: 0;
   min-height: 0;
 }
@@ -3282,22 +3326,25 @@ const formatFileTime = (time) => {
   justify-content: space-between;
   padding: 8px 10px;
   margin: 2px 0;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.85rem;
   color: var(--text-primary);
   position: relative;
+  border: 1px solid transparent;
 }
 
 .tree-item-wrapper:hover {
-  background-color: var(--hover-bg);
+  background-color: rgba(255,255,255,0.58);
 }
 
 .tree-item-wrapper.active {
-  background-color: var(--active-bg);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
   color: var(--accent-color);
   font-weight: 600;
+  border-color: rgba(10,132,255,0.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
 }
 
 .tree-info {
@@ -3456,13 +3503,20 @@ const formatFileTime = (time) => {
 /* ignore */
 .content-area {
   flex: 1;
-  background-color: var(--bg-content);
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
   min-width: 0;
   z-index: 0;
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 0 18px 18px 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.main-container.sidebar-hidden .content-area {
+  border-radius: 18px;
 }
 
 /* ignore */

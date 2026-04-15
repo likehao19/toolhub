@@ -176,7 +176,19 @@
           "sidecar": false
         },
         {
+          "name": "cmd.exe",
+          "cmd": "cmd.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
           "name": "powershell",
+          "cmd": "powershell.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "powershell.exe",
           "cmd": "powershell.exe",
           "args": true,
           "sidecar": false
@@ -262,6 +274,24 @@
         {
           "name": "wmic",
           "cmd": "wmic.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "git",
+          "cmd": "git.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "git.exe",
+          "cmd": "git.exe",
+          "args": true,
+          "sidecar": false
+        },
+        {
+          "name": "git",
+          "cmd": "git",
           "args": true,
           "sidecar": false
         }

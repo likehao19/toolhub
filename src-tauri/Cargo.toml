@@ -67,6 +67,13 @@ md-5 = "0.10"
 quick-xml = { version = "0.31", features = ["serialize"] }
 walkdir = "2"
 dirs = "5"
+regex = "1"
+russh = "0.46"
+russh-keys = "0.46"
+russh-sftp = "2.0"
+async-trait = "0.1"
+aes-gcm = "0.10"
+rand = "0.8"
 
 [target.'cfg(target_os = "windows")'.dependencies]
 windows = { version = "0.61", features = [

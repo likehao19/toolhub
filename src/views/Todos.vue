@@ -3,11 +3,17 @@
     <!-- 顶部导航 -->
     <header class="header">
       <div class="header-left">
-        <!-- 折叠/展开侧边栏按钮 -->
-        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('common.showSidebar') : t('common.hideSidebar')">
+        <el-button size="small" circle @click="hideSidebar = !hideSidebar" :title="hideSidebar ? t('common.showSidebar') : t('common.hideSidebar')" class="sidebar-toggle-btn">
           <el-icon><ArrowLeft v-if="!hideSidebar" /><ArrowRight v-else /></el-icon>
         </el-button>
-        <div class="breadcrumb">{{ t('todos.title') }} / {{ currentCategoryName }}</div>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Productivity</div>
+          <div class="breadcrumb">
+            <span>{{ t('todos.title') }}</span>
+            <span class="breadcrumb-divider">/</span>
+            <span>{{ currentCategoryName }}</span>
+          </div>
+        </div>
       </div>
       <div class="header-actions">
         <!-- 搜索框 -->
@@ -30,7 +36,7 @@
       </div>
     </header>
 
-    <div class="main-container">
+    <div class="main-container" :class="{ 'sidebar-hidden': hideSidebar }">
       <!-- 左侧分类栏 -->
       <aside class="sidebar-left" v-show="!hideSidebar">
         <div class="sidebar-toolbar">
@@ -114,7 +120,7 @@
         <!-- 待办列表 -->
         <div class="todo-list" v-loading="loading">
           <el-empty v-if="filteredTodos.length === 0" :description="t('todos.noTodos')" />
-          
+
           <div v-else class="todo-cards">
             <div 
               v-for="todo in filteredTodos" 
@@ -1165,32 +1171,69 @@ onMounted(async () => {
 
 <style scoped>
 .todos-page-wrapper {
-  height: 100vh;
+  min-height: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 .header {
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  padding: var(--space-md) var(--space-xl);
+  min-height: 58px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 0 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
   flex-shrink: 0;
+  backdrop-filter: blur(18px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar-toggle-btn {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(242, 246, 251, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.page-eyebrow {
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-quaternary);
 }
 
 .breadcrumb {
-  font-size: var(--font-size-body);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-regular);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.breadcrumb-divider {
+  color: var(--text-quaternary);
+  font-weight: 400;
 }
 
 .header-actions {
@@ -1200,70 +1243,87 @@ onMounted(async () => {
 }
 
 .main-container {
+  display: grid;
+  grid-template-columns: 272px minmax(0, 1fr);
   flex: 1;
-  display: flex;
   overflow: hidden;
+  min-height: 0;
+  padding: 5px 5px 0;
+  gap: 0;
+}
+
+.main-container.sidebar-hidden {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .sidebar-left {
-  width: 220px;
-  background: var(--bg-primary);
-  border-right: 1px solid var(--border-color);
+  min-width: 0;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 .sidebar-toolbar {
-  padding: var(--space-lg);
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .sidebar-title {
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-caption);
-  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text-quaternary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
 
 .sidebar-btn {
   cursor: pointer;
   color: var(--accent-blue);
   font-size: var(--font-size-body);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-xs);
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: color var(--transition-fast), background var(--transition-fast);
 }
 
 .sidebar-btn:hover {
-  background: var(--accent-blue-bg);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .category-list {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-sm);
+  padding: 8px;
 }
 
 .category-item {
   display: flex;
   align-items: center;
-  padding: 10px var(--space-md);
-  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background var(--transition-normal);
-  margin-bottom: var(--space-xs);
+  transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  margin-bottom: 4px;
   position: relative;
+  border: 1px solid transparent;
 }
 
 .category-item:hover {
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .category-item.active {
-  background: var(--accent-blue-bg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
   color: var(--accent-blue);
+  border-color: rgba(10, 132, 255, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(15, 23, 42, 0.05);
 }
 
 .category-item.active .category-icon {
@@ -1321,30 +1381,70 @@ onMounted(async () => {
 
 .content-area {
   flex: 1;
-  overflow-y: auto;
-  padding: var(--space-2xl);
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0 18px 18px 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container.sidebar-hidden .content-area {
+  border-radius: 18px;
 }
 
 .todo-list {
+  flex: 1;
+  overflow-y: auto;
   max-width: 1200px;
+  padding: 16px 20px 22px;
+}
+
+.todo-list :deep(.el-empty) {
+  min-height: 320px;
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
+}
+
+.todo-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.24);
+  border-radius: 999px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.36);
+}
+
+.todo-list::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .todo-cards {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: 12px;
 }
 
 .todo-card {
-  background: var(--bg-primary);
-  border-radius: var(--radius-md);
-  padding: var(--space-lg) var(--space-xl);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow var(--transition-smooth);
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  transition: box-shadow var(--transition-smooth), transform var(--transition-fast);
+  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .todo-card:hover {
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
 }
 
 .todo-card.completed {

@@ -13,7 +13,11 @@ mod state;
 
 use setup::setup_app;
 use state::ChildWindowCounter;
+use commands::downloader::Aria2State;
+use commands::ssh::SshState;
 use log::LevelFilter;
+use tauri::{Emitter, Manager};
+use tauri::webview::PageLoadEvent;
 
 /// 应用程序入口点
 ///
@@ -27,6 +31,14 @@ pub fn run() {
     let builder = builder.plugin(configure_single_instance());
 
     builder
+        .on_page_load(|webview, payload| {
+            if webview.label() == "splashscreen" && matches!(payload.event(), PageLoadEvent::Finished) {
+                if let Some(window) = webview.app_handle().get_webview_window("splashscreen") {
+                    let _ = window.show();
+                    let _ = window.emit("splash-page-ready", ());
+                }
+            }
+        })
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
@@ -57,6 +69,8 @@ pub fn run() {
         )
         // 状态管理
         .manage(ChildWindowCounter::new())
+        .manage(Aria2State::new())
+        .manage(SshState::new())
         // 应用启动配置
         .setup(|app| {
             setup_app(app)?;
@@ -86,6 +100,12 @@ pub fn run() {
             commands::file_ops::copy_file,
             commands::file_ops::move_file,
             commands::file_ops::rename_file,
+            commands::log_analysis::open_log_analysis_session,
+            commands::log_analysis::get_log_analysis_summary,
+            commands::log_analysis::query_log_blocks,
+            commands::log_analysis::get_log_block_detail,
+            commands::log_analysis::cancel_log_analysis_session,
+            commands::log_analysis::close_log_analysis_session,
             commands::shell::execute_shell_command,
             commands::database::get_database_init_sql,
             commands::chat::get_local_ip,
@@ -162,10 +182,32 @@ pub fn run() {
             commands::wallpaper::set_wallpaper,
             commands::wallpaper::scan_images,
             commands::wallpaper::fetch_bing_wallpapers,
+            commands::wallpaper::download_wallpaper,
             commands::wallpaper::download_and_set_wallpaper,
             commands::wallpaper::fetch_wallhaven_wallpapers,
             commands::wallpaper::scan_downloaded_wallpapers,
             commands::hardware::get_hardware_info,
+            commands::network::network_dns_lookup,
+            commands::network::network_ip_lookup,
+            commands::dev_server::get_dev_server_port,
+            commands::downloader::start_aria2,
+            commands::downloader::stop_aria2,
+            commands::downloader::get_aria2_status,
+            commands::downloader::get_default_download_dir,
+            commands::ssh::ssh_connect,
+            commands::ssh::ssh_write,
+            commands::ssh::ssh_resize,
+            commands::ssh::ssh_disconnect,
+            commands::ssh::ssh_list_sessions,
+            commands::ssh::ssh_host_key_response,
+            commands::ssh::encrypt_credential,
+            commands::ssh::decrypt_credential,
+            commands::ssh::sftp_list,
+            commands::ssh::sftp_download,
+            commands::ssh::sftp_upload,
+            commands::ssh::sftp_mkdir,
+            commands::ssh::sftp_remove,
+            commands::ssh::sftp_rename,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

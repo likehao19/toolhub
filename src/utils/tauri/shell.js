@@ -8,6 +8,11 @@ import { Command } from '@tauri-apps/plugin-shell'
 import { platform } from '@tauri-apps/plugin-os'
 import { ElMessage } from 'element-plus'
 
+function isWindowsPlatform(value) {
+  const normalized = String(value || '').toLowerCase()
+  return normalized === 'win32' || normalized === 'windows'
+}
+
 /**
  * 在默认浏览器中打开 URL
  * @param {string} url - URL 地址
@@ -30,17 +35,17 @@ export async function openURL(url) {
  * @returns {Promise<Object>} - 返回执行结果
  */
 export async function executeCommand(program, args = []) {
+  let finalProgram = program
+  let finalArgs = [...args]
+
   try {
     // Windows 内置命令需要通过 cmd.exe 执行
     const windowsBuiltinCommands = ['dir', 'cd', 'type', 'copy', 'del', 'move', 'ren', 'md', 'rd', 'cls', 'echo', 'set', 'if', 'for', 'goto', 'call', 'date', 'time', 'ver']
     
-    let finalProgram = program
-    let finalArgs = [...args]
-    
     // 如果是 Windows 内置命令，通过 cmd.exe /c 执行
     try {
       const currentPlatform = await platform()
-      if (currentPlatform === 'win32') {
+      if (isWindowsPlatform(currentPlatform)) {
         // 将 ls 转换为 dir（跨平台兼容）
         if (program.toLowerCase() === 'ls') {
           finalProgram = 'cmd.exe'
@@ -62,8 +67,25 @@ export async function executeCommand(program, args = []) {
       })
       return result
     } catch (rustError) {
-      // 如果 Rust 命令失败，回退到插件 API
-      const command = Command.create(finalProgram, finalArgs)
+      const rustErrorMsg = rustError?.message || String(rustError || '')
+      const lowerRustErrorMsg = rustErrorMsg.toLowerCase()
+
+      // 只有在 Rust invoke 本身不可用时才回退到 plugin-shell，避免掩盖真实命令错误
+      const canFallback =
+        lowerRustErrorMsg.includes('unknown ipc command') ||
+        lowerRustErrorMsg.includes('command execute_shell_command not found') ||
+        lowerRustErrorMsg.includes('command not found: execute_shell_command')
+
+      if (!canFallback) {
+        throw rustError
+      }
+
+      let fallbackProgram = finalProgram
+      if (finalProgram === 'cmd.exe') fallbackProgram = 'cmd'
+      else if (finalProgram === 'powershell.exe') fallbackProgram = 'powershell'
+      else if (finalProgram === 'git.exe') fallbackProgram = 'git'
+
+      const command = Command.create(fallbackProgram, finalArgs)
       const output = await command.execute()
       return {
         code: output.code,
@@ -73,8 +95,16 @@ export async function executeCommand(program, args = []) {
     }
   } catch (error) {
     const errorMsg = error.message || String(error)
-    if (errorMsg.includes('not allowed') || errorMsg.includes('not found')) {
-      ElMessage.error('命令执行失败: 权限不足或命令未找到。请检查权限配置。')
+    const lowerErrorMsg = errorMsg.toLowerCase()
+
+    if (lowerErrorMsg.includes('not allowed')) {
+      ElMessage.error('命令执行失败: 当前应用未授予该命令的执行权限，请检查 Tauri 权限配置。')
+    } else if (
+      lowerErrorMsg.includes('not found') ||
+      errorMsg.includes('系统找不到指定的文件') ||
+      errorMsg.includes('No such file or directory')
+    ) {
+      ElMessage.error(`命令执行失败: 未找到命令 ${finalProgram}。请确认已安装并已加入 PATH。`)
     } else {
       ElMessage.error('执行命令失败: ' + errorMsg)
     }

@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "tauri:dev2": "set CARGO_TARGET_DIR=../target_dev2&& tauri dev --config src-tauri/tauri.dev2.conf.json -- --features dev2"
+    "tauri:dev2": "set CARGO_TARGET_DIR=../target_dev2&& tauri dev --config src-tauri/tauri.dev2.conf.json -- --features dev2",
+    "dev:auto": "node scripts/auto-dev.cjs"
   },
   "dependencies": {
     "@antv/g6": "^5.0.51",
@@ -56,6 +57,10 @@
     "@types/markdown-it": "^14.1.2",
     "@univerjs/preset-sheets-core": "^0.15.3",
     "@univerjs/presets": "^0.15.3",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-search": "^0.16.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/xterm": "^6.0.0",
     "codemirror": "^6.0.2",
     "crypto-js": "^4.2.0",
     "diff": "^8.0.3",

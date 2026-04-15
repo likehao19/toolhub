@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Dashboard from '@/views/Dashboard.vue'
 
 const routes = [
   {
     path: '/',
     name: 'dashboard',
-    component: () => import('@/views/Dashboard.vue'),
+    component: Dashboard,
     meta: { title: '首页' }
   },
   {
@@ -260,6 +261,30 @@ const routes = [
     meta: { title: '端口管理' }
   },
   {
+    path: '/toolbox/ip-lookup',
+    name: 'ipLookup',
+    component: () => import('@/views/IpLookup.vue'),
+    meta: { title: 'IP 查询' }
+  },
+  {
+    path: '/toolbox/dns-lookup',
+    name: 'dnsLookup',
+    component: () => import('@/views/DnsLookup.vue'),
+    meta: { title: 'DNS 查询' }
+  },
+  {
+    path: '/toolbox/speed-test',
+    name: 'speedTest',
+    component: () => import('@/views/SpeedTest.vue'),
+    meta: { title: '测速' }
+  },
+  {
+    path: '/toolbox/websocket-test',
+    name: 'websocketTest',
+    component: () => import('@/views/WebSocketTest.vue'),
+    meta: { title: 'WebSocket 测试' }
+  },
+  {
     path: '/toolbox/code-formatter',
     name: 'codeFormatter',
     component: () => import('@/views/CodeFormatter.vue'),
@@ -348,6 +373,12 @@ const routes = [
     meta: { title: '图片Base64' }
   },
   {
+    path: '/toolbox/hex-converter',
+    name: 'hexConverter',
+    component: () => import('@/views/HexConverter.vue'),
+    meta: { title: '进制转换' }
+  },
+  {
     path: '/toolbox/image-format-converter',
     name: 'imageFormatConverter',
     component: () => import('@/views/ImageFormatConverter.vue'),
@@ -394,6 +425,18 @@ const routes = [
     name: 'hardwareInfo',
     component: () => import('@/views/HardwareInfo.vue'),
     meta: { title: '硬件信息' }
+  },
+  {
+    path: '/toolbox/download-manager',
+    name: 'downloadManager',
+    component: () => import('@/views/DownloadManager.vue'),
+    meta: { title: '下载管理' }
+  },
+  {
+    path: '/toolbox/ssh-terminal',
+    name: 'sshTerminal',
+    component: () => import('@/views/SshTerminal.vue'),
+    meta: { title: '终端连接' }
   },
   {
     path: '/screenshot-overlay',

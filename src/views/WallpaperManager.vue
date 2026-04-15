@@ -3,11 +3,14 @@
     <!-- Header -->
     <div class="wp-header">
       <div class="wp-header-left">
-        <div class="breadcrumb">
-          <el-icon><Picture /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('wallpaper.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Desktop Assets</div>
+          <div class="breadcrumb">
+            <el-icon><Picture /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('wallpaper.title') }}</span>
+          </div>
         </div>
       </div>
       <div class="wp-header-right">
@@ -405,6 +408,8 @@ async function loadCurrentWallpaper() {
 async function initWallpaperDir() {
   const base = await appDataDir()
   wallpaperDir.value = await join(base, 'wallpapers')
+  const { mkdir } = await import('@tauri-apps/plugin-fs')
+  await mkdir(wallpaperDir.value, { recursive: true }).catch(() => {})
 }
 
 async function refreshDownloadedPaths() {
@@ -608,7 +613,7 @@ watch(loading, async (val) => {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 /* ===== Header ===== */
@@ -616,24 +621,37 @@ watch(loading, async (val) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  height: 44px;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+  padding: 0 18px;
+  min-height: 58px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   flex-shrink: 0;
+  box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
 
-.wp-header-left { display: flex; align-items: center; }
+.wp-header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
 
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-quaternary); }
@@ -644,13 +662,13 @@ watch(loading, async (val) => {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: var(--accent-blue-bg);
+  background: rgba(10,132,255,0.1);
   font-size: 12px;
   color: var(--accent-blue);
   font-weight: 500;
-  max-width: 260px;
+  max-width: 280px;
 }
 
 .current-dot {
@@ -672,28 +690,28 @@ watch(loading, async (val) => {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 20px;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px 18px 0;
   flex-shrink: 0;
 }
 
 .source-tabs {
   display: flex;
-  gap: 2px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  padding: 2px;
+  gap: 6px;
+  padding: 6px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
 }
 
 .source-tab {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 12px;
+  padding: 7px 12px;
   border: none;
   background: transparent;
-  border-radius: 6px;
+  border-radius: 10px;
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
@@ -704,13 +722,13 @@ watch(loading, async (val) => {
 
 .source-tab:hover {
   color: var(--text-primary);
-  background: var(--bg-primary);
+  background: rgba(255,255,255,0.8);
 }
 
 .source-tab.active {
   color: var(--accent-blue);
-  background: var(--bg-primary);
-  box-shadow: var(--shadow-sm);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
 }
 
 .source-count {
@@ -721,21 +739,25 @@ watch(loading, async (val) => {
 }
 
 .toolbar-actions { display: flex; gap: 8px; }
+.toolbar-actions :deep(.el-button) { --el-button-border-radius: 10px; }
 
 /* ===== Content ===== */
 .wp-content {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 16px 20px;
+  padding: 14px 18px 18px;
 }
 
 .wp-loading {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 200px;
+  height: 240px;
   color: var(--text-tertiary);
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.54);
 }
 
 .wp-empty {
@@ -746,12 +768,12 @@ watch(loading, async (val) => {
   height: 320px;
   color: var(--text-quaternary);
   gap: 12px;
-  border: 1px dashed var(--border-color);
-  border-radius: 16px;
-  background: var(--bg-primary);
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.6);
 }
 
-.wp-empty p { font-size: 13px; color: var(--text-tertiary); }
+.wp-empty p { font-size: 13px; color: var(--text-tertiary); margin: 0; }
 
 /* ===== Grid ===== */
 .wp-grid {
@@ -762,23 +784,24 @@ watch(loading, async (val) => {
 
 .wp-card {
   position: relative;
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
   aspect-ratio: 16/10;
-  background: var(--bg-tertiary, var(--bg-secondary));
-  border: 2px solid transparent;
+  background: rgba(255,255,255,0.78);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
 }
 
 .wp-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
 }
 
 .wp-card.is-current {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px var(--accent-blue-bg);
+  box-shadow: 0 0 0 3px rgba(10,132,255,0.12), 0 12px 28px rgba(15, 23, 42, 0.1);
 }
 
 .wp-card-img {
@@ -790,9 +813,9 @@ watch(loading, async (val) => {
 /* Badges */
 .wp-badge {
   position: absolute;
-  top: 8px; left: 8px; z-index: 2;
-  padding: 3px 8px;
-  border-radius: 6px;
+  top: 10px; left: 10px; z-index: 2;
+  padding: 4px 8px;
+  border-radius: 999px;
   font-size: 10px;
   font-weight: 600;
   backdrop-filter: blur(8px);
@@ -848,7 +871,7 @@ watch(loading, async (val) => {
   margin-top: 8px;
 }
 
-.wp-card-actions :deep(.el-button) { backdrop-filter: blur(8px); }
+.wp-card-actions :deep(.el-button) { backdrop-filter: blur(8px); --el-button-border-radius: 999px; }
 
 /* Scroll sentinel */
 .wp-sentinel {
@@ -888,6 +911,9 @@ watch(loading, async (val) => {
   background: var(--bg-primary);
 }
 
+.wp-content::-webkit-scrollbar { width: 5px; }
+.wp-content::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 3px; }
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .wp-header {
@@ -902,7 +928,7 @@ watch(loading, async (val) => {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    padding: 8px 16px;
+    padding: 10px 16px 0;
   }
 
   .source-tabs { flex-wrap: wrap; }
@@ -919,3 +945,4 @@ watch(loading, async (val) => {
   }
 }
 </style>
+

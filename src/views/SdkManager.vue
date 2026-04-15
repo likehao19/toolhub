@@ -3,11 +3,14 @@
     <!-- 顶部工具栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Briefcase /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('sdkManager.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Briefcase /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('sdkManager.title') }}</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -37,8 +40,9 @@
 
       <!-- 右侧内容 -->
       <main class="content-area">
-        <template v-for="sdk in sdkKeys" :key="sdk">
-          <div v-show="activeTab === sdk" class="sdk-panel">
+        <div class="sdk-workspace">
+          <template v-for="sdk in sdkKeys" :key="sdk">
+            <div v-show="activeTab === sdk" class="sdk-panel">
             <sdk-env-card :config="SDK_CONFIG[sdk]" :info="data[sdk].env" :loading="data[sdk].envLoading" />
             <sdk-version-card
               :versions="data[sdk].versions" :env-info="data[sdk].env"
@@ -48,6 +52,7 @@
             />
           </div>
         </template>
+        </div>
       </main>
     </div>
   </div>
@@ -188,61 +193,79 @@ onMounted(() => { refreshAll() })
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-lg);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 42px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
 
-.header-left { display: flex; align-items: center; }
+.header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
 
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--font-size-footnote);
-  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--text-secondary); }
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
 
-.main-container { display: flex; flex: 1; overflow: hidden; }
+.main-container { display: grid; grid-template-columns: 172px minmax(0, 1fr); flex: 1; overflow: hidden; padding: 5px 5px 0; gap: 0; }
 
 /* 左侧菜单 */
 .sidebar-left {
-  width: 152px; min-width: 152px;
-  background-color: var(--bg-primary);
-  border-right: 1px solid var(--border-color);
+  width: auto; min-width: 0;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
   display: flex; flex-direction: column;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
-.menu-list { padding: 6px; flex: 1; overflow-y: auto; }
+.menu-list { padding: 8px; flex: 1; overflow-y: auto; }
 
 .menu-item {
   display: flex; align-items: center; gap: 8px;
-  padding: 7px 10px; border-radius: var(--radius-sm);
+  padding: 9px 10px; border-radius: 12px;
   cursor: pointer; transition: all var(--transition-fast);
-  color: var(--text-secondary); font-size: 13px; margin-bottom: 1px;
+  color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;
+  border: 1px solid transparent;
 }
-.menu-item:hover { background-color: var(--bg-tertiary); color: var(--text-primary); }
+.menu-item:hover { background-color: rgba(255,255,255,0.58); color: var(--text-primary); }
 .menu-item.active {
-  background-color: var(--accent-blue-light, rgba(64, 158, 255, 0.1));
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
   color: var(--accent-blue); font-weight: var(--font-weight-semibold);
+  border-color: rgba(10,132,255,0.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
 }
 
 .menu-badge {
   display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 4px;
+  width: 22px; height: 22px; border-radius: 6px;
   font-size: 11px; font-weight: 700; color: #fff;
   flex-shrink: 0; line-height: 1;
 }
@@ -256,11 +279,26 @@ onMounted(() => { refreshAll() })
 
 /* 右侧内容 */
 .content-area {
-  flex: 1; overflow-y: auto; padding: 14px 18px; scrollbar-gutter: stable;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  border: 1px solid rgba(15,23,42,0.08);
+  border-radius: 0 18px 18px 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
-.content-area::-webkit-scrollbar { width: 5px; }
-.content-area::-webkit-scrollbar-track { background: transparent; }
-.content-area::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 3px; }
-.content-area::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+.sdk-workspace {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+  scrollbar-gutter: stable;
+}
+.sdk-workspace::-webkit-scrollbar { width: 5px; }
+.sdk-workspace::-webkit-scrollbar-track { background: transparent; }
+.sdk-workspace::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 3px; }
+.sdk-workspace::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
 </style>

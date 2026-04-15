@@ -1,11 +1,13 @@
 /**
- * API Workbench — environment management + variable resolver
+ * API Workbench - environment management + variable resolver
  */
 import { load, save, STORAGE_KEYS, uuid } from './shared'
 
+const VARIABLE_PATTERN = /\{\{\s*([\w.-]+)\s*\}\}/g
+
 export function resolveVariables(text, variables = {}) {
   if (!text || typeof text !== 'string') return text
-  return text.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] ?? `{{${key}}}`)
+  return text.replace(VARIABLE_PATTERN, (_, key) => variables[key] ?? `{{${key}}}`)
 }
 
 export function getActiveVariables() {

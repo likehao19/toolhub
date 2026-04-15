@@ -3,10 +3,11 @@
 use tauri::{
     menu::{Menu, MenuItem},
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    window::Color,
     App, Emitter, Manager,
 };
 
-use crate::config::{startup, tray, window};
+use crate::config::{tray, window};
 
 /// 从 Store 中获取启动动画配置
 fn get_splash_animation(app: &App) -> Result<String, Box<dyn std::error::Error>> {
@@ -108,9 +109,13 @@ fn setup_splash_screen(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     let anim_type = splash_animation.clone();
     let splash_clone_for_eval = splashscreen_window.clone();
     
-    // 显示启动窗口
-    splashscreen_window.show()?;
-    
+    // 在显示前先把原生窗口和 webview 底色压成与 splash 首屏一致，尽量消除 HTML/CSS 首次绘制前的白底。
+    let splash_bg = Some(Color(234, 241, 251, 255));
+    let _ = splashscreen_window.set_background_color(splash_bg);
+
+    // 这里先不主动 show，等 splash 页面真正完成首帧加载后再显示，
+    // 否则 Windows 下会出现背景先出来、内容后补上的抖动。
+
     // 延迟一下确保窗口已加载，然后通过eval设置动画类型
     // 使用多次尝试确保设置成功
     tauri::async_runtime::spawn(async move {
@@ -136,29 +141,21 @@ fn setup_splash_screen(app: &App) -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    // 克隆窗口用于异步任务
-    let splash_clone = splashscreen_window.clone();
-    let main_clone = main_window.clone();
-
-    // 启动后台任务：等待主窗口加载完成
+    // 主窗口的显示与 splash 的关闭统一交给前端在真正 ready 后触发，
+    // 避免开发环境下主窗口过早显示而出现白屏空档。
+    //
+    // 安全超时：如果前端 15 秒内未调用 close_splashscreen，则 Rust 端强制关闭 splash 并显示主窗口，
+    // 防止因前端加载失败导致用户永远卡在启动画面。
+    let splash_for_timeout = splashscreen_window.clone();
+    let main_for_timeout = main_window.clone();
     tauri::async_runtime::spawn(async move {
-        // 初始化延迟
-        std::thread::sleep(startup::SPLASH_INITIAL_DELAY);
-
-        // 等待主窗口加载完成
-        std::thread::sleep(startup::MAIN_WINDOW_LOAD_DELAY);
-
-        // 关闭启动窗口并显示主窗口
-        if let Err(e) = splash_clone.close() {
-            eprintln!("关闭启动窗口失败: {}", e);
-        }
-
-        if let Err(e) = main_clone.show() {
-            eprintln!("显示主窗口失败: {}", e);
-        }
-
-        if let Err(e) = main_clone.set_focus() {
-            eprintln!("聚焦主窗口失败: {}", e);
+        tokio::time::sleep(std::time::Duration::from_secs(15)).await;
+        // 如果 splash 窗口仍然存在（未被前端关闭），说明启动超时
+        if splash_for_timeout.is_visible().unwrap_or(false) {
+            eprintln!("[安全超时] 前端 15s 内未关闭 splash，强制进入主界面");
+            let _ = main_for_timeout.show();
+            let _ = main_for_timeout.set_focus();
+            let _ = splash_for_timeout.close();
         }
     });
 

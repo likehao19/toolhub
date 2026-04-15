@@ -1,6 +1,10 @@
 <template>
   <div class="productivity-sidebar" :class="{ collapsed: isCollapsed }">
     <div class="sidebar-header">
+      <div v-show="!isCollapsed" class="sidebar-brand">
+        <div class="brand-title">ToolHub</div>
+        <div class="brand-subtitle">Workspace</div>
+      </div>
       <el-button text @click="toggleCollapse" class="collapse-btn">
         <el-icon><Menu v-if="isCollapsed" /><Fold v-else /></el-icon>
       </el-button>
@@ -15,12 +19,14 @@
           :disabled="!isCollapsed"
         >
           <div
-            class="menu-item"
+            class="menu-item menu-item-dashboard"
             :class="{ active: currentPath === '/' }"
             @click="navigateTo('/')"
           >
-            <el-icon><HomeFilled /></el-icon>
-            <span v-show="!isCollapsed">{{ t('sidebar.dashboard') }}</span>
+            <span class="menu-icon-shell">
+              <el-icon><HomeFilled /></el-icon>
+            </span>
+            <span v-show="!isCollapsed" class="menu-label">{{ t('sidebar.dashboard') }}</span>
           </div>
         </el-tooltip>
       </div>
@@ -29,10 +35,9 @@
     <div class="sidebar-content">
       <!-- 常用工具 -->
       <div class="menu-section">
-        <div v-if="isCollapsed" class="section-divider"></div>
         <div
           v-show="!isCollapsed"
-          class="section-header"
+          class="section-header section-header-static"
           @click="toggleFavorites"
         >
           <el-icon>
@@ -56,8 +61,10 @@
                 :class="{ active: currentPath === getToolPath(tool) }"
                 @click="openFavoriteTool(tool)"
               >
-                <span class="tool-emoji-icon">{{ tool.icon }}</span>
-                <span v-show="!isCollapsed">{{ tool.name }}</span>
+                <span class="menu-icon-shell menu-icon-shell-emoji">
+                  <span class="tool-emoji-icon">{{ tool.icon }}</span>
+                </span>
+                <span v-show="!isCollapsed" class="menu-label">{{ tool.name }}</span>
               </div>
             </el-tooltip>
           </template>
@@ -73,8 +80,10 @@
               class="menu-item favorites-empty-item"
               @click="navigateTo('/toolbox')"
             >
-              <el-icon><Star /></el-icon>
-              <span>{{ t('sidebar.addFavorite') }}</span>
+              <span class="menu-icon-shell">
+                <el-icon><Star /></el-icon>
+              </span>
+              <span class="menu-label">{{ t('sidebar.addFavorite') }}</span>
             </div>
           </el-tooltip>
         </div>
@@ -112,8 +121,10 @@
               :class="{ active: currentPath === item.path && !item.isWindow }"
               @click="navigateTo(item.path, item)"
             >
-              <el-icon><component :is="item.icon" /></el-icon>
-              <span v-show="!isCollapsed">{{ item.title }}</span>
+              <span class="menu-icon-shell">
+                <el-icon><component :is="item.icon" /></el-icon>
+              </span>
+              <span v-show="!isCollapsed" class="menu-label">{{ item.title }}</span>
             </div>
           </el-tooltip>
         </div>
@@ -131,12 +142,14 @@
           :disabled="!isCollapsed"
         >
           <div
-            class="menu-item toolbox-btn"
+            class="menu-item toolbox-btn footer-entry"
             :class="{ active: currentPath === '/toolbox' }"
             @click="navigateTo('/toolbox')"
           >
-            <el-icon><Briefcase /></el-icon>
-            <span v-show="!isCollapsed">{{ t('sidebar.toolbox') }}</span>
+            <span class="menu-icon-shell">
+              <el-icon><Briefcase /></el-icon>
+            </span>
+            <span v-show="!isCollapsed" class="menu-label">{{ t('sidebar.toolbox') }}</span>
             <el-badge v-show="!isCollapsed" :value="enabledToolsCount" class="tools-badge" />
           </div>
         </el-tooltip>
@@ -150,12 +163,14 @@
           :disabled="!isCollapsed"
         >
           <div
-            class="menu-item"
+            class="menu-item footer-entry"
             :class="{ active: currentPath === '/settings' }"
             @click="navigateTo('/settings')"
           >
-            <el-icon><Setting /></el-icon>
-            <span v-show="!isCollapsed">{{ t('sidebar.settings') }}</span>
+            <span class="menu-icon-shell">
+              <el-icon><Setting /></el-icon>
+            </span>
+            <span v-show="!isCollapsed" class="menu-label">{{ t('sidebar.settings') }}</span>
           </div>
         </el-tooltip>
       </div>
@@ -205,6 +220,10 @@ const toolPathMap = {
   'sdk-manager': '/toolbox/sdk-manager',
   'redis-client': '/toolbox/redis-client',
   'port-manager': '/toolbox/port-manager',
+  'ip-lookup': '/toolbox/ip-lookup',
+  'dns-lookup': '/toolbox/dns-lookup',
+  'speed-test': '/toolbox/speed-test',
+  'websocket-test': '/toolbox/websocket-test',
   'git-manager': '/toolbox/git-manager',
   'git-daily-report': '/toolbox/git-daily-report',
   'code-formatter': '/toolbox/code-formatter',
@@ -217,6 +236,7 @@ const toolPathMap = {
   'ebook-shelf': '/toolbox/ebook-shelf',
   'screenshot': '/toolbox/screenshot',
   'image-to-base64': '/toolbox/image-to-base64',
+  'hex-converter': '/toolbox/hex-converter',
   'image-format': '/toolbox/image-format-converter',
   'regex-tester': '/toolbox/regex-tester',
   'crypto': '/toolbox/crypto-tool',
@@ -225,6 +245,8 @@ const toolPathMap = {
   'wallpaper-manager': '/toolbox/wallpaper-manager',
   'log-analyzer': '/toolbox/log-analyzer',
   'hardware-info': '/toolbox/hardware-info',
+  'download-manager': '/toolbox/download-manager',
+  'ssh-terminal': '/toolbox/ssh-terminal',
 }
 
 const getToolPath = (tool) => toolPathMap[tool.id] ?? null
@@ -320,12 +342,15 @@ watch(currentPath, (newPath) => {
 <style scoped>
 .productivity-sidebar {
   width: var(--sidebar-width);
-  background: var(--bg-primary);
-  border-right: 0.5px solid var(--border-color);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 32%),
+    linear-gradient(180deg, rgba(249, 250, 252, 0.985), rgba(243, 246, 249, 0.98));
+  border-right: 1px solid rgba(15, 23, 42, 0.07);
   display: flex;
   flex-direction: column;
-  transition: width var(--transition-smooth);
+  transition: width var(--transition-smooth), background var(--transition-smooth);
   flex-shrink: 0;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.72);
 }
 
 .productivity-sidebar.collapsed {
@@ -333,22 +358,60 @@ watch(currentPath, (newPath) => {
 }
 
 .sidebar-header {
-  height: 44px;
+  min-height: 56px;
   display: flex;
   align-items: center;
-  padding: 0 var(--space-md);
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.045);
+}
+
+.sidebar-brand {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-left: 8px;
+}
+
+.brand-title {
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
+}
+
+.brand-subtitle {
+  font-size: 11px;
+  line-height: 1.2;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .collapse-btn {
-  width: 100%;
-  justify-content: flex-start;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 10px;
+  justify-content: center;
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text-primary);
 }
 
 /* 顶部固定区域 — 不参与滚动 */
 .sidebar-top {
   flex-shrink: 0;
-  padding-bottom: var(--space-xs);
-  border-bottom: 0.5px solid var(--border-color);
+  padding: 8px 0 6px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.045);
 }
 
 .sidebar-top .menu-section {
@@ -358,7 +421,7 @@ watch(currentPath, (newPath) => {
 .sidebar-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-sm) 0;
+  padding: 10px 0 12px;
   display: flex;
   flex-direction: column;
 }
@@ -375,59 +438,79 @@ watch(currentPath, (newPath) => {
   border-radius: 2px;
 }
 .sidebar-content:hover::-webkit-scrollbar-thumb {
-  background: var(--text-quaternary);
+  background: rgba(148, 163, 184, 0.55);
 }
 
 .menu-section {
-  margin-bottom: var(--space-sm);
+  margin-bottom: 8px;
 }
 
 /* 底部固定区域 — 不参与滚动 */
 .sidebar-footer {
   flex-shrink: 0;
-  padding-top: var(--space-sm);
-  border-top: 0.5px solid var(--border-color);
+  padding: 10px 0 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.045);
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.68), rgba(243, 246, 249, 0.92));
 }
 
 .sidebar-footer .menu-section {
   margin-bottom: 0;
+  padding: 0 10px;
+}
+
+.sidebar-footer .menu-section + .menu-section {
+  margin-top: 4px;
 }
 
 .sidebar-footer .menu-section:last-child {
-  padding-bottom: var(--space-sm);
+  padding-bottom: 0;
 }
 
-/* 分组标题 — macOS Settings 风格 */
+/* 分组标题 */
 .section-header {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: 18px 16px 6px 16px;
-  font-size: var(--font-size-caption2);
-  font-weight: var(--font-weight-semibold);
+  gap: 8px;
+  padding: 10px 16px 5px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.08em;
   cursor: pointer;
   user-select: none;
 }
 
 .section-header .el-icon {
-  font-size: 12px;
+  font-size: 11px;
+  color: var(--text-quaternary);
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.section-header:hover {
+  color: var(--text-secondary);
+}
+
+.section-header:hover .el-icon {
+  color: var(--text-secondary);
+}
+
+.section-header.section-header-static {
+  padding-top: 6px;
 }
 
 .section-items {
-  padding: 2px 0;
+  padding: 1px 0;
 }
 
 .section-divider {
-  height: 0.5px;
-  background: var(--border-color);
-  margin: var(--space-sm) var(--space-md);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.28), rgba(148, 163, 184, 0));
+  margin: 8px 14px;
 }
 
 .productivity-sidebar.collapsed .section-divider {
-  margin: var(--space-sm);
+  margin: 8px 8px;
 }
 
 /* 菜单项 */
@@ -435,46 +518,95 @@ watch(currentPath, (newPath) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 7px 12px 7px 20px;
-  margin: 1px 8px;
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-regular);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
+  min-height: 36px;
+  padding: 7px 12px 7px 14px;
+  margin: 1px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(15, 23, 42, 0.88);
+  border-radius: 11px;
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
   position: relative;
+}
+
+.menu-item-dashboard {
+  background: transparent;
+  box-shadow: none;
+}
+
+.menu-icon-shell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 7px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.menu-icon-shell-emoji {
+  background: transparent;
 }
 
 /* 图标统一单色 */
 .menu-item .el-icon {
-  font-size: 16px;
-  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  min-width: 16px;
+  font-size: 15px;
+  color: rgba(71, 85, 105, 0.9);
   flex-shrink: 0;
-  transition: color var(--transition-fast);
+  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
 /* Hover 态 */
 .menu-item:hover {
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12);
 }
 
 .menu-item:hover .el-icon {
-  color: var(--text-primary);
+  color: rgba(15, 23, 42, 0.92);
 }
 
-/* 选中态 — 系统蓝 */
+.menu-item:hover .menu-icon-shell {
+  background: rgba(15, 23, 42, 0.028);
+}
+
+/* 选中态 */
 .menu-item.active {
-  background: var(--accent-blue-bg);
-  color: var(--accent-blue);
-  font-weight: var(--font-weight-medium);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.86), rgba(229, 238, 252, 0.82));
+  color: #1d4ed8;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.14);
+}
+
+.menu-item.active::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
 }
 
 .menu-item.active .el-icon {
-  color: var(--accent-blue);
+  color: #2563eb;
 }
 
-.menu-item span {
+.menu-item.active .menu-icon-shell {
+  background: rgba(37, 99, 235, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.08);
+}
+
+.menu-label {
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -482,16 +614,34 @@ watch(currentPath, (newPath) => {
 }
 
 /* 折叠状态 */
-.productivity-sidebar.collapsed .menu-item span,
-.productivity-sidebar.collapsed .section-header span {
+.productivity-sidebar.collapsed .menu-label,
+.productivity-sidebar.collapsed .section-header span,
+.productivity-sidebar.collapsed .sidebar-brand,
+.productivity-sidebar.collapsed .tools-badge {
   display: none;
 }
 
 .productivity-sidebar.collapsed .menu-item {
-  padding: 10px;
+  padding: 9px;
   justify-content: center;
-  margin: 2px 6px;
+  margin: 2px 8px;
   gap: 0;
+  border-radius: 11px;
+}
+
+.productivity-sidebar.collapsed .menu-icon-shell {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
+.productivity-sidebar.collapsed .menu-item.active::before {
+  left: 50%;
+  top: auto;
+  bottom: 4px;
+  width: 14px;
+  height: 3px;
+  transform: translateX(-50%);
 }
 
 .productivity-sidebar.collapsed .section-header {
@@ -499,42 +649,53 @@ watch(currentPath, (newPath) => {
 }
 
 .productivity-sidebar.collapsed .collapse-btn {
-  justify-content: center;
-  padding: 0;
+  margin: 0 auto;
 }
 
 .productivity-sidebar.collapsed .sidebar-header {
+  padding: 10px 0 8px;
+  justify-content: center;
+}
+
+.productivity-sidebar.collapsed .sidebar-top {
+  padding-top: 8px;
+}
+
+.productivity-sidebar.collapsed .sidebar-footer .menu-section {
   padding: 0;
 }
 
-.productivity-sidebar.collapsed .menu-section:first-child .menu-item {
-  margin-top: var(--space-xs);
-}
-
-/* 工具 emoji 图标 — 覆盖 .menu-item span 的 flex:1，保持和 el-icon 一致的固定宽度 */
+/* 工具 emoji 图标 */
 .tool-emoji-icon {
   font-size: 15px;
   width: 16px;
   min-width: 16px;
   text-align: center;
-  flex: none !important;   /* 不参与 flex 伸缩，与 el-icon 对齐 */
+  flex: none !important;
   flex-shrink: 0;
   line-height: 1;
 }
 
-/* 折叠时 emoji 图标保持显示（不被 .collapsed .menu-item span 规则隐藏） */
+/* 折叠时 emoji 图标保持显示 */
 .productivity-sidebar.collapsed .menu-item .tool-emoji-icon {
   display: inline !important;
 }
 
-/* 常用工具空状态 — 与普通菜单项结构一致，仅颜色更淡 */
+/* 常用工具空状态 */
 .favorites-empty-item {
-  opacity: 0.5;
+  opacity: 0.68;
 }
 
 /* 工具箱按钮 */
 .toolbox-btn {
   position: relative;
+}
+
+.footer-entry {
+  margin-left: 0;
+  margin-right: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .tools-badge {
@@ -545,12 +706,16 @@ watch(currentPath, (newPath) => {
 }
 
 .tools-badge :deep(.el-badge__content) {
-  background-color: var(--text-tertiary);
+  background: rgba(100, 116, 139, 0.12);
+  color: rgba(71, 85, 105, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.22);
   font-size: 10px;
-  height: 16px;
+  font-weight: 600;
+  height: 18px;
   line-height: 16px;
-  padding: 0 5px;
-  border-radius: 8px;
+  padding: 0 6px;
+  border-radius: 999px;
+  box-shadow: none;
 }
 </style>
 

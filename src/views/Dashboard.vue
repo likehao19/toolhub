@@ -1,90 +1,118 @@
 <template>
   <div class="dashboard-wrapper">
-    <!-- 顶部状态栏：日期 + 快速统计 -->
     <header class="dash-topbar">
-      <div class="topbar-date">
-        <span class="date-day">{{ new Date().getDate() }}</span>
-        <div class="date-meta">
-          <span class="date-ym">{{ new Date().toLocaleDateString(locale === 'zh-CN' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long' }) }}</span>
-          <span class="date-week">{{ todayWeekday }}</span>
+      <div class="topbar-hero">
+        <div class="topbar-copy">
+          <div class="topbar-date-line">
+            <span class="date-day">{{ currentDayNumber }}</span>
+            <span class="date-meta">
+              <span class="date-week">{{ currentWeekday }}</span>
+              <span class="date-ym">{{ currentYearMonth }}</span>
+            </span>
+          </div>
         </div>
       </div>
+
       <div class="topbar-stats">
-        <div class="stat-chip" @click="navigateTo('/todos')">
-          <span class="stat-dot todo-dot"></span>
-          <span class="stat-label">{{ t('dashboard.statTodos') }}</span>
-          <span class="stat-num">{{ totalTodos }}</span>
+        <div class="stat-item" @click="navigateTo('/todos')">
+          <span class="stat-chip-main">
+            <span class="stat-dot todo-dot"></span>
+            <span class="stat-label">{{ t('dashboard.statTodos') }}</span>
+          </span>
+          <span class="stat-num">{{ upcomingTodoCount }}</span>
         </div>
-        <div class="stat-chip" @click="navigateTo('/calendar')">
-          <span class="stat-dot event-dot"></span>
-          <span class="stat-label">{{ t('dashboard.statEvents') }}</span>
-          <span class="stat-num">{{ todayEvents.length }}</span>
+        <div class="stat-item" @click="navigateTo('/calendar')">
+          <span class="stat-chip-main">
+            <span class="stat-dot event-dot"></span>
+            <span class="stat-label">{{ t('dashboard.statEvents') }}</span>
+          </span>
+          <span class="stat-num">{{ upcomingEventCount }}</span>
         </div>
-        <div class="stat-chip" @click="navigateTo('/notes')">
-          <span class="stat-dot note-dot"></span>
-          <span class="stat-label">{{ t('dashboard.statNotes') }}</span>
-          <span class="stat-num">{{ totalNotes }}</span>
+        <div class="stat-item" @click="navigateTo('/notes')">
+          <span class="stat-chip-main">
+            <span class="stat-dot note-dot"></span>
+            <span class="stat-label">{{ t('dashboard.statNotes') }}</span>
+          </span>
+          <span class="stat-num">{{ recentNotes.length }}</span>
         </div>
-        <div class="stat-chip" @click="navigateTo('/bookmarks')">
-          <span class="stat-dot bm-dot"></span>
-          <span class="stat-label">{{ t('dashboard.statBookmarks') }}</span>
-          <span class="stat-num">{{ totalBookmarks }}</span>
+        <div class="stat-item" @click="navigateTo('/bookmarks')">
+          <span class="stat-chip-main">
+            <span class="stat-dot bm-dot"></span>
+            <span class="stat-label">{{ t('dashboard.statBookmarks') }}</span>
+          </span>
+          <span class="stat-num">{{ topBookmarks.length }}</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" :title="t('dashboard.aiAssistant')" @click="showAIAssistant = true">
+            <el-icon><MagicStick /></el-icon>
+          </button>
+          <button class="icon-btn" @click="refreshAll" :title="t('dashboard.refresh')">
+            <el-icon><Refresh /></el-icon>
+          </button>
         </div>
       </div>
-      <div class="topbar-actions">
-        <button class="icon-btn" :title="t('dashboard.aiAssistant')" @click="showAIAssistant = true">
-          <el-icon><MagicStick /></el-icon>
-        </button>
-        <button class="icon-btn" @click="refreshAll" :title="t('dashboard.refresh')">
-          <el-icon><Refresh /></el-icon>
-        </button>
-      </div>
+
     </header>
 
-    <!-- 快捷入口：左书签图标 | 右凭据列表 -->
     <div class="quick-strip" v-if="topBookmarks.length > 0 || topPasswords.length > 0">
-      <!-- 左：常用网站（仅图标） -->
-      <div class="qs-bookmarks" v-if="topBookmarks.length > 0">
-        <div
-          v-for="bm in topBookmarks"
-          :key="'bm-' + bm.id"
-          class="qs-bm-icon"
-          @click="openBookmark(bm)"
-          :title="bm.title + '\n' + bm.url"
-        >
-          <img v-if="bm.favicon_data" :src="bm.favicon_data" class="qs-favicon" />
-          <img v-else-if="bm.favicon_url" :src="bm.favicon_url" class="qs-favicon" @error="$event.target.style.display='none'" />
-          <el-icon v-else class="qs-favicon-fallback"><Link /></el-icon>
+      <div class="quick-panel qs-bookmarks panel-surface panel-surface-soft" v-if="topBookmarks.length > 0">
+        <div class="quick-panel-head">
+          <div class="quick-panel-title-row">
+            <span class="quick-panel-label">{{ t('dashboard.statBookmarks') }}</span>
+            <span class="quick-panel-count">{{ topBookmarks.length }}</span>
+          </div>
+        </div>
+        <div class="qs-bookmark-list">
+          <div
+            v-for="bm in topBookmarks"
+            :key="'bm-' + bm.id"
+            class="qs-bm-icon"
+            @click="openBookmark(bm)"
+            :title="bm.title + '\n' + bm.url"
+          >
+            <img v-if="bm.favicon_data" :src="bm.favicon_data" class="qs-favicon" />
+            <img v-else-if="bm.favicon_url" :src="bm.favicon_url" class="qs-favicon" @error="$event.target.style.display='none'" />
+            <el-icon v-else class="qs-favicon-fallback"><Link /></el-icon>
+          </div>
         </div>
       </div>
 
-      <div class="qs-divider" v-if="topBookmarks.length > 0 && topPasswords.length > 0"></div>
-
-      <!-- 右：常用凭据（标题 + 复制账号/密码） -->
-      <div class="qs-credentials" v-if="topPasswords.length > 0">
-        <div
-          v-for="pwd in topPasswords"
-          :key="'pwd-' + pwd.id"
-          class="qs-cred-item"
-        >
-          <span class="qs-cred-title">{{ pwd.title }}</span>
-          <button class="qs-copy-btn" @click="copyText(pwd.username, t('dashboard.copyAccount'))" :title="t('dashboard.copyAccount')">
-            <el-icon><User /></el-icon>
-          </button>
-          <button class="qs-copy-btn" @click="copyText(decryptPassword(pwd.password), t('dashboard.copyPassword'))" :title="t('dashboard.copyPassword')">
-            <el-icon><Key /></el-icon>
-          </button>
+      <div class="quick-panel qs-credentials panel-surface panel-surface-soft" v-if="topPasswords.length > 0">
+        <div class="quick-panel-head">
+          <div class="quick-panel-title-row">
+            <span class="quick-panel-label">{{ t('dashboard.credentials') }}</span>
+            <span class="quick-panel-count">{{ topPasswords.length }}</span>
+          </div>
+        </div>
+        <div class="qs-credentials-list">
+          <div
+            v-for="pwd in topPasswords"
+            :key="'pwd-' + pwd.id"
+            class="qs-cred-item"
+          >
+            <span class="qs-cred-title">{{ pwd.title }}</span>
+            <button class="qs-copy-btn" @click="copyText(pwd.username, t('dashboard.copyAccount'))" :title="t('dashboard.copyAccount')">
+              <el-icon><User /></el-icon>
+            </button>
+            <button class="qs-copy-btn" @click="copyText(decryptPassword(pwd.password), t('dashboard.copyPassword'))" :title="t('dashboard.copyPassword')">
+              <el-icon><Key /></el-icon>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 主体内容 -->
-    <div class="dash-body">
+    <div class="dashboard-workspace">
+      <div class="dash-body">
       <!-- 左列：最近笔记 -->
       <section class="dash-primary">
-        <div class="section-block">
+        <div class="section-block section-notes panel-surface panel-surface-soft">
           <div class="section-head">
-            <span class="section-title">{{ t('dashboard.recentNotes') }}</span>
+            <div class="section-heading">
+              <span class="section-title">{{ t('dashboard.recentNotes') }}</span>
+              <span class="section-meta">{{ t('dashboard.itemsCount', { count: recentNotes.length }) }}</span>
+            </div>
             <button class="link-btn" @click="navigateTo('/notes')"><el-icon><ArrowRight /></el-icon></button>
           </div>
           <div class="section-content">
@@ -110,9 +138,12 @@
 
       <!-- 右列：待办 + 日程 -->
       <aside class="dash-secondary">
-        <div class="section-block">
+        <div class="section-block section-todos panel-surface panel-surface-soft">
           <div class="section-head">
-            <span class="section-title">{{ t('dashboard.todos') }}</span>
+            <div class="section-heading">
+              <span class="section-title">{{ t('dashboard.todos') }}</span>
+              <span class="section-meta">{{ t('dashboard.itemsCount', { count: todayTodos.length }) }}</span>
+            </div>
             <button class="link-btn" @click="navigateTo('/todos')"><el-icon><ArrowRight /></el-icon></button>
           </div>
           <div class="section-content">
@@ -122,7 +153,7 @@
               <span class="empty-sub">{{ t('dashboard.goAddTask') }}</span>
             </div>
             <div v-else class="todo-rows">
-              <template v-for="todo in todayTodos.slice(0, 5)" :key="todo.id">
+              <template v-for="todo in visibleTodos" :key="todo.id">
                 <!-- 主任务 -->
                 <div class="todo-row">
                   <span
@@ -165,9 +196,12 @@
           </div>
         </div>
 
-        <div class="section-block">
+        <div class="section-block section-events panel-surface panel-surface-soft">
           <div class="section-head">
-            <span class="section-title">{{ t('dashboard.upcomingEvents') }}</span>
+            <div class="section-heading">
+              <span class="section-title">{{ t('dashboard.upcomingEvents') }}</span>
+              <span class="section-meta">{{ t('dashboard.itemsCount', { count: todayEvents.length }) }}</span>
+            </div>
             <button class="link-btn" @click="navigateTo('/calendar')"><el-icon><ArrowRight /></el-icon></button>
           </div>
           <div class="section-content">
@@ -178,14 +212,14 @@
             </div>
             <div v-else class="event-timeline">
               <div
-                v-for="(event, idx) in todayEvents.slice(0, 8)"
+                v-for="(event, idx) in visibleEvents"
                 :key="event.id"
                 class="tl-item"
                 @click="navigateTo('/calendar')"
               >
                 <div class="tl-rail">
                   <span class="tl-dot" :class="{ 'tl-dot-now': isNowOrFuture(event.start_time) }"></span>
-                  <span v-if="idx < todayEvents.slice(0, 8).length - 1" class="tl-line"></span>
+                  <span v-if="idx < visibleEvents.length - 1" class="tl-line"></span>
                 </div>
                 <div class="tl-content">
                   <span class="tl-time">{{ formatEventTime(event.start_time) }}</span>
@@ -197,6 +231,7 @@
           </div>
         </div>
       </aside>
+      </div>
     </div>
 
     <!-- AI助手对话框 -->
@@ -205,9 +240,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowRight, Calendar, CircleCheck, Clock, Document, Key, Link, Lock, MagicStick, Refresh, User } from '@element-plus/icons-vue'
+import { ArrowRight, CircleCheck, Clock, Document, Key, Link, MagicStick, Refresh, User } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
 import { decryptPassword } from '@/utils/encryption'
@@ -225,39 +260,18 @@ const todayEvents = ref([])
 const recentNotes = ref([])
 const topBookmarks = ref([])
 const topPasswords = ref([])
-const passwordStats = ref({
-  total: 0,
-  strong: 0,
-  weak: 0
-})
 
-// 统计数据
-const totalNotes = ref(0)
-const totalTodos = ref(0)
-const totalBookmarks = ref(0)
-const completedTodos = ref(0)
-const todoCompletionRate = ref(0)
-const weekEvents = ref(0)
+const currentDate = ref(new Date())
+let currentDateTimer = null
+const dateLocale = computed(() => (locale.value === 'zh-CN' ? 'zh-CN' : 'en-US'))
 
-// 今日日期信息
-const todayDate = ref('')
-const todayWeekday = ref('')
-const lunarDate = ref('')
-
-// 初始化今日日期
-const initTodayDate = () => {
-  const now = new Date()
-  const loc = locale.value === 'zh-CN' ? 'zh-CN' : 'en-US'
-  todayDate.value = now.toLocaleDateString(loc, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-  todayWeekday.value = now.toLocaleDateString(loc, { weekday: 'long' })
-
-  // 简单的农历显示（可以后续集成农历库）
-  lunarDate.value = `农历${now.getMonth() + 1}月${now.getDate()}日`
-}
+const visibleTodos = computed(() => todayTodos.value.slice(0, 5))
+const visibleEvents = computed(() => todayEvents.value.slice(0, 8))
+const currentDayNumber = computed(() => currentDate.value.getDate())
+const currentWeekday = computed(() => currentDate.value.toLocaleDateString(dateLocale.value, { weekday: 'long' }))
+const currentYearMonth = computed(() => currentDate.value.toLocaleDateString(dateLocale.value, { year: 'numeric', month: 'long' }))
+const upcomingTodoCount = computed(() => todayTodos.value.length)
+const upcomingEventCount = computed(() => todayEvents.value.length)
 
 // 加载待办
 const loadTodayTodos = async () => {
@@ -296,21 +310,8 @@ const loadTodayTodos = async () => {
       children: childMap[t.id] || []
     }))
 
-    // 获取待办总数和完成数
-    const totalResult = await db.select('SELECT COUNT(*) as count FROM todos WHERE status = 0')
-    totalTodos.value = totalResult[0]?.count || 0
-
-    const completedResult = await db.select('SELECT COUNT(*) as count FROM todos WHERE status = 1')
-    completedTodos.value = completedResult[0]?.count || 0
-
-    // 计算完成率
-    const total = totalTodos.value + completedTodos.value
-    todoCompletionRate.value = total > 0 ? Math.round((completedTodos.value / total) * 100) : 0
   } catch (error) {
     todayTodos.value = []
-    totalTodos.value = 0
-    completedTodos.value = 0
-    todoCompletionRate.value = 0
   }
 }
 
@@ -330,21 +331,8 @@ const loadTodayEvents = async () => {
     )
     todayEvents.value = events || []
 
-    // 获取本周日程数量
-    const weekStart = new Date()
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay())
-    const weekEnd = new Date(weekStart)
-    weekEnd.setDate(weekEnd.getDate() + 7)
-
-    const weekResult = await db.select(
-      `SELECT COUNT(*) as count FROM calendar_events
-       WHERE DATE(start_time) >= ? AND DATE(start_time) < ?`,
-      [weekStart.toISOString().split('T')[0], weekEnd.toISOString().split('T')[0]]
-    )
-    weekEvents.value = weekResult[0]?.count || 0
   } catch (error) {
     todayEvents.value = []
-    weekEvents.value = 0
   }
 }
 
@@ -385,10 +373,8 @@ const loadRecentNotes = async () => {
     await scanDir(notesDir, null)
     allFiles.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
     recentNotes.value = allFiles.slice(0, 20)
-    totalNotes.value = allFiles.length
   } catch {
     recentNotes.value = []
-    totalNotes.value = 0
   }
 }
 
@@ -435,42 +421,6 @@ const loadTopPasswords = async () => {
   }
 }
 
-// 加载书签统计
-const loadBookmarkStats = async () => {
-  try {
-    const db = await Database.load('sqlite:productivity.db')
-
-    // 获取书签总数
-    const totalResult = await db.select('SELECT COUNT(*) as count FROM bookmarks')
-    totalBookmarks.value = totalResult[0]?.count || 0
-  } catch (error) {
-    totalBookmarks.value = 0
-  }
-}
-
-// 加载密码统计
-const loadPasswordStats = async () => {
-  try {
-    const db = await Database.load('sqlite:productivity.db')
-    const stats = await db.select('SELECT COUNT(*) as total FROM passwords')
-    passwordStats.value.total = stats[0]?.total || 0
-
-    // 根据password_strength字段统计（如果存在）
-    try {
-      const strongStats = await db.select('SELECT COUNT(*) as count FROM passwords WHERE password_strength >= 3')
-      const weakStats = await db.select('SELECT COUNT(*) as count FROM passwords WHERE password_strength < 3 OR password_strength IS NULL')
-      passwordStats.value.strong = strongStats[0]?.count || Math.floor(passwordStats.value.total * 0.7)
-      passwordStats.value.weak = weakStats[0]?.count || (passwordStats.value.total - passwordStats.value.strong)
-    } catch {
-      // 如果没有password_strength字段，使用估算
-      passwordStats.value.strong = Math.floor(passwordStats.value.total * 0.7)
-      passwordStats.value.weak = passwordStats.value.total - passwordStats.value.strong
-    }
-  } catch (error) {
-    passwordStats.value = { total: 0, strong: 0, weak: 0 }
-  }
-}
-
 // 刷新所有数据
 const refreshAll = async () => {
   try {
@@ -479,9 +429,7 @@ const refreshAll = async () => {
       loadTodayEvents(),
       loadRecentNotes(),
       loadTopBookmarks(),
-      loadTopPasswords(),
-      loadBookmarkStats(),
-      loadPasswordStats()
+      loadTopPasswords()
     ])
     ElMessage.success(t('dashboard.dataUpdated'))
   } catch (error) {
@@ -616,224 +564,356 @@ const handleKeydown = (e) => {
   }
 }
 
+const startCurrentDateTimer = () => {
+  const syncCurrentDate = () => {
+    currentDate.value = new Date()
+  }
+
+  syncCurrentDate()
+
+  const scheduleNextSync = () => {
+    const now = new Date()
+    const nextMinute = new Date(now)
+    nextMinute.setSeconds(0, 0)
+    nextMinute.setMinutes(nextMinute.getMinutes() + 1)
+
+    currentDateTimer = window.setTimeout(() => {
+      syncCurrentDate()
+      scheduleNextSync()
+    }, nextMinute.getTime() - now.getTime())
+  }
+
+  scheduleNextSync()
+}
+
+const stopCurrentDateTimer = () => {
+  if (currentDateTimer !== null) {
+    window.clearTimeout(currentDateTimer)
+    currentDateTimer = null
+  }
+}
+
 // 页面加载
 onMounted(() => {
-  initTodayDate()
+  startCurrentDateTimer()
   refreshAll()
   window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
+  stopCurrentDateTimer()
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
 <style scoped>
-/* ================================================================
-   Borderless — 纯白底 · 细线分区 · 快捷入口
-   ================================================================ */
 .dashboard-wrapper {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--bg-primary, #fff);
+  padding: 5px;
+  gap: 6px;
+  background: var(--surface-page);
   overflow: hidden;
 }
 
-/* ── 顶部状态栏 ───────────────────────────────── */
+.panel-surface {
+  background: color-mix(in srgb, var(--surface-panel) 70%, var(--bg-secondary) 30%);
+  border: 1px solid var(--surface-divider);
+  box-shadow: var(--shadow-card);
+  border-radius: 14px;
+}
+
+.panel-surface-soft {
+  background: color-mix(in srgb, var(--surface-panel-soft) 68%, var(--bg-secondary) 32%);
+}
+
 .dash-topbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(170px, auto) minmax(0, 1fr);
+  gap: 12px;
   align-items: center;
-  gap: 24px;
-  padding: 14px 28px;
-  border-bottom: 1px solid var(--border-color, #ebebef);
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--surface-panel-soft) 62%, var(--bg-secondary) 38%);
+  border: 1px solid var(--surface-divider);
+  box-shadow: var(--shadow-sm);
+  border-radius: 14px;
+  backdrop-filter: saturate(150%) blur(12px);
   flex-shrink: 0;
 }
 
-.topbar-date {
+.topbar-hero {
   display: flex;
   align-items: center;
-  gap: 12px;
+  min-width: 0;
 }
 
-.date-day {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-}
-
-.date-meta {
+.topbar-copy {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.date-ym {
-  font-size: 13px;
-  font-weight: 600;
+.quick-panel-label,
+.section-title {
+  font-size: var(--font-size-caption2);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.topbar-date-line {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.date-day {
+  min-width: 56px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
   color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.date-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
 }
 
 .date-week {
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.08;
+  color: var(--text-primary);
+}
+
+.date-ym {
   font-size: 12px;
-  color: var(--text-tertiary, #999);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text-tertiary);
 }
 
 .topbar-stats {
   display: flex;
-  gap: 2px;
-  margin-left: auto;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  min-width: 0;
 }
 
-.stat-chip {
-  display: flex;
+.stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.stat-item:hover {
+  opacity: 0.84;
+}
+
+.stat-chip-main {
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.15s;
-  user-select: none;
+  min-width: 0;
 }
 
-.stat-chip:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.04));
+.stat-chip-main .stat-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
   flex-shrink: 0;
+  opacity: 0.92;
 }
 
 .todo-dot  { background: #3b82f6; }
 .event-dot { background: #f59e0b; }
 .note-dot  { background: #10b981; }
-.bm-dot   { background: #8b5cf6; }
+.bm-dot    { background: #8b5cf6; }
 
 .stat-label {
   font-size: 12px;
-  color: var(--text-tertiary, #999);
+  color: var(--text-secondary);
 }
 
 .stat-num {
-  font-size: 13px;
-  font-weight: 600;
+  min-width: 18px;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .topbar-actions {
   display: flex;
+  align-items: center;
   gap: 4px;
+  margin-left: 8px;
 }
 
 .icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  background: none;
-  border-radius: 6px;
-  color: var(--text-tertiary, #999);
+  border: 1px solid transparent;
+  background: var(--surface-muted);
+  border-radius: 8px;
+  color: var(--text-secondary);
   cursor: pointer;
-  font-size: 16px;
-  transition: background 0.15s, color 0.15s;
+  font-size: 12px;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .icon-btn:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.04));
+  background: var(--surface-hover);
+  border-color: var(--surface-divider);
   color: var(--text-primary);
 }
 
-/* ── 快捷入口条：左书签 | 右凭据 均匀分布 ────────── */
 .quick-strip {
-  display: flex;
-  align-items: center;
-  padding: 10px 28px;
-  border-bottom: 1px solid var(--border-color, #ebebef);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 6px;
   flex-shrink: 0;
-  gap: 0;
-  min-height: 0;
 }
 
-.qs-bookmarks {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
+.quick-panel {
   min-width: 0;
-}
-
-.qs-bm-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  border: 1px solid var(--border-color, #ebebef);
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
 }
 
-.qs-bm-icon:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.04));
-  transform: scale(1.08);
-}
-
-.qs-favicon {
-  width: 18px;
-  height: 18px;
-  border-radius: 3px;
-  object-fit: contain;
-}
-
-.qs-favicon-fallback {
-  font-size: 14px;
-  color: var(--text-quaternary, #c7c7cc);
-}
-
-.qs-divider {
-  width: 1px;
-  height: 24px;
-  background: var(--border-color, #ebebef);
-  flex-shrink: 0;
-  margin: 0 16px;
-}
-
-.qs-credentials {
-  flex: 1;
+.quick-panel-head {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
-  min-width: 0;
-  overflow-x: auto;
 }
 
-.qs-credentials::-webkit-scrollbar { display: none; }
+.quick-panel-title-row,
+.section-heading {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.quick-panel-count,
+.section-meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  min-height: 16px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: var(--font-size-caption2);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-tertiary);
+  background: var(--surface-muted);
+  border: 1px solid transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+.qs-bookmarks,
+.qs-credentials {
+  padding-bottom: 8px;
+}
+
+.qs-bookmark-list,
+.qs-credentials-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.qs-bookmark-list::-webkit-scrollbar,
+.qs-credentials-list::-webkit-scrollbar {
+  display: none;
+}
+
+.qs-bm-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  border: 1px solid transparent;
+  background: var(--surface-muted);
+  flex-shrink: 0;
+}
+
+.qs-bm-icon:hover {
+  background: var(--surface-hover);
+  border-color: var(--surface-divider);
+}
+
+.qs-favicon {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.qs-favicon-fallback {
+  font-size: 13px;
+  color: var(--text-quaternary);
+}
 
 .qs-cred-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 8px 4px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color, #ebebef);
+  gap: 5px;
+  padding: 3px 5px 3px 7px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: var(--surface-muted);
   flex-shrink: 0;
-  max-width: 220px;
+  min-width: 132px;
+  max-width: 200px;
 }
 
 .qs-cred-title {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -843,99 +923,96 @@ onUnmounted(() => {
 }
 
 .qs-copy-btn {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  background: none;
-  border-radius: 4px;
-  color: var(--text-quaternary, #aeaeb2);
+  border: 1px solid transparent;
+  background: var(--surface-accent);
+  border-radius: 5px;
+  color: var(--text-tertiary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 10px;
   flex-shrink: 0;
-  transition: background 0.12s, color 0.12s;
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .qs-copy-btn:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.06));
-  color: var(--text-primary);
+  background: var(--surface-hover);
+  border-color: var(--surface-divider);
+  color: var(--accent-blue);
 }
 
-/* ── 主体双栏布局 ──────────────────────────────── */
+.dashboard-workspace {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
 .dash-body {
   flex: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1.22fr) 360px;
   overflow: hidden;
+  gap: 10px;
+  padding: 2px 0 0;
 }
 
-.dash-primary {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-}
-
+.dash-primary,
 .dash-secondary {
-  width: 340px;
-  flex-shrink: 0;
+  min-width: 0;
   overflow-y: auto;
-  border-left: 1px solid var(--border-color, #ebebef);
   display: flex;
   flex-direction: column;
+  gap: 8px;
 }
 
-/* ── 区块容器 ──────────────────────────────────── */
 .section-block {
-  padding: 20px 28px;
+  padding: 10px 12px 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-.section-block + .section-block {
-  border-top: 1px solid var(--border-color, #ebebef);
+.section-notes {
+  flex: 1;
 }
 
-/* ── 区块标题栏 ────────────────────────────────── */
 .section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding: 0 4px;
   flex-shrink: 0;
 }
 
-.section-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-tertiary, #8e8e93);
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-}
-
 .link-btn {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  color: var(--text-quaternary, #aeaeb2);
-  background: none;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: transparent;
   border: none;
   cursor: pointer;
-  border-radius: 4px;
-  transition: background 0.15s, color 0.15s;
+  border-radius: 6px;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 .link-btn:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.04));
-  color: var(--text-primary);
+  background: var(--surface-muted);
+  color: var(--accent-blue);
 }
 
 .section-content {
@@ -945,79 +1022,85 @@ onUnmounted(() => {
   min-height: 0;
 }
 
-/* ── 空态 ──────────────────────────────────────── */
 .empty-state {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 24px 16px;
-  border-radius: 8px;
-  border: 1px dashed var(--border-color, #e0e0e3);
+  gap: 5px;
+  padding: 14px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--surface-muted);
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-  min-height: 90px;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  min-height: 70px;
 }
 
 .empty-state:hover {
-  border-color: var(--text-quaternary, #c7c7cc);
-  background: var(--bg-hover, rgba(0,0,0,0.015));
+  background: var(--surface-hover);
+  border-color: var(--surface-divider);
 }
 
 .empty-icon {
-  font-size: 26px;
-  color: var(--text-quaternary, #d1d1d6);
+  font-size: 20px;
+  color: var(--text-quaternary);
 }
 
 .empty-text {
-  font-size: 13px;
-  color: var(--text-tertiary, #8e8e93);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .empty-sub {
-  font-size: 11px;
-  color: var(--text-quaternary, #c7c7cc);
+  font-size: 10px;
+  color: var(--text-quaternary);
 }
 
-/* ── 笔记行 ───────────────────────────────────── */
 .note-rows {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+  gap: 3px;
 }
 
 .note-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 9px 10px;
-  border-radius: 6px;
+  gap: 8px;
+  padding: 6px 7px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background 0.12s;
-  border-bottom: 1px solid var(--border-color, #ebebef);
-}
-
-.note-row:last-child {
-  border-bottom: none;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  border: 1px solid transparent;
+  background: var(--surface-muted);
 }
 
 .note-row:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.03));
+  background: var(--surface-hover);
+  border-color: var(--surface-divider);
 }
 
 .note-row-icon {
-  font-size: 15px;
-  color: var(--text-quaternary, #c7c7cc);
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.08);
+  color: #10b981;
   flex-shrink: 0;
 }
 
 .note-row-name {
   flex: 1;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1025,44 +1108,42 @@ onUnmounted(() => {
 }
 
 .note-row-time {
-  font-size: 11px;
-  color: var(--text-quaternary, #aeaeb2);
+  font-size: 10px;
+  color: var(--text-quaternary);
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
 }
 
-/* ── 待办行 ────────────────────────────────────── */
 .todo-rows {
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 
 .todo-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 6px;
-  border-radius: 5px;
-  transition: background 0.12s;
-  border-bottom: 1px solid var(--border-color, #ebebef);
-}
-
-.todo-row:last-child {
-  border-bottom: none;
+  padding: 6px 7px;
+  border-radius: 8px;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  border: 1px solid transparent;
+  background: var(--surface-muted);
 }
 
 .todo-row:hover {
-  background: var(--bg-hover, rgba(0,0,0,0.03));
+  background: var(--surface-hover);
+  border-color: var(--surface-divider);
 }
 
 .todo-arrow {
   width: 14px;
   font-size: 8px;
-  color: var(--text-quaternary, #aeaeb2);
+  color: var(--text-quaternary);
   cursor: pointer;
   flex-shrink: 0;
   text-align: center;
-  transition: transform 0.15s;
+  transition: transform var(--transition-fast);
   user-select: none;
   line-height: 1;
 }
@@ -1081,24 +1162,25 @@ onUnmounted(() => {
 }
 
 .todo-check :deep(.el-checkbox__inner) {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
 }
 
 .todo-label {
   flex: 1;
-  font-size: 12px;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 500;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
 }
 
 .todo-label.is-done {
   text-decoration: line-through;
-  color: var(--text-quaternary, #c7c7cc);
+  color: var(--text-quaternary);
 }
 
 .priority-dot {
@@ -1110,10 +1192,10 @@ onUnmounted(() => {
 }
 
 .todo-progress-bar {
-  width: 36px;
+  width: 32px;
   height: 3px;
-  border-radius: 2px;
-  background: var(--border-color, #ebebef);
+  border-radius: 999px;
+  background: var(--surface-divider);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -1121,80 +1203,83 @@ onUnmounted(() => {
 .todo-progress-fill {
   display: block;
   height: 100%;
-  border-radius: 2px;
-  background: #3b82f6;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, #2563eb);
+}
+
+.todo-progress-text,
+.todo-due {
+  font-size: 10px;
+  color: var(--text-quaternary);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
 }
 
 .todo-progress-text {
-  font-size: 10px;
-  color: var(--text-quaternary, #aeaeb2);
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-  width: 26px;
+  width: 22px;
   text-align: right;
 }
 
-.todo-due {
-  font-size: 10px;
-  color: var(--text-quaternary, #aeaeb2);
-  font-variant-numeric: tabular-nums;
-  flex-shrink: 0;
-}
-
 .todo-child {
-  padding-left: 34px;
+  margin-left: 18px;
 }
 
 .todo-child .todo-label {
-  font-size: 11px;
-  color: var(--text-secondary, #636366);
+  font-size: 10px;
+  color: var(--text-secondary);
 }
 
-/* ── 日程时间线 ──────────────────────────────────── */
 .event-timeline {
   display: flex;
   flex-direction: column;
+  gap: 1px;
 }
 
 .tl-item {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
-  padding-right: 4px;
+  padding: 4px 3px 4px 0;
+  border-radius: 7px;
+  transition: background var(--transition-fast);
+}
+
+.tl-item:hover {
+  background: var(--surface-muted);
 }
 
 .tl-item:hover .tl-title {
-  color: var(--el-color-primary, #409eff);
+  color: var(--accent-blue);
 }
 
 .tl-rail {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 12px;
+  width: 10px;
   flex-shrink: 0;
   padding-top: 2px;
 }
 
 .tl-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: var(--border-color, #dcdfe6);
+  background: rgba(148, 163, 184, 0.6);
   flex-shrink: 0;
   z-index: 1;
 }
 
 .tl-dot-now {
   background: #f59e0b;
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08);
 }
 
 .tl-line {
   width: 1px;
   flex: 1;
-  background: var(--border-color, #e4e7ed);
-  min-height: 8px;
+  background: linear-gradient(180deg, rgba(148, 163, 184, 0.22), rgba(148, 163, 184, 0.04));
+  min-height: 10px;
 }
 
 .tl-content {
@@ -1202,40 +1287,40 @@ onUnmounted(() => {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  padding-bottom: 10px;
+  gap: 2px;
+  padding-bottom: 6px;
 }
 
 .tl-time {
   font-size: 10px;
-  font-weight: 500;
-  color: var(--text-quaternary, #aeaeb2);
+  font-weight: 600;
+  color: var(--text-quaternary);
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
 .tl-title {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  transition: color 0.12s;
+  transition: color var(--transition-fast);
 }
 
 .tl-desc {
   font-size: 10px;
-  color: var(--text-quaternary, #aeaeb2);
+  color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* ── 滚动条 ────────────────────────────────────── */
 .dash-primary::-webkit-scrollbar,
 .dash-secondary::-webkit-scrollbar,
 .note-rows::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 .dash-primary::-webkit-scrollbar-track,
@@ -1248,37 +1333,82 @@ onUnmounted(() => {
 .dash-secondary::-webkit-scrollbar-thumb,
 .note-rows::-webkit-scrollbar-thumb {
   background: transparent;
-  border-radius: 2px;
+  border-radius: 999px;
 }
 
 .dash-primary:hover::-webkit-scrollbar-thumb,
 .dash-secondary:hover::-webkit-scrollbar-thumb,
 .note-rows:hover::-webkit-scrollbar-thumb {
-  background: var(--text-quaternary, #d1d1d6);
+  background: rgba(148, 163, 184, 0.42);
 }
 
-/* ── 响应式 ────────────────────────────────────── */
 @media (max-width: 900px) {
-  .dash-body {
-    flex-direction: column;
-  }
-
-  .dash-secondary {
-    width: 100%;
-    border-left: none;
-    border-top: 1px solid var(--border-color, #ebebef);
+  .dash-topbar {
+    grid-template-columns: 1fr;
   }
 
   .topbar-stats {
-    display: none;
-  }
-
-  .quick-nav {
-    padding: 12px 20px;
-  }
-
-  .section-block {
-    padding: 16px 20px;
+    justify-content: flex-start;
   }
 }
+
+@media (max-width: 540px) {
+  .topbar-date-line {
+    gap: 10px;
+  }
+
+  .date-day {
+    min-width: 52px;
+    font-size: 34px;
+  }
+
+  .date-meta {
+    gap: 2px;
+  }
+
+  .date-ym {
+    font-size: 12px;
+  }
+
+  .date-week {
+    font-size: 11px;
+  }
+
+  .topbar-stats {
+    gap: 6px 12px;
+  }
+
+  .stat-item {
+    gap: 6px;
+  }
+
+  .stat-chip-main {
+    gap: 5px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-num {
+    font-size: 14px;
+  }
+
+  .stat-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .topbar-actions {
+    gap: 2px;
+    margin-left: 0;
+  }
+
+  .icon-btn {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+
 </style>

@@ -2,7 +2,6 @@
  * 壁纸管理工具函数
  */
 import { invoke } from '@tauri-apps/api/core'
-import { download } from '@tauri-apps/plugin-upload'
 
 /** 获取当前桌面壁纸路径 */
 export const getCurrentWallpaper = () => invoke('get_current_wallpaper')
@@ -28,16 +27,18 @@ export const downloadAndSetWallpaper = (url, saveDir) =>
   invoke('download_and_set_wallpaper', { url, saveDir })
 
 /**
- * 下载壁纸到指定路径（带进度回调）
+ * 下载壁纸到指定路径
+ * 安装包环境下统一走 Rust 后端，避免 plugin-upload 在部分客户机上失败。
  * @param {string} url - 壁纸下载地址
  * @param {string} savePath - 完整保存路径（含文件名）
  * @param {(progress: number, total: number) => void} onProgress - 进度回调
- * @returns {Promise<void>}
+ * @returns {Promise<string>}
  */
 export async function downloadWallpaper(url, savePath, onProgress) {
-  await download(url, savePath, (progress, total) => {
-    if (onProgress) onProgress(progress, total)
-  })
+  if (onProgress) onProgress(0, 0)
+  const savedPath = await invoke('download_wallpaper', { url, savePath })
+  if (onProgress) onProgress(1, 1)
+  return savedPath
 }
 
 /**

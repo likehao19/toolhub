@@ -3,11 +3,14 @@
     <!-- 顶部工具栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Monitor /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('gitReport.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Monitor /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('gitReport.title') }}</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -243,6 +246,23 @@ function getDateRange() {
   return { since: fmt(now), until: fmt(tomorrow) }
 }
 
+function getGitUserHint(message, scope) {
+  const text = String(message || '')
+  const lower = text.toLowerCase()
+
+  if (lower.includes('not allowed')) {
+    return t(`${scope}.gitPermissionHint`)
+  }
+  if (
+    lower.includes('not found') ||
+    text.includes('系统找不到指定的文件') ||
+    text.includes('No such file or directory')
+  ) {
+    return t(`${scope}.gitMissingHint`)
+  }
+  return text
+}
+
 async function scanRepos() {
   scanning.value = true
   try {
@@ -256,11 +276,12 @@ async function scanRepos() {
       selectedRepos.value = [...discoveredRepos.value]
     }
     if (selectedRepos.value.length) {
-      loadAuthors()
+      await loadAuthors()
+      await generate()
     }
     ElMessage.success(t('gitReport.foundRepos', { count: repos.length }))
   } catch (e) {
-    ElMessage.error(e.message)
+    ElMessage.error(getGitUserHint(e.message, 'gitReport'))
   } finally {
     scanning.value = false
   }
@@ -287,11 +308,14 @@ async function addRepo() {
   if (!selectedRepos.value.includes(dir)) {
     selectedRepos.value.push(dir)
   }
-  loadAuthors()
+  await loadAuthors()
+  await generate()
 }
 
 function onTimeRangeChange() {
-  if (reportMarkdown.value) generate()
+  if (timeRange.value !== 'custom') {
+    generate()
+  }
 }
 
 async function loadAuthors() {
@@ -383,13 +407,37 @@ async function exportReport() {
   }
 }
 
-onMounted(() => {
+watch(selectedRepos, async (val, oldVal) => {
+  if (JSON.stringify(val) === JSON.stringify(oldVal)) return
+  if (!val.length) {
+    commits.value = []
+    stats.value = null
+    groupedCommits.value = []
+    reportMarkdown.value = ''
+    authors.value = []
+    return
+  }
+  await loadAuthors()
+  await generate()
+}, { deep: true })
+
+watch(selectedAuthor, () => {
+  if (selectedRepos.value.length) generate()
+})
+
+watch(customRange, (val) => {
+  if (timeRange.value === 'custom' && Array.isArray(val) && val[0] && val[1]) {
+    generate()
+  }
+}, { deep: true })
+
+onMounted(async () => {
   // 清理：移除已不在 discovered 列表中的选中仓库
   selectedRepos.value = selectedRepos.value.filter(r => discoveredRepos.value.includes(r))
 
   if (selectedRepos.value.length) {
-    loadAuthors()
-    generate()
+    await loadAuthors()
+    await generate()
   }
 })
 </script>
@@ -401,33 +449,42 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
-/* ---- 顶栏 ---- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-lg);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 42px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
+  backdrop-filter: blur(18px);
 }
 
-.header-left { display: flex; align-items: center; }
-
+.header-left { display: flex; align-items: center; min-width: 0; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--font-size-footnote);
-  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--text-secondary); }
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
@@ -436,32 +493,39 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
-
+.header-actions :deep(.el-button),
+.header-actions :deep(.el-select) { --el-border-radius-base: 10px; }
 .repo-select { width: 280px; }
 .repo-select :deep(.el-select-dropdown) { min-width: 420px !important; }
 
-/* ---- 筛选栏 ---- */
 .filter-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 16px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  gap: 12px;
+  padding: 12px 18px 0;
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
-
 .filter-left {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
-
+.filter-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.filter-bar :deep(.el-radio-button__inner),
+.filter-bar :deep(.el-select),
+.filter-bar :deep(.el-date-editor) { --el-border-radius-base: 10px; }
 .date-picker { width: 240px; }
 .author-select { width: 160px; }
 
-/* ---- 空状态 ---- */
 .empty-state {
   flex: 1;
   display: flex;
@@ -469,91 +533,83 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 12px;
+  margin: 18px;
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.6);
 }
 .empty-icon { font-size: 48px; }
 .empty-text { color: var(--text-tertiary); font-size: 14px; }
 
-/* ---- 主内容区 ---- */
 .main-content {
   flex: 1;
   display: flex;
   overflow: hidden;
   min-height: 0;
+  padding: 14px 18px 0;
+  gap: 0;
 }
 
-/* ---- 左侧面板 ---- */
 .left-panel {
   width: 380px;
   min-width: 300px;
-  border-right: 1px solid var(--border-color);
-  background: var(--bg-primary);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: none;
+  border-radius: 18px 0 0 18px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
-
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-  padding: 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 14px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
-
 .stat-card {
   text-align: center;
-  padding: 8px 4px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  padding: 10px 6px;
+  background: rgba(255,255,255,0.68);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 14px;
 }
-
-.stat-value {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
+.stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 .stat-value.green { color: #67c23a; }
 .stat-value.red { color: #f56c6c; }
+.stat-label { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
 
-.stat-label {
-  font-size: 10px;
-  color: var(--text-tertiary);
-  margin-top: 2px;
-}
-
-/* ---- 提交分组 ---- */
-.commit-groups { padding: 8px 0; }
-
+.commit-groups { padding: 10px 0; }
 .commit-group { margin-bottom: 8px; }
-
 .group-header {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
 }
-
 .group-icon { font-size: 14px; }
 .group-count { color: var(--text-tertiary); font-weight: 400; }
-
 .commit-item {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 12px 3px 32px;
+  padding: 8px 14px 8px 32px;
+  margin: 0 10px 8px;
   font-size: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.64);
 }
-
 .commit-repo {
   color: var(--accent-blue);
   font-size: 11px;
   font-weight: 600;
   flex-shrink: 0;
 }
-
 .commit-msg {
   color: var(--text-primary);
   overflow: hidden;
@@ -561,62 +617,58 @@ onMounted(() => {
   white-space: nowrap;
   flex: 1;
 }
-
 .commit-time {
   color: var(--text-quaternary);
   font-size: 11px;
   flex-shrink: 0;
 }
-
 .empty-commits {
   text-align: center;
-  padding: 32px;
+  margin: 14px;
+  padding: 24px;
   color: var(--text-quaternary);
   font-size: 13px;
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.5);
 }
 
-/* ---- 右侧面板 ---- */
 .right-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-primary);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0 18px 0 0;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
 }
-
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border-color);
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   flex-shrink: 0;
+  background: rgba(255,255,255,0.64);
 }
-
-.panel-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
+.panel-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .panel-actions { display: flex; gap: 2px; }
-
 .report-preview {
   flex: 1;
   overflow: auto;
-  padding: 12px;
+  padding: 14px;
 }
-
 .report-textarea :deep(.el-textarea__inner) {
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 12px;
   line-height: 1.7;
-  background: var(--bg-secondary);
+  background: rgba(248,250,252,0.88);
   color: var(--text-primary);
-  border: none;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
   resize: none;
+  box-shadow: none;
 }
-
 .report-empty {
   flex: 1;
   display: flex;
@@ -626,20 +678,58 @@ onMounted(() => {
   font-size: 13px;
 }
 
-/* ---- 底部状态栏 ---- */
 .status-bar {
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 0 16px;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+  margin: 0 18px 18px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: none;
   font-size: 11px;
   color: var(--text-tertiary);
-  height: 28px;
+  height: 30px;
   box-sizing: border-box;
   flex-shrink: 0;
+  border-radius: 0 0 18px 18px;
 }
-
 .status-right { margin-left: auto; }
+
+@media (max-width: 1100px) {
+  .header,
+  .filter-bar {
+    align-items: flex-start;
+  }
+
+  .header {
+    flex-direction: column;
+    padding: 10px 14px;
+  }
+
+  .header-left,
+  .header-actions,
+  .filter-left,
+  .filter-right {
+    width: 100%;
+  }
+
+  .main-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .left-panel,
+  .right-panel {
+    width: 100%;
+    min-width: 0;
+    border-radius: 18px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+  }
+
+  .status-bar {
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 18px;
+  }
+}
 </style>

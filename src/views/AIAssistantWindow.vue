@@ -52,7 +52,7 @@
             <el-icon v-else><MagicStick /></el-icon>
           </div>
           <div class="message-content">
-            <div class="message-text" v-html="formatMessage(msg.content)"></div>
+            <div class="message-text">{{ formatMessage(msg.content) }}</div>
             <div v-if="msg.result" class="message-result" :class="msg.result.status">
               <el-icon v-if="msg.result.status === 'success'"><CircleCheck /></el-icon>
               <el-icon v-else><CircleClose /></el-icon>
@@ -120,7 +120,7 @@ const messageListRef = ref(null)
 
 // 格式化消息（支持换行）
 const formatMessage = (content) => {
-  return content.replace(/\n/g, '<br>')
+  return typeof content === 'string' ? content : String(content ?? '')
 }
 
 // 发送消息
@@ -432,6 +432,8 @@ onMounted(() => {
   font-size: 14px;
   line-height: 1.6;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .message-item.user .message-text {

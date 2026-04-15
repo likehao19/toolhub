@@ -8,7 +8,11 @@ import { platform } from '@tauri-apps/plugin-os'
 
 let _platform = null
 async function getPlatform() {
-  if (!_platform) _platform = await platform()
+  if (!_platform) {
+    const detected = await platform()
+    const normalized = String(detected || '').toLowerCase()
+    _platform = normalized === 'windows' ? 'win32' : normalized
+  }
   return _platform
 }
 

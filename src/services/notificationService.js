@@ -3,7 +3,7 @@
  * 负责检查待办和日程，发送桌面通知
  */
 
-import { sendNotification, isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification'
+import { isPermissionGranted, requestPermission } from '@tauri-apps/plugin-notification'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { emit } from '@tauri-apps/api/event'
 import Database from '@tauri-apps/plugin-sql'
@@ -24,6 +24,7 @@ const CHECK_INTERVAL = 60000 // 1分钟检查一次
 let checkInterval = null
 let notifiedTodos = new Set() // 已通知的待办ID
 let notifiedEvents = new Set() // 已通知的日程ID
+let notifiedPasswords = new Set() // 已通知的密码提醒
 
 /**
  * 初始化通知服务
@@ -52,6 +53,8 @@ function startChecking() {
     clearInterval(checkInterval)
   }
 
+  checkPasswordHistory()
+
   // 立即检查一次
   checkTodosAndEvents()
   checkPasswordExpiration()
@@ -61,6 +64,48 @@ function startChecking() {
     checkTodosAndEvents()
     checkPasswordExpiration()
   }, CHECK_INTERVAL)
+}
+
+function checkPasswordHistory() {
+  const now = Date.now()
+  notifiedPasswords.forEach((key) => {
+    const [, expiresAt] = key.split('|')
+    const expiresTime = new Date(expiresAt).getTime()
+    if (!Number.isFinite(expiresTime) || expiresTime < now - 24 * 60 * 60 * 1000) {
+      notifiedPasswords.delete(key)
+    }
+  })
+}
+
+async function sendSystemNotification(options, clickPayload = null) {
+  const notification = new window.Notification(options.title, options)
+
+  if (!clickPayload) {
+    return
+  }
+
+  notification.onclick = async () => {
+    try {
+      const currentWindow = getCurrentWindow()
+      await currentWindow.show()
+      await currentWindow.unminimize()
+      await currentWindow.setFocus()
+    } catch {
+      // ignore
+    }
+
+    try {
+      await emit('notification-clicked', clickPayload)
+    } catch {
+      // ignore
+    }
+
+    try {
+      notification.close()
+    } catch {
+      // ignore
+    }
+  }
 }
 
 /**
@@ -84,33 +129,44 @@ async function checkPasswordExpiration() {
     const db = await getDatabase()
     const now = new Date()
     const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
-    
-    // 查询即将过期（7天内）或已过期的密码
+
     const passwords = await db.select(
-      `SELECT id, title, username, website, expires_at 
-       FROM passwords 
-       WHERE expires_at IS NOT NULL 
+      `SELECT id, title, username, website, expires_at
+       FROM passwords
+       WHERE expires_at IS NOT NULL
        AND expires_at <= ?`,
       [sevenDaysLater.toISOString()]
     )
-    
+
     for (const pwd of passwords) {
       const expiresAt = new Date(pwd.expires_at)
-      const daysUntilExpiry = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24))
-      
-      // 如果已过期或7天内过期
-      if (daysUntilExpiry <= 7) {
-        const title = pwd.title || pwd.website || '密码'
-        const message = daysUntilExpiry <= 0 
-          ? `${title} 的密码已过期 ${Math.abs(daysUntilExpiry)} 天，请及时更新`
-          : `${title} 的密码将在 ${daysUntilExpiry} 天后过期，请及时更新`
-        
-        await sendNotification({
-          title: '密码过期提醒',
-          body: message,
-          icon: 'lock'
-        })
+      const expiresTime = expiresAt.getTime()
+      if (!Number.isFinite(expiresTime)) {
+        continue
       }
+
+      const daysUntilExpiry = Math.ceil((expiresTime - now.getTime()) / (1000 * 60 * 60 * 24))
+      if (daysUntilExpiry > 7) {
+        continue
+      }
+
+      const notificationKey = `${pwd.id}|${pwd.expires_at}`
+      if (notifiedPasswords.has(notificationKey)) {
+        continue
+      }
+
+      const title = pwd.title || pwd.website || '密码'
+      const message = daysUntilExpiry <= 0
+        ? `${title} 的密码已过期 ${Math.abs(daysUntilExpiry)} 天，请及时更新`
+        : `${title} 的密码将在 ${daysUntilExpiry} 天后过期，请及时更新`
+
+      await sendSystemNotification({
+        title: '密码过期提醒',
+        body: message,
+        icon: 'lock',
+        tag: `password-${pwd.id}`
+      })
+      notifiedPasswords.add(notificationKey)
     }
   } catch (e) { /* ignore */ }
 }
@@ -232,21 +288,16 @@ async function sendTodoNotification(todo) {
     const title = '待办提醒'
     const body = `${todo.title}${todo.description ? `\n${todo.description}` : ''}`
 
-    await sendNotification({
+    await sendSystemNotification({
       title,
       body,
-      icon: 'icon.png', // 应用图标
-      tag: `todo-${todo.id}` // 使用 tag 标识通知
+      icon: 'icon.png',
+      tag: `todo-${todo.id}`
+    }, {
+      type: 'todo',
+      id: todo.id,
+      title: todo.title
     })
-
-    // 发送事件，用于通知点击跳转
-    try {
-      await emit('notification-clicked', {
-        type: 'todo',
-        id: todo.id,
-        title: todo.title
-      })
-    } catch (e) { /* ignore */ }
   } catch (e) { /* ignore */ }
 }
 
@@ -256,9 +307,9 @@ async function sendTodoNotification(todo) {
 async function sendEventNotification(event, reminderMinutes = null) {
   try {
     const startTime = new Date(event.start_time)
-    const timeStr = startTime.toLocaleTimeString('zh-CN', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const timeStr = startTime.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit'
     })
 
     let title = '日程提醒'
@@ -271,32 +322,27 @@ async function sendEventNotification(event, reminderMinutes = null) {
         title = `日程提醒（${Math.floor(reminderMinutes / 1440)}天后）`
       }
     }
-    
+
     let body = `${event.title}\n时间: ${timeStr}`
-    
+
     if (event.location) {
       body += `\n地点: ${event.location}`
     }
-    
+
     if (event.description) {
       body += `\n${event.description}`
     }
 
-    await sendNotification({
+    await sendSystemNotification({
       title,
       body,
       icon: 'icon.png',
-      tag: `event-${event.id}` // 使用 tag 标识通知
+      tag: `event-${event.id}`
+    }, {
+      type: 'event',
+      id: event.id,
+      title: event.title
     })
-
-    // 发送事件，用于通知点击跳转
-    try {
-      await emit('notification-clicked', {
-        type: 'event',
-        id: event.id,
-        title: event.title
-      })
-    } catch (e) { /* ignore */ }
   } catch (e) { /* ignore */ }
 }
 

@@ -2,10 +2,15 @@
   <div class="hardware-info-page">
     <div class="page-header">
       <div class="header-left">
-        <el-button text @click="goBack" class="back-btn">
-          <el-icon><ArrowLeft /></el-icon>
-        </el-button>
-        <span class="page-title">{{ t('hardwareInfo.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">System Diagnostics</div>
+          <div class="breadcrumb">
+            <el-icon><ArrowLeft /></el-icon>
+            <span class="breadcrumb-link" @click="goBack">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('hardwareInfo.title') }}</span>
+          </div>
+        </div>
       </div>
       <div class="header-right">
         <el-button type="primary" :loading="loading" @click="refresh" size="small">
@@ -66,7 +71,7 @@
             <span class="section-icon">🔧</span>
             {{ t('hardwareInfo.motherboard') }}
           </div>
-          <div v-for="(mb, i) in info.motherboard" :key="'mb-' + i">
+          <div v-for="(mb, i) in info.motherboard" :key="'mb-' + i" class="sub-card">
             <el-descriptions :column="2" border size="small">
               <el-descriptions-item :label="t('hardwareInfo.mbManufacturer')">{{ mb.manufacturer }}</el-descriptions-item>
               <el-descriptions-item :label="t('hardwareInfo.mbProduct')">{{ mb.product }}</el-descriptions-item>
@@ -271,45 +276,64 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-md) var(--space-xl);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 50px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  min-width: 0;
+  flex: 1;
 }
 
-.back-btn {
-  padding: 4px 8px;
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
-.page-title {
-  font-size: var(--font-size-body);
-  font-weight: var(--font-weight-semibold);
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
+.breadcrumb-link:hover { text-decoration: underline; }
+.breadcrumb-sep { color: var(--text-quaternary); }
+
 .header-right {
   display: flex;
-  gap: var(--space-sm);
+  gap: 8px;
 }
+
+.header-right :deep(.el-button) { --el-button-border-radius: 10px; }
 
 .content-area {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-2xl);
+  padding: 14px 18px 0;
   scrollbar-gutter: stable;
 }
 
@@ -331,19 +355,22 @@ onMounted(() => {
 }
 
 .info-section {
-  margin-bottom: var(--space-xl);
+  margin-bottom: 16px;
+  padding: 16px 18px 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.72);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
 }
 
 .section-title {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  font-size: var(--font-size-body);
+  gap: 8px;
+  font-size: 15px;
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  margin-bottom: var(--space-md);
-  padding-bottom: var(--space-sm);
-  border-bottom: 2px solid var(--accent-blue);
+  margin-bottom: 14px;
 }
 
 .section-icon {
@@ -351,14 +378,18 @@ onMounted(() => {
 }
 
 .section-badge {
-  font-size: var(--font-size-caption);
+  font-size: 12px;
   font-weight: var(--font-weight-normal);
   color: var(--text-tertiary);
   margin-left: auto;
 }
 
 .sub-card {
-  margin-bottom: var(--space-md);
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 14px;
+  background: rgba(248,250,252,0.78);
 }
 
 .sub-card:last-child {
@@ -366,14 +397,55 @@ onMounted(() => {
 }
 
 .sub-card-label {
-  font-size: var(--font-size-caption);
+  font-size: 12px;
   color: var(--text-secondary);
-  margin-bottom: var(--space-xs);
+  margin-bottom: 8px;
   font-weight: var(--font-weight-medium);
+}
+
+:deep(.el-descriptions) {
+  border-radius: 14px;
+  overflow: hidden;
 }
 
 :deep(.el-descriptions__label) {
   width: 130px;
   font-weight: var(--font-weight-medium);
+}
+
+:deep(.el-result) {
+  margin-top: 12px;
+  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.68);
+}
+
+@media (max-width: 900px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 14px;
+  }
+
+  .header-left,
+  .header-right {
+    width: 100%;
+  }
+
+  .header-right {
+    justify-content: flex-start;
+  }
+
+  .content-area {
+    padding: 14px;
+  }
+
+  .section-badge {
+    margin-left: 0;
+  }
+
+  :deep(.el-descriptions) {
+    --el-descriptions-table-border: rgba(15, 23, 42, 0.08);
+  }
 }
 </style>

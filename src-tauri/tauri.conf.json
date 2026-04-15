@@ -19,7 +19,7 @@
         "width": 600,
         "height": 400,
         "decorations": false,
-        "transparent": true,
+        "transparent": false,
         "center": true,
         "resizable": false,
         "alwaysOnTop": true,
@@ -112,6 +112,9 @@
         "language": ["zh-CN", "en-US"],
         "template": null
       }
+    },
+    "resources": {
+      "binaries/aria2c.exe": "binaries/aria2c.exe"
     },
     "publisher": "ToolHub Team",
     "copyright": "Copyright © 2026",

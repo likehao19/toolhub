@@ -3,11 +3,14 @@
     <!-- 顶部工具栏 -->
     <div class="header">
       <div class="header-left">
-        <div class="breadcrumb">
-          <el-icon><Monitor /></el-icon>
-          <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-          <span class="breadcrumb-sep">/</span>
-          <span>{{ t('portManager.title') }}</span>
+        <div class="page-title-block">
+          <div class="page-eyebrow">Developer Tools</div>
+          <div class="breadcrumb">
+            <el-icon><Monitor /></el-icon>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ t('portManager.title') }}</span>
+          </div>
         </div>
       </div>
       <div class="header-actions">
@@ -272,87 +275,90 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: var(--bg-secondary);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
 
-/* ---- 顶栏 ---- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 var(--space-lg);
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
-  height: 42px;
+  gap: 16px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  min-height: 58px;
   box-sizing: border-box;
+  backdrop-filter: blur(18px);
 }
 
-.header-left { display: flex; align-items: center; }
-
+.header-left { display: flex; align-items: center; min-width: 0; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.page-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: var(--font-size-footnote);
-  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--text-secondary); }
+.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
+.header-actions :deep(.el-button) { --el-border-radius-base: 10px; }
 
-/* ---- 筛选栏 ---- */
 .filter-bar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  background-color: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  padding: 12px 18px 0;
+  flex-wrap: wrap;
 }
-
 .search-input { width: 240px; }
 .filter-select { width: 130px; }
-
 .killable-check { margin-left: 4px; }
-.killable-check :deep(.el-checkbox__label) {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
+.killable-check :deep(.el-checkbox__label) { font-size: 12px; color: var(--text-secondary); }
+.filter-bar :deep(.el-input__wrapper),
+.filter-bar :deep(.el-select__wrapper) { border-radius: 10px; }
 
-/* ---- 表格区域 ---- */
 .table-area {
   flex: 1;
   overflow: hidden;
-  padding: 10px 16px;
+  padding: 14px 18px 0;
 }
-
 .table-area :deep(.el-table) {
-  --el-table-border-color: var(--border-color);
-  --el-table-header-bg-color: var(--bg-tertiary);
-  --el-table-bg-color: var(--bg-primary);
-  --el-table-tr-bg-color: var(--bg-primary);
-  --el-table-row-hover-bg-color: var(--bg-tertiary);
+  --el-table-border-color: rgba(15, 23, 42, 0.08);
+  --el-table-header-bg-color: rgba(248,250,252,0.94);
+  --el-table-bg-color: rgba(252,253,255,0.99);
+  --el-table-tr-bg-color: rgba(252,253,255,0.99);
+  --el-table-row-hover-bg-color: rgba(64, 158, 255, 0.06);
   --el-table-header-text-color: var(--text-secondary);
   --el-table-text-color: var(--text-primary);
-  --el-fill-color-lighter: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  --el-fill-color-lighter: rgba(248,250,252,0.9);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: none;
+  border-radius: 18px 18px 0 0;
   font-size: 12px;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
 }
-
 .table-area :deep(.el-table th) {
   font-weight: 600;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
+.table-area :deep(.el-table td) { padding: 6px 0; }
 
-.table-area :deep(.el-table td) {
-  padding: 6px 0;
-}
-
-/* 状态标签 — 纯文字圆角小药丸 */
 .state-badge {
   display: inline-block;
   font-size: 11px;
@@ -365,29 +371,25 @@ onMounted(() => {
 .state-badge.established { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue); }
 .state-badge.time-wait { background: rgba(230, 162, 60, 0.12); color: #e6a23c; }
 .state-badge.close-wait { background: rgba(245, 108, 108, 0.12); color: #f56c6c; }
-.state-badge.other { background: var(--bg-tertiary); color: var(--text-tertiary); }
+.state-badge.other { background: rgba(248,250,252,0.9); color: var(--text-tertiary); }
+.system-tag { font-size: 11px; color: var(--text-quaternary); }
 
-.system-tag {
-  font-size: 11px;
-  color: var(--text-quaternary);
-}
-
-/* ---- 底部状态栏 ---- */
 .status-bar {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 0 16px;
-  background-color: var(--bg-primary);
-  border-top: 1px solid var(--border-color);
+  margin: 0 18px 18px;
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: none;
   font-size: 11px;
   color: var(--text-tertiary);
-  height: 28px;
+  height: 30px;
   box-sizing: border-box;
+  border-radius: 0 0 18px 18px;
 }
-
 .stat-total { font-weight: 500; }
-
 .stat-chip {
   font-size: 10px;
   font-weight: 600;
@@ -396,7 +398,6 @@ onMounted(() => {
 }
 .stat-chip.listening { background: rgba(103, 194, 58, 0.1); color: #67c23a; }
 .stat-chip.established { background: rgba(64, 158, 255, 0.1); color: var(--accent-blue); }
-
 .page-info {
   margin-left: auto;
   display: flex;

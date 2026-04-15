@@ -44,7 +44,16 @@
       "Bash(npm ls:*)",
       "Bash(cargo doc:*)",
       "Bash(git:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(powershell:*)",
+      "Read(//c/Users/17647/scoop/apps/**)",
+      "Read(//c/tools/**)",
+      "Read(//c/Users/17647/**)",
+      "Bash(cp aria2-temp/aria2-1.37.0-win-64bit-build1/aria2c.exe .)",
+      "Bash(rm -rf aria2-temp aria2-win64.zip)",
+      "Bash(npm uninstall:*)",
+      "Bash(cargo add:*)"
     ]
   }
 }
