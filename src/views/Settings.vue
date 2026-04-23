@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="settings-page-wrapper">
     <header class="header">
       <div class="header-left">
@@ -103,17 +103,14 @@
                 </el-radio-group>
               </el-form-item>
 
-              <el-form-item :label="t('settings.fontSize')">
-                <el-slider
+              <el-form-item :label="t('settings.fontSize')" class="form-item-inline-center">
+                <el-select
                   v-model="settings.fontSize"
-                  :min="12"
-                  :max="20"
-                  :step="1"
-                  show-stops
-                  style="width: 300px"
+                  style="width: 140px"
                   @change="handleFontSizeChange"
-                />
-                <span style="margin-left: 10px">{{ settings.fontSize }}px</span>
+                >
+                  <el-option v-for="size in [12,13,14,15,16,17,18,19,20]" :key="size" :label="`${size}px`" :value="size" />
+                </el-select>
               </el-form-item>
 
               <el-form-item :label="t('settings.fontFamily')">
@@ -150,21 +147,11 @@
             </el-form>
           </el-card>
 
-          <!-- 通知与提醒 -->
+          <!-- 閫氱煡涓庢彁閱?-->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
               <div class="card-header">{{ t('settings.notifications') }}</div>
             </template>
-            <el-alert
-              :title="t('settings.notifDesc')"
-              type="info"
-              :closable="false"
-              style="margin-bottom: 16px;"
-            >
-              <p style="margin: 8px 0;">📋 {{ t('settings.notifTodoHint') }}</p>
-              <p style="margin: 8px 0;">📅 {{ t('settings.notifCalendarHint') }}</p>
-              <p style="margin: 8px 0;">{{ t('settings.notifOnlyDisplay') }}</p>
-            </el-alert>
             <el-form :model="reminderConfig" label-width="120px" label-position="left">
               <el-form-item :label="t('settings.positionType')">
                 <el-radio-group v-model="reminderConfig.positionType" @change="handleReminderSettingChange">
@@ -198,7 +185,7 @@
             </el-form>
           </el-card>
 
-          <!-- AI 助手悬浮球 -->
+          <!-- AI 鍔╂墜鎮诞鐞?-->
           <el-card shadow="never">
             <template #header>
               <div class="card-header">{{ t('settings.aiFloatingBall') }}</div>
@@ -258,7 +245,7 @@
         <div v-show="activeTab === 'workspace'" class="settings-section">
           <h3 class="group-title">{{ t('settings.workspace') }}</h3>
 
-          <!-- 笔记设置 -->
+          <!-- 绗旇璁剧疆 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
               <div class="card-header">{{ t('settings.notesSettings') }}</div>
@@ -275,25 +262,29 @@
               </el-form-item>
 
               <el-form-item :label="t('settings.storageUsage')">
-                <el-descriptions :column="1" border>
-                  <el-descriptions-item :label="t('settings.notesSize')">
-                    {{ formatFileSize(storageStats.notesSize) }}
-                  </el-descriptions-item>
-                  <el-descriptions-item :label="t('settings.databaseSize')">
-                    {{ formatFileSize(storageStats.databaseSize) }}
-                  </el-descriptions-item>
-                  <el-descriptions-item :label="t('settings.mediaSize')">
-                    {{ formatFileSize(storageStats.mediaSize) }}
-                  </el-descriptions-item>
-                  <el-descriptions-item :label="t('settings.totalSize')">
-                    {{ formatFileSize(storageStats.totalSize) }}
-                  </el-descriptions-item>
-                </el-descriptions>
+                <div class="stats-list">
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.notesSize') }}</span>
+                    <span class="stats-value">{{ formatFileSize(storageStats.notesSize) }}</span>
+                  </div>
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.databaseSize') }}</span>
+                    <span class="stats-value">{{ formatFileSize(storageStats.databaseSize) }}</span>
+                  </div>
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.mediaSize') }}</span>
+                    <span class="stats-value">{{ formatFileSize(storageStats.mediaSize) }}</span>
+                  </div>
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.totalSize') }}</span>
+                    <span class="stats-value">{{ formatFileSize(storageStats.totalSize) }}</span>
+                  </div>
+                </div>
               </el-form-item>
             </el-form>
           </el-card>
 
-          <!-- Markdown 主题 -->
+          <!-- Markdown 涓婚 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
               <div class="card-header">{{ t('settings.markdownTheme') }}</div>
@@ -363,7 +354,7 @@
             </el-form>
           </el-card>
 
-          <!-- AI 服务配置（多 Provider） -->
+          <!-- AI 鏈嶅姟閰嶇疆锛堝 Provider锛?-->
           <el-card shadow="never">
             <template #header>
               <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
@@ -465,7 +456,7 @@
                         <div v-if="providerModelErrors[prov.id]" style="font-size:11px;color:var(--el-color-warning);">{{ providerModelErrors[prov.id] }}</div>
                       </div>
                     </el-form-item>
-                    <el-form-item>
+                    <el-form-item class="provider-actions-row">
                       <el-button type="primary" size="small" @click="testProviderConnection(prov)" :loading="testingAI && testingProvId === prov.id">
                         {{ t('settings.testConnection') }}
                       </el-button>
@@ -556,7 +547,7 @@
             </el-form>
           </el-card>
 
-          <!-- 密码管理 -->
+          <!-- 瀵嗙爜绠＄悊 -->
           <el-card shadow="never" style="margin-bottom: 20px;">
             <template #header>
               <div class="card-header">{{ t('settings.passwordMgmt') }}</div>
@@ -603,20 +594,24 @@
               <el-divider />
 
               <el-form-item :label="t('settings.vaultStatus')">
-                <el-descriptions :column="1" border>
-                  <el-descriptions-item :label="t('settings.pwdCount')">
-                    {{ passwordStats.totalPasswords }} {{ t('common.unit') }}
-                  </el-descriptions-item>
-                  <el-descriptions-item :label="t('settings.historyCount')">
-                    {{ passwordStats.historyCount }} {{ t('common.entries') }}
-                  </el-descriptions-item>
-                  <el-descriptions-item :label="t('settings.recycleBin')">
-                    {{ passwordStats.recycleBinCount }} {{ t('common.unit') }}
-                  </el-descriptions-item>
-                  <el-descriptions-item :label="t('settings.masterPwdStatus')">
-                    {{ passwordStats.hasMasterPassword ? t('settings.masterPwdSet') : t('settings.masterPwdNotSet') }}
-                  </el-descriptions-item>
-                </el-descriptions>
+                <div class="stats-list">
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.pwdCount') }}</span>
+                    <span class="stats-value">{{ passwordStats.totalPasswords }} {{ t('common.unit') }}</span>
+                  </div>
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.historyCount') }}</span>
+                    <span class="stats-value">{{ passwordStats.historyCount }} {{ t('common.entries') }}</span>
+                  </div>
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.recycleBin') }}</span>
+                    <span class="stats-value">{{ passwordStats.recycleBinCount }} {{ t('common.unit') }}</span>
+                  </div>
+                  <div class="stats-row">
+                    <span class="stats-label">{{ t('settings.masterPwdStatus') }}</span>
+                    <span class="stats-value">{{ passwordStats.hasMasterPassword ? t('settings.masterPwdSet') : t('settings.masterPwdNotSet') }}</span>
+                  </div>
+                </div>
               </el-form-item>
             </el-form>
           </el-card>
@@ -625,12 +620,12 @@
         <div v-show="activeTab === 'about'" class="settings-section">
           <h3 class="group-title">{{ t('settings.help') }}</h3>
 
-          <!-- 关于应用 -->
-          <el-card shadow="never" style="margin-bottom: 20px;">
+          <!-- 鍏充簬搴旂敤 -->
+          <el-card shadow="never" style="margin-bottom: 20px;" class="about-app-card">
             <template #header>
               <div class="card-header">{{ t('settings.aboutApp') }}</div>
             </template>
-            <el-descriptions :column="1" border>
+            <el-descriptions :column="1" class="about-app-descriptions">
               <el-descriptions-item :label="t('settings.appNameLabel')">{{ t('settings.appName') }}</el-descriptions-item>
               <el-descriptions-item :label="t('settings.version')">v1.0.0</el-descriptions-item>
               <el-descriptions-item :label="t('settings.buildTime')">2026-02-01</el-descriptions-item>
@@ -638,14 +633,15 @@
             </el-descriptions>
           </el-card>
 
-          <!-- 帮助与支持 -->
-          <el-card shadow="never">
+          <!-- 甯姪涓庢敮鎸?-->
+          <el-card shadow="never" class="help-support-card">
             <template #header>
               <div class="card-header">{{ t('settings.helpSupport') }}</div>
             </template>
-            <el-form label-width="100px">
+            <el-form label-width="100px" class="help-support-form">
               <el-form-item :label="t('settings.feedbackContent')">
                 <el-input
+                  class="feedback-textarea"
                   v-model="feedbackContent"
                   type="textarea"
                   :rows="6"
@@ -656,28 +652,29 @@
               </el-form-item>
               <el-form-item :label="t('settings.feedbackContact')">
                 <el-input
+                  class="feedback-contact-input"
                   v-model="feedbackContact"
                   :placeholder="t('settings.feedbackContactPlaceholder')"
                 />
               </el-form-item>
-              <el-form-item>
+              <el-form-item class="feedback-action-row">
                 <el-button type="primary" @click="submitFeedback" :loading="submittingFeedback">
                   {{ t('settings.submitFeedback') }}
                 </el-button>
                 <el-button @click="clearFeedback">{{ t('settings.clearBtn') }}</el-button>
               </el-form-item>
               <el-divider />
-              <el-form-item :label="t('settings.softwareUpdate')">
-                <el-button @click="checkUpdate" :loading="checkingUpdate">
+              <el-form-item :label="t('settings.softwareUpdate')" class="form-item-inline-center">
+                <el-button class="check-update-btn" @click="checkUpdate" :loading="checkingUpdate">
                   <el-icon><Refresh /></el-icon>
                   {{ t('settings.checkUpdate') }}
                 </el-button>
-                <span v-if="updateInfo" style="margin-left: 12px; color: #67c23a;">
+                <span v-if="updateInfo" class="update-info">
                   {{ updateInfo }}
                 </span>
               </el-form-item>
               <el-divider />
-              <el-form-item>
+              <el-form-item class="danger-action-row">
                 <el-button type="danger" @click="handleReset">
                   {{ t('settings.resetAppSettings') }}
                 </el-button>
@@ -688,7 +685,7 @@
       </main>
     </div>
 
-    <!-- 笔记迁移进度对话框 -->
+    <!-- 绗旇杩佺Щ杩涘害瀵硅瘽妗?-->
     <el-dialog
       v-model="showMigrationDialog"
       :title="migrateMode === 'move' ? t('settings.migrationDialogMove') : t('settings.migrationDialogCopy')"
@@ -710,7 +707,7 @@
       </div>
     </el-dialog>
 
-    <!-- 修改密码对话框 -->
+    <!-- 淇敼瀵嗙爜瀵硅瘽妗?-->
     <el-dialog v-model="showChangePasswordDialog" :title="t('settings.changePwdTitle')" width="450px">
       <el-alert
         :title="t('settings.changePwdWarning')"
@@ -800,12 +797,12 @@ const savedPasswordSettings = ref(null)
 const autoSaving = ref(false)
 const initializing = ref(true)
 
-// 反馈相关
+// 鍙嶉鐩稿叧
 const feedbackContent = ref('')
 const feedbackContact = ref('')
 const submittingFeedback = ref(false)
 
-// 更新相关
+// 鏇存柊鐩稿叧
 const checkingUpdate = ref(false)
 const updateInfo = ref('')
 const hasChanges = ref(false)
@@ -813,7 +810,7 @@ const manualHasChanges = ref(false)
 const configPath = ref('')
 const lastSaved = ref('')
 
-// 菜单项
+// 鑿滃崟椤?
 const menuItems = computed(() => [
   {
     key: 'general',
@@ -841,7 +838,7 @@ const menuItems = computed(() => [
   }
 ])
 
-// 当前菜单名称
+// 褰撳墠鑿滃崟鍚嶇О
 const currentMenuName = computed(() => {
   const menu = menuItems.value.find(m => m.key === activeTab.value)
   return menu ? menu.label : t('settings.title')
@@ -849,13 +846,13 @@ const currentMenuName = computed(() => {
 
 const currentMenuDescription = computed(() => {
   const menu = menuItems.value.find(m => m.key === activeTab.value)
-  return menu?.description || '集中管理当前应用的关键偏好与日常使用设置'
+  return menu?.description || '闆嗕腑绠＄悊褰撳墠搴旂敤鐨勫叧閿亸濂戒笌鏃ュ父浣跨敤璁剧疆'
 })
 
 const saveStatusText = computed(() => {
   if (saving.value || autoSaving.value) return t('settings.statusSaving')
   if (manualHasChanges.value) return t('settings.statusUnsaved')
-  if (lastSaved.value) return `${t('settings.statusSaved')} · ${lastSaved.value}`
+  if (lastSaved.value) return `${t('settings.statusSaved')} 路 ${lastSaved.value}`
   return t('settings.statusIdle')
 })
 
@@ -891,7 +888,7 @@ const formatSavedTime = () => new Date().toLocaleTimeString('zh-CN', {
   minute: '2-digit'
 })
 
-// 设置数据
+// 璁剧疆鏁版嵁
 const settings = reactive({
   closeAction: 'ask',
   autoStart: false,
@@ -901,28 +898,28 @@ const settings = reactive({
   fontFamily: 'system',
   enableAnimations: true,
   notesStoragePath: '',
-  // Markdown 主题设置
+  // Markdown 涓婚璁剧疆
   previewTheme: 'mk-cute',
   previewCodeTheme: 'github',
   editorPreviewTheme: 'mk-cute',
   editorCodeTheme: 'github'
 })
 
-// AI 设置
+// AI 璁剧疆
 const aiSettings = reactive({
   providers: [],
   activeProviderId: ''
 })
 
-// AI 助手悬浮球设置
+// AI 鍔╂墜鎮诞鐞冭缃?
 const aiAssistantSettings = reactive({
   enableFloatingBall: false,
-  floatingBallMode: 'inApp', // 'inApp' 或 'desktop'
+  floatingBallMode: 'inApp', // 'inApp' 鎴?'desktop'
   floatingBallStyle: 'circle', // 'circle', 'rounded', 'capsule'
   floatingBallSize: 60
 })
 
-// 存储统计
+// 瀛樺偍缁熻
 const storageStats = reactive({
   notesSize: 0,
   databaseSize: 0,
@@ -930,16 +927,16 @@ const storageStats = reactive({
   totalSize: 0
 })
 
-// 加载统计状态
+// 鍔犺浇缁熻鐘舵€?
 const loadingStats = ref(false)
 
-// 密码管理设置
+// 瀵嗙爜绠＄悊璁剧疆
 const passwordSettings = reactive({
   requirePasswordOnStart: true,
   autoLockTime: 15
 })
 
-// 密码库统计
+// 瀵嗙爜搴撶粺璁?
 const passwordStats = reactive({
   totalPasswords: 0,
   historyCount: 0,
@@ -947,13 +944,13 @@ const passwordStats = reactive({
   hasMasterPassword: false
 })
 
-// 修改密码相关
+// 淇敼瀵嗙爜鐩稿叧
 const showChangePasswordDialog = ref(false)
 const oldPasswordInput = ref('')
 const newPasswordInput = ref('')
 const newPasswordConfirm = ref('')
 
-// 系统权限
+// 绯荤粺鏉冮檺
 const systemPrivilege = reactive({
   authorized: false,
   checking: false,
@@ -961,17 +958,17 @@ const systemPrivilege = reactive({
   envScope: getEnvScope(),
 })
 
-// 提醒设置
+// 鎻愰啋璁剧疆
 const reminderConfig = reactive({
   position: 'bottomRight',
   positionType: 'screen'
 })
 
-// 迁移进度
+// 杩佺Щ杩涘害
 const showMigrationDialog = ref(false)
 const migrationProgress = ref(0)
 const migrationStatus = ref('')
-const migrateMode = ref('move') // 'move' 或 'copy'
+const migrateMode = ref('move') // 'move' 鎴?'copy'
 
 const DB_PATH = 'sqlite:productivity.db'
 let dbInstance = null
@@ -983,7 +980,7 @@ async function getDatabase() {
   return dbInstance
 }
 
-// 切换语言
+// 鍒囨崲璇█
 const handleLanguageChange = (lang) => {
   setLocale(lang)
 }
@@ -1357,13 +1354,13 @@ const handleSystemPrivilegeAuthorize = async () => {
 }
 
 /**
- * 加载配置
+ * 鍔犺浇閰嶇疆
  */
 const loadSettings = async () => {
   try {
     const config = await loadConfig()
 
-    // 更新设置
+    // 鏇存柊璁剧疆
     if (config) {
       Object.assign(settings, config)
       if (config.aiSettings) {
@@ -1382,19 +1379,19 @@ const loadSettings = async () => {
 
       applyAppearance(config)
 
-      // 同步窗口关闭行为到 store
+      // 鍚屾绐楀彛鍏抽棴琛屼负鍒?store
       if (config.closeAction) {
         appStore.setCloseAction(config.closeAction)
       }
     }
 
-    // 检查自动启动状态
+    // 妫€鏌ヨ嚜鍔ㄥ惎鍔ㄧ姸鎬?
     try {
       const autostartEnabled = await TauriAutostart.checkAutostart()
       settings.autoStart = autostartEnabled
     } catch (e) { /* ignore */ }
 
-    // 加载笔记存储路径
+    // 鍔犺浇绗旇瀛樺偍璺緞
     if (!settings.notesStoragePath) {
       const dataDir = await appDataDir()
       settings.notesStoragePath = await join(dataDir, 'notes')
@@ -1411,19 +1408,19 @@ const loadSettings = async () => {
     }
     initProviderModelState()
 
-    // 加载存储统计
+    // 鍔犺浇瀛樺偍缁熻
     await loadStorageStats()
 
-    // 保存原始设置用于比较
+    // 淇濆瓨鍘熷璁剧疆鐢ㄤ簬姣旇緝
     syncSavedSnapshots()
   } catch (e) { /* ignore */ }
 }
 
 /**
- * 处理自动启动状态变化
+ * 澶勭悊鑷姩鍚姩鐘舵€佸彉鍖?
  */
 /**
- * 保存配置
+ * 淇濆瓨閰嶇疆
  */
 const handleSave = async () => {
   saving.value = true
@@ -1438,7 +1435,7 @@ const handleSave = async () => {
 const handleAutostartChange = handleAutoStartToggle
 
 /**
- * 选择笔记存储路径
+ * 閫夋嫨绗旇瀛樺偍璺緞
  */
 const selectNotesStoragePath = async () => {
   try {
@@ -1451,7 +1448,7 @@ const selectNotesStoragePath = async () => {
     if (selected && selected !== settings.notesStoragePath) {
       const oldPath = settings.notesStoragePath
 
-      // 询问用户迁移模式
+      // 璇㈤棶鐢ㄦ埛杩佺Щ妯″紡
       try {
         const { value } = await ElMessageBox.confirm(
           t('settings.migrateModeMsg', { oldPath, newPath: selected }),
@@ -1468,16 +1465,16 @@ const selectNotesStoragePath = async () => {
           }
         )
 
-        // 用户选择移动
+        // 鐢ㄦ埛閫夋嫨绉诲姩
         migrateMode.value = 'move'
         await performMigration(oldPath, selected)
       } catch (action) {
         if (action === 'cancel') {
-          // 用户选择复制
+          // 鐢ㄦ埛閫夋嫨澶嶅埗
           migrateMode.value = 'copy'
           await performMigration(oldPath, selected)
         } else if (action === 'close') {
-          // 显示"仅更改路径"确认
+          // 鏄剧ず"浠呮洿鏀硅矾寰?纭
           try {
             await ElMessageBox.confirm(
               t('settings.migrateOnlyPathConfirm'),
@@ -1489,14 +1486,14 @@ const selectNotesStoragePath = async () => {
               }
             )
 
-            // 仅更改路径
+            // 浠呮洿鏀硅矾寰?
             settings.notesStoragePath = selected
             const { resetNotesDir } = await import('@/utils/notes')
             resetNotesDir()
             await handleSave()
             ElMessage.warning(t('settings.migrateOnlyPathDone'))
           } catch {
-            // 用户取消了"仅更改路径"
+            // 鐢ㄦ埛鍙栨秷浜?浠呮洿鏀硅矾寰?
           }
         }
       }
@@ -1510,7 +1507,7 @@ const selectNotesStoragePath = async () => {
 }
 
 /**
- * 执行迁移操作
+ * 鎵ц杩佺Щ鎿嶄綔
  */
 const performMigration = async (oldPath, newPath) => {
   showMigrationDialog.value = true
@@ -1561,7 +1558,7 @@ const performMigration = async (oldPath, newPath) => {
 }
 
 /**
- * 迁移笔记文件
+ * 杩佺Щ绗旇鏂囦欢
  */
 const migrateNotes = async (oldPath, newPath) => {
   const { exists, mkdir, copyFile, remove } = await import('@tauri-apps/plugin-fs')
@@ -1632,7 +1629,7 @@ const migrateNotes = async (oldPath, newPath) => {
 }
 
 /**
- * 删除空目录（递归）
+ * 鍒犻櫎绌虹洰褰曪紙閫掑綊锛?
  */
 const removeEmptyDirs = async (dir) => {
   const { readDir, remove } = await import('@tauri-apps/plugin-fs')
@@ -1640,13 +1637,13 @@ const removeEmptyDirs = async (dir) => {
   try {
     const entries = await readDir(dir)
 
-    // 如果目录为空，删除它
+    // 濡傛灉鐩綍涓虹┖锛屽垹闄ゅ畠
     if (entries.length === 0) {
       await remove(dir, { recursive: false })
       return true
     }
 
-    // 递归处理子目录
+    // 閫掑綊澶勭悊瀛愮洰褰?
     for (const entry of entries) {
       if (entry.isDirectory) {
         const { join } = await import('@tauri-apps/api/path')
@@ -1655,7 +1652,7 @@ const removeEmptyDirs = async (dir) => {
       }
     }
 
-    // 再次检查当前目录是否为空
+    // 鍐嶆妫€鏌ュ綋鍓嶇洰褰曟槸鍚︿负绌?
     const updatedEntries = await readDir(dir)
     if (updatedEntries.length === 0) {
       await remove(dir, { recursive: false })
@@ -1670,7 +1667,7 @@ const removeEmptyDirs = async (dir) => {
 }
 
 /**
- * 递归获取所有文件
+ * 閫掑綊鑾峰彇鎵€鏈夋枃浠?
  */
 const getAllFiles = async (dir, baseDir) => {
   const { readDir, stat } = await import('@tauri-apps/plugin-fs')
@@ -1686,7 +1683,7 @@ const getAllFiles = async (dir, baseDir) => {
       const fileStat = await stat(fullPath)
 
       if (fileStat.isDirectory) {
-        // 递归获取子目录文件
+        // 閫掑綊鑾峰彇瀛愮洰褰曟枃浠?
         const subFiles = await getAllFiles(fullPath, baseDir)
         files.push(...subFiles)
       } else if (fileStat.isFile) {
@@ -1699,7 +1696,7 @@ const getAllFiles = async (dir, baseDir) => {
 }
 
 /**
- * 测试 AI 连接
+ * 娴嬭瘯 AI 杩炴帴
  */
 const testProviderConnection = async (provider) => {
   if (!provider?.apiKey || !provider?.baseUrl || !provider?.model) {
@@ -1781,7 +1778,7 @@ const testProviderConnection = async (provider) => {
 }
 
 /**
- * 加载存储统计
+ * 鍔犺浇瀛樺偍缁熻
  */
 const loadStorageStats = async () => {
   loadingStats.value = true
@@ -1790,17 +1787,17 @@ const loadStorageStats = async () => {
     const { stat, exists, readDir } = await import('@tauri-apps/plugin-fs')
     const { join, appDataDir } = await import('@tauri-apps/api/path')
 
-    // 先清零，避免部分失败时残留旧值
+    // 鍏堟竻闆讹紝閬垮厤閮ㄥ垎澶辫触鏃舵畫鐣欐棫鍊?
     storageStats.notesSize = 0
     storageStats.databaseSize = 0
     storageStats.mediaSize = 0
     storageStats.totalSize = 0
 
-    // 计算笔记文件大小
+    // 璁＄畻绗旇鏂囦欢澶у皬
     const notesDir = await getNotesDir()
     storageStats.notesSize = await calculateDirectorySize(notesDir)
 
-    // 计算数据库文件大小
+    // 璁＄畻鏁版嵁搴撴枃浠跺ぇ灏?
     const appDir = await appDataDir()
     const dbPath = await join(appDir, 'productivity.db')
     if (await exists(dbPath)) {
@@ -1808,14 +1805,14 @@ const loadStorageStats = async () => {
       storageStats.databaseSize = dbStat.size || 0
     }
 
-    // 计算媒体文件大小（images, videos 文件夹）
+    // 璁＄畻濯掍綋鏂囦欢澶у皬锛坕mages, videos 鏂囦欢澶癸級
     let mediaSize = 0
     const imagesPath = await join(notesDir, 'images')
     if (await exists(imagesPath)) {
       mediaSize += await calculateDirectorySize(imagesPath)
     }
 
-    // 遍历所有笔记文件夹，计算其中的 images 和 videos 子文件夹
+    // 閬嶅巻鎵€鏈夌瑪璁版枃浠跺す锛岃绠楀叾涓殑 images 鍜?videos 瀛愭枃浠跺す
     try {
       const entries = await readDir(notesDir)
       for (const entry of entries) {
@@ -1837,10 +1834,10 @@ const loadStorageStats = async () => {
     storageStats.mediaSize = mediaSize
     storageStats.totalSize = storageStats.notesSize + storageStats.databaseSize + storageStats.mediaSize
 
-    // ElMessage.success('存储统计已更新') // 已移除提示，避免重复弹出
+    // ElMessage.success('瀛樺偍缁熻宸叉洿鏂?) // 宸茬Щ闄ゆ彁绀猴紝閬垮厤閲嶅寮瑰嚭
   } catch (error) {
-    // 安装包环境下自定义路径、权限或目录瞬态异常会导致这里频繁报错
-    // 保持页面静默并展示 0，避免每次进入设置页都弹错误提示
+    // 瀹夎鍖呯幆澧冧笅鑷畾涔夎矾寰勩€佹潈闄愭垨鐩綍鐬€佸紓甯镐細瀵艰嚧杩欓噷棰戠箒鎶ラ敊
+    // 淇濇寔椤甸潰闈欓粯骞跺睍绀?0锛岄伩鍏嶆瘡娆¤繘鍏ヨ缃〉閮藉脊閿欒鎻愮ず
     storageStats.notesSize = 0
     storageStats.databaseSize = 0
     storageStats.mediaSize = 0
@@ -1851,7 +1848,7 @@ const loadStorageStats = async () => {
 }
 
 /**
- * 递归计算目录大小
+ * 閫掑綊璁＄畻鐩綍澶у皬
  */
 const calculateDirectorySize = async (dirPath) => {
   const { stat, exists, readDir } = await import('@tauri-apps/plugin-fs')
@@ -1873,7 +1870,7 @@ const calculateDirectorySize = async (dirPath) => {
         const entryStat = await stat(entryPath)
 
         if (entryStat.isDirectory) {
-          // 递归计算子目录大小
+          // 閫掑綊璁＄畻瀛愮洰褰曞ぇ灏?
           totalSize += await calculateDirectorySize(entryPath)
         } else if (entryStat.isFile) {
           totalSize += entryStat.size || 0
@@ -1886,7 +1883,7 @@ const calculateDirectorySize = async (dirPath) => {
 }
 
 /**
- * 格式化文件大小
+ * 鏍煎紡鍖栨枃浠跺ぇ灏?
  */
 const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 B'
@@ -1897,7 +1894,7 @@ const formatFileSize = (bytes) => {
 }
 
 /**
- * 加载密码设置
+ * 鍔犺浇瀵嗙爜璁剧疆
  */
 const loadPasswordSettings = async () => {
   try {
@@ -1910,7 +1907,7 @@ const loadPasswordSettings = async () => {
 }
 
 /**
- * 保存密码设置
+ * 淇濆瓨瀵嗙爜璁剧疆
  */
 const savePasswordSettings = async () => {
   try {
@@ -1945,40 +1942,40 @@ const savePasswordSettings = async () => {
         ['', '', passwordSettings.requirePasswordOnStart ? 1 : 0, now, now]
       )
     }
-    // 移除单独的成功提示，由 handleSave 统一提示
+    // 绉婚櫎鍗曠嫭鐨勬垚鍔熸彁绀猴紝鐢?handleSave 缁熶竴鎻愮ず
   } catch (error) {
 
-    throw error // 抛出错误让 handleSave 处理
+    throw error // 鎶涘嚭閿欒璁?handleSave 澶勭悊
   }
 }
 
 /**
- * 加载密码库统计
+ * 鍔犺浇瀵嗙爜搴撶粺璁?
  */
 const loadPasswordStats = async () => {
   try {
     const db = await getDatabase()
 
-    // 统计密码数量
+    // 缁熻瀵嗙爜鏁伴噺
     const passwords = await db.select('SELECT COUNT(*) as count FROM passwords WHERE is_deleted = 0 OR is_deleted IS NULL')
     passwordStats.totalPasswords = passwords[0]?.count || 0
 
-    // 统计历史记录
+    // 缁熻鍘嗗彶璁板綍
     const history = await db.select('SELECT COUNT(*) as count FROM password_history')
     passwordStats.historyCount = history[0]?.count || 0
 
-    // 统计回收站
+    // 缁熻鍥炴敹绔?
     const recycleBin = await db.select('SELECT COUNT(*) as count FROM password_recycle_bin')
     passwordStats.recycleBinCount = recycleBin[0]?.count || 0
 
-    // 检查主密码
+    // 妫€鏌ヤ富瀵嗙爜
     const masterPassword = await db.select('SELECT COUNT(*) as count FROM master_password')
     passwordStats.hasMasterPassword = (masterPassword[0]?.count || 0) > 0
   } catch (e) { /* ignore */ }
 }
 
 /**
- * 修改主密码
+ * 淇敼涓诲瘑鐮?
  */
 const changePassword = async () => {
   if (!oldPasswordInput.value) {
@@ -2005,7 +2002,7 @@ const changePassword = async () => {
       return
     }
 
-    // 验证旧密码
+    // 楠岃瘉鏃у瘑鐮?
     const { password_hash, salt } = result[0]
     const isValid = verifyPassword(oldPasswordInput.value, password_hash, salt)
 
@@ -2014,7 +2011,7 @@ const changePassword = async () => {
       return
     }
 
-    // 生成新密码哈希
+    // 鐢熸垚鏂板瘑鐮佸搱甯?
     const newSalt = generateSalt()
     const newHash = hashPassword(newPasswordInput.value, newSalt)
     const now = new Date().toISOString()
@@ -2036,7 +2033,7 @@ const changePassword = async () => {
 }
 
 /**
- * 重置配置
+ * 閲嶇疆閰嶇疆
  */
 const handleReset = async () => {
   try {
@@ -2071,10 +2068,10 @@ const handleReset = async () => {
 }
 
 /**
- * 加载提醒设置
+ * 鍔犺浇鎻愰啋璁剧疆
  */
 /**
- * 加载提醒设置
+ * 鍔犺浇鎻愰啋璁剧疆
  */
 const loadReminderSettings = async () => {
   try {
@@ -2088,7 +2085,7 @@ const loadReminderSettings = async () => {
 
 
 /**
- * 测试通知
+ * 娴嬭瘯閫氱煡
  */
 const testNotification = async () => {
   try {
@@ -2102,12 +2099,12 @@ const testNotification = async () => {
       positionType: reminderConfig.positionType
     })
   } catch (error) {
-    // 测试通知发送失败静默处理
+    // 娴嬭瘯閫氱煡鍙戦€佸け璐ラ潤榛樺鐞?
   }
 }
 
 /**
- * 提交反馈
+ * 鎻愪氦鍙嶉
  */
 const submitFeedback = async () => {
   if (!feedbackContent.value.trim()) {
@@ -2119,7 +2116,7 @@ const submitFeedback = async () => {
   try {
     const db = await Database.load('sqlite:app.db')
 
-    // 确保反馈表存在
+    // 纭繚鍙嶉琛ㄥ瓨鍦?
     await db.execute(`
       CREATE TABLE IF NOT EXISTS feedback (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -2147,7 +2144,7 @@ const submitFeedback = async () => {
 }
 
 /**
- * 清空反馈表单
+ * 娓呯┖鍙嶉琛ㄥ崟
  */
 const clearFeedback = () => {
   feedbackContent.value = ''
@@ -2155,13 +2152,13 @@ const clearFeedback = () => {
 }
 
 /**
- * 处理悬浮球开关切换
+ * 澶勭悊鎮诞鐞冨紑鍏冲垏鎹?
  */
 const handleFloatingBallToggle = (enabled) => {
-  // 保存配置到 localStorage（供实时预览使用）
+  // 淇濆瓨閰嶇疆鍒?localStorage锛堜緵瀹炴椂棰勮浣跨敤锛?
   localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
 
-  // 发送全局事件通知应用更新悬浮球状态
+  // 鍙戦€佸叏灞€浜嬩欢閫氱煡搴旂敤鏇存柊鎮诞鐞冪姸鎬?
   window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
     detail: {
       enabled,
@@ -2281,13 +2278,13 @@ watch(activeTab, (tab) => {
 })
 
 /**
- * 处理悬浮球配置变化（位置、样式、大小）
+ * 澶勭悊鎮诞鐞冮厤缃彉鍖栵紙浣嶇疆銆佹牱寮忋€佸ぇ灏忥級
  */
 const handleFloatingBallChange = () => {
-  // 保存配置到 localStorage（供实时预览使用）
+  // 淇濆瓨閰嶇疆鍒?localStorage锛堜緵瀹炴椂棰勮浣跨敤锛?
   localStorage.setItem('aiAssistantSettings', JSON.stringify(aiAssistantSettings))
 
-  // 发送全局事件通知应用更新悬浮球状态
+  // 鍙戦€佸叏灞€浜嬩欢閫氱煡搴旂敤鏇存柊鎮诞鐞冪姸鎬?
   window.dispatchEvent(new CustomEvent('ai-floating-ball-toggle', {
     detail: {
       enabled: aiAssistantSettings.enableFloatingBall,
@@ -2299,18 +2296,18 @@ const handleFloatingBallChange = () => {
 }
 
 /**
- * 检查更新
+ * 妫€鏌ユ洿鏂?
  */
 const checkUpdate = async () => {
   checkingUpdate.value = true
   updateInfo.value = ''
 
   try {
-    // 模拟检查更新（实际应该调用 Tauri 更新 API）
+    // 妯℃嫙妫€鏌ユ洿鏂帮紙瀹為檯搴旇璋冪敤 Tauri 鏇存柊 API锛?
     await new Promise(resolve => setTimeout(resolve, 1500))
 
-    // 这里可以集成 Tauri 的更新功能
-    // 目前显示当前已是最新版本
+    // 杩欓噷鍙互闆嗘垚 Tauri 鐨勬洿鏂板姛鑳?
+    // 鐩墠鏄剧ず褰撳墠宸叉槸鏈€鏂扮増鏈?
     updateInfo.value = t('settings.latestVersion')
   } catch (error) {
     updateInfo.value = t('settings.checkUpdateFailed')
@@ -2348,18 +2345,18 @@ const handleEnvScopeChange = (value) => {
   systemPrivilege.envScope = value
 }
 
-// 组件挂载时加载配置
+// 缁勪欢鎸傝浇鏃跺姞杞介厤缃?
 onMounted(async () => {
   initializing.value = true
   try {
-    await loadSettings() // loadSettings 内部已经调用了 loadStorageStats
+    await loadSettings() // loadSettings 鍐呴儴宸茬粡璋冪敤浜?loadStorageStats
     await loadPasswordSettings()
     await loadPasswordStats()
     await loadReminderSettings()
     await loadSystemPrivilegeStatus()
-    // await loadStorageStats() // 已在 loadSettings 中调用，避免重复
+    // await loadStorageStats() // 宸插湪 loadSettings 涓皟鐢紝閬垮厤閲嶅
 
-    // 加载配置路径
+    // 鍔犺浇閰嶇疆璺緞
     try {
       const dataDir = await appDataDir()
       configPath.value = await join(dataDir, 'config.json')
@@ -2379,19 +2376,19 @@ onMounted(async () => {
   height: 100%;
   overflow: hidden;
   color: var(--text-primary);
-  background: linear-gradient(180deg, #eef1f5 0%, #e8edf3 100%);
+  background: #f5f6f8;
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 8px;
   min-height: 58px;
-  padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(18px);
+  padding: 8px 10px;
+  background: #fff;
+  border: none;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
@@ -2409,8 +2406,8 @@ onMounted(async () => {
 .page-eyebrow {
   font-size: 10px;
   line-height: 1;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
@@ -2418,10 +2415,10 @@ onMounted(async () => {
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
@@ -2445,77 +2442,72 @@ onMounted(async () => {
 .save-status {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
-  padding: 0 10px;
+  min-height: 22px;
+  padding: 0 8px;
   border-radius: 999px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
-  border: 1px solid transparent;
+  border: none;
 }
 
 .save-status.idle {
   color: var(--text-quaternary);
   background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(15, 23, 42, 0.06);
 }
 
 .save-status.saved {
   color: #1f8a52;
   background: rgba(46, 204, 113, 0.12);
-  border-color: rgba(46, 204, 113, 0.16);
 }
 
 .save-status.unsaved {
   color: #b26a00;
   background: rgba(255, 179, 71, 0.15);
-  border-color: rgba(255, 179, 71, 0.16);
 }
 
 .save-status.saving {
   color: var(--accent-blue);
   background: rgba(10, 132, 255, 0.12);
-  border-color: rgba(10, 132, 255, 0.14);
 }
 
 .toolbar-btn {
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 251, 0.95));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  border: none;
+  background: #fff;
+  box-shadow: none;
 }
 
 .toolbar-btn:hover {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(238, 243, 249, 1));
+  background: #f8fafc;
 }
 
 .main-container {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
-  gap: 0;
+  gap: 5px;
   flex: 1;
   min-height: 0;
-  padding: 5px 5px 0;
+  padding: 5px 0 5px 5px;
 }
 
 .sidebar-left {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  border: none;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: none;
 }
 
 .sidebar-toolbar {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: none;
 }
 
 .sidebar-toolbar-main {
@@ -2527,7 +2519,7 @@ onMounted(async () => {
 
 .sidebar-title {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
@@ -2540,20 +2532,20 @@ onMounted(async () => {
 .sidebar-caption {
   font-size: 10px;
   line-height: 1;
-  padding: 4px 7px;
-  border-radius: 999px;
+  padding: 2px 6px;
+  border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-quaternary);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(15, 23, 42, 0.05);
+  background: #f8fafc;
+  border: none;
 }
 
 .sidebar-section-label {
-  padding: 10px 14px 2px;
+  padding: 8px 10px 2px;
   font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
@@ -2562,58 +2554,57 @@ onMounted(async () => {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 8px;
+  padding: 6px;
 }
 
 .menu-item {
   position: relative;
   display: grid;
-  grid-template-columns: 3px 30px minmax(0, 1fr) auto;
+  grid-template-columns: 2px 26px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 4px;
-  padding: 9px 10px 9px 8px;
-  border-radius: 12px;
+  gap: 8px;
+  margin-bottom: 3px;
+  padding: 6px 8px 6px 6px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
-  border: 1px solid transparent;
+  border: none;
 }
 
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.55);
+  background: #f8fafc;
 }
 
 .menu-item.active {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
-  border-color: rgba(10, 132, 255, 0.15);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(15, 23, 42, 0.05);
+  background: #eff6ff;
+  box-shadow: none;
 }
 
 .menu-active-indicator {
-  width: 3px;
-  height: 26px;
+  width: 2px;
+  height: 20px;
   border-radius: 999px;
   background: transparent;
 }
 
 .menu-item.active .menu-active-indicator {
-  background: linear-gradient(180deg, #4da3ff, #0a84ff);
+  background: var(--accent-blue);
 }
 
 .menu-icon-shell {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 6px;
+  background: #f8fafc;
+  border: none;
 }
 
 .menu-icon {
-  font-size: 15px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
@@ -2629,14 +2620,14 @@ onMounted(async () => {
 }
 
 .menu-name {
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .menu-desc {
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.3;
   color: var(--text-tertiary);
   white-space: nowrap;
@@ -2646,7 +2637,7 @@ onMounted(async () => {
 
 .menu-chevron {
   align-self: center;
-  font-size: 16px;
+  font-size: 14px;
   line-height: 1;
   color: var(--text-quaternary);
   opacity: 0.7;
@@ -2661,10 +2652,10 @@ onMounted(async () => {
   min-width: 0;
   min-height: 0;
   overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 18px 0;
-  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: none !important;
+  border-radius: 6px 0 0 6px;
+  background: #fff;
+  box-shadow: none !important;
 }
 
 .content-area::-webkit-scrollbar {
@@ -2685,93 +2676,108 @@ onMounted(async () => {
 }
 
 .settings-section {
-  padding: 20px 22px 26px;
+  padding: 6px 8px;
 }
 
 .group-title {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   padding: 0 2px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-quaternary);
 }
 
 .settings-section :deep(.el-card) {
-  margin-bottom: 10px !important;
+  margin-bottom: 0 !important;
   border-radius: 0;
   border: none;
-  border-top: 1px solid rgba(15, 23, 42, 0.06);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(255, 255, 255, 0.78);
+  background: transparent;
   box-shadow: none;
   overflow: hidden;
 }
 
+.settings-section :deep(.el-card + .el-card) {
+  margin-top: 10px !important;
+  padding-top: 10px;
+  border-top: 1px solid #dfe5ee;
+}
+
 .settings-section :deep(.el-card__header) {
-  padding: 12px 16px 8px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
-  background: rgba(247, 249, 252, 0.62);
+  padding: 6px 10px 8px;
+  border-bottom: none;
+  background: transparent;
 }
 
 .settings-section :deep(.el-card__body) {
-  padding: 0 16px 2px;
+  padding: 0 10px 4px;
 }
 
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  font-size: 13px;
-  font-weight: 700;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
 .settings-section :deep(.el-form-item) {
   margin-bottom: 0;
-  padding: 11px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-  align-items: flex-start;
+  padding: 7px 0;
+  border-bottom: none;
+  align-items: center;
 }
 
 .settings-section :deep(.el-form-item__label) {
   display: inline-flex;
-  align-items: flex-start;
-  min-height: 30px;
-  padding-right: 18px;
-  font-size: 13px;
-  line-height: 1.45;
-  font-weight: 600;
+  align-items: center;
+  min-height: 28px;
+  padding-right: 6px;
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .settings-section :deep(.el-form-item__content) {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  min-height: 30px;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
   color: var(--text-secondary);
 }
 
 .settings-section :deep(.el-radio-group) {
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
 .settings-section :deep(.el-radio) {
-  min-height: 30px;
-  margin-right: 0;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(248, 250, 252, 0.82);
+  min-height: 28px;
+  margin-right: 8px;
+  padding: 0 2px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.settings-section :deep(.el-radio__label) {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.settings-section :deep(.el-radio.is-checked .el-radio__label) {
+  color: var(--accent-blue);
 }
 
 .inline-control-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -2787,14 +2793,14 @@ onMounted(async () => {
 .stacked-control-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
 }
 
 .form-hint-block {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 12px;
-  line-height: 1.6;
+  line-height: 1.45;
   color: var(--text-tertiary);
 }
 
@@ -2803,13 +2809,13 @@ onMounted(async () => {
 }
 
 .settings-section :deep(.el-form) {
-  --settings-label-width: 220px;
+  --settings-label-width: 132px;
 }
 
 .settings-section :deep(.el-form--label-left .el-form-item) {
   display: grid;
-  grid-template-columns: minmax(180px, var(--settings-label-width)) minmax(0, 1fr);
-  column-gap: 18px;
+  grid-template-columns: minmax(104px, var(--settings-label-width)) minmax(0, 1fr);
+  column-gap: 8px;
 }
 
 .settings-section :deep(.el-form--label-left .el-form-item__label) {
@@ -2823,7 +2829,22 @@ onMounted(async () => {
 }
 
 .settings-section :deep(.el-form-item:last-child) {
-  border-bottom: none;
+  padding-bottom: 7px;
+}
+
+.settings-section :deep(.inline-control-row),
+.settings-section :deep(.stacked-control-group),
+.settings-section :deep(.form-hint-block),
+.settings-section :deep(.feedback-textarea),
+.settings-section :deep(.stats-list),
+.settings-section :deep(.provider-actions-row .el-form-item__content) {
+  align-self: stretch;
+}
+
+.settings-section :deep(.stacked-control-group),
+.settings-section :deep(.form-hint-block),
+.settings-section :deep(.form-hint-block.compact) {
+  align-items: flex-start;
 }
 
 .settings-section :deep(.el-form-item__content > *) {
@@ -2887,9 +2908,127 @@ onMounted(async () => {
 .settings-section :deep(.el-input__wrapper),
 .settings-section :deep(.el-select__wrapper),
 .settings-section :deep(.el-textarea__inner) {
-  border-radius: 10px;
-  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08) inset;
-  background: rgba(255, 255, 255, 0.94);
+  border-radius: 6px;
+  box-shadow: none;
+  border: none !important;
+  background: #f7f8fa;
+}
+
+/* keep slider handle visible and centered in default state */
+.settings-section :deep(.el-slider__button-wrapper) {
+  opacity: 1 !important;
+  visibility: visible !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin-top: 0 !important;
+}
+
+.settings-section :deep(.el-slider__button) {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--accent-blue);
+  background: #fff;
+  box-shadow: none;
+}
+
+.settings-section :deep(.el-slider__runway) {
+  margin: 10px 0;
+}
+
+/* feedback area tuning */
+.settings-section :deep(.help-support-card .el-card__body) {
+  padding-top: 6px;
+}
+
+.settings-section :deep(.help-support-form .el-form-item__label) {
+  align-items: center;
+  min-height: 30px;
+}
+
+.settings-section :deep(.feedback-textarea) {
+  width: min(780px, 100%) !important;
+}
+
+.settings-section :deep(.feedback-textarea .el-textarea__inner) {
+  min-height: 132px;
+  line-height: 1.5;
+  resize: none !important;
+}
+
+.settings-section :deep(.feedback-contact-input) {
+  width: min(520px, 100%) !important;
+}
+
+.settings-section :deep(.feedback-action-row .el-form-item__content) {
+  align-items: center !important;
+  gap: 6px;
+}
+
+/* inline control rows that need vertical centering */
+.settings-section :deep(.form-item-inline-center .el-form-item__content) {
+  align-items: center !important;
+  gap: 6px;
+}
+
+.settings-section :deep(.check-update-btn) {
+  height: 28px;
+  padding: 0 10px;
+}
+
+.settings-section :deep(.check-update-btn .el-icon) {
+  margin-right: 6px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.settings-section :deep(.update-info) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  margin-left: 8px;
+  color: #16a34a;
+  line-height: 1;
+}
+
+.settings-section :deep(.danger-action-row .el-form-item__content) {
+  align-items: center !important;
+  padding-top: 2px;
+}
+
+/* about app block refinement */
+.settings-section :deep(.about-app-card .el-card__body) {
+  padding-top: 6px;
+}
+
+.settings-section :deep(.about-app-descriptions) {
+  width: min(760px, 100%);
+}
+
+.settings-section :deep(.about-app-descriptions .el-descriptions__table) {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.settings-section :deep(.about-app-descriptions .el-descriptions__label) {
+  width: 130px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border-color: transparent !important;
+}
+
+.settings-section :deep(.about-app-descriptions .el-descriptions__content) {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-color: transparent !important;
+}
+
+.settings-section :deep(.about-app-descriptions .el-descriptions__cell) {
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .settings-section :deep(.el-descriptions) {
@@ -2903,17 +3042,48 @@ onMounted(async () => {
 
 .settings-section :deep(.el-descriptions__label),
 .settings-section :deep(.el-descriptions__content) {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-color: transparent !important;
+}
+
+/* storage/vault status list */
+.stats-list {
+  width: 100%;
+}
+
+.stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #e7edf5;
+}
+
+.stats-row:last-child {
+  border-bottom: none;
+}
+
+.stats-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.stats-value {
+  font-size: 12px;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
 }
 
 .settings-section :deep(.el-divider) {
-  margin: 14px 0;
+  margin: 6px 0;
 }
 
 .settings-section :deep(.el-divider__text) {
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--text-tertiary);
 }
 
@@ -2925,32 +3095,51 @@ onMounted(async () => {
 .ai-provider-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .ai-provider-item {
-  border-radius: 0;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  background: rgba(248, 250, 252, 0.62);
+  border-radius: 6px;
+  border: none;
+  background: #fff;
   overflow: hidden;
 }
 
 .ai-provider-item.active {
-  border-color: rgba(10, 132, 255, 0.14);
-  background: rgba(244, 248, 255, 0.86);
+  background: #eff6ff;
 }
 
 .ai-provider-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 6px;
+  padding: 6px 8px;
   cursor: pointer;
 }
 
 .ai-provider-form {
-  padding: 0 12px 10px;
-  border-top: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 0 8px 6px;
+  border-top: none;
+}
+
+.settings-section :deep(.provider-actions-row .el-form-item__content) {
+  display: flex;
+  flex-wrap: wrap !important;
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+}
+
+.settings-section :deep(.provider-actions-row.el-form-item) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.settings-section :deep(.provider-actions-row .el-form-item__content) {
+  margin-left: 0 !important;
+}
+
+.settings-section :deep(.provider-actions-row .el-button) {
+  white-space: nowrap;
 }
 
 .ai-prov-dot {
@@ -2962,26 +3151,26 @@ onMounted(async () => {
 }
 
 .ai-prov-dot.is-active {
-  background: #30d158;
-  box-shadow: 0 0 0 5px rgba(48, 209, 88, 0.14);
+  background: var(--accent-blue);
+  box-shadow: none;
 }
 
 .ai-prov-name {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .ai-prov-model {
   margin-left: auto;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-tertiary);
 }
 
 @media (max-width: 1100px) {
   .main-container {
     grid-template-columns: 250px minmax(0, 1fr);
-    padding: 14px;
+    padding: 5px 0 5px 5px;
   }
 
   .section-title {
@@ -2992,23 +3181,24 @@ onMounted(async () => {
 @media (max-width: 820px) {
   .main-container {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 5px;
+    padding: 5px;
   }
 
   .sidebar-left {
-    border-right: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
+    border-right: none;
+    border-radius: 6px;
   }
 
   .content-area {
-    border-radius: 18px;
+    border-radius: 6px;
   }
 }
 
 @media (max-width: 640px) {
   .header {
-    min-height: 64px;
-    padding: 10px 14px;
+    min-height: 56px;
+    padding: 8px;
     flex-direction: column;
     align-items: flex-start;
   }
@@ -3020,8 +3210,8 @@ onMounted(async () => {
 
   .settings-section-header,
   .settings-section {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 8px;
+    padding-right: 8px;
   }
 
   .settings-section :deep(.el-form-item) {
@@ -3037,3 +3227,4 @@ onMounted(async () => {
   }
 }
 </style>
+

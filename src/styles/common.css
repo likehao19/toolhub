@@ -5,10 +5,10 @@
 
 /* ========== 页面布局 ========== */
 .page-container {
-  padding: var(--space-2xl);
+  padding: clamp(16px, 2vw, 24px);
   height: 100%;
   overflow-y: auto;
-  background: var(--bg-secondary);
+  background: transparent;
 }
 
 .page-header {
@@ -16,7 +16,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: var(--space-xl);
-  padding: var(--space-md) 0;
+  padding: 6px 0 12px;
 }
 
 .page-header h2 {
@@ -43,29 +43,33 @@
   gap: var(--space-sm);
   align-items: center;
   margin-bottom: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-primary);
+  padding: 10px 14px;
+  background: var(--surface-panel-soft);
   border-radius: var(--radius-md);
-  border: 0.5px solid var(--border-color);
+  border: 1px solid var(--divider);
+  box-shadow: var(--shadow-sm);
 }
 
 .search-bar {
   margin-bottom: var(--space-lg);
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-primary);
+  padding: 10px 14px;
+  background: var(--surface-panel-soft);
   border-radius: var(--radius-md);
-  border: 0.5px solid var(--border-color);
+  border: 1px solid var(--divider);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ========== 卡片样式 ========== */
 .content-card {
-  background: var(--bg-primary);
+  background: var(--surface-panel);
   border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
-  transition: box-shadow var(--transition-normal);
+  transition: box-shadow var(--transition-normal), transform var(--transition-fast);
 }
 
 .content-card:hover {
+  transform: var(--interactive-lift);
   box-shadow: var(--shadow-card-hover);
 }
 
@@ -92,22 +96,26 @@
 }
 
 .list-item {
-  padding: var(--space-md);
+  padding: 12px;
   border-radius: var(--radius-sm);
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
   cursor: pointer;
 }
 
 .list-item:hover {
-  background: var(--bg-tertiary);
+  background: color-mix(in srgb, var(--accent-blue-bg) 54%, transparent 46%);
+  transform: var(--interactive-lift);
 }
 
 /* ========== 空状态 ========== */
 .empty-state {
   text-align: center;
-  padding: 60px var(--space-xl);
+  padding: 52px var(--space-xl);
   color: var(--text-tertiary);
   font-size: var(--font-size-callout);
+  border: 1px dashed var(--divider);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-panel-soft) 86%, transparent 14%);
 }
 
 /* ========== 操作按钮 ========== */

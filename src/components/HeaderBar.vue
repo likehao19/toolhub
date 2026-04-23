@@ -300,9 +300,9 @@ onUnmounted(() => {
 <style scoped>
 .header-bar {
   height: var(--header-height);
-  background: var(--bg-primary);
-  border-bottom: 0.5px solid var(--border-color-strong);
-  backdrop-filter: saturate(180%) blur(20px);
+  background: color-mix(in srgb, var(--surface-panel) 86%, transparent 14%);
+  border-bottom: 1px solid var(--divider);
+  backdrop-filter: saturate(160%) blur(18px);
   user-select: none;
   -webkit-app-region: drag;
   position: fixed;
@@ -317,7 +317,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 var(--space-sm);
+  padding: 0 var(--space-md);
   -webkit-app-region: drag;
 }
 
@@ -353,8 +353,8 @@ onUnmounted(() => {
 .app-name {
   font-size: var(--font-size-footnote);
   font-weight: var(--font-weight-semibold);
-  color: var(--text-primary);
-  letter-spacing: 0.3px;
+  color: color-mix(in srgb, var(--text-primary) 92%, #111827 8%);
+  letter-spacing: 0.02em;
   -webkit-app-region: drag;
   background: none;
   -webkit-text-fill-color: var(--text-primary);
@@ -369,21 +369,25 @@ onUnmounted(() => {
 
 /* 窗口控制按钮 */
 .header-button {
-  width: 30px;
-  height: 30px;
+  width: 31px;
+  height: 31px;
   border: none;
-  background: transparent;
-  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--surface-panel-soft) 88%, transparent 12%);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
   color: var(--text-secondary);
+  border: 1px solid var(--divider);
 }
 
 .header-button:hover {
-  background: var(--bg-tertiary);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  transform: var(--interactive-lift);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 关闭按钮特殊处理 */
@@ -394,6 +398,8 @@ onUnmounted(() => {
 
 .header-button.pin-button.active {
   color: var(--accent-blue);
+  border-color: color-mix(in srgb, var(--accent-blue) 40%, var(--divider) 60%);
+  background: color-mix(in srgb, var(--accent-blue-bg) 80%, transparent 20%);
 }
 
 .header-button .el-icon {
@@ -407,11 +413,18 @@ onUnmounted(() => {
 }
 
 .global-search :deep(.el-input) {
-  width: 260px;
-  --el-input-bg-color: var(--bg-tertiary);
-  --el-input-border-color: transparent;
+  width: 300px;
+  --el-input-bg-color: color-mix(in srgb, var(--surface-panel-soft) 84%, transparent 16%);
+  --el-input-border-color: var(--divider);
   --el-input-hover-border-color: var(--border-color-strong);
   --el-input-focus-border-color: var(--accent-blue);
+}
+
+.global-search :deep(.el-input__wrapper) {
+  box-shadow: none !important;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  min-height: 34px;
 }
 
 /* 搜索结果下拉面板 */
@@ -420,9 +433,9 @@ onUnmounted(() => {
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: var(--space-xs);
-  background: var(--bg-primary);
-  border: 0.5px solid var(--border-color);
+  margin-top: 10px;
+  background: color-mix(in srgb, var(--surface-panel) 90%, transparent 10%);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-popover);
   max-height: 500px;
@@ -476,14 +489,15 @@ onUnmounted(() => {
 }
 
 .search-item {
-  padding: var(--space-sm);
+  padding: 10px 12px;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .search-item:hover {
-  background: var(--bg-tertiary);
+  background: color-mix(in srgb, var(--accent-blue-bg) 60%, transparent 40%);
+  transform: var(--interactive-lift);
 }
 
 .item-title {
@@ -552,11 +566,12 @@ onUnmounted(() => {
   padding: var(--space-sm);
   cursor: pointer;
   border-radius: var(--radius-sm);
-  transition: background var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .history-item:hover {
-  background: var(--bg-tertiary);
+  background: color-mix(in srgb, var(--accent-blue-bg) 55%, transparent 45%);
+  transform: var(--interactive-lift);
 }
 
 .history-item .el-icon {

@@ -632,13 +632,13 @@ onUnmounted(() => {
 .dash-topbar {
   display: grid;
   grid-template-columns: minmax(170px, auto) minmax(0, 1fr);
-  gap: 12px;
+  gap: 14px;
   align-items: center;
-  padding: 8px 10px;
-  background: color-mix(in srgb, var(--surface-panel-soft) 62%, var(--bg-secondary) 38%);
-  border: 1px solid var(--surface-divider);
-  box-shadow: var(--shadow-sm);
-  border-radius: 14px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--surface-panel-soft) 74%, var(--bg-secondary) 26%);
+  border: 1px solid var(--divider);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
   backdrop-filter: saturate(150%) blur(12px);
   flex-shrink: 0;
 }
@@ -722,11 +722,15 @@ onUnmounted(() => {
   gap: 7px;
   cursor: pointer;
   user-select: none;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+  padding: 4px 8px;
+  border-radius: 999px;
 }
 
 .stat-item:hover {
-  opacity: 0.84;
+  opacity: 1;
+  background: color-mix(in srgb, var(--accent-blue-bg) 60%, transparent 40%);
+  transform: var(--interactive-lift);
 }
 
 .stat-chip-main {
@@ -780,24 +784,26 @@ onUnmounted(() => {
 }
 
 .icon-btn {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
   background: var(--surface-muted);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
   font-size: 12px;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .icon-btn:hover {
   background: var(--surface-hover);
   border-color: var(--surface-divider);
   color: var(--text-primary);
+  transform: var(--interactive-lift);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-strip {
@@ -812,7 +818,10 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-panel-head {
@@ -870,12 +879,12 @@ onUnmounted(() => {
 .qs-bm-icon {
   width: 28px;
   height: 28px;
-  border-radius: 7px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   border: 1px solid transparent;
   background: var(--surface-muted);
   flex-shrink: 0;
@@ -884,6 +893,7 @@ onUnmounted(() => {
 .qs-bm-icon:hover {
   background: var(--surface-hover);
   border-color: var(--surface-divider);
+  transform: var(--interactive-lift);
 }
 
 .qs-favicon {
@@ -903,11 +913,11 @@ onUnmounted(() => {
   align-items: center;
   gap: 5px;
   padding: 3px 5px 3px 7px;
-  border-radius: 7px;
+  border-radius: 9px;
   border: 1px solid transparent;
   background: var(--surface-muted);
   flex-shrink: 0;
-  min-width: 132px;
+  min-width: 148px;
   max-width: 200px;
 }
 
@@ -930,18 +940,19 @@ onUnmounted(() => {
   justify-content: center;
   border: 1px solid transparent;
   background: var(--surface-accent);
-  border-radius: 5px;
+  border-radius: 7px;
   color: var(--text-tertiary);
   cursor: pointer;
   font-size: 10px;
   flex-shrink: 0;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .qs-copy-btn:hover {
   background: var(--surface-hover);
   border-color: var(--surface-divider);
   color: var(--accent-blue);
+  transform: var(--interactive-lift);
 }
 
 .dashboard-workspace {
@@ -960,7 +971,7 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: minmax(0, 1.22fr) 360px;
   overflow: hidden;
-  gap: 10px;
+  gap: 12px;
   padding: 2px 0 0;
 }
 
@@ -970,15 +981,18 @@ onUnmounted(() => {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .section-block {
-  padding: 10px 12px 12px;
+  padding: 12px 14px 14px;
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .section-notes {
@@ -996,8 +1010,8 @@ onUnmounted(() => {
 }
 
 .link-btn {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1006,13 +1020,14 @@ onUnmounted(() => {
   background: transparent;
   border: none;
   cursor: pointer;
-  border-radius: 6px;
-  transition: background var(--transition-fast), color var(--transition-fast);
+  border-radius: 8px;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
 .link-btn:hover {
   background: var(--surface-muted);
   color: var(--accent-blue);
+  transform: var(--interactive-lift);
 }
 
 .section-content {
@@ -1030,17 +1045,18 @@ onUnmounted(() => {
   justify-content: center;
   gap: 5px;
   padding: 14px 10px;
-  border-radius: 10px;
-  border: 1px solid transparent;
+  border-radius: 12px;
+  border: 1px dashed color-mix(in srgb, var(--border-color) 72%, transparent 28%);
   background: var(--surface-muted);
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   min-height: 70px;
 }
 
 .empty-state:hover {
   background: var(--surface-hover);
   border-color: var(--surface-divider);
+  transform: var(--interactive-lift);
 }
 
 .empty-icon {
@@ -1073,9 +1089,9 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   padding: 6px 7px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
   border: 1px solid transparent;
   background: var(--surface-muted);
 }
@@ -1083,6 +1099,7 @@ onUnmounted(() => {
 .note-row:hover {
   background: var(--surface-hover);
   border-color: var(--surface-divider);
+  transform: var(--interactive-lift);
 }
 
 .note-row-icon {

@@ -343,14 +343,14 @@ watch(currentPath, (newPath) => {
 .productivity-sidebar {
   width: var(--sidebar-width);
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 32%),
-    linear-gradient(180deg, rgba(249, 250, 252, 0.985), rgba(243, 246, 249, 0.98));
-  border-right: 1px solid rgba(15, 23, 42, 0.07);
+    radial-gradient(circle at -4% -5%, color-mix(in srgb, var(--accent-blue-bg) 72%, transparent 28%), transparent 38%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 90%, white 10%), color-mix(in srgb, var(--surface-panel-soft) 88%, transparent 12%));
+  border-right: 1px solid var(--divider);
   display: flex;
   flex-direction: column;
   transition: width var(--transition-smooth), background var(--transition-smooth);
   flex-shrink: 0;
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.72);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.46);
 }
 
 .productivity-sidebar.collapsed {
@@ -363,8 +363,8 @@ watch(currentPath, (newPath) => {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px 8px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.045);
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid var(--divider);
 }
 
 .sidebar-brand {
@@ -395,23 +395,26 @@ watch(currentPath, (newPath) => {
   width: 32px;
   height: 32px;
   min-width: 32px;
-  border-radius: 10px;
+  border-radius: 12px;
   justify-content: center;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.42);
-  border: 1px solid rgba(15, 23, 42, 0.05);
+  background: color-mix(in srgb, var(--surface-panel-soft) 82%, transparent 18%);
+  border: 1px solid var(--divider);
+  transition: all var(--transition-fast);
 }
 
 .collapse-btn:hover {
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--surface-hover);
   color: var(--text-primary);
+  transform: var(--interactive-lift);
+  box-shadow: var(--shadow-sm);
 }
 
 /* 顶部固定区域 — 不参与滚动 */
 .sidebar-top {
   flex-shrink: 0;
   padding: 8px 0 6px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.045);
+  border-bottom: 1px solid var(--divider);
 }
 
 .sidebar-top .menu-section {
@@ -449,8 +452,8 @@ watch(currentPath, (newPath) => {
 .sidebar-footer {
   flex-shrink: 0;
   padding: 10px 0 12px;
-  border-top: 1px solid rgba(15, 23, 42, 0.045);
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.68), rgba(243, 246, 249, 0.92));
+  border-top: 1px solid var(--divider);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 74%, transparent 26%), color-mix(in srgb, var(--surface-panel) 88%, transparent 12%));
 }
 
 .sidebar-footer .menu-section {
@@ -474,7 +477,7 @@ watch(currentPath, (newPath) => {
   padding: 10px 16px 5px;
   font-size: 11px;
   font-weight: 600;
-  color: var(--text-tertiary);
+  color: color-mix(in srgb, var(--text-tertiary) 88%, #0f172a 12%);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -518,15 +521,16 @@ watch(currentPath, (newPath) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 36px;
-  padding: 7px 12px 7px 14px;
+  min-height: 38px;
+  padding: 8px 12px 8px 14px;
   margin: 1px 10px;
   font-size: 13px;
   font-weight: 500;
-  color: rgba(15, 23, 42, 0.88);
+  color: color-mix(in srgb, var(--text-primary) 88%, transparent 12%);
   border-radius: 11px;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  border: 1px solid transparent;
+  transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
   position: relative;
 }
 
@@ -542,7 +546,7 @@ watch(currentPath, (newPath) => {
   width: 22px;
   height: 22px;
   min-width: 22px;
-  border-radius: 7px;
+  border-radius: 8px;
   background: transparent;
   box-shadow: none;
 }
@@ -566,8 +570,10 @@ watch(currentPath, (newPath) => {
 
 /* Hover 态 */
 .menu-item:hover {
-  background: rgba(255, 255, 255, 0.62);
-  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12);
+  background: color-mix(in srgb, var(--accent-blue-bg) 46%, transparent 54%);
+  border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent 74%);
+  box-shadow: var(--shadow-sm);
+  transform: var(--interactive-lift);
 }
 
 .menu-item:hover .el-icon {
@@ -575,15 +581,16 @@ watch(currentPath, (newPath) => {
 }
 
 .menu-item:hover .menu-icon-shell {
-  background: rgba(15, 23, 42, 0.028);
+  background: color-mix(in srgb, var(--accent-blue-bg) 56%, transparent 44%);
 }
 
 /* 选中态 */
 .menu-item.active {
-  background: linear-gradient(180deg, rgba(239, 246, 255, 0.86), rgba(229, 238, 252, 0.82));
-  color: #1d4ed8;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 78%, white 22%), color-mix(in srgb, var(--accent-blue-bg) 92%, transparent 8%));
+  color: color-mix(in srgb, var(--accent-blue) 84%, #0f172a 16%);
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.14);
+  border-color: color-mix(in srgb, var(--accent-blue) 32%, transparent 68%);
+  box-shadow: 0 8px 14px rgba(13, 110, 253, 0.16);
 }
 
 .menu-item.active::before {
@@ -598,12 +605,12 @@ watch(currentPath, (newPath) => {
 }
 
 .menu-item.active .el-icon {
-  color: #2563eb;
+  color: var(--accent-blue);
 }
 
 .menu-item.active .menu-icon-shell {
-  background: rgba(37, 99, 235, 0.05);
-  box-shadow: inset 0 0 0 1px rgba(96, 165, 250, 0.08);
+  background: color-mix(in srgb, var(--accent-blue-bg) 82%, transparent 18%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-blue) 24%, transparent 76%);
 }
 
 .menu-label {

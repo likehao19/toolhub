@@ -35,7 +35,7 @@
         <HeaderBar />
         <div class="app-body">
           <ProductivitySidebar />
-          <div class="app-content">
+          <div class="app-content" :class="{ 'toolbox-unified-shell': isToolboxToolRoute }">
             <router-view v-slot="{ Component }">
               <transition name="fade" mode="out-in">
                 <keep-alive include="Chat">
@@ -110,6 +110,7 @@ const isStandaloneWindow = ref(
 const appStore = useAppStore()
 const router = useRouter()
 const route = useRoute()
+const isToolboxToolRoute = computed(() => route.path.startsWith('/toolbox/') && route.path !== '/toolbox')
 const closeDialogRef = ref(null)
 const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
@@ -979,28 +980,28 @@ const handleCloseConfirm = async ({ action, remember }) => {
 :root {
   /* —— 背景层级 —— */
   --bg-primary:        #ffffff;
-  --bg-secondary:      #f5f5f7;
-  --bg-tertiary:       #e8e8ed;
-  --bg-grouped:        #f2f2f7;
-  --surface-page:      linear-gradient(180deg, #f6f8fb 0%, #f1f5f9 100%);
+  --bg-secondary:      #f3f6fb;
+  --bg-tertiary:       #e9edf5;
+  --bg-grouped:        #f0f4fa;
+  --surface-page:      radial-gradient(circle at 0% 0%, #eef6ff 0%, #f8fbff 36%, #f3f6fb 100%);
   --surface-panel:     rgba(255,255,255,0.92);
   --surface-panel-soft:rgba(255,255,255,0.72);
-  --surface-hover:     rgba(255,255,255,0.88);
-  --surface-muted:     rgba(255,255,255,0.58);
-  --surface-accent:    rgba(0,122,255,0.08);
-  --surface-divider:   rgba(15,23,42,0.06);
+  --surface-hover:     rgba(255,255,255,0.96);
+  --surface-muted:     rgba(255,255,255,0.62);
+  --surface-accent:    rgba(13,110,253,0.10);
+  --surface-divider:   rgba(15,23,42,0.08);
 
   /* —— 文字层级 —— */
-  --text-primary:      #1d1d1f;
-  --text-secondary:    #6e6e73;
-  --text-tertiary:     #aeaeb2;
-  --text-quaternary:   #c7c7cc;
+  --text-primary:      #0f172a;
+  --text-secondary:    #475569;
+  --text-tertiary:     #64748b;
+  --text-quaternary:   #94a3b8;
 
   /* —— 系统强调色 —— */
-  --accent-blue:       #007aff;
-  --accent-blue-hover: #0066d6;
-  --accent-blue-active:#0055b3;
-  --accent-blue-bg:    rgba(0,122,255,0.08);
+  --accent-blue:       #0d6efd;
+  --accent-blue-hover: #0b5ed7;
+  --accent-blue-active:#0a58ca;
+  --accent-blue-bg:    rgba(13,110,253,0.12);
 
   /* —— 语义色（低饱和） —— */
   --color-red:         #ff3b30;
@@ -1011,24 +1012,24 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --color-purple:      #af52de;
 
   /* —— 分割与边框 —— */
-  --border-color:      rgba(0,0,0,0.06);
-  --border-color-strong:rgba(0,0,0,0.10);
-  --divider:           rgba(0,0,0,0.04);
+  --border-color:      rgba(15,23,42,0.10);
+  --border-color-strong:rgba(15,23,42,0.16);
+  --divider:           rgba(15,23,42,0.07);
 
   /* —— 阴影层级 —— */
-  --shadow-sm:         0 0.5px 1px rgba(0,0,0,0.04);
-  --shadow-md:         0 2px 8px rgba(0,0,0,0.08);
-  --shadow-lg:         0 8px 24px rgba(0,0,0,0.12);
-  --shadow-popover:    0 4px 16px rgba(0,0,0,0.14), 0 0 1px rgba(0,0,0,0.06);
-  --shadow-card:       0 0 0 0.5px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05);
-  --shadow-card-hover: 0 0 0 0.5px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-sm:         0 1px 2px rgba(15,23,42,0.05);
+  --shadow-md:         0 6px 18px rgba(15,23,42,0.08);
+  --shadow-lg:         0 16px 40px rgba(15,23,42,0.12);
+  --shadow-popover:    0 14px 38px rgba(15,23,42,0.14), 0 1px 2px rgba(15,23,42,0.08);
+  --shadow-card:       0 1px 2px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.05);
+  --shadow-card-hover: 0 2px 6px rgba(15,23,42,0.08), 0 16px 28px rgba(15,23,42,0.10);
 
   /* —— 圆角 —— */
-  --radius-xs:         4px;
-  --radius-sm:         6px;
-  --radius-md:         10px;
-  --radius-lg:         12px;
-  --radius-xl:         16px;
+  --radius-xs:         6px;
+  --radius-sm:         10px;
+  --radius-md:         14px;
+  --radius-lg:         18px;
+  --radius-xl:         24px;
 
   /* —— 间距 —— */
   --space-xs:          4px;
@@ -1040,8 +1041,8 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --space-3xl:         32px;
 
   /* —— 字体 —— */
-  --font-family:       "PingFang SC";
-  --font-family-mono:  "PingFang SC";
+  --font-family:       "Segoe UI Variable Display", "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+  --font-family-mono:  "Cascadia Mono", "JetBrains Mono", "Consolas", monospace;
 
   /* —— 字号层级 —— */
   --font-size-caption2: 11px;
@@ -1062,14 +1063,16 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --font-weight-bold:     700;
 
   /* —— 动效 —— */
-  --transition-fast:   120ms ease;
-  --transition-normal: 200ms ease;
-  --transition-smooth: 300ms cubic-bezier(0.25, 0.1, 0.25, 1);
+  --transition-fast:   120ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-normal: 200ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-smooth: 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* —— 布局尺寸 —— */
-  --header-height:     38px;
-  --sidebar-width:     220px;
+  --header-height:     44px;
+  --sidebar-width:     236px;
   --sidebar-collapsed: 56px;
+  --focus-ring:        0 0 0 3px rgba(13,110,253,0.20);
+  --interactive-lift:  translateY(-1px);
 
   /* —— Element Plus 覆盖 —— */
   --el-color-primary: var(--accent-blue);
@@ -1100,7 +1103,7 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --el-font-size-small: var(--font-size-footnote);
   --el-font-size-extra-small: var(--font-size-caption);
 
-  --el-transition-duration: 200ms;
+  --el-transition-duration: 180ms;
 
   --el-card-border-radius: var(--radius-md);
   --el-card-border-color: var(--border-color);
@@ -1429,4 +1432,177 @@ body {
   opacity: 1;
 }
 
+/* ===== Design Refresh Overrides ===== */
+:root {
+  --bg-secondary: #f3f6fb;
+  --bg-tertiary: #e9edf5;
+  --bg-grouped: #f0f4fa;
+  --surface-page: radial-gradient(circle at 0% 0%, #eef6ff 0%, #f8fbff 36%, #f3f6fb 100%);
+  --surface-panel-soft: rgba(255,255,255,0.76);
+  --surface-hover: rgba(255,255,255,0.96);
+  --surface-accent: rgba(13,110,253,0.10);
+  --surface-divider: rgba(15,23,42,0.08);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-quaternary: #94a3b8;
+  --accent-blue: #0d6efd;
+  --accent-blue-hover: #0b5ed7;
+  --accent-blue-active: #0a58ca;
+  --accent-blue-bg: rgba(13,110,253,0.12);
+  --border-color: rgba(15,23,42,0.10);
+  --border-color-strong: rgba(15,23,42,0.16);
+  --divider: rgba(15,23,42,0.07);
+  --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
+  --shadow-md: 0 6px 18px rgba(15,23,42,0.08);
+  --shadow-lg: 0 16px 40px rgba(15,23,42,0.12);
+  --shadow-popover: 0 14px 38px rgba(15,23,42,0.14), 0 1px 2px rgba(15,23,42,0.08);
+  --shadow-card: 0 1px 2px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.05);
+  --shadow-card-hover: 0 2px 6px rgba(15,23,42,0.08), 0 16px 28px rgba(15,23,42,0.10);
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --font-family: "Segoe UI Variable Display", "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
+  --font-family-mono: "Cascadia Mono", "JetBrains Mono", "Consolas", monospace;
+  --transition-fast: 120ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-normal: 200ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-smooth: 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --header-height: 44px;
+  --sidebar-width: 236px;
+  --focus-ring: 0 0 0 3px rgba(13,110,253,0.20);
+  --interactive-lift: translateY(-1px);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #111827;
+  --bg-secondary: #030712;
+  --bg-tertiary: #1f2937;
+  --bg-grouped: #111827;
+  --surface-page: radial-gradient(circle at 0% 0%, #0f1b34 0%, #0b1120 34%, #020617 100%);
+  --surface-panel: rgba(17,24,39,0.92);
+  --surface-panel-soft: rgba(17,24,39,0.76);
+  --surface-hover: rgba(30,41,59,0.92);
+  --surface-muted: rgba(51,65,85,0.62);
+  --surface-accent: rgba(59,130,246,0.18);
+  --surface-divider: rgba(148,163,184,0.18);
+  --text-primary: #e5e7eb;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  --text-quaternary: #475569;
+  --accent-blue: #3b82f6;
+  --accent-blue-hover: #60a5fa;
+  --accent-blue-bg: rgba(59,130,246,0.18);
+  --border-color: rgba(148,163,184,0.20);
+  --border-color-strong: rgba(148,163,184,0.28);
+  --divider: rgba(148,163,184,0.14);
+}
+
+body {
+  line-height: 1.5;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+.el-button {
+  border-radius: var(--radius-sm);
+  font-weight: var(--font-weight-medium);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.el-button:hover {
+  transform: var(--interactive-lift);
+}
+
+.el-button:focus-visible,
+.el-input__wrapper.is-focus,
+.el-select__wrapper.is-focused,
+.el-input-number.is-focus,
+.el-textarea__inner:focus {
+  box-shadow: var(--focus-ring) !important;
+}
+
+.el-button--primary {
+  box-shadow: 0 10px 16px rgba(13, 110, 253, 0.22);
+}
+
+.el-button--primary:hover {
+  box-shadow: 0 12px 20px rgba(13, 110, 253, 0.30);
+}
+
+.el-button--default {
+  background: var(--surface-panel-soft);
+}
+
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner,
+.el-input-number,
+.el-date-editor.el-input__wrapper {
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid var(--border-color);
+  box-shadow: none !important;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.el-input__wrapper:hover,
+.el-select__wrapper:hover,
+.el-textarea__inner:hover,
+.el-input-number:hover {
+  border-color: var(--border-color-strong);
+}
+
+.el-card,
+.content-card {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--border-color) !important;
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.el-card:hover,
+.content-card:hover {
+  box-shadow: var(--shadow-card-hover);
+}
+
+.el-dialog {
+  border-radius: var(--radius-xl) !important;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-popover);
+}
+
+.el-dialog__header {
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: var(--space-md);
+}
+
+.el-dialog__footer {
+  border-top: 1px solid var(--divider);
+  padding-top: var(--space-md);
+}
+
+.el-table {
+  --el-table-border-color: var(--divider);
+  --el-table-header-bg-color: color-mix(in srgb, var(--bg-secondary) 82%, white 18%);
+  --el-table-row-hover-bg-color: color-mix(in srgb, var(--accent-blue-bg) 55%, transparent 45%);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.el-popover,
+.el-dropdown__popper,
+.el-select__popper,
+.el-picker__popper {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-popover) !important;
+  backdrop-filter: blur(16px);
+}
 </style>

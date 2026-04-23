@@ -10,6 +10,10 @@ import examplePlugin from './plugins/examplePlugin';
 import 'element-plus/dist/index.css'
 // 导入全局通用样式
 import './styles/common.css'
+// 导入全站视觉升级样式
+import './styles/design-refresh.css'
+// 导入工具箱工具页统一布局样式
+import './styles/toolbox-unified.css'
 
 import 'md-editor-v3/lib/style.css'
 
