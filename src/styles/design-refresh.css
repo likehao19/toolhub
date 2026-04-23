@@ -1,0 +1,2508 @@
+﻿/* Global design refresh for all pages */
+
+:root {
+  --app-section-gap: 12px;
+  --app-block-pad: 12px;
+}
+
+html,
+body,
+#app {
+  text-rendering: optimizeLegibility;
+}
+
+[class*="page"],
+[class*="workspace"],
+[class*="content"] {
+  color: var(--text-primary);
+}
+
+/* Most views use *-wrapper / *-page containers */
+[class$="-wrapper"],
+[class$="-page"],
+[class*="-wrapper "],
+[class*="-page "] {
+  color: var(--text-primary);
+}
+
+.page-container,
+.app-content,
+.dashboard-wrapper,
+.settings-page-wrapper,
+.toolbox-page,
+.bookmarks-page,
+.passwords-page,
+.calendar-page,
+.todos-page,
+.note-view-page {
+  background: transparent;
+}
+
+[class$="-wrapper"],
+[class$="-page"] {
+  padding: clamp(12px, 1.4vw, 18px);
+}
+
+[class$="-wrapper"] .main-container,
+[class$="-page"] .main-container,
+[class$="-wrapper"] .workspace,
+[class$="-page"] .workspace,
+[class$="-wrapper"] .workspace-shell,
+[class$="-page"] .workspace-shell {
+  gap: 12px;
+}
+
+/* Global section rhythm */
+.page-container > * + *,
+.app-content > * + *,
+.dashboard-wrapper > * + * {
+  margin-top: var(--app-section-gap);
+}
+
+/* Universal panel styling */
+.content-card,
+.el-card,
+.panel-surface,
+.panel,
+.section,
+.section-block,
+.tool-panel,
+.list-panel,
+.settings-section {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Header strips and toolbars */
+.toolbar,
+.filter-bar,
+.action-bar,
+.page-header,
+.section-head,
+.card-header,
+.header-actions {
+  backdrop-filter: blur(10px);
+}
+
+.toolbar,
+.filter-bar,
+.action-bar,
+.search-bar {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--surface-panel-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Shared page title area */
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-eyebrow {
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.page-title,
+.group-title {
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+}
+
+/* Better tables and lists globally */
+.el-table,
+.el-table__inner-wrapper,
+.el-table__header-wrapper,
+.el-table__body-wrapper {
+  border-radius: var(--radius-md);
+}
+
+.el-table__row {
+  transition: background var(--transition-fast);
+}
+
+.el-table__row:hover > td {
+  background: color-mix(in srgb, var(--accent-blue-bg) 56%, transparent 44%) !important;
+}
+
+/* Form spacing consistency */
+.el-form-item {
+  margin-bottom: 14px;
+}
+
+.el-form-item__label {
+  color: var(--text-secondary) !important;
+  font-weight: 600;
+}
+
+.el-checkbox__label,
+.el-radio__label {
+  color: var(--text-primary);
+}
+
+/* Tab and menu polish */
+.el-tabs__item {
+  border-radius: 10px;
+  margin: 0 2px;
+}
+
+.el-tabs__item.is-active {
+  background: color-mix(in srgb, var(--accent-blue-bg) 70%, transparent 30%);
+}
+
+/* Chip/badge consistency */
+.el-tag,
+.meta-tag,
+.badge,
+.el-badge__content {
+  border-radius: 999px;
+}
+
+/* Unified clickable affordance */
+button,
+[role="button"],
+.clickable,
+.link-btn,
+.icon-btn,
+.tool-card,
+.list-item,
+.note-row,
+.menu-item,
+.search-item,
+.history-item {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+button:hover,
+[role="button"]:hover,
+.clickable:hover,
+.link-btn:hover,
+.icon-btn:hover,
+.tool-card:hover,
+.list-item:hover,
+.note-row:hover,
+.search-item:hover,
+.history-item:hover {
+  transform: var(--interactive-lift);
+}
+
+/* Generic empty state */
+.empty-state,
+.empty,
+.no-data,
+.el-empty {
+  border-radius: var(--radius-md);
+}
+
+.empty-text {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.empty-sub {
+  color: var(--text-quaternary);
+}
+
+/* Dialog internals */
+.el-dialog__body {
+  padding-top: 16px;
+}
+
+/* Inputs in dense tool pages */
+.el-input,
+.el-select,
+.el-input-number,
+.el-date-editor,
+.el-textarea {
+  width: auto;
+}
+
+/* Better scrollbar across long panels */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-quaternary) 68%, transparent 32%);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-secondary) 70%, transparent 30%);
+  background-clip: content-box;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --app-section-gap: 10px;
+    --app-block-pad: 10px;
+  }
+
+  .toolbar,
+  .filter-bar,
+  .action-bar,
+  .search-bar {
+    padding: 8px 10px;
+  }
+
+  [class$="-wrapper"],
+  [class$="-page"] {
+    padding: 10px;
+  }
+}
+
+/* Page-shell normalization for most routed views */
+.dashboard-wrapper,
+.ai-conversation-wrapper,
+.ai-chat-wrapper,
+.calendar-wrapper,
+.log-analyzer-wrapper,
+.agent-team-wrapper,
+.bookmarks-page-wrapper,
+.auto-test-wrapper,
+.network-tool-page,
+.api-docs-wrapper,
+.download-manager-wrapper,
+.git-report-wrapper,
+.git-manager-wrapper,
+.img-cvt-wrapper,
+.file-diff-wrapper,
+.hardware-info-page,
+.hex-converter-wrapper,
+.ssh-terminal-wrapper,
+.toolbox-wrapper,
+.screenshot-mgr-wrapper,
+.wallpaper-wrapper,
+.todos-page-wrapper,
+.settings-page-wrapper,
+.sdk-manager-wrapper,
+.passwords-page-wrapper,
+.notes-page-wrapper,
+.perf-test-wrapper,
+.regex-wrapper,
+.mock-service-wrapper,
+.port-manager-wrapper,
+.maven-wrapper,
+.crypto-wrapper,
+.code-fmt-wrapper,
+.redis-client-wrapper,
+.api-debug-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+  padding: clamp(14px, 1.8vw, 24px);
+  background: transparent;
+}
+
+.page-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.page-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.page-title,
+.group-title,
+.section-title {
+  letter-spacing: -0.02em;
+}
+
+.main-container,
+.content-container,
+.workspace,
+.workspace-shell,
+.calendar-workspace,
+.toolbox-workspace,
+.sdk-workspace,
+.dashboard-workspace {
+  min-height: 0;
+  gap: 12px;
+}
+
+.main-container,
+.content-container,
+.workspace-shell,
+.calendar-workspace,
+.sdk-workspace {
+  display: flex;
+}
+
+.main-container,
+.content-container {
+  border-radius: var(--radius-lg);
+}
+
+/* Shared sidebars inside feature pages */
+.sidebar,
+.sidebar-panel,
+.left-sidebar,
+.folder-sidebar,
+.category-sidebar {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--surface-panel-soft);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Shared content wells */
+.editor-container,
+.preview-container,
+.list-wrapper,
+.tree-container,
+.file-list-container,
+.audit-container,
+.sys-table-wrapper,
+.template-table-container,
+.log-container,
+.chart-container,
+.text-container,
+.xterm-container {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Common list rows */
+.tree-item-wrapper,
+.file-item,
+.history-item,
+.search-item,
+.todo-row,
+.tl-item,
+.qs-cred-item,
+.qs-bm-icon {
+  border-radius: var(--radius-sm);
+}
+
+/* Responsive safety net */
+@media (max-width: 900px) {
+  .dashboard-wrapper,
+  .ai-conversation-wrapper,
+  .ai-chat-wrapper,
+  .calendar-wrapper,
+  .log-analyzer-wrapper,
+  .agent-team-wrapper,
+  .bookmarks-page-wrapper,
+  .auto-test-wrapper,
+  .network-tool-page,
+  .api-docs-wrapper,
+  .download-manager-wrapper,
+  .git-report-wrapper,
+  .git-manager-wrapper,
+  .img-cvt-wrapper,
+  .file-diff-wrapper,
+  .hardware-info-page,
+  .hex-converter-wrapper,
+  .ssh-terminal-wrapper,
+  .toolbox-wrapper,
+  .screenshot-mgr-wrapper,
+  .wallpaper-wrapper,
+  .todos-page-wrapper,
+  .settings-page-wrapper,
+  .sdk-manager-wrapper,
+  .passwords-page-wrapper,
+  .notes-page-wrapper,
+  .perf-test-wrapper,
+  .regex-wrapper,
+  .mock-service-wrapper,
+  .port-manager-wrapper,
+  .maven-wrapper,
+  .crypto-wrapper,
+  .code-fmt-wrapper,
+  .api-debug-wrapper {
+    padding: 12px;
+    gap: 10px;
+  }
+}
+
+/* ===== Toolbox inner layout unify to 5px ===== */
+.app-content > :is(
+  .toolbox-wrapper,
+  .toolbox-sticky-notes-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .screenshot-mgr-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .redis-client,
+  .img-b64-wrapper,
+  .sqlite-mgr,
+  .sqlite-mgr
+) :is(
+  .toolbar,
+  .main-area,
+  .main-body,
+  .content-area,
+  .content-container,
+  .workspace,
+  .workspace-shell,
+  .sdk-workspace,
+  .toolbox-workspace,
+  .calendar-workspace,
+  .left-panel,
+  .right-panel,
+  .input-panel,
+  .output-panel,
+  .tab-bar,
+  .tab-content,
+  .sql-toolbar,
+  .status-bar,
+  .drop-zone,
+  .settings,
+  .preview-area,
+  .file-list
+) {
+  padding: 5px !important;
+  margin: 0 !important;
+}
+
+.app-content > .sqlite-mgr .header,
+.app-content > .img-cvt-wrapper .header,
+.app-content > .img-b64-wrapper .header {
+  padding: 0 5px !important;
+}
+
+.app-content > .sqlite-mgr .main-body,
+.app-content > .img-cvt-wrapper .main-area,
+.app-content > .img-b64-wrapper .main-area {
+  padding-top: 5px !important;
+}
+
+.app-content > .sqlite-mgr .status-bar,
+.app-content > .img-cvt-wrapper .status-bar,
+.app-content > .img-b64-wrapper .status-bar {
+  margin: 0 5px 5px !important;
+}
+
+/* ===== High-frequency page refinements ===== */
+
+/* Todos / Notes / Passwords shared shell */
+.todos-page-wrapper .header,
+.notes-page-wrapper .header,
+.passwords-page-wrapper .header,
+.calendar-wrapper .header,
+.toolbox-wrapper .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 10px 14px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 94%, #fff 6%), var(--surface-panel-soft));
+  box-shadow: var(--shadow-sm);
+}
+
+.todos-page-wrapper .header-left,
+.notes-page-wrapper .header-left,
+.passwords-page-wrapper .header-left,
+.calendar-wrapper .header-left,
+.toolbox-wrapper .header-left {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.todos-page-wrapper .header-actions,
+.notes-page-wrapper .header-actions,
+.passwords-page-wrapper .header-actions,
+.calendar-wrapper .header-actions,
+.toolbox-wrapper .header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--divider);
+  border-radius: calc(var(--radius-md) - 2px);
+  background: color-mix(in srgb, var(--surface-panel) 92%, #fff 8%);
+}
+
+.todos-page-wrapper .main-container,
+.notes-page-wrapper .main-container,
+.passwords-page-wrapper .main-container {
+  padding: 8px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  box-shadow: var(--shadow-sm);
+}
+
+.todos-page-wrapper .sidebar-left,
+.notes-page-wrapper .sidebar-left,
+.passwords-page-wrapper .sidebar-left {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+.todos-page-wrapper .sidebar-toolbar,
+.notes-page-wrapper .sidebar-toolbar,
+.passwords-page-wrapper .sidebar-toolbar {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface-panel-soft);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.todos-page-wrapper .content-area,
+.notes-page-wrapper .content-area,
+.passwords-page-wrapper .content-area {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+.todos-page-wrapper .category-item,
+.notes-page-wrapper .category-item,
+.passwords-page-wrapper .category-item {
+  margin: 4px 6px;
+  border-radius: 10px;
+}
+
+.todos-page-wrapper .category-item.active,
+.notes-page-wrapper .category-item.active,
+.passwords-page-wrapper .category-item.active {
+  background: color-mix(in srgb, var(--accent-blue-bg) 72%, transparent 28%);
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 30%, transparent 70%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* Todos cards */
+.todos-page-wrapper .todo-list {
+  padding: 12px;
+}
+
+.todos-page-wrapper .todo-cards {
+  gap: 10px;
+}
+
+.todos-page-wrapper .todo-card {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, #fff 5%), var(--surface-panel-soft));
+  box-shadow: var(--shadow-sm);
+}
+
+.todos-page-wrapper .todo-card:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--divider) 66%);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.11);
+}
+
+.todos-page-wrapper .card-actions .el-button.is-text {
+  border-radius: 8px;
+  padding: 5px;
+  background: color-mix(in srgb, var(--surface-panel-soft) 86%, transparent 14%);
+}
+
+/* Notes workspace */
+.notes-page-wrapper .file-tree {
+  padding: 8px;
+}
+
+.notes-page-wrapper .resize-handle {
+  margin: 8px 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--divider) 70%, transparent 30%);
+}
+
+.notes-page-wrapper .markdown-preview-mode,
+.notes-page-wrapper .markdown-editor-mode,
+.notes-page-wrapper .txt-mode,
+.notes-page-wrapper .txt-preview-mode,
+.notes-page-wrapper .excel-mode,
+.notes-page-wrapper .word-mode,
+.notes-page-wrapper .preview-mode,
+.notes-page-wrapper .empty-state {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--divider);
+  background: var(--surface-panel);
+}
+
+.notes-page-wrapper .action-card {
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 92%, #fff 8%), var(--surface-panel-soft));
+}
+
+.notes-page-wrapper .action-card:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 32%, var(--divider) 68%);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.11);
+}
+
+/* Password cards and tables */
+.passwords-page-wrapper .password-list,
+.passwords-page-wrapper .sys-table-wrapper {
+  padding: 12px;
+}
+
+.passwords-page-wrapper .password-row {
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), var(--surface-panel-soft));
+}
+
+.passwords-page-wrapper .password-row:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--divider) 66%);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.11);
+}
+
+.passwords-page-wrapper .row-actions .el-button.is-text {
+  border-radius: 8px;
+}
+
+.passwords-page-wrapper .sys-section-header {
+  margin: 10px 8px 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-panel-soft) 90%, transparent 10%);
+  color: var(--text-secondary);
+}
+
+/* Calendar view polish */
+.calendar-wrapper .content-container {
+  padding: 10px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  box-shadow: var(--shadow-sm);
+}
+
+.calendar-wrapper .calendar-workspace {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.calendar-wrapper .view-switcher {
+  padding: 3px;
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface-panel-soft) 88%, transparent 12%);
+}
+
+.calendar-wrapper .event-card,
+.calendar-wrapper .week-event,
+.calendar-wrapper .day-event-item {
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, #fff 5%), var(--surface-panel-soft));
+}
+
+.calendar-wrapper .event-card:hover,
+.calendar-wrapper .week-event:hover,
+.calendar-wrapper .day-event-item:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 32%, var(--divider) 68%);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+}
+
+/* Toolbox cards and category strips */
+.toolbox-wrapper .content-area {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbox-wrapper .toolbox-workspace {
+  display: block;
+  padding: 12px;
+  gap: 12px;
+}
+
+.toolbox-wrapper .tool-category {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbox-wrapper .category-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--divider);
+  background: var(--surface-panel-soft);
+}
+
+.toolbox-wrapper .tool-card {
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, #fff 5%), var(--surface-panel-soft));
+}
+
+.toolbox-wrapper .tool-card:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--divider) 66%);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+}
+
+.toolbox-wrapper .favorite-btn {
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--divider) 82%, transparent 18%);
+  background: color-mix(in srgb, var(--surface-panel-soft) 86%, transparent 14%);
+}
+
+@media (max-width: 900px) {
+  .todos-page-wrapper .header,
+  .notes-page-wrapper .header,
+  .passwords-page-wrapper .header,
+  .calendar-wrapper .header,
+  .toolbox-wrapper .header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .todos-page-wrapper .header-actions,
+  .notes-page-wrapper .header-actions,
+  .passwords-page-wrapper .header-actions,
+  .calendar-wrapper .header-actions,
+  .toolbox-wrapper .header-actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .todos-page-wrapper .main-container,
+  .notes-page-wrapper .main-container,
+  .passwords-page-wrapper .main-container,
+  .calendar-wrapper .content-container,
+  .toolbox-wrapper .content-area {
+    padding: 6px;
+  }
+}
+/* ===== Extended all-page refinements ===== */
+
+.api-debug-wrapper .header,
+.api-docs-wrapper .header,
+.auto-test-wrapper .header,
+.code-fmt-wrapper .header,
+.crypto-wrapper .header,
+.download-manager-wrapper .header,
+.file-diff-wrapper .header,
+.git-manager-wrapper .header,
+.git-report-wrapper .header,
+.img-cvt-wrapper .header,
+.log-analyzer-wrapper .header,
+.maven-wrapper .header,
+.mock-service-wrapper .header,
+.perf-test-wrapper .header,
+.port-manager-wrapper .header,
+.redis-client-wrapper .header,
+.regex-wrapper .header,
+.sdk-manager-wrapper .header,
+.ssh-terminal-wrapper .header,
+.toolbox-wrapper .header,
+.network-tool-page .header,
+.bookmarks-page-wrapper .header,
+.settings-page-wrapper .header,
+.wallpaper-wrapper .wp-header,
+.credential-manager-page .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), color-mix(in srgb, var(--surface-panel-soft) 90%, #fff 10%));
+  box-shadow: var(--shadow-sm);
+}
+
+.api-debug-wrapper .header-left,
+.api-docs-wrapper .header-left,
+.auto-test-wrapper .header-left,
+.code-fmt-wrapper .header-left,
+.crypto-wrapper .header-left,
+.download-manager-wrapper .header-left,
+.file-diff-wrapper .header-left,
+.git-manager-wrapper .header-left,
+.git-report-wrapper .header-left,
+.img-cvt-wrapper .header-left,
+.log-analyzer-wrapper .header-left,
+.maven-wrapper .header-left,
+.mock-service-wrapper .header-left,
+.perf-test-wrapper .header-left,
+.port-manager-wrapper .header-left,
+.redis-client-wrapper .header-left,
+.regex-wrapper .header-left,
+.sdk-manager-wrapper .header-left,
+.ssh-terminal-wrapper .header-left,
+.toolbox-wrapper .header-left,
+.network-tool-page .header-left,
+.bookmarks-page-wrapper .header-left,
+.settings-page-wrapper .header-left,
+.wallpaper-wrapper .wp-header-left,
+.credential-manager-page .header-left,
+.api-debug-wrapper .header-actions,
+.api-docs-wrapper .header-actions,
+.auto-test-wrapper .header-actions,
+.download-manager-wrapper .header-actions,
+.git-manager-wrapper .header-actions,
+.git-report-wrapper .header-actions,
+.img-cvt-wrapper .header-actions,
+.log-analyzer-wrapper .header-actions,
+.maven-wrapper .header-actions,
+.mock-service-wrapper .header-actions,
+.perf-test-wrapper .header-actions,
+.port-manager-wrapper .header-actions,
+.redis-client-wrapper .header-actions,
+.regex-wrapper .header-actions,
+.sdk-manager-wrapper .header-actions,
+.ssh-terminal-wrapper .header-actions,
+.toolbox-wrapper .header-actions,
+.settings-page-wrapper .header-actions,
+.wallpaper-wrapper .wp-header-right,
+.code-fmt-wrapper .toolbar,
+.file-diff-wrapper .toolbar,
+.wallpaper-wrapper .wp-toolbar,
+.auto-test-wrapper .panel-toolbar,
+.sql-toolbar,
+.tab-toolbar,
+.sftp-toolbar,
+.response-toolbar,
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.api-debug-wrapper .content-area,
+.api-docs-wrapper .content-area,
+.auto-test-wrapper .content-area,
+.code-fmt-wrapper .content-area,
+.crypto-wrapper .content-area,
+.download-manager-wrapper .content-area,
+.file-diff-wrapper .workspace-shell,
+.git-manager-wrapper .content-area,
+.git-report-wrapper .content-area,
+.img-cvt-wrapper .content-area,
+.log-analyzer-wrapper .content-area,
+.maven-wrapper .content-area,
+.mock-service-wrapper .content-area,
+.perf-test-wrapper .content-area,
+.port-manager-wrapper .content-area,
+.redis-client-wrapper .content-area,
+.regex-wrapper .content-area,
+.sdk-manager-wrapper .content-area,
+.ssh-terminal-wrapper .content-area,
+.network-tool-page .content-area,
+.bookmarks-page-wrapper .content-area,
+.settings-page-wrapper .content-area,
+.wallpaper-wrapper .wp-content,
+.toolbox-sticky-notes-wrapper .content-area {
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  box-shadow: var(--shadow-sm);
+}
+
+.api-debug-wrapper .toolbar,
+.api-docs-wrapper .toolbar,
+.auto-test-wrapper .panel-toolbar,
+.auto-test-wrapper .suite-toolbar,
+.code-fmt-wrapper .toolbar,
+.file-diff-wrapper .toolbar,
+.wallpaper-wrapper .wp-toolbar,
+.sql-toolbar,
+.tab-toolbar,
+.sftp-toolbar,
+.response-toolbar,
+.list-toolbar,
+.preview-toolbar,
+.excel-toolbar,
+.graph-toolbar {
+  padding: 10px 12px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface-panel-soft) 90%, #fff 10%);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-content .panel-header,
+.app-content .sidebar-toolbar,
+.app-content .preview-header,
+.app-content .picker-header,
+.app-content .doc-preview-header,
+.app-content .verify-header,
+.app-content .response-headers-table,
+.app-content .excel-table-wrapper {
+  border-radius: var(--radius-sm);
+}
+
+.app-content .panel-header,
+.app-content .sidebar-toolbar,
+.app-content .preview-header,
+.app-content .picker-header,
+.app-content .doc-preview-header,
+.app-content .verify-header,
+.app-content .step-header,
+.app-content .week-header,
+.app-content .day-header {
+  border: 1px solid var(--divider);
+  background: color-mix(in srgb, var(--surface-panel-soft) 88%, #fff 12%);
+  box-shadow: var(--shadow-xs);
+}
+
+.kv-row,
+.res-header-row,
+.table-row,
+.history-item,
+.search-item,
+.recent-row,
+.download-item,
+.mock-row,
+.port-row,
+.result-row,
+.file-item,
+.tree-item-wrapper,
+.folder-header,
+.password-row,
+.todo-card,
+.event-card,
+.tool-card,
+.bookmark-card,
+.log-item,
+.endpoint-item,
+.node-card,
+.version-card,
+.server-card,
+.db-card,
+.rule-card,
+.test-card,
+.case-card,
+.stat-card,
+.summary-card {
+  border: 1px solid var(--divider);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), var(--surface-panel-soft));
+  box-shadow: var(--shadow-sm);
+}
+
+.kv-row:hover,
+.res-header-row:hover,
+.history-item:hover,
+.search-item:hover,
+.recent-row:hover,
+.download-item:hover,
+.mock-row:hover,
+.port-row:hover,
+.result-row:hover,
+.file-item:hover,
+.tree-item-wrapper:hover,
+.bookmark-card:hover,
+.log-item:hover,
+.endpoint-item:hover,
+.node-card:hover,
+.version-card:hover,
+.server-card:hover,
+.db-card:hover,
+.rule-card:hover,
+.test-card:hover,
+.case-card:hover,
+.stat-card:hover,
+.summary-card:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 30%, var(--divider) 70%);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+.response-headers-table,
+.log-container,
+.chart-container,
+.editor-container,
+.preview-container,
+.tree-container,
+.file-list-container,
+.list-wrapper,
+.template-table-container,
+.audit-container,
+.text-container,
+.xterm-container,
+.excel-editor-wrapper,
+.markdown-editor-wrapper,
+.spreadsheet-editor-wrapper,
+.txt-editor-wrapper,
+.word-editor-wrapper {
+  overflow: hidden;
+}
+
+.el-descriptions,
+.el-collapse,
+.el-tabs,
+.el-calendar,
+.el-upload-dragger,
+.el-empty,
+pre,
+code {
+  border-radius: var(--radius-md);
+}
+
+.el-upload-dragger,
+.drop-zone,
+.upload-dropzone,
+.import-dropzone {
+  border: 1px dashed color-mix(in srgb, var(--accent-blue) 26%, var(--divider) 74%);
+  background: color-mix(in srgb, var(--accent-blue-bg) 34%, var(--surface-panel) 66%);
+}
+
+.el-upload-dragger:hover,
+.drop-zone:hover,
+.upload-dropzone:hover,
+.import-dropzone:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 44%, var(--divider) 56%);
+}
+
+.el-tabs__header,
+.el-collapse-item__header,
+.el-descriptions__header,
+.result-header,
+.section-head {
+  margin-bottom: 10px;
+}
+
+.toolbar .el-button,
+.header-actions .el-button,
+.panel-toolbar .el-button,
+.suite-toolbar .el-button,
+.sql-toolbar .el-button,
+.tab-toolbar .el-button,
+.sftp-toolbar .el-button,
+.response-toolbar .el-button,
+.list-toolbar .el-button,
+.preview-toolbar .el-button,
+.excel-toolbar .el-button,
+.graph-toolbar .el-button {
+  box-shadow: none;
+}
+
+.toolbar .el-button.is-text,
+.header-actions .el-button.is-text,
+.response-toolbar .el-button.is-text,
+.preview-toolbar .el-button.is-text,
+.excel-toolbar .el-button.is-text {
+  padding: 6px 8px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--surface-panel-soft) 84%, transparent 16%);
+}
+
+.toolbar .el-input,
+.toolbar .el-select,
+.header-actions .el-input,
+.header-actions .el-select,
+.panel-toolbar .el-input,
+.panel-toolbar .el-select,
+.suite-toolbar .el-input,
+.suite-toolbar .el-select,
+.sql-toolbar .el-input,
+.sql-toolbar .el-select,
+.tab-toolbar .el-input,
+.tab-toolbar .el-select,
+.list-toolbar .el-input,
+.list-toolbar .el-select,
+.list-toolbar .el-date-editor,
+.response-toolbar .el-input,
+.response-toolbar .el-select,
+.wp-toolbar .el-input,
+.wp-toolbar .el-select {
+  min-width: 160px;
+}
+
+.about-page,
+.statistics-page,
+.system-info-page,
+.cli-demo-page,
+.clipboard-demo-page,
+.dialog-demo-page,
+.shell-demo-page,
+.sql-demo-page,
+.upload-demo-page,
+.websocket-demo-page,
+.window-custom-demo-page,
+.splash-animation-demo-page,
+.updater-demo-page {
+  padding: clamp(16px, 2vw, 24px);
+}
+
+.about-page .content-card,
+.statistics-page .content-card,
+.system-info-page .content-card,
+.cli-demo-page .content-card,
+.clipboard-demo-page .content-card,
+.dialog-demo-page .content-card,
+.shell-demo-page .content-card,
+.sql-demo-page .content-card,
+.upload-demo-page .content-card,
+.websocket-demo-page .content-card,
+.window-custom-demo-page .content-card,
+.splash-animation-demo-page .content-card,
+.updater-demo-page .content-card {
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .api-debug-wrapper .header,
+  .api-docs-wrapper .header,
+  .auto-test-wrapper .header,
+  .code-fmt-wrapper .header,
+  .crypto-wrapper .header,
+  .download-manager-wrapper .header,
+  .file-diff-wrapper .header,
+  .git-manager-wrapper .header,
+  .git-report-wrapper .header,
+  .img-cvt-wrapper .header,
+  .log-analyzer-wrapper .header,
+  .maven-wrapper .header,
+  .mock-service-wrapper .header,
+  .perf-test-wrapper .header,
+  .port-manager-wrapper .header,
+  .redis-client-wrapper .header,
+  .regex-wrapper .header,
+  .sdk-manager-wrapper .header,
+  .ssh-terminal-wrapper .header,
+  .network-tool-page .header,
+  .bookmarks-page-wrapper .header,
+  .settings-page-wrapper .header,
+  .wallpaper-wrapper .wp-header {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .api-debug-wrapper .content-area,
+  .api-docs-wrapper .content-area,
+  .auto-test-wrapper .content-area,
+  .code-fmt-wrapper .content-area,
+  .crypto-wrapper .content-area,
+  .download-manager-wrapper .content-area,
+  .file-diff-wrapper .workspace-shell,
+  .git-manager-wrapper .content-area,
+  .git-report-wrapper .content-area,
+  .img-cvt-wrapper .content-area,
+  .log-analyzer-wrapper .content-area,
+  .maven-wrapper .content-area,
+  .mock-service-wrapper .content-area,
+  .perf-test-wrapper .content-area,
+  .port-manager-wrapper .content-area,
+  .redis-client-wrapper .content-area,
+  .regex-wrapper .content-area,
+  .sdk-manager-wrapper .content-area,
+  .ssh-terminal-wrapper .content-area,
+  .network-tool-page .content-area,
+  .bookmarks-page-wrapper .content-area,
+  .settings-page-wrapper .content-area,
+  .wallpaper-wrapper .wp-content,
+  .toolbox-wrapper .content-area {
+    padding: 6px;
+  }
+
+  .toolbar,
+  .panel-toolbar,
+  .suite-toolbar,
+  .sql-toolbar,
+  .tab-toolbar,
+  .sftp-toolbar,
+  .response-toolbar,
+  .list-toolbar,
+  .preview-toolbar,
+  .excel-toolbar,
+  .graph-toolbar,
+  .wp-toolbar {
+    padding: 8px 10px;
+  }
+
+  .toolbar .el-input,
+  .toolbar .el-select,
+  .header-actions .el-input,
+  .header-actions .el-select,
+  .panel-toolbar .el-input,
+  .panel-toolbar .el-select,
+  .suite-toolbar .el-input,
+  .suite-toolbar .el-select,
+  .sql-toolbar .el-input,
+  .sql-toolbar .el-select,
+  .tab-toolbar .el-input,
+  .tab-toolbar .el-select,
+  .list-toolbar .el-input,
+  .list-toolbar .el-select,
+  .list-toolbar .el-date-editor,
+  .response-toolbar .el-input,
+  .response-toolbar .el-select,
+  .wp-toolbar .el-input,
+  .wp-toolbar .el-select {
+    min-width: 0;
+    width: 100%;
+  }
+}
+/* ===== Compact right-pane spacing ===== */
+.app-content > [class$="-wrapper"],
+.app-content > [class$="-page"],
+.app-content > [class*="-wrapper "],
+.app-content > [class*="-page "],
+.app-content > .page-container,
+.app-content > .about-page,
+.app-content > .statistics-page,
+.app-content > .system-info-page,
+.app-content > .network-tool-page,
+.app-content > .toolbox-wrapper,
+.app-content > .dashboard-wrapper,
+.app-content > .settings-page-wrapper,
+.app-content > .bookmarks-page-wrapper,
+.app-content > .passwords-page-wrapper,
+.app-content > .notes-page-wrapper,
+.app-content > .todos-page-wrapper,
+.app-content > .calendar-wrapper {
+  padding: 5px !important;
+}
+
+.app-content > .page-container {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
+
+@media (max-width: 900px) {
+  .app-content > [class$="-wrapper"],
+  .app-content > [class$="-page"],
+  .app-content > [class*="-wrapper "],
+  .app-content > [class*="-page "],
+  .app-content > .page-container,
+  .app-content > .about-page,
+  .app-content > .statistics-page,
+  .app-content > .system-info-page,
+  .app-content > .network-tool-page,
+  .app-content > .toolbox-wrapper,
+  .app-content > .dashboard-wrapper,
+  .app-content > .settings-page-wrapper,
+  .app-content > .bookmarks-page-wrapper,
+  .app-content > .passwords-page-wrapper,
+  .app-content > .notes-page-wrapper,
+  .app-content > .todos-page-wrapper,
+  .app-content > .calendar-wrapper {
+    padding: 5px !important;
+  }
+}
+/* ===== Fix over-broad global overrides ===== */
+.app-content .toolbar-group,
+.app-content .header-right,
+.app-content .card-row {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.productivity-sidebar .section-header,
+.productivity-sidebar .section-header.section-header-static,
+.productivity-sidebar.collapsed .section-header {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.productivity-sidebar .section-header:hover,
+.productivity-sidebar .section-header.section-header-static:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
+.productivity-sidebar .section-header .el-icon {
+  background: transparent;
+  box-shadow: none;
+}
+/* ===== Scope corrections for generic class names ===== */
+.app-content .section-header {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.toolbox-sticky-notes-wrapper .section-header,
+.wallpaper-wrapper .section-header,
+.agent-team-wrapper .section-header,
+.statistics-page .section-header,
+.doc-page .section-header {
+  border: 1px solid var(--divider);
+  background: color-mix(in srgb, var(--surface-panel-soft) 88%, #fff 12%);
+  box-shadow: var(--shadow-xs);
+}
+
+.todos-page-wrapper .card-row,
+.passwords-page-wrapper .card-row,
+.notes-page-wrapper .card-row,
+.bookmarks-page-wrapper .card-row,
+.credential-manager-page .card-row {
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.crypto-wrapper .header-right,
+.wallpaper-wrapper .wp-header-right,
+.toolbox-wrapper .header-actions,
+.settings-page-wrapper .header-actions,
+.download-manager-wrapper .header-actions,
+.api-debug-wrapper .header-actions,
+.api-docs-wrapper .header-actions,
+.auto-test-wrapper .header-actions,
+.code-fmt-wrapper .header-actions,
+.file-diff-wrapper .header-actions,
+.git-manager-wrapper .header-actions,
+.git-report-wrapper .header-actions,
+.img-cvt-wrapper .header-actions,
+.log-analyzer-wrapper .header-actions,
+.maven-wrapper .header-actions,
+.mock-service-wrapper .header-actions,
+.perf-test-wrapper .header-actions,
+.port-manager-wrapper .header-actions,
+.redis-client-wrapper .header-actions,
+.regex-wrapper .header-actions,
+.sdk-manager-wrapper .header-actions,
+.ssh-terminal-wrapper .header-actions,
+.bookmarks-page-wrapper .header-actions,
+.network-tool-page .header-actions {
+  border-radius: var(--radius-sm);
+}
+
+/* ===== Calendar / Toolbox spacing fix ===== */
+.app-content > .calendar-wrapper .content-container {
+  margin: 6px !important;
+  padding: 6px !important;
+}
+
+.app-content > .calendar-wrapper .calendar-workspace {
+  padding: 12px !important;
+}
+
+.app-content > .toolbox-wrapper .content-area {
+  margin: 6px !important;
+}
+
+.app-content > .toolbox-wrapper .toolbox-workspace {
+  padding: 12px !important;
+}
+
+@media (max-width: 900px) {
+  .app-content > .calendar-wrapper .content-container,
+  .app-content > .toolbox-wrapper .content-area {
+    margin: 5px !important;
+    padding: 5px !important;
+  }
+
+  .app-content > .calendar-wrapper .calendar-workspace,
+  .app-content > .toolbox-wrapper .toolbox-workspace {
+    padding: 10px !important;
+  }
+}
+/* ===== Toolbox route spacing overrides ===== */
+.app-content > .toolbox-wrapper,
+.app-content > .sdk-manager-wrapper,
+.app-content > .port-manager-wrapper,
+.app-content > .network-tool-page,
+.app-content > .code-fmt-wrapper,
+.app-content > .git-manager-wrapper,
+.app-content > .git-report-wrapper,
+.app-content > .file-diff-wrapper,
+.app-content > .api-debug-wrapper,
+.app-content > .api-docs-wrapper,
+.app-content > .mock-service-wrapper,
+.app-content > .perf-test-wrapper,
+.app-content > .auto-test-wrapper,
+.app-content > .screenshot-mgr-wrapper,
+.app-content > .hex-converter-wrapper,
+.app-content > .img-cvt-wrapper,
+.app-content > .regex-wrapper,
+.app-content > .crypto-wrapper,
+.app-content > .maven-wrapper,
+.app-content > .wallpaper-wrapper,
+.app-content > .log-analyzer-wrapper,
+.app-content > .hardware-info-page,
+.app-content > .download-manager-wrapper,
+.app-content > .ssh-terminal-wrapper,
+.app-content > .ebook-shelf,
+.app-content > .ebook-reader,
+.app-content > .redis-client,
+.app-content > .img-b64-wrapper,
+.app-content > .sqlite-mgr {
+  padding: 12px !important;
+}
+
+.app-content > .toolbox-wrapper .content-area,
+.app-content > .sdk-manager-wrapper .content-area,
+.app-content > .port-manager-wrapper .content-area,
+.app-content > .network-tool-page .content-area,
+.app-content > .code-fmt-wrapper .content-area,
+.app-content > .git-manager-wrapper .content-area,
+.app-content > .git-report-wrapper .content-area,
+.app-content > .api-debug-wrapper .content-area,
+.app-content > .api-docs-wrapper .content-area,
+.app-content > .mock-service-wrapper .content-area,
+.app-content > .perf-test-wrapper .content-area,
+.app-content > .auto-test-wrapper .content-area,
+.app-content > .screenshot-mgr-wrapper .content-area,
+.app-content > .hex-converter-wrapper .content-area,
+.app-content > .img-cvt-wrapper .content-area,
+.app-content > .regex-wrapper .content-area,
+.app-content > .crypto-wrapper .content-area,
+.app-content > .maven-wrapper .content-area,
+.app-content > .log-analyzer-wrapper .workspace,
+.app-content > .download-manager-wrapper .content-area,
+.app-content > .ssh-terminal-wrapper .content-area,
+.app-content > .toolbox-wrapper .toolbox-workspace,
+.app-content > .sdk-manager-wrapper .sdk-workspace,
+.app-content > .file-diff-wrapper .workspace-shell {
+  min-height: 0;
+}
+
+.app-content > .toolbox-wrapper .toolbox-workspace,
+.app-content > .sdk-manager-wrapper .sdk-workspace,
+.app-content > .log-analyzer-wrapper .workspace,
+.app-content > .download-manager-wrapper .content-area,
+.app-content > .screenshot-mgr-wrapper .content-area,
+.app-content > .network-tool-page .content-area,
+.app-content > .redis-client .key-tree-wrapper,
+.app-content > .img-b64-wrapper,
+.app-content > .sqlite-mgr,
+.app-content > .ebook-shelf,
+.app-content > .hardware-info-page .content-area {
+  padding: 14px;
+}
+
+.app-content > .toolbox-wrapper .content-area,
+.app-content > .network-tool-page .content-area,
+.app-content > .download-manager-wrapper .content-area,
+.app-content > .screenshot-mgr-wrapper .content-area,
+.app-content > .hardware-info-page .content-area {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .app-content > .toolbox-wrapper,
+  .app-content > .sdk-manager-wrapper,
+  .app-content > .port-manager-wrapper,
+  .app-content > .network-tool-page,
+  .app-content > .code-fmt-wrapper,
+  .app-content > .git-manager-wrapper,
+  .app-content > .git-report-wrapper,
+  .app-content > .file-diff-wrapper,
+  .app-content > .api-debug-wrapper,
+  .app-content > .api-docs-wrapper,
+  .app-content > .mock-service-wrapper,
+  .app-content > .perf-test-wrapper,
+  .app-content > .auto-test-wrapper,
+  .app-content > .screenshot-mgr-wrapper,
+  .app-content > .hex-converter-wrapper,
+  .app-content > .img-cvt-wrapper,
+  .app-content > .regex-wrapper,
+  .app-content > .crypto-wrapper,
+  .app-content > .maven-wrapper,
+  .app-content > .wallpaper-wrapper,
+  .app-content > .log-analyzer-wrapper,
+  .app-content > .hardware-info-page,
+  .app-content > .download-manager-wrapper,
+  .app-content > .ssh-terminal-wrapper,
+  .app-content > .ebook-shelf,
+  .app-content > .ebook-reader,
+  .app-content > .redis-client,
+  .app-content > .img-b64-wrapper,
+  .app-content > .sqlite-mgr {
+    padding: 8px !important;
+  }
+
+  .app-content > .toolbox-wrapper .toolbox-workspace,
+  .app-content > .sdk-manager-wrapper .sdk-workspace,
+  .app-content > .log-analyzer-wrapper .workspace,
+  .app-content > .download-manager-wrapper .content-area,
+  .app-content > .screenshot-mgr-wrapper .content-area,
+  .app-content > .network-tool-page .content-area,
+  .app-content > .redis-client .key-tree-wrapper,
+  .app-content > .img-b64-wrapper,
+  .app-content > .sqlite-mgr,
+  .app-content > .ebook-shelf,
+  .app-content > .hardware-info-page .content-area {
+    padding: 10px;
+  }
+}
+/* ===== Toolbox route compact 5px spacing ===== */
+.app-content > .toolbox-wrapper,
+.app-content > .sdk-manager-wrapper,
+.app-content > .port-manager-wrapper,
+.app-content > .network-tool-page,
+.app-content > .code-fmt-wrapper,
+.app-content > .git-manager-wrapper,
+.app-content > .git-report-wrapper,
+.app-content > .file-diff-wrapper,
+.app-content > .api-debug-wrapper,
+.app-content > .api-docs-wrapper,
+.app-content > .mock-service-wrapper,
+.app-content > .perf-test-wrapper,
+.app-content > .auto-test-wrapper,
+.app-content > .screenshot-mgr-wrapper,
+.app-content > .hex-converter-wrapper,
+.app-content > .img-cvt-wrapper,
+.app-content > .regex-wrapper,
+.app-content > .crypto-wrapper,
+.app-content > .maven-wrapper,
+.app-content > .wallpaper-wrapper,
+.app-content > .log-analyzer-wrapper,
+.app-content > .hardware-info-page,
+.app-content > .download-manager-wrapper,
+.app-content > .ssh-terminal-wrapper,
+.app-content > .ebook-shelf,
+.app-content > .ebook-reader,
+.app-content > .redis-client,
+.app-content > .img-b64-wrapper,
+.app-content > .sqlite-mgr {
+  padding: 5px !important;
+}
+
+.app-content > .toolbox-wrapper .content-area,
+.app-content > .sdk-manager-wrapper .content-area,
+.app-content > .port-manager-wrapper .content-area,
+.app-content > .network-tool-page .content-area,
+.app-content > .code-fmt-wrapper .content-area,
+.app-content > .git-manager-wrapper .content-area,
+.app-content > .git-report-wrapper .content-area,
+.app-content > .api-debug-wrapper .content-area,
+.app-content > .api-docs-wrapper .content-area,
+.app-content > .mock-service-wrapper .content-area,
+.app-content > .perf-test-wrapper .content-area,
+.app-content > .auto-test-wrapper .content-area,
+.app-content > .screenshot-mgr-wrapper .content-area,
+.app-content > .hex-converter-wrapper .content-area,
+.app-content > .img-cvt-wrapper .content-area,
+.app-content > .regex-wrapper .content-area,
+.app-content > .crypto-wrapper .content-area,
+.app-content > .maven-wrapper .content-area,
+.app-content > .log-analyzer-wrapper .workspace,
+.app-content > .download-manager-wrapper .content-area,
+.app-content > .ssh-terminal-wrapper .content-area,
+.app-content > .toolbox-wrapper .toolbox-workspace,
+.app-content > .sdk-manager-wrapper .sdk-workspace,
+.app-content > .file-diff-wrapper .workspace-shell,
+.app-content > .redis-client .key-tree-wrapper,
+.app-content > .img-b64-wrapper,
+.app-content > .sqlite-mgr,
+.app-content > .ebook-shelf,
+.app-content > .hardware-info-page .content-area {
+  padding: 5px !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .app-content > .toolbox-wrapper,
+  .app-content > .sdk-manager-wrapper,
+  .app-content > .port-manager-wrapper,
+  .app-content > .network-tool-page,
+  .app-content > .code-fmt-wrapper,
+  .app-content > .git-manager-wrapper,
+  .app-content > .git-report-wrapper,
+  .app-content > .file-diff-wrapper,
+  .app-content > .api-debug-wrapper,
+  .app-content > .api-docs-wrapper,
+  .app-content > .mock-service-wrapper,
+  .app-content > .perf-test-wrapper,
+  .app-content > .auto-test-wrapper,
+  .app-content > .screenshot-mgr-wrapper,
+  .app-content > .hex-converter-wrapper,
+  .app-content > .img-cvt-wrapper,
+  .app-content > .regex-wrapper,
+  .app-content > .crypto-wrapper,
+  .app-content > .maven-wrapper,
+  .app-content > .wallpaper-wrapper,
+  .app-content > .log-analyzer-wrapper,
+  .app-content > .hardware-info-page,
+  .app-content > .download-manager-wrapper,
+  .app-content > .ssh-terminal-wrapper,
+  .app-content > .ebook-shelf,
+  .app-content > .ebook-reader,
+  .app-content > .redis-client,
+  .app-content > .img-b64-wrapper,
+  .app-content > .sqlite-mgr,
+  .app-content > .toolbox-wrapper .content-area,
+  .app-content > .sdk-manager-wrapper .content-area,
+  .app-content > .port-manager-wrapper .content-area,
+  .app-content > .network-tool-page .content-area,
+  .app-content > .code-fmt-wrapper .content-area,
+  .app-content > .git-manager-wrapper .content-area,
+  .app-content > .git-report-wrapper .content-area,
+  .app-content > .api-debug-wrapper .content-area,
+  .app-content > .api-docs-wrapper .content-area,
+  .app-content > .mock-service-wrapper .content-area,
+  .app-content > .perf-test-wrapper .content-area,
+  .app-content > .auto-test-wrapper .content-area,
+  .app-content > .screenshot-mgr-wrapper .content-area,
+  .app-content > .hex-converter-wrapper .content-area,
+  .app-content > .img-cvt-wrapper .content-area,
+  .app-content > .regex-wrapper .content-area,
+  .app-content > .crypto-wrapper .content-area,
+  .app-content > .maven-wrapper .content-area,
+  .app-content > .log-analyzer-wrapper .workspace,
+  .app-content > .download-manager-wrapper .content-area,
+  .app-content > .ssh-terminal-wrapper .content-area,
+  .app-content > .toolbox-wrapper .toolbox-workspace,
+  .app-content > .sdk-manager-wrapper .sdk-workspace,
+  .app-content > .file-diff-wrapper .workspace-shell,
+  .app-content > .redis-client .key-tree-wrapper,
+  .app-content > .img-b64-wrapper,
+  .app-content > .sqlite-mgr,
+  .app-content > .ebook-shelf,
+  .app-content > .hardware-info-page .content-area {
+    padding: 5px !important;
+  }
+}
+/* ===== Toolbox inner containers force 5px ===== */
+.app-content > .sqlite-mgr .main-body,
+.app-content > .img-cvt-wrapper .main-area,
+.app-content > .img-b64-wrapper .main-area,
+.app-content > .toolbox-wrapper .toolbox-workspace,
+.app-content > .sdk-manager-wrapper .sdk-workspace,
+.app-content > .file-diff-wrapper .workspace-shell,
+.app-content > .git-manager-wrapper .workspace-shell,
+.app-content > .log-analyzer-wrapper .workspace,
+.app-content > .network-tool-page .content-area,
+.app-content > .download-manager-wrapper .content-area,
+.app-content > .hardware-info-page .content-area,
+.app-content > .screenshot-mgr-wrapper .content-area,
+.app-content > .api-debug-wrapper .content-area,
+.app-content > .api-docs-wrapper .content-area,
+.app-content > .mock-service-wrapper .content-area,
+.app-content > .perf-test-wrapper .content-area,
+.app-content > .auto-test-wrapper .content-area,
+.app-content > .code-fmt-wrapper .content-area,
+.app-content > .port-manager-wrapper .content-area,
+.app-content > .regex-wrapper .content-area,
+.app-content > .crypto-wrapper .content-area,
+.app-content > .maven-wrapper .content-area,
+.app-content > .ssh-terminal-wrapper .content-area {
+  padding: 5px !important;
+  margin: 0 !important;
+}
+
+.app-content > .sqlite-mgr .status-bar,
+.app-content > .img-cvt-wrapper .status-bar,
+.app-content > .img-b64-wrapper .status-bar,
+.app-content > .img-cvt-wrapper .toolbar,
+.app-content > .img-b64-wrapper .toolbar,
+.app-content > .sqlite-mgr .header,
+.app-content > .img-cvt-wrapper .header,
+.app-content > .img-b64-wrapper .header,
+.app-content > .sqlite-mgr .tab-bar,
+.app-content > .sqlite-mgr .tab-content,
+.app-content > .sqlite-mgr .sql-toolbar,
+.app-content > .sqlite-mgr .pagination-bar,
+.app-content > .img-cvt-wrapper .left-panel,
+.app-content > .img-cvt-wrapper .right-panel,
+.app-content > .img-b64-wrapper .input-panel,
+.app-content > .img-b64-wrapper .output-panel {
+  margin: 0 !important;
+}
+
+.app-content > .sqlite-mgr .status-bar,
+.app-content > .img-cvt-wrapper .status-bar,
+.app-content > .img-b64-wrapper .status-bar,
+.app-content > .img-cvt-wrapper .toolbar,
+.app-content > .img-b64-wrapper .toolbar,
+.app-content > .sqlite-mgr .tab-bar,
+.app-content > .sqlite-mgr .tab-content,
+.app-content > .sqlite-mgr .sql-toolbar,
+.app-content > .sqlite-mgr .pagination-bar,
+.app-content > .img-cvt-wrapper .left-panel,
+.app-content > .img-cvt-wrapper .right-panel,
+.app-content > .img-b64-wrapper .input-panel,
+.app-content > .img-b64-wrapper .output-panel,
+.app-content > .img-cvt-wrapper .settings,
+.app-content > .img-cvt-wrapper .exif-section,
+.app-content > .img-cvt-wrapper .batch-table,
+.app-content > .img-cvt-wrapper .size-compare,
+.app-content > .img-cvt-wrapper .preview-card,
+.app-content > .img-b64-wrapper .output-body,
+.app-content > .img-b64-wrapper .file-info,
+.app-content > .sqlite-mgr .create-sql,
+.app-content > .sqlite-mgr .empty-state,
+.app-content > .sqlite-mgr .empty-hint {
+  padding: 5px !important;
+}
+
+.app-content > .img-cvt-wrapper .drop-zone,
+.app-content > .img-b64-wrapper .drop-zone,
+.app-content > .img-cvt-wrapper .file-item,
+.app-content > .img-b64-wrapper .info-row,
+.app-content > .sqlite-mgr .history-item,
+.app-content > .sqlite-mgr .table-item,
+.app-content > .sqlite-mgr .sql-textarea,
+.app-content > .img-b64-wrapper .b64-output {
+  padding: 5px !important;
+}
+
+.app-content > .sqlite-mgr .table-list,
+.app-content > .sqlite-mgr .panel-title,
+.app-content > .img-cvt-wrapper .section-card-title,
+.app-content > .img-cvt-wrapper .preview-label,
+.app-content > .img-b64-wrapper .output-header {
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+.app-content > .sqlite-mgr .empty-state,
+.app-content > .sqlite-mgr .empty-state.small,
+.app-content > .sqlite-mgr .status-bar,
+.app-content > .img-cvt-wrapper .status-bar,
+.app-content > .img-b64-wrapper .status-bar,
+.app-content > .img-cvt-wrapper .toolbar,
+.app-content > .img-b64-wrapper .toolbar {
+  margin: 0 !important;
+}
+/* ===== Toolbox inner containers force 5px ===== */
+.app-content > .sqlite-mgr .main-body,
+.app-content > .sqlite-mgr .panel-section,
+.app-content > .sqlite-mgr .table-list,
+.app-content > .sqlite-mgr .tab-bar,
+.app-content > .sqlite-mgr .pagination-bar,
+.app-content > .sqlite-mgr .sql-toolbar,
+.app-content > .sqlite-mgr .sql-textarea,
+.app-content > .sqlite-mgr .sql-result-info,
+.app-content > .sqlite-mgr .sql-error,
+.app-content > .sqlite-mgr .create-sql,
+.app-content > .sqlite-mgr .status-bar,
+.app-content > .sqlite-mgr .tab-content[style],
+.app-content > .img-cvt-wrapper .toolbar,
+.app-content > .img-cvt-wrapper .main-area,
+.app-content > .img-cvt-wrapper .left-panel,
+.app-content > .img-cvt-wrapper .right-panel,
+.app-content > .img-cvt-wrapper .drop-zone,
+.app-content > .img-cvt-wrapper .settings,
+.app-content > .img-cvt-wrapper .exif-section,
+.app-content > .img-cvt-wrapper .empty-preview,
+.app-content > .img-cvt-wrapper .preview-card,
+.app-content > .img-cvt-wrapper .size-compare,
+.app-content > .img-cvt-wrapper .batch-table,
+.app-content > .img-cvt-wrapper .status-bar,
+.app-content > .img-b64-wrapper .toolbar,
+.app-content > .img-b64-wrapper .main-area,
+.app-content > .img-b64-wrapper .input-panel,
+.app-content > .img-b64-wrapper .output-header,
+.app-content > .img-b64-wrapper .output-body,
+.app-content > .img-b64-wrapper .drop-zone,
+.app-content > .img-b64-wrapper .file-info,
+.app-content > .img-b64-wrapper .b64-output,
+.app-content > .img-b64-wrapper .status-bar {
+  padding: 5px !important;
+}
+
+.app-content > .sqlite-mgr .history-item,
+.app-content > .sqlite-mgr .table-item,
+.app-content > .img-cvt-wrapper .file-item,
+.app-content > .img-cvt-wrapper .exif-row,
+.app-content > .img-b64-wrapper .info-row {
+  padding: 5px !important;
+}
+
+.app-content > .sqlite-mgr .empty-state,
+.app-content > .sqlite-mgr .empty-state.small,
+.app-content > .sqlite-mgr .empty-hint,
+.app-content > .sqlite-mgr .status-bar,
+.app-content > .img-cvt-wrapper .toolbar,
+.app-content > .img-cvt-wrapper .main-area,
+.app-content > .img-cvt-wrapper .status-bar,
+.app-content > .img-b64-wrapper .toolbar,
+.app-content > .img-b64-wrapper .main-area,
+.app-content > .img-b64-wrapper .status-bar {
+  margin: 0 !important;
+}
+
+/* ===== Calendar compact + remove triple borders ===== */
+.app-content > .calendar-wrapper {
+  padding: 5px !important;
+}
+
+.app-content > .calendar-wrapper .content-container {
+  margin: 0 !important;
+  padding: 5px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content > .calendar-wrapper .calendar-workspace {
+  margin: 0 !important;
+  padding: 5px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content > .calendar-wrapper .calendar-container,
+.app-content > .calendar-wrapper .week-view,
+.app-content > .calendar-wrapper .day-view,
+.app-content > .calendar-wrapper .list-view,
+.app-content > .calendar-wrapper .list-toolbar {
+  margin: 0 !important;
+  padding: 5px !important;
+}
+/* ===== Calendar compact single-border fix ===== */
+.app-content > .calendar-wrapper {
+  padding: 5px !important;
+}
+
+.app-content > .calendar-wrapper .content-container {
+  margin: 0 !important;
+  padding: 5px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content > .calendar-wrapper .calendar-workspace {
+  padding: 5px !important;
+  border: 1px solid var(--divider) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.app-content > .calendar-wrapper .calendar-container,
+.app-content > .calendar-wrapper .list-view,
+.app-content > .calendar-wrapper .day-view,
+.app-content > .calendar-wrapper .week-view {
+  margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .app-content > .calendar-wrapper,
+  .app-content > .calendar-wrapper .content-container,
+  .app-content > .calendar-wrapper .calendar-workspace {
+    padding: 5px !important;
+    margin: 0 !important;
+  }
+}
+/* ===== Calendar single-border compact fix ===== */
+.app-content > .calendar-wrapper {
+  padding: 5px !important;
+}
+
+.app-content > .calendar-wrapper .content-container {
+  margin: 0 !important;
+  padding: 5px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content > .calendar-wrapper .calendar-workspace {
+  padding: 5px !important;
+  border: 1px solid var(--divider) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm) !important;
+  background: var(--surface-panel) !important;
+}
+
+.app-content > .calendar-wrapper .calendar-container,
+.app-content > .calendar-wrapper .week-view,
+.app-content > .calendar-wrapper .day-view,
+.app-content > .calendar-wrapper .list-view {
+  margin: 0 !important;
+}
+
+.app-content > .calendar-wrapper .calendar-container {
+  padding: 5px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content > .calendar-wrapper .week-view,
+.app-content > .calendar-wrapper .day-view,
+.app-content > .calendar-wrapper .list-view {
+  padding: 5px !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content > .calendar-wrapper .list-toolbar,
+.app-content > .calendar-wrapper .day-header,
+.app-content > .calendar-wrapper .week-header {
+  margin: 0 0 5px !important;
+}
+/* ===== Bookmarks & Todos sidebar refresh ===== */
+.bookmarks-page-wrapper .sidebar-left,
+.todos-page-wrapper .sidebar-left {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), color-mix(in srgb, var(--surface-panel-soft) 94%, #f8fbff 6%));
+  border: 1px solid color-mix(in srgb, var(--divider) 92%, rgba(13, 110, 253, 0.12) 8%);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.72);
+}
+
+.bookmarks-page-wrapper .sidebar-toolbar,
+.todos-page-wrapper .sidebar-toolbar {
+  padding: 12px 12px 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,249,255,0.92));
+  border-bottom: 1px solid color-mix(in srgb, var(--divider) 84%, rgba(13, 110, 253, 0.12) 16%);
+}
+
+.bookmarks-page-wrapper .sidebar-title,
+.todos-page-wrapper .sidebar-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.bookmarks-page-wrapper .category-list,
+.todos-page-wrapper .category-list {
+  padding: 10px 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bookmarks-page-wrapper .category-divider,
+.todos-page-wrapper .category-divider {
+  height: 1px;
+  margin: 4px 6px;
+  background: linear-gradient(90deg, rgba(148,163,184,0), rgba(148,163,184,0.34), rgba(148,163,184,0));
+}
+
+.bookmarks-page-wrapper .category-item,
+.todos-page-wrapper .category-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  margin: 0;
+  padding: 9px 10px 9px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+}
+
+.bookmarks-page-wrapper .category-item::before,
+.todos-page-wrapper .category-item::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 8px;
+  bottom: 8px;
+  width: 3px;
+  border-radius: 999px;
+  background: transparent;
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+  opacity: 0;
+}
+
+.bookmarks-page-wrapper .category-item:hover,
+.todos-page-wrapper .category-item:hover {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 44%, #fff 56%), color-mix(in srgb, var(--accent-blue-bg) 22%, transparent 78%));
+  border-color: color-mix(in srgb, var(--accent-blue) 18%, transparent 82%);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07), inset 0 1px 0 rgba(255,255,255,0.72);
+}
+
+.bookmarks-page-wrapper .category-item.active,
+.todos-page-wrapper .category-item.active {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 84%, #fff 16%), color-mix(in srgb, var(--accent-blue-bg) 68%, rgba(255,255,255,0.2) 32%));
+  border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent 74%);
+  box-shadow: 0 10px 22px rgba(13,110,253,0.12), inset 0 1px 0 rgba(255,255,255,0.78);
+}
+
+.bookmarks-page-wrapper .category-item.active::before,
+.todos-page-wrapper .category-item.active::before {
+  opacity: 1;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+}
+
+.bookmarks-page-wrapper .category-icon,
+.todos-page-wrapper .category-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  min-width: 18px;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.bookmarks-page-wrapper .category-name,
+.todos-page-wrapper .category-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bookmarks-page-wrapper .category-count,
+.todos-page-wrapper .category-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.86);
+  border: 1px solid rgba(15,23,42,0.06);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+}
+
+.bookmarks-page-wrapper .category-item.active .category-count,
+.todos-page-wrapper .category-item.active .category-count {
+  background: rgba(255,255,255,0.94);
+  color: var(--accent-blue);
+  border-color: color-mix(in srgb, var(--accent-blue) 14%, rgba(15,23,42,0.06) 86%);
+}
+
+.bookmarks-page-wrapper .category-actions,
+.todos-page-wrapper .category-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 2px;
+}
+
+.bookmarks-page-wrapper .action-icon,
+.todos-page-wrapper .action-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: var(--text-quaternary);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(15,23,42,0.05);
+}
+
+.bookmarks-page-wrapper .action-icon:hover,
+.todos-page-wrapper .action-icon:hover {
+  color: var(--text-primary);
+  background: #fff;
+}
+
+.bookmarks-page-wrapper .action-icon.del:hover,
+.todos-page-wrapper .action-icon.del:hover {
+  color: #dc2626;
+  border-color: rgba(220,38,38,0.12);
+}
+
+.bookmarks-page-wrapper .category-favorite .favorite-icon,
+.todos-page-wrapper .category-item .favorite-icon {
+  color: #f59e0b;
+}
+
+/* ===== Global visual weight reduction ===== */
+.app-content .page-eyebrow,
+.bookmarks-page-wrapper .sidebar-title,
+.todos-page-wrapper .sidebar-title {
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.app-content .breadcrumb,
+.app-content .page-title-block,
+.app-content .header,
+.app-content .header-left,
+.app-content .header-actions {
+  gap: 8px !important;
+}
+
+.api-debug-wrapper .header,
+.api-docs-wrapper .header,
+.auto-test-wrapper .header,
+.code-fmt-wrapper .header,
+.crypto-wrapper .header,
+.download-manager-wrapper .header,
+.file-diff-wrapper .header,
+.git-manager-wrapper .header,
+.git-report-wrapper .header,
+.img-cvt-wrapper .header,
+.log-analyzer-wrapper .header,
+.maven-wrapper .header,
+.mock-service-wrapper .header,
+.perf-test-wrapper .header,
+.port-manager-wrapper .header,
+.redis-client-wrapper .header,
+.regex-wrapper .header,
+.sdk-manager-wrapper .header,
+.ssh-terminal-wrapper .header,
+.toolbox-wrapper .header,
+.network-tool-page .header,
+.bookmarks-page-wrapper .header,
+.todos-page-wrapper .header,
+.settings-page-wrapper .header,
+.passwords-page-wrapper .header,
+.notes-page-wrapper .header,
+.calendar-wrapper .header,
+.credential-manager-page .header,
+.wallpaper-wrapper .wp-header,
+.app-content > .sqlite-mgr .header,
+.app-content > .img-b64-wrapper .header {
+  padding: 8px 10px !important;
+  gap: 8px !important;
+}
+
+.app-content .header-actions .el-button,
+.app-content .header-actions .el-input,
+.app-content .header-actions .el-select {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.app-content .panel-header,
+.app-content .preview-header,
+.app-content .picker-header,
+.app-content .doc-preview-header,
+.app-content .verify-header,
+.app-content .step-header,
+.app-content .week-header,
+.app-content .day-header,
+.app-content .section-header,
+.folder-header,
+.res-header-row,
+.result-header,
+.el-tabs__header,
+.el-collapse-item__header,
+.el-descriptions__header {
+  min-height: 34px !important;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+}
+
+/* ===== Bookmarks / Todos sidebar compact refinement ===== */
+.bookmarks-page-wrapper .sidebar-left,
+.todos-page-wrapper .sidebar-left {
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+}
+
+.bookmarks-page-wrapper .sidebar-toolbar,
+.todos-page-wrapper .sidebar-toolbar {
+  padding: 8px 10px 7px !important;
+}
+
+.bookmarks-page-wrapper .category-list,
+.todos-page-wrapper .category-list {
+  padding: 6px !important;
+  gap: 4px !important;
+}
+
+.bookmarks-page-wrapper .category-divider,
+.todos-page-wrapper .category-divider {
+  margin: 2px 4px !important;
+}
+
+.bookmarks-page-wrapper .category-item,
+.todos-page-wrapper .category-item {
+  grid-template-columns: 16px minmax(0, 1fr) auto auto !important;
+  gap: 8px !important;
+  min-height: 34px !important;
+  padding: 6px 8px 6px 10px !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.36) !important;
+}
+
+.bookmarks-page-wrapper .category-item::before,
+.todos-page-wrapper .category-item::before {
+  left: 4px !important;
+  top: 6px !important;
+  bottom: 6px !important;
+  width: 2px !important;
+}
+
+.bookmarks-page-wrapper .category-item:hover,
+.todos-page-wrapper .category-item:hover {
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255,255,255,0.65) !important;
+}
+
+.bookmarks-page-wrapper .category-item.active,
+.todos-page-wrapper .category-item.active {
+  box-shadow: 0 6px 14px rgba(13,110,253,0.08), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+}
+
+.bookmarks-page-wrapper .category-icon,
+.todos-page-wrapper .category-icon {
+  width: 16px !important;
+  min-width: 16px !important;
+  font-size: 14px !important;
+}
+
+.bookmarks-page-wrapper .category-name,
+.todos-page-wrapper .category-name {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+.bookmarks-page-wrapper .category-count,
+.todos-page-wrapper .category-count {
+  min-width: 20px !important;
+  height: 18px !important;
+  padding: 0 6px !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+}
+
+.bookmarks-page-wrapper .category-actions,
+.todos-page-wrapper .category-actions {
+  gap: 4px !important;
+}
+
+.bookmarks-page-wrapper .action-icon,
+.todos-page-wrapper .action-icon {
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 10px !important;
+}
+
+/* ===== Cards and forms tighter rhythm ===== */
+.bookmarks-page-wrapper .bookmark-row,
+.todos-page-wrapper .todo-card,
+.notes-page-wrapper .note-card,
+.passwords-page-wrapper .password-item,
+.toolbox-wrapper .tool-card,
+.calendar-wrapper .event-card,
+.calendar-wrapper .week-event,
+.calendar-wrapper .day-event-item {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.todos-page-wrapper .todo-cards,
+.bookmarks-page-wrapper .bookmark-cards,
+.toolbox-wrapper .toolbox-workspace,
+.calendar-wrapper .calendar-workspace {
+  gap: 8px !important;
+}
+
+.todos-page-wrapper .card-row,
+.bookmarks-page-wrapper .row-left,
+.bookmarks-page-wrapper .row-right {
+  gap: 6px !important;
+}
+
+.app-content .el-form-item {
+  margin-bottom: 12px !important;
+}
+
+.app-content .el-dialog__body {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+/* ===== Minimal clean override (remove AI-ish decoration) ===== */
+.app-content .header,
+.app-content .panel-header,
+.app-content .preview-header,
+.app-content .picker-header,
+.app-content .doc-preview-header,
+.app-content .verify-header,
+.app-content .step-header,
+.app-content .section-header,
+.app-content .card-header,
+.app-content .res-header-row,
+.app-content .result-header {
+  background: #fff !important;
+  border: 1px solid var(--divider) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+.app-content .card,
+.app-content .panel,
+.app-content .content-area,
+.app-content .main-container,
+.app-content .calendar-container,
+.app-content .week-view,
+.app-content .day-view,
+.app-content .list-view,
+.app-content .tool-card,
+.app-content .todo-card,
+.app-content .bookmark-row,
+.app-content .note-card,
+.app-content .password-item {
+  background: #fff !important;
+  border: 1px solid var(--divider) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+.app-content .tool-card:hover,
+.app-content .todo-card:hover,
+.app-content .bookmark-row:hover,
+.app-content .note-card:hover,
+.app-content .password-item:hover {
+  transform: none !important;
+  box-shadow: none !important;
+  border-color: color-mix(in srgb, var(--divider) 75%, #cbd5e1 25%) !important;
+}
+
+.bookmarks-page-wrapper .sidebar-left,
+.todos-page-wrapper .sidebar-left,
+.notes-page-wrapper .sidebar-left,
+.passwords-page-wrapper .sidebar-left {
+  background: #fff !important;
+  border: 1px solid var(--divider) !important;
+  box-shadow: none !important;
+}
+
+.bookmarks-page-wrapper .sidebar-toolbar,
+.todos-page-wrapper .sidebar-toolbar,
+.notes-page-wrapper .sidebar-toolbar,
+.passwords-page-wrapper .sidebar-toolbar {
+  background: #fff !important;
+  border-bottom: 1px solid var(--divider) !important;
+  padding: 8px 10px !important;
+}
+
+.bookmarks-page-wrapper .category-item,
+.todos-page-wrapper .category-item,
+.notes-page-wrapper .category-item,
+.passwords-page-wrapper .category-item {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+.bookmarks-page-wrapper .category-item::before,
+.todos-page-wrapper .category-item::before,
+.notes-page-wrapper .category-item::before,
+.passwords-page-wrapper .category-item::before {
+  display: none !important;
+}
+
+.bookmarks-page-wrapper .category-item:hover,
+.todos-page-wrapper .category-item:hover,
+.notes-page-wrapper .category-item:hover,
+.passwords-page-wrapper .category-item:hover {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+.bookmarks-page-wrapper .category-item.active,
+.todos-page-wrapper .category-item.active,
+.notes-page-wrapper .category-item.active,
+.passwords-page-wrapper .category-item.active {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  box-shadow: none !important;
+}
+
+.bookmarks-page-wrapper .category-count,
+.todos-page-wrapper .category-count,
+.notes-page-wrapper .category-count,
+.passwords-page-wrapper .category-count {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+.app-content .el-button:not(.is-text) {
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.app-content .el-input__wrapper,
+.app-content .el-textarea__inner,
+.app-content .el-select__wrapper {
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+/* Settings page: force borderless right content pane */
+.app-content .settings-page-wrapper .content-area {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Toolbox: clean white theme final override */
+.app-content .toolbox-wrapper .header {
+  border-bottom: 1px solid #e8edf4 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: none !important;
+}
+
+.app-content .toolbox-wrapper .content-area {
+  border: 1px solid #e6ecf3 !important;
+  background: #f8fafd !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05) !important;
+}
+
+.app-content .toolbox-wrapper .tool-category {
+  border: 1px solid #e7edf4 !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+}
+
+.app-content .toolbox-wrapper .tool-card {
+  border: 1px solid #e7edf4 !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04) !important;
+}
+
+.app-content .toolbox-wrapper .tool-card:hover {
+  border: 1px solid #d7e3f6 !important;
+  background: #fbfdff !important;
+  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.1) !important;
+}
+
+.app-content .toolbox-wrapper .category-header {
+  background: transparent !important;
+  border-bottom: 1px dashed #e8edf4 !important;
+  border-radius: 0 !important;
+  padding: 0 2px 10px !important;
+}
+
+.app-content .toolbox-wrapper .favorite-btn {
+  border: 1px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+}
