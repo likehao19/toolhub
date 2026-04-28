@@ -42,16 +42,16 @@
       <main class="content-area">
         <div class="sdk-workspace">
           <template v-for="sdk in sdkKeys" :key="sdk">
-            <div v-show="activeTab === sdk" class="sdk-panel">
-            <sdk-env-card :config="SDK_CONFIG[sdk]" :info="data[sdk].env" :loading="data[sdk].envLoading" />
-            <sdk-version-card
-              :versions="data[sdk].versions" :env-info="data[sdk].env"
-              :scanning="data[sdk].scanning" :switching="data[sdk].switching"
-              @scan="doScan(sdk)" @add="doAdd(sdk)"
-              @switch="(v) => doSwitch(sdk, v)" @remove="(v) => doRemove(sdk, v)"
-            />
-          </div>
-        </template>
+            <div v-if="activeTab === sdk" class="sdk-panel">
+              <sdk-env-card :config="SDK_CONFIG[sdk]" :info="data[sdk].env" :loading="data[sdk].envLoading" />
+              <sdk-version-card
+                :versions="data[sdk].versions" :env-info="data[sdk].env"
+                :scanning="data[sdk].scanning" :switching="data[sdk].switching"
+                @scan="doScan(sdk)" @add="doAdd(sdk)"
+                @switch="(v) => doSwitch(sdk, v)" @remove="(v) => doRemove(sdk, v)"
+              />
+            </div>
+          </template>
         </div>
       </main>
     </div>
@@ -234,33 +234,44 @@ onMounted(() => { refreshAll() })
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
 
-.main-container { display: grid; grid-template-columns: 172px minmax(0, 1fr); flex: 1; overflow: hidden; padding: 5px 5px 0; gap: 0; }
+.main-container {
+  display: grid;
+  grid-template-columns: 148px minmax(0, 1fr);
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  gap: 0;
+}
 
 /* 左侧菜单 */
 .sidebar-left {
-  width: auto; min-width: 0;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
+  width: 148px;
+  min-width: 148px;
+  max-width: 148px;
+  background: linear-gradient(180deg, rgba(249, 252, 255, 0.58), rgba(239, 246, 252, 0.34));
+  border: 0;
+  border-right: 1px solid rgba(112, 128, 150, 0.16);
+  border-radius: 0;
   display: flex; flex-direction: column;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  box-shadow: none;
 }
-.menu-list { padding: 8px; flex: 1; overflow-y: auto; }
+.menu-list { padding: 8px 6px; flex: 1; overflow-y: auto; }
 
 .menu-item {
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 10px; border-radius: 12px;
+  padding: 8px 9px; border-radius: 9px;
   cursor: pointer; transition: all var(--transition-fast);
-  color: var(--text-secondary); font-size: 13px; margin-bottom: 4px;
-  border: 1px solid transparent;
+  color: var(--text-secondary); font-size: 13px; margin-bottom: 0;
+  border: 0;
 }
-.menu-item:hover { background-color: rgba(255,255,255,0.58); color: var(--text-primary); }
+.menu-item + .menu-item { border-top: 1px solid rgba(100, 116, 139, 0.08); }
+.menu-item:hover { background-color: rgba(255,255,255,0.42); color: var(--text-primary); }
 .menu-item.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  background: linear-gradient(90deg, rgba(58, 117, 216, 0.12), rgba(255,255,255,0.26));
   color: var(--accent-blue); font-weight: var(--font-weight-semibold);
-  border-color: rgba(10,132,255,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  box-shadow: inset 3px 0 0 rgba(58, 117, 216, 0.76);
 }
 
 .menu-badge {
@@ -280,25 +291,50 @@ onMounted(() => { refreshAll() })
 /* 右侧内容 */
 .content-area {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
-  border: 1px solid rgba(15,23,42,0.08);
-  border-radius: 0 18px 18px 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  background: linear-gradient(180deg, rgba(252,253,255,0.56), rgba(244,248,252,0.36));
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 .sdk-workspace {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
   overflow-y: auto;
-  padding: 20px;
+  padding: 0;
   scrollbar-gutter: stable;
 }
 .sdk-workspace::-webkit-scrollbar { width: 5px; }
 .sdk-workspace::-webkit-scrollbar-track { background: transparent; }
 .sdk-workspace::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 3px; }
 .sdk-workspace::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+.sdk-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  gap: 0;
+}
+
+.sdk-panel > * {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.sdk-panel > .versions-panel {
+  flex: 1 1 auto;
+}
 
 </style>

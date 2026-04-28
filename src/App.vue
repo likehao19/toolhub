@@ -58,7 +58,7 @@
 
         <!-- AI助手悬浮球 (应用内) -->
         <AIFloatingBall
-          v-if="floatingBallConfig.enabled && floatingBallConfig.mode === 'inApp'"
+          v-if="floatingBallConfig.enabled && floatingBallConfig.mode === 'inApp' && !isToolboxToolRoute"
           :visible="true"
           :mode="floatingBallConfig.mode"
           :style="floatingBallConfig.style"
@@ -110,7 +110,7 @@ const isStandaloneWindow = ref(
 const appStore = useAppStore()
 const router = useRouter()
 const route = useRoute()
-const isToolboxToolRoute = computed(() => route.path.startsWith('/toolbox/') && route.path !== '/toolbox')
+const isToolboxToolRoute = computed(() => route.path === '/toolbox' || route.path.startsWith('/toolbox/'))
 const closeDialogRef = ref(null)
 const contextMenuVisible = ref(false)
 const contextMenuPosition = ref({ x: 0, y: 0 })
@@ -1378,6 +1378,13 @@ body {
   flex: 1;
   overflow: hidden;
   background: var(--surface-page);
+}
+
+.app-content.toolbox-unified-shell {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(219, 234, 254, 0.58) 0%, transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(220, 252, 231, 0.42) 0%, transparent 30%),
+    linear-gradient(135deg, #f3f8ff 0%, #fbfdff 48%, #f3faf7 100%) !important;
 }
 
 /* ===== 页面切换动画 ===== */

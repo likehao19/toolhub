@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="network-tool-page">
     <div class="header">
       <div class="header-left">
@@ -15,9 +15,9 @@
     </div>
 
     <div class="content-area">
-      <div class="config-panel">
+      <aside class="config-panel">
         <div class="panel-title">连接配置</div>
-        <el-form label-width="88px" size="small">
+        <el-form label-width="72px" size="small">
           <el-form-item label="地址">
             <el-input v-model="url" placeholder="ws:// 或 wss://" />
           </el-form-item>
@@ -27,20 +27,32 @@
           </el-form-item>
         </el-form>
 
-        <div class="panel-title" style="margin-top:20px">发送消息</div>
-        <el-input v-model="message" type="textarea" :rows="5" placeholder="输入要发送的消息" />
+        <div class="panel-title composer-title">发送消息</div>
+        <el-input
+          v-model="message"
+          type="textarea"
+          :rows="8"
+          class="composer-input"
+          placeholder="输入要发送的内容"
+        />
         <div class="quick-actions">
           <el-button type="primary" :disabled="!ws" @click="sendMessage">发送</el-button>
           <el-button :disabled="!ws" @click="sendJsonMessage">发送 JSON</el-button>
           <el-button :disabled="!ws" @click="sendHeartbeat">发送心跳</el-button>
-          <el-button @click="clearMessages">清空日志</el-button>
         </div>
-      </div>
+      </aside>
 
-      <div class="result-panel">
-        <div class="status-row">
-          <el-tag :type="ws ? 'success' : 'info'">{{ ws ? '已连接' : '未连接' }}</el-tag>
-          <span class="hint">{{ url || '请先输入 WebSocket 地址' }}</span>
+      <section class="result-panel">
+        <div class="result-toolbar">
+          <div class="status-row">
+            <el-tag :type="ws ? 'success' : 'info'">{{ ws ? '已连接' : '未连接' }}</el-tag>
+            <span class="hint">{{ url || '请先输入 WebSocket 地址' }}</span>
+          </div>
+          <div class="log-meta">
+            <span class="log-count">{{ messages.length }}</span>
+            <span class="log-label">条日志</span>
+            <el-button text size="small" @click="clearMessages">清空日志</el-button>
+          </div>
         </div>
 
         <div class="log-list">
@@ -50,7 +62,7 @@
           </div>
           <div v-if="messages.length === 0" class="empty-hint">暂无消息日志</div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -80,10 +92,12 @@ async function connect() {
     ElMessage.warning('请输入 WebSocket 地址')
     return
   }
+
   connecting.value = true
   try {
     const socket = await TauriWebSocket.connect(url.value.trim())
     ws.value = socket
+
     removeListener = socket.addListener((msg) => {
       if (msg.type === 'Text') addMessage('received', `收到: ${msg.data}`)
       else if (msg.type === 'Binary') addMessage('received', `收到二进制数据: ${msg.data.length} 字节`)
@@ -98,6 +112,7 @@ async function connect() {
         addMessage('system', `事件: ${msg.type}`)
       }
     })
+
     addMessage('system', '连接成功')
   } catch (error) {
     ElMessage.error(error?.message || String(error))
@@ -109,6 +124,7 @@ async function connect() {
 
 async function disconnect() {
   if (!ws.value) return
+
   try {
     await ws.value.disconnect()
     addMessage('system', '已断开连接')
@@ -128,10 +144,12 @@ async function sendPayload(payload, label = payload) {
     ElMessage.warning('请先连接 WebSocket')
     return false
   }
+
   if (!payload.trim()) {
     ElMessage.warning('请输入消息内容')
     return false
   }
+
   try {
     await ws.value.send(payload)
     addMessage('sent', `发送: ${label}`)
@@ -146,9 +164,7 @@ async function sendPayload(payload, label = payload) {
 async function sendMessage() {
   const payload = message.value.trim()
   const sent = await sendPayload(payload)
-  if (sent) {
-    message.value = ''
-  }
+  if (sent) message.value = ''
 }
 
 async function sendJsonMessage() {
@@ -160,9 +176,7 @@ async function sendJsonMessage() {
   try {
     const formatted = JSON.stringify(JSON.parse(message.value), null, 2)
     const sent = await sendPayload(formatted, formatted)
-    if (sent) {
-      message.value = formatted
-    }
+    if (sent) message.value = formatted
   } catch {
     ElMessage.error('JSON 格式不正确')
   }
@@ -191,6 +205,7 @@ onUnmounted(() => {
   overflow: hidden;
   background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
 }
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -203,6 +218,7 @@ onUnmounted(() => {
   box-sizing: border-box;
   backdrop-filter: blur(18px);
 }
+
 .header-left { display: flex; align-items: center; min-width: 0; }
 .page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .page-eyebrow {
@@ -213,6 +229,7 @@ onUnmounted(() => {
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
+
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -221,61 +238,148 @@ onUnmounted(() => {
   font-weight: 600;
   color: var(--text-primary);
 }
+
 .breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); }
+
 .content-area {
   flex: 1;
-  display: flex;
-  overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
+  display: grid;
+  grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.config-panel {
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 18px;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
   gap: 0;
 }
-.config-panel {
-  width: 360px;
-  min-width: 320px;
-  padding: 16px;
-  overflow: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+
+.panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
 }
+
+.composer-title { margin-top: 8px; }
+.composer-input { flex: 0 0 auto; }
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .result-panel {
-  flex: 1;
   min-width: 0;
-  padding: 16px;
-  overflow: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 18px 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
-.panel-title { font-size: 13px; font-weight:600; color: var(--text-primary); margin-bottom:12px; }
-.status-row { display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap: wrap; }
-.hint,.empty-hint { font-size:12px; color:var(--text-tertiary); }
-.empty-hint {
-  padding: 16px;
+
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  padding: 12px 18px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.log-count {
+  min-width: 30px;
+  padding: 1px 8px;
   text-align: center;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.5);
+  border-radius: 999px;
+  font-size: 12px;
+  color: #334155;
+  background: rgba(148, 163, 184, 0.18);
 }
-.log-list { display:flex; flex-direction:column; gap:8px; }
+
+.log-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.log-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
 .log-item {
-  border:1px solid rgba(15, 23, 42, 0.08);
-  border-radius:12px;
-  padding:10px;
-  font-size:12px;
-  display:flex;
-  gap:10px;
-  background: rgba(255,255,255,0.68);
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  font-size: 13px;
 }
-.log-item.sent { border-color: rgba(64,158,255,.35); }
-.log-item.received { border-color: rgba(103,194,58,.35); }
-.log-item.error { border-color: rgba(245,108,108,.35); }
-.time { color:var(--text-tertiary); white-space:nowrap; }
-.content { color:var(--text-primary); word-break:break-all; }
-.quick-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+
+.log-item.sent { background: rgba(64, 158, 255, 0.06); }
+.log-item.received { background: rgba(103, 194, 58, 0.08); }
+.log-item.error { background: rgba(245, 108, 108, 0.08); }
+.log-item.system { background: rgba(148, 163, 184, 0.08); }
+
+.time {
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.content {
+  color: var(--text-primary);
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+.empty-hint {
+  height: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+  .content-area { grid-template-columns: 1fr; }
+  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+  .result-toolbar { padding: 10px 14px; }
+  .log-item { padding: 10px 14px; }
+}
 </style>

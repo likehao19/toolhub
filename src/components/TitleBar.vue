@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="title-bar" data-tauri-drag-region>
     <div class="title-bar-content" data-tauri-drag-region>
       <div class="title-bar-left" data-tauri-drag-region>
@@ -51,11 +51,11 @@ const props = defineProps({
 
 const isMaximized = ref(false)
 
-// 检查初始窗口状态
+// 妫€鏌ュ垵濮嬬獥鍙ｇ姸鎬?
 onMounted(async () => {
   isMaximized.value = await TauriWindow.isMaximized()
 
-  // 监听窗口状态变化
+  // 鐩戝惉绐楀彛鐘舵€佸彉鍖?
   TauriWindow.onWindowEvent('tauri://resize', async () => {
     isMaximized.value = await TauriWindow.isMaximized()
   })
@@ -81,9 +81,10 @@ const handleClose = () => {
   top: 0;
   left: 0;
   right: 0;
-  height: 32px;
-  background: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  height: 36px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 251, 255, 0.86) 100%);
+  border-bottom: 1px solid #dfe8f4;
+  backdrop-filter: blur(12px);
   user-select: none;
   display: flex;
   align-items: center;
@@ -108,68 +109,77 @@ const handleClose = () => {
 .app-icon {
   width: 16px;
   height: 16px;
+  border-radius: 4px;
 }
 
 .app-title {
   font-size: 12px;
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #0f172a;
+  letter-spacing: 0.02em;
 }
 
 .title-bar-right {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   pointer-events: auto;
 }
 
 .title-bar-button {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: transparent;
-  color: #666;
+  width: 28px;
+  height: 28px;
+  border: 1px solid #dbe5f2;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #64748b;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s, color 0.2s;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
   pointer-events: auto;
 }
 
 .title-bar-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: #000;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
 .close-button:hover {
   background-color: #e81123;
+  border-color: transparent;
   color: #fff;
 }
 
-/* ignore */
 @media (prefers-color-scheme: dark) {
   .title-bar {
-    background: #2d2d2d;
-    border-bottom-color: #3d3d3d;
+    background: linear-gradient(180deg, rgba(25, 35, 50, 0.92) 0%, rgba(18, 26, 38, 0.9) 100%);
+    border-bottom-color: #2e3d52;
   }
 
   .app-title {
-    color: #e0e0e0;
+    color: #dbe7f8;
   }
 
   .title-bar-button {
-    color: #e0e0e0;
+    border-color: #35506f;
+    background: rgba(24, 36, 52, 0.72);
+    color: #9db2cd;
   }
 
   .title-bar-button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
+    background-color: rgba(40, 59, 84, 0.86);
+    color: #e6f0ff;
   }
 
   .close-button:hover {
     background-color: #e81123;
     color: #fff;
+    border-color: transparent;
   }
 }
 </style>
+

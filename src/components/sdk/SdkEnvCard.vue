@@ -40,11 +40,14 @@ defineProps({
 
 <style scoped>
 .env-card {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.14);
+  border-radius: 0;
+  padding: 14px 18px;
+  margin: 0;
 }
 
 /* 顶栏 */
@@ -68,9 +71,10 @@ defineProps({
   font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
   font-size: 13px;
   color: var(--text-primary);
-  background: var(--bg-tertiary);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(247, 251, 255, 0.44));
+  border: 1px solid rgba(100, 116, 139, 0.12);
   padding: 6px 10px;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   word-break: break-all;
   line-height: 1.5;
   margin-bottom: 10px;
@@ -96,7 +100,7 @@ defineProps({
   color: var(--text-secondary);
   padding: 3px 10px;
   border-radius: 20px;
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .status-chip.ok .chip-dot {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="network-tool-page">
     <div class="header">
       <div class="header-left">
@@ -15,14 +15,14 @@
     </div>
 
     <div class="content-area">
-      <div class="config-panel">
+      <aside class="config-panel">
         <div class="panel-title">查询配置</div>
-        <el-form label-width="88px" size="small">
+        <el-form label-width="72px" size="small">
           <el-form-item label="域名">
             <el-input v-model="domain" placeholder="例如：example.com" clearable @keyup.enter="submit" />
           </el-form-item>
           <el-form-item label="记录类型">
-            <el-select v-model="recordType" style="width:100%">
+            <el-select v-model="recordType" style="width: 100%">
               <el-option v-for="item in recordTypes" :key="item" :label="item" :value="item" />
             </el-select>
           </el-form-item>
@@ -35,21 +35,28 @@
         <div class="history-card">
           <div class="sub-title">最近查询</div>
           <div v-if="historyList.length" class="history-list">
-            <div v-for="item in historyList" :key="`${item.domain}-${item.recordType}`" class="history-item" @click="selectHistory(item)">
+            <div
+              v-for="item in historyList"
+              :key="`${item.domain}-${item.recordType}`"
+              class="history-item"
+              @click="selectHistory(item)"
+            >
               <span class="history-text">{{ item.domain }}</span>
               <el-tag size="small">{{ item.recordType }}</el-tag>
             </div>
           </div>
           <div v-else class="hint">暂无查询历史</div>
         </div>
-      </div>
+      </aside>
 
-      <div class="result-panel" v-loading="loading">
+      <section class="result-panel" v-loading="loading">
         <template v-if="result">
-          <div class="meta-row">
-            <el-tag size="small">{{ result.domain }}</el-tag>
-            <el-tag size="small" type="success">{{ result.recordType }}</el-tag>
-            <el-tag size="small" type="info">耗时 {{ result.elapsedMs }} ms</el-tag>
+          <div class="result-toolbar">
+            <div class="meta-row">
+              <el-tag size="small">{{ result.domain }}</el-tag>
+              <el-tag size="small" type="success">{{ result.recordType }}</el-tag>
+              <el-tag size="small" type="info">耗时 {{ result.elapsedMs }} ms</el-tag>
+            </div>
             <el-button text size="small" @click="copyAll">复制全部</el-button>
           </div>
 
@@ -66,7 +73,7 @@
           </el-table>
         </template>
         <div v-else class="empty-hint">输入域名并选择记录类型后开始查询</div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -155,110 +162,101 @@ function clearResult() {
 </script>
 
 <style scoped>
-.network-tool-page {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
-  box-sizing: border-box;
-  backdrop-filter: blur(18px);
-}
-.header-left { display: flex; align-items: center; min-width: 0; }
-.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.page-eyebrow {
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-}
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
-.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
-.breadcrumb-link:hover { text-decoration: underline; }
-.breadcrumb-sep { color: var(--text-tertiary); }
 .content-area {
   flex: 1;
-  display: flex;
-  overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
-  gap: 0;
+  display: grid;
+  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+  overflow: hidden;
 }
+
 .config-panel {
-  width: 340px;
-  min-width: 300px;
-  padding: 16px;
-  overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-}
-.result-panel {
-  flex: 1;
-  min-width: 0;
-  padding: 16px;
+  min-height: 0;
   overflow: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 18px 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  padding: 16px 18px;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
 }
-.panel-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+
+.panel-title,
+.sub-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+}
+
+.history-card {
+  margin-top: 14px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+}
+
+.history-text {
+  word-break: break-all;
+}
+
+.result-panel {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.meta-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.result-panel :deep(.el-table) {
+  border: 0;
+}
+
+.result-panel :deep(.el-table th.el-table__cell) {
+  background: rgba(248, 251, 255, 0.8);
+}
+
+.hint {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
 .empty-hint {
+  min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  color: var(--text-quaternary);
-  font-size: 12px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.5);
+  font-size: 13px;
+  color: var(--text-tertiary);
 }
-.meta-row { display:flex; gap:8px; margin-bottom:12px; align-items:center; flex-wrap:wrap; }
-.history-card { margin-top:20px; }
-.sub-title { font-weight:600; font-size:13px; margin-bottom:8px; color: var(--text-primary); }
-.history-list { display:flex; flex-direction:column; gap:8px; }
-.history-item {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  padding:8px 10px;
-  border:1px solid rgba(15, 23, 42, 0.08);
-  border-radius:10px;
-  cursor:pointer;
-  background: rgba(255,255,255,0.74);
-}
-.history-item:hover .history-text { color:var(--accent-blue); }
-.history-text { color:var(--text-primary); word-break:break-all; }
-.hint {
-  font-size:12px;
-  color:var(--text-tertiary);
-  padding: 10px 12px;
-  background: rgba(255,255,255,0.64);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
+
+@media (max-width: 1100px) {
+  .content-area { grid-template-columns: 1fr; }
+  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
 }
 </style>

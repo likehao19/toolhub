@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="header-bar" data-tauri-drag-region>
     <div class="header-content" data-tauri-drag-region>
       <div class="header-left" data-tauri-drag-region>
@@ -135,7 +135,7 @@ const searchResults = ref({
 const searchHistory = ref([])
 let searchTimeout = null
 
-// 置顶窗口
+// 缃《绐楀彛
 const handlePin = async () => {
   try {
     isPinned.value = !isPinned.value
@@ -143,14 +143,14 @@ const handlePin = async () => {
   } catch (e) { /* ignore */ }
 }
 
-// 最小化
+// 鏈€灏忓寲
 const handleMinimize = async () => {
   try {
     await TauriWindow.minimize()
   } catch (e) { /* ignore */ }
 }
 
-// 最大化/还原
+// 鏈€澶у寲/杩樺師
 const handleToggleMaximize = async () => {
   try {
     if (isMaximized.value) {
@@ -162,14 +162,14 @@ const handleToggleMaximize = async () => {
   } catch (e) { /* ignore */ }
 }
 
-// 关闭
+// 鍏抽棴
 const handleClose = async () => {
   try {
     await TauriWindow.close()
   } catch (e) { /* ignore */ }
 }
 
-// 全局搜索
+// 鍏ㄥ眬鎼滅储
 const handleGlobalSearch = () => {
   if (searchTimeout) {
     clearTimeout(searchTimeout)
@@ -192,22 +192,22 @@ const handleGlobalSearch = () => {
   }, 300)
 }
 
-// 处理搜索框失焦
+// 澶勭悊鎼滅储妗嗗け鐒?
 const handleSearchBlur = () => {
-  // 延迟隐藏，允许点击搜索结果
+  // 寤惰繜闅愯棌锛屽厑璁哥偣鍑绘悳绱㈢粨鏋?
   setTimeout(() => {
     showSearchResults.value = false
   }, 200)
 }
 
-// 高亮文本
+// 楂樹寒鏂囨湰
 const highlightText = (text, query) => {
   if (!text || !query) return text
   const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi')
   return text.replace(regex, '<mark>$1</mark>')
 }
 
-// 获取模块名称
+// 鑾峰彇妯″潡鍚嶇О
 const getModuleName = (module) => {
   const names = {
     notes: t('header.notes'),
@@ -219,7 +219,7 @@ const getModuleName = (module) => {
   return names[module] || module
 }
 
-// 处理搜索结果项点击
+// 澶勭悊鎼滅储缁撴灉椤圭偣鍑?
 const handleSearchItemClick = (result) => {
   const item = result.item
   showSearchResults.value = false
@@ -237,7 +237,7 @@ const handleSearchItemClick = (result) => {
   }
 }
 
-// 查看全部结果
+// 鏌ョ湅鍏ㄩ儴缁撴灉
 const viewAllResults = (module) => {
   showSearchResults.value = false
   const routes = {
@@ -252,25 +252,25 @@ const viewAllResults = (module) => {
   }
 }
 
-// 应用搜索历史
+// 搴旂敤鎼滅储鍘嗗彶
 const applySearchHistory = (query) => {
   searchQuery.value = query
   showSearchResults.value = true
   handleGlobalSearch()
 }
 
-// 加载搜索历史
+// 鍔犺浇鎼滅储鍘嗗彶
 const loadSearchHistory = async () => {
   try {
     searchHistory.value = await searchAPI.getSearchHistory('global', 5)
   } catch (e) { /* ignore */ }
 }
 
-// 键盘快捷键
+// 閿洏蹇嵎閿?
 const handleKeyDown = (event) => {
   if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
     event.preventDefault()
-    // 聚焦搜索框
+    // 鑱氱劍鎼滅储妗?
     const searchInput = document.querySelector('.global-search input')
     if (searchInput) {
       searchInput.focus()
@@ -279,7 +279,7 @@ const handleKeyDown = (event) => {
   }
 }
 
-// 检查窗口状态
+// 妫€鏌ョ獥鍙ｇ姸鎬?
 onMounted(async () => {
   try {
     isMaximized.value = await TauriWindow.isMaximized()
@@ -300,9 +300,9 @@ onUnmounted(() => {
 <style scoped>
 .header-bar {
   height: var(--header-height);
-  background: color-mix(in srgb, var(--surface-panel) 86%, transparent 14%);
-  border-bottom: 1px solid var(--divider);
-  backdrop-filter: saturate(160%) blur(18px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(248, 251, 255, 0.84) 100%);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 88%, #dbe7f6 12%);
+  backdrop-filter: saturate(165%) blur(16px);
   user-select: none;
   -webkit-app-region: drag;
   position: fixed;
@@ -317,14 +317,14 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   height: 100%;
-  padding: 0 var(--space-md);
+  padding: 0 10px;
   -webkit-app-region: drag;
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 10px;
   -webkit-app-region: drag;
 }
 
@@ -332,81 +332,86 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #3f7ff0 0%, #2f6fe4 100%);
+  box-shadow: 0 8px 18px rgba(47, 111, 228, 0.22);
   -webkit-app-region: drag;
-  margin-left: var(--space-xs);
+  margin-left: 2px;
 }
 
 .app-logo svg {
   display: block;
+  width: 16px;
+  height: 16px;
 }
 
-/* Logo 单色系统蓝 */
 .app-logo svg path {
-  fill: var(--accent-blue);
+  fill: rgba(255, 255, 255, 0.96);
 }
 
 .app-logo svg circle {
-  fill: #ffffff;
+  fill: rgba(47, 111, 228, 0.9);
 }
 
-/* 应用名称：纯色，semibold，移除渐变 */
 .app-name {
-  font-size: var(--font-size-footnote);
+  font-size: 13px;
   font-weight: var(--font-weight-semibold);
-  color: color-mix(in srgb, var(--text-primary) 92%, #111827 8%);
-  letter-spacing: 0.02em;
+  color: #0f172a;
+  letter-spacing: 0.03em;
   -webkit-app-region: drag;
-  background: none;
-  -webkit-text-fill-color: var(--text-primary);
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid color-mix(in srgb, var(--border-color) 70%, #e9eff7 30%);
+  -webkit-text-fill-color: #0f172a;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 6px;
   -webkit-app-region: no-drag;
 }
 
-/* 窗口控制按钮 */
 .header-button {
   width: 31px;
   height: 31px;
-  border: none;
-  background: color-mix(in srgb, var(--surface-panel-soft) 88%, transparent 12%);
+  border: 1px solid color-mix(in srgb, var(--border-color) 86%, #d9e4f2 14%);
+  background: rgba(255, 255, 255, 0.72);
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background var(--transition-fast), transform var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
-  color: var(--text-secondary);
-  border: 1px solid var(--divider);
+  color: #475569;
 }
 
 .header-button:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-  transform: var(--interactive-lift);
-  box-shadow: var(--shadow-sm);
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
 }
 
-/* 关闭按钮特殊处理 */
 .header-button.close-button:hover {
   background: var(--color-red);
   color: #ffffff;
+  border-color: transparent;
 }
 
 .header-button.pin-button.active {
-  color: var(--accent-blue);
-  border-color: color-mix(in srgb, var(--accent-blue) 40%, var(--divider) 60%);
-  background: color-mix(in srgb, var(--accent-blue-bg) 80%, transparent 20%);
+  color: #2f6fe4;
+  border-color: rgba(47, 111, 228, 0.38);
+  background: rgba(47, 111, 228, 0.12);
 }
 
 .header-button .el-icon {
   font-size: 14px;
 }
 
-/* 搜索框 */
 .global-search {
   position: relative;
   -webkit-app-region: no-drag;
@@ -414,30 +419,40 @@ onUnmounted(() => {
 
 .global-search :deep(.el-input) {
   width: 300px;
-  --el-input-bg-color: color-mix(in srgb, var(--surface-panel-soft) 84%, transparent 16%);
-  --el-input-border-color: var(--divider);
-  --el-input-hover-border-color: var(--border-color-strong);
-  --el-input-focus-border-color: var(--accent-blue);
+  --el-input-bg-color: rgba(255, 255, 255, 0.72);
+  --el-input-border-color: color-mix(in srgb, var(--border-color) 85%, #dce7f6 15%);
+  --el-input-hover-border-color: #b7c8dd;
+  --el-input-focus-border-color: #2f6fe4;
 }
 
 .global-search :deep(.el-input__wrapper) {
   box-shadow: none !important;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--divider);
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 85%, #dce7f6 15%);
   min-height: 34px;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
-/* 搜索结果下拉面板 */
+.global-search :deep(.el-input__wrapper:hover) {
+  border-color: #b7c8dd;
+}
+
+.global-search :deep(.el-input__wrapper.is-focus) {
+  border-color: #2f6fe4;
+  box-shadow: 0 0 0 2px rgba(47, 111, 228, 0.14) !important;
+}
+
 .search-results {
   position: absolute;
   top: 100%;
   left: 0;
   right: 0;
-  margin-top: 10px;
-  background: color-mix(in srgb, var(--surface-panel) 90%, transparent 10%);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-popover);
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid color-mix(in srgb, var(--border-color) 90%, #dce6f4 10%);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(12px);
   max-height: 500px;
   overflow-y: auto;
   z-index: 1000;
@@ -455,11 +470,11 @@ onUnmounted(() => {
 }
 
 .search-results-content {
-  padding: var(--space-sm);
+  padding: 8px;
 }
 
 .search-module {
-  margin-bottom: var(--space-lg);
+  margin-bottom: 12px;
 }
 
 .search-module:last-child {
@@ -469,13 +484,13 @@ onUnmounted(() => {
 .module-header {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  gap: 8px;
+  padding: 8px 10px;
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-body);
+  font-size: 13px;
   color: var(--text-primary);
-  border-bottom: 0.5px solid var(--border-color);
-  margin-bottom: var(--space-sm);
+  border-bottom: 1px solid rgba(223, 231, 241, 0.85);
+  margin-bottom: 6px;
 }
 
 .module-count {
@@ -485,19 +500,20 @@ onUnmounted(() => {
 }
 
 .module-items {
-  padding: 0 var(--space-sm);
+  padding: 0 6px;
 }
 
 .search-item {
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  padding: 10px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background var(--transition-fast), transform var(--transition-fast);
+  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .search-item:hover {
-  background: color-mix(in srgb, var(--accent-blue-bg) 60%, transparent 40%);
-  transform: var(--interactive-lift);
+  background: rgba(47, 111, 228, 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
 }
 
 .item-title {
@@ -507,7 +523,7 @@ onUnmounted(() => {
 }
 
 .item-title mark {
-  background: rgba(255,204,0,0.25);
+  background: rgba(255, 204, 0, 0.25);
   color: inherit;
   padding: 0 2px;
   border-radius: 2px;
@@ -520,7 +536,7 @@ onUnmounted(() => {
 }
 
 .item-desc mark {
-  background: rgba(255,204,0,0.25);
+  background: rgba(255, 204, 0, 0.25);
   color: inherit;
   padding: 0 2px;
   border-radius: 2px;
@@ -532,18 +548,18 @@ onUnmounted(() => {
 }
 
 .more-results {
-  padding: var(--space-sm);
+  padding: 8px;
   text-align: center;
   color: var(--accent-blue);
   cursor: pointer;
   font-size: var(--font-size-caption);
-  border-top: 0.5px solid var(--border-color);
-  margin-top: var(--space-sm);
+  border-top: 1px solid rgba(223, 231, 241, 0.85);
+  margin-top: 6px;
   transition: background var(--transition-fast);
 }
 
 .more-results:hover {
-  background: var(--bg-tertiary);
+  background: rgba(47, 111, 228, 0.07);
 }
 
 .search-history {
@@ -562,20 +578,37 @@ onUnmounted(() => {
 .history-item {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm);
+  gap: 8px;
+  padding: 8px 10px;
   cursor: pointer;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   transition: background var(--transition-fast), transform var(--transition-fast);
 }
 
 .history-item:hover {
-  background: color-mix(in srgb, var(--accent-blue-bg) 55%, transparent 45%);
-  transform: var(--interactive-lift);
+  background: rgba(47, 111, 228, 0.08);
+  transform: translateY(-1px);
 }
 
 .history-item .el-icon {
   color: var(--text-tertiary);
 }
+
+@media (max-width: 1220px) {
+  .global-search :deep(.el-input) {
+    width: 240px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .app-name {
+    display: none;
+  }
+
+  .global-search :deep(.el-input) {
+    width: 200px;
+  }
+}
 </style>
+
 

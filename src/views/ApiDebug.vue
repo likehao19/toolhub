@@ -37,10 +37,13 @@
               </div>
 
               <div v-if="sidebarTab === 'collections'" class="sidebar-list">
-                <div class="sidebar-toolbar">
-                  <el-button size="small" text type="primary" @click="onCreateCollection">+ {{ t('apiDebug.newCollection') }}</el-button>
-                  <el-button size="small" text @click="onCreateFolderAtSelection">+ {{ t('apiDebug.newFolder') }}</el-button>
-                  <el-button size="small" text @click="onCreateInterfaceAtSelection">+ {{ t('apiDebug.newInterface') }}</el-button>
+                <div class="sidebar-toolbar sidebar-toolbar-create">
+                  <div class="create-actions-grid">
+                    <el-button size="small" class="create-action-btn" type="primary" @click="onCreateCollection">
+                      <el-icon><CollectionTag /></el-icon>
+                      <span>{{ t('apiDebug.newCollection') }}</span>
+                    </el-button>
+                  </div>
                 </div>
                 <el-tree
                   v-if="collectionTree.length"
@@ -112,25 +115,27 @@
               </el-option>
             </el-select>
             <el-input v-model="reqUrl" class="url-input" :placeholder="'https://api.example.com/users'" @keydown.ctrl.enter="doSend" clearable />
-            <el-button type="primary" :loading="sending" @click="doSend" :disabled="!reqUrl.trim()">
-              {{ sending ? t('apiDebug.sending') : t('apiDebug.send') }}
-            </el-button>
-            <el-button v-if="sending" @click="doCancel" type="danger" plain>
-              {{ t('apiDebug.cancel') }}
-            </el-button>
-            <el-dropdown trigger="click" @command="onUrlMenuCmd">
-              <el-button><el-icon><ArrowDown /></el-icon></el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="save">{{ t('apiDebug.saveToCollection') }}</el-dropdown-item>
-                  <el-dropdown-item command="curl">{{ t('apiDebug.copyCurl') }}</el-dropdown-item>
-                  <el-dropdown-item command="importCurl">{{ t('apiDebug.importCurl') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+            <div class="url-actions">
+              <el-button type="primary" :loading="sending" @click="doSend" :disabled="!reqUrl.trim()">
+                {{ sending ? t('apiDebug.sending') : t('apiDebug.send') }}
+              </el-button>
+              <el-button v-if="sending" @click="doCancel" type="danger" plain>
+                {{ t('apiDebug.cancel') }}
+              </el-button>
+              <el-dropdown trigger="click" @command="onUrlMenuCmd">
+                <el-button class="url-more-btn"><el-icon><ArrowDown /></el-icon></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="save">{{ t('apiDebug.saveToCollection') }}</el-dropdown-item>
+                    <el-dropdown-item command="curl">{{ t('apiDebug.copyCurl') }}</el-dropdown-item>
+                    <el-dropdown-item command="importCurl">{{ t('apiDebug.importCurl') }}</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
           </div>
 
-          <div class="split-panels" :style="splitPanelsStyle">
+          <div class="split-panels">
             <div class="request-panel">
               <el-tabs v-model="reqTab" class="compact-tabs">
                 <el-tab-pane :label="`Params${activeParamsCount ? ' (' + activeParamsCount + ')' : ''}`" name="params">
@@ -211,8 +216,6 @@
                 </el-tab-pane>
               </el-tabs>
             </div>
-
-            <div class="panel-resizer" @mousedown="startPanelResize"></div>
 
             <div class="response-panel">
               <div v-if="!response && !sending" class="response-empty">
@@ -342,7 +345,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading } from '@element-plus/icons-vue'
+import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading, CollectionTag } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { sendRequest, cancelRequest } from '@/utils/apiWorkbench/httpEngine'
 import { formatSize, METHOD_COLORS, COMMON_HEADERS, tryFormatJson, isJson, buildUrl, buildAuthHeader } from '@/utils/apiWorkbench/shared'
@@ -386,7 +389,6 @@ const reqTab = ref('params')
 const reqParams = ref([{ key: '', value: '', enabled: true }])
 const reqHeaders = ref([{ key: '', value: '', enabled: true }])
 const reqBody = ref({ type: 'none', content: '', formData: [{ key: '', value: '', enabled: true }] })
-const requestPanelHeight = ref(45)
 const reqAuth = ref({ type: 'none', token: '', username: '', password: '', key: '', value: '', position: 'header' })
 
 const activeParamsCount = computed(() => reqParams.value.filter(p => p.enabled && p.key).length)
@@ -398,7 +400,6 @@ const responseError = ref(null)
 const requestCanceled = ref(false)
 const resTab = ref('body')
 const resBodyMode = ref('pretty')
-const splitPanelsStyle = computed(() => ({ '--request-panel-height': requestPanelHeight.value + '%' }))
 
 const prettyBody = computed(() => {
   if (!response.value?.body) return ''
@@ -773,25 +774,6 @@ function normalizeRequestUrl(url) {
   return trimmed
 }
 
-function startPanelResize(event) {
-  const wrapper = event.currentTarget?.parentElement
-  if (!wrapper) return
-  const rect = wrapper.getBoundingClientRect()
-
-  const handleMove = (moveEvent) => {
-    const nextPercent = ((moveEvent.clientY - rect.top) / rect.height) * 100
-    requestPanelHeight.value = Math.min(75, Math.max(25, nextPercent))
-  }
-
-  const handleUp = () => {
-    window.removeEventListener('mousemove', handleMove)
-    window.removeEventListener('mouseup', handleUp)
-  }
-
-  window.addEventListener('mousemove', handleMove)
-  window.addEventListener('mouseup', handleUp)
-}
-
 function formatBodyJson() {
   if (reqBody.value.content) reqBody.value.content = tryFormatJson(reqBody.value.content)
 }
@@ -949,25 +931,55 @@ onMounted(() => {
 .response-toolbar :deep(.el-button) {
   --el-button-border-radius: 10px;
 }
+.api-debug-wrapper :deep(.el-button) {
+  font-weight: 650;
+  letter-spacing: 0;
+}
+.api-debug-wrapper :deep(.el-button--primary) {
+  color: #fff;
+  background: linear-gradient(180deg, #4c82e6 0%, #316bd0 100%);
+  border-color: rgba(49, 107, 208, 0.85);
+  box-shadow: 0 6px 14px rgba(49, 107, 208, 0.18), inset 0 1px 0 rgba(255,255,255,0.26);
+}
+.api-debug-wrapper :deep(.el-button--primary:hover) {
+  color: #fff;
+  background: linear-gradient(180deg, #5a8dea 0%, #3a72d6 100%);
+  border-color: rgba(58, 114, 214, 0.9);
+}
+.api-debug-wrapper :deep(.el-button--default) {
+  color: #314155;
+  background: rgba(255,255,255,0.68);
+  border-color: rgba(100, 116, 139, 0.16);
+}
+.api-debug-wrapper :deep(.el-button--default:hover) {
+  color: #245fca;
+  background: rgba(255,255,255,0.88);
+  border-color: rgba(74, 120, 217, 0.32);
+}
 .content-area {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin: 14px 18px 0;
-  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px 18px 0 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 .debug-layout {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
   flex: 1;
   min-height: 0;
-  padding: 20px;
-  gap: 18px;
+  padding: 0;
+  gap: 0;
+}
+.sidebar-area.collapsed {
+  width: 0;
 }
 .sidebar-area {
   position: relative;
@@ -975,24 +987,24 @@ onMounted(() => {
   min-height: 0;
 }
 .left-sidebar {
-  width: 280px; min-width: 280px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  width: 260px; min-width: 260px;
+  background: linear-gradient(180deg, rgba(248, 252, 255, 0.72), rgba(241, 247, 252, 0.52));
   display: flex; flex-direction: column; position: relative;
   transition: width 0.2s, min-width 0.2s;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  border: 0;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0;
+  box-shadow: none;
 }
 .left-sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; border-width: 0; }
 .sidebar-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 .sidebar-toggle {
-  position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
-  width: 24px; height: 56px; display: flex; align-items: center; justify-content: center;
+  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+  width: 20px; height: 48px; display: flex; align-items: center; justify-content: center;
   cursor: pointer; background: rgba(255, 255, 255, 0.98);
   border: 1px solid rgba(15, 23, 42, 0.08); border-left: none;
-  border-radius: 0 10px 10px 0; z-index: 10; color: var(--text-tertiary); font-size: 12px;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  border-radius: 0 8px 8px 0; z-index: 10; color: var(--text-tertiary); font-size: 11px;
+  box-shadow: none;
 }
 .sidebar-toggle:hover { color: var(--accent-blue); }
 .sidebar-tabs { display: flex; padding: 10px 10px 8px; gap: 6px; }
@@ -1008,7 +1020,53 @@ onMounted(() => {
   box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
 }
 .sidebar-list { flex: 1; overflow-y: auto; padding: 4px 8px 8px; }
-.sidebar-toolbar { padding: 6px 4px 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.sidebar-toolbar {
+  padding: 6px 4px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sidebar-toolbar-create {
+  display: block;
+  padding: 8px 6px 10px;
+}
+.create-actions-grid {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+.create-action-btn {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(49, 107, 208, 0.2);
+  background: rgba(74, 120, 217, 0.1);
+  color: #245fca;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.2;
+  box-shadow: none;
+}
+.create-action-btn :deep(.el-icon) {
+  margin-right: 4px;
+  margin-bottom: 0;
+  font-size: 14px;
+}
+.create-action-btn :deep(span) {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+.create-action-btn:hover {
+  border-color: rgba(49, 107, 208, 0.28);
+  background: rgba(74, 120, 217, 0.15);
+  color: #245fca;
+}
 .collection-tree-row {
   display: flex;
   align-items: center;
@@ -1073,36 +1131,85 @@ onMounted(() => {
   background: rgba(255,255,255,0.52);
 }
 .main-panel {
+  width: 100%;
   min-width: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 18px 0;
-  background: rgba(255,255,255,0.92);
-  box-shadow: 0 10px 30px rgba(15,23,42,0.05);
+  border: 0;
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(252,253,255,0.7), rgba(246,249,252,0.5));
+  box-shadow: none;
 }
 .url-bar {
-  display: flex; align-items: center; gap: 8px; padding: 12px 16px;
-  background: rgba(255,255,255,0.62); border-bottom: 1px solid rgba(15, 23, 42, 0.08); flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: rgba(255,255,255,0.58); border-bottom: 1px solid rgba(100, 116, 139, 0.12); flex-shrink: 0;
+}
+.url-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+  padding: 4px;
+  border: 1px solid rgba(100, 116, 139, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.5);
+}
+.url-actions :deep(.el-button) {
+  min-width: 74px;
+  height: 32px;
+  padding: 0 13px;
+}
+.url-actions :deep(.el-button--primary) {
+  min-width: 86px;
+}
+.url-more-btn {
+  min-width: 32px !important;
+  padding: 0 8px !important;
+  color: #526174 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 .method-select { width: 110px; flex-shrink: 0; }
 .method-select :deep(.el-input__inner) { font-weight: 700; }
 .url-input { flex: 1; }
 .url-input :deep(.el-input__inner) { font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
-.split-panels { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; --request-panel-height: 45%; }
-.request-panel {
-  flex: 0 0 var(--request-panel-height); min-height: 180px; overflow-y: auto;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08); background: transparent;
+.split-panels {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
-.panel-resizer { height: 8px; cursor: row-resize; background: linear-gradient(180deg, transparent, rgba(15, 23, 42, 0.08), transparent); flex-shrink: 0; }
-.response-panel { flex: 1; overflow-y: auto; background: transparent; display: flex; flex-direction: column; min-height: 0; }
-.compact-tabs :deep(.el-tabs__header) { margin: 0; padding: 0 16px; }
+.request-panel {
+  flex: 0 0 45%;
+  width: 100%;
+  min-width: 0;
+  min-height: 180px;
+  overflow-y: auto;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12); background: rgba(255,255,255,0.24);
+}
+.panel-resizer { display: none; }
+.response-panel {
+  flex: 1 1 55%;
+  width: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.compact-tabs :deep(.el-tabs__header) { margin: 0; padding: 0 12px; }
 .compact-tabs :deep(.el-tabs__item) { height: 36px; line-height: 36px; font-size: 12px; padding: 0 12px; }
 .compact-tabs :deep(.el-tabs__content) { padding: 0; }
-.compact-tabs :deep(.el-tab-pane) { padding: 0 16px 10px; }
+.compact-tabs :deep(.el-tab-pane) { padding: 0 12px 10px; }
 .kv-editor { padding: 6px 0; }
-.kv-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.kv-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; min-height: 30px; }
 .kv-header-row { margin-bottom: 8px; }
 .kv-delete { flex-shrink: 0; font-size: 14px; color: var(--text-quaternary); cursor: pointer; }
 .kv-delete:hover { color: var(--el-color-danger); }
@@ -1129,7 +1236,7 @@ onMounted(() => {
 .response-empty-hint { font-size: 11px; }
 .response-loading { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-tertiary); }
 .response-status-bar {
-  display: flex; align-items: center; gap: 12px; padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px; padding: 8px 12px;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08); flex-shrink: 0;
 }
 .status-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
@@ -1151,9 +1258,9 @@ onMounted(() => {
 .env-list-bar { display: flex; gap: 8px; }
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 16px; padding: 0 16px;
-  margin: 0 18px 18px;
+  margin: 0;
   background: rgba(255,255,255,0.72); border: 1px solid rgba(15, 23, 42, 0.08); border-top: none;
-  border-radius: 0 0 18px 18px;
+  border-radius: 0;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
 }
 .sidebar-list::-webkit-scrollbar, .response-body::-webkit-scrollbar,
@@ -1174,5 +1281,6 @@ onMounted(() => {
   .left-sidebar { width: 220px; min-width: 220px; }
 }
 </style>
+
 
 

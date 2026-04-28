@@ -29,10 +29,6 @@
           <el-icon><Delete /></el-icon>
           {{ t('common.clear') }}
         </el-button>
-        <el-button size="small" type="primary" @click="runAiAnalysis" :disabled="!canRunAi || aiLoading">
-          <el-icon><MagicStick /></el-icon>
-          {{ t('logAnalyzer.aiAnalyze') }}
-        </el-button>
       </div>
     </div>
 
@@ -161,7 +157,7 @@
             <div class="section-header">
               <span>{{ t('logAnalyzer.parseFailed') }}</span>
             </div>
-            <div class="error-text">{{ activeLog.error || t('logAnalyzer.aiFailed') }}</div>
+            <div class="error-text">{{ activeLog.error || t('logAnalyzer.parseFailed') }}</div>
           </div>
 
           <template v-else>
@@ -337,30 +333,13 @@
         <el-empty v-else :description="t('logAnalyzer.emptyState')" />
       </main>
     </div>
-
-    <el-drawer
-      v-model="showAiDrawer"
-      :title="t('logAnalyzer.aiAnalysisDrawerTitle')"
-      size="42%"
-      append-to-body
-      :destroy-on-close="false"
-    >
-      <div class="ai-drawer-content">
-        <div class="ai-meta" v-if="matchedSourceSnippets.length">
-          {{ t('logAnalyzer.aiUsingSources', { count: matchedSourceSnippets.length }) }}
-        </div>
-        <el-skeleton v-if="aiLoading" :rows="10" animated />
-        <div v-else-if="aiResult" class="ai-result">{{ aiResult }}</div>
-        <el-empty v-else :description="t('logAnalyzer.noAiResult')" :image-size="60" />
-      </div>
-    </el-drawer>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Document, Upload, FolderOpened, Delete, Search, MagicStick } from '@element-plus/icons-vue'
+import { Document, Upload, FolderOpened, Delete, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { t } from '@/i18n'
@@ -368,9 +347,8 @@ import { openFiles, selectFolder } from '@/utils/tauri/dialog'
 import { readTextFile } from '@/utils/tauri/fileOps'
 import { readDir } from '@tauri-apps/plugin-fs'
 import { join } from '@tauri-apps/api/path'
-import { highlightLogText, buildLogAiPayload } from '@/utils/logAnalysis'
+import { highlightLogText } from '@/utils/logAnalysis'
 import { parseJavaSourceMeta, buildSourceSnippets } from '@/utils/sourceContextAnalysis'
-import { analyzeJavaLogWithSources } from '@/services/aiService'
 import {
   openLogAnalysisSession,
   getLogAnalysisSummary,
@@ -381,8 +359,6 @@ import {
 } from '@/utils/tauri/logAnalysis'
 
 const MATCHED_SOURCE_LIMIT = 8
-const AI_SOURCE_LIMIT = 6
-const AI_BLOCK_LIMIT = 8
 const SEARCH_HISTORY_KEY = 'log_analyzer_search_history'
 const SEARCH_HISTORY_MAX = 10
 const DEBOUNCE_MS = 300
@@ -402,12 +378,9 @@ const pageSize = ref(50)
 const blockPage = ref(createEmptyBlockPage())
 const loadingBlocks = ref(false)
 const loadingDetail = ref(false)
-const showAiDrawer = ref(false)
 const keyword = ref('')
 const debouncedKeyword = ref('')
 const filterMode = ref('issues')
-const aiResult = ref('')
-const aiLoading = ref(false)
 const showHistory = ref(false)
 const searchHistoryList = ref([])
 const detailCache = ref(new Map())
@@ -439,7 +412,6 @@ const matchedSourceSnippets = computed(() => {
     }
   )
 })
-const aiMatchedSources = computed(() => matchedSourceSnippets.value.slice(0, AI_SOURCE_LIMIT))
 const activeSourceSnippet = computed(() => {
   if (!matchedSourceSnippets.value.length) return null
   return matchedSourceSnippets.value.find(item => item.sourceKey === activeSourceKey.value) || null
@@ -449,7 +421,6 @@ const selectedBlockHtml = computed(() => {
   if (!selectedBlockDetail.value) return ''
   return highlightLogText({ ...selectedBlockDetail.value.summary, rawText: selectedBlockDetail.value.rawText }, debouncedKeyword.value)
 })
-const canRunAi = computed(() => activeLog.value?.status === 'ready')
 const analysisHint = computed(() => {
   if (!activeLog.value) return ''
   if (activeLog.value.status === 'indexing') return t('logAnalyzer.indexingHint')
@@ -461,7 +432,6 @@ const analysisHint = computed(() => {
 watch(activeLogPath, async () => {
   selectedBlockId.value = ''
   selectedBlockDetail.value = null
-  aiResult.value = ''
   currentPage.value = 1
   blockPage.value = createEmptyBlockPage()
   if (activeLog.value?.status === 'ready') {
@@ -891,45 +861,6 @@ function tagType(block) {
   return 'info'
 }
 
-async function collectAiBlockDetails() {
-  const ids = []
-  if (selectedBlockId.value) ids.push(selectedBlockId.value)
-  ;(activeSummary.value.rootCauseCandidates || []).forEach(item => ids.push(item.id))
-  ;(blockPage.value.items || []).slice(0, AI_BLOCK_LIMIT).forEach(item => ids.push(item.id))
-  const uniqueIds = Array.from(new Set(ids)).slice(0, AI_BLOCK_LIMIT)
-  const details = []
-  for (const id of uniqueIds) {
-    try {
-      const detail = await fetchBlockDetail(id)
-      if (detail) details.push(detail)
-    } catch {
-      // ignore per-block failures for AI payload assembly
-    }
-  }
-  return details
-}
-
-async function runAiAnalysis() {
-  if (!canRunAi.value) return
-  showAiDrawer.value = true
-  aiLoading.value = true
-  aiResult.value = ''
-  try {
-    const details = await collectAiBlockDetails()
-    const payload = buildLogAiPayload(activeSummary.value, details, aiMatchedSources.value, {
-      keyword: debouncedKeyword.value,
-      mode: filterMode.value,
-      maxBlocks: AI_BLOCK_LIMIT,
-      maxSources: AI_SOURCE_LIMIT,
-    })
-    aiResult.value = await analyzeJavaLogWithSources(payload)
-  } catch (error) {
-    ElMessage.error(error.message || t('logAnalyzer.aiFailed'))
-  } finally {
-    aiLoading.value = false
-  }
-}
-
 async function cleanupLogEntry(file) {
   try {
     ;(file.unlisteners || []).forEach(unlisten => {
@@ -982,8 +913,6 @@ async function clearAll() {
   blockPage.value = createEmptyBlockPage()
   currentPage.value = 1
   pageSize.value = 50
-  showAiDrawer.value = false
-  aiResult.value = ''
   keyword.value = ''
   debouncedKeyword.value = ''
   filterMode.value = 'issues'
@@ -1294,10 +1223,6 @@ async function clearAll() {
 .matched-source-item.active { border-color: rgba(64, 158, 255, 0.35); }
 .candidate-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .source-snippet-panel { margin-top: 12px; }
-.ai-drawer-content { display: flex; flex-direction: column; gap: 12px; }
-.ai-meta { font-size: 12px; color: var(--text-tertiary); }
-.ai-result { white-space: pre-wrap; line-height: 1.7; color: var(--text-primary); }
-
 @media (max-width: 1280px) {
   .hero-cards,
   .analysis-columns,

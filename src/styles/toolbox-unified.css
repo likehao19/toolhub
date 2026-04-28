@@ -1,16 +1,17 @@
-/*
- * Toolbox tool pages unified shell styles.
- * Activated by `.app-content.toolbox-unified-shell` in App.vue.
+﻿/*
+ * Toolbox pages: strict unified shell layout.
+ * Active only under `.app-content.toolbox-unified-shell`.
  */
 
 .app-content.toolbox-unified-shell {
-  --tb-bg: #ffffff;
-  --tb-panel: #f8fafd;
-  --tb-card: #ffffff;
-  --tb-border: #e6ecf3;
+  --tb-bg: #f4f8fc;
+  --tb-bg-soft: #f8fbfe;
+  --tb-line: #dfe7f1;
+  --tb-line-strong: #cfd9e6;
   --tb-text: #0f172a;
-  --tb-text-muted: #64748b;
-  --tb-primary: #2563eb;
+  --tb-muted: #64748b;
+  --tb-primary: #2f6fe4;
+  --tb-hover: rgba(47, 111, 228, 0.05);
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -44,11 +45,102 @@
   .download-manager-wrapper,
   .ssh-terminal-wrapper
 ) {
+  height: 100%;
   min-height: 100%;
+  display: flex;
+  flex-direction: column;
   background:
-    radial-gradient(circle at 10% 0%, #f4f8ff 0%, transparent 36%),
-    radial-gradient(circle at 90% 8%, #f9fbff 0%, transparent 30%),
-    var(--tb-bg) !important;
+    radial-gradient(circle at 0% -10%, #eef5ff 0%, transparent 42%),
+    radial-gradient(circle at 100% 0%, #f1f7ff 0%, transparent 36%),
+    linear-gradient(180deg, var(--tb-bg-soft) 0%, var(--tb-bg) 100%) !important;
+  color: var(--tb-text);
+  overflow: hidden;
+}
+
+/* Unified top header strip */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  flex: 0 0 auto;
+  min-height: 58px;
+  padding: 0 18px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--tb-line-strong) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: rgba(248, 251, 255, 0.88) !important;
+  backdrop-filter: blur(18px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Toolbox page header internals: "工具箱 / 页面名" unified */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) :is(.header-left, .wp-header-left) {
+  display: flex !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -81,13 +173,11 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) > :is(.header, .wp-header, .page-header, .reader-header) {
-  min-height: 58px;
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--tb-border) !important;
-  background: #fff !important;
-  box-shadow: none !important;
-  backdrop-filter: none !important;
+) :is(.header-right, .wp-header-right) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -105,6 +195,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -119,7 +210,82 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) .page-eyebrow {
+) :is(.header-actions, .toolbar-actions) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) .page-title-block {
+  display: flex !important;
+  align-items: flex-start !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) :is(.page-eyebrow) {
   display: none !important;
 }
 
@@ -138,6 +304,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -152,14 +319,20 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) .breadcrumb {
+) :is(.breadcrumb, .header-title) {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0;
-  font-size: 14px;
-  font-weight: 500;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--tb-text) !important;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -177,6 +350,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -191,9 +365,11 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) .breadcrumb-link {
-  color: var(--tb-text) !important;
+) :is(.breadcrumb-link) {
+  color: var(--tb-primary) !important;
+  cursor: pointer !important;
   text-decoration: none !important;
+  transition: color 0.15s ease;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -211,6 +387,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -225,9 +402,9 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) .breadcrumb-link:hover {
-  color: var(--tb-text) !important;
-  opacity: 0.72;
+) :is(.breadcrumb-link:hover) {
+  color: var(--tb-primary) !important;
+  text-decoration: underline !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -245,39 +422,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) .breadcrumb :is(.el-icon, .icon, [class*="icon"]) {
-  display: none !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -293,8 +438,8 @@
   .download-manager-wrapper,
   .ssh-terminal-wrapper
 ) :is(.breadcrumb-sep, .breadcrumb-divider) {
-  margin: 0 2px;
-  color: #94a3b8 !important;
+  margin: 0 1px !important;
+  color: var(--tb-muted) !important;
   font-weight: 400 !important;
 }
 
@@ -313,6 +458,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -327,12 +473,8 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) > :is(.content-area, .main-container, .workspace-shell, .table-area) {
-  margin: 12px 14px 0;
-  border: 1px solid var(--tb-border) !important;
-  border-radius: 14px !important;
-  background: var(--tb-panel) !important;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05) !important;
+) :is(.breadcrumb-link, .breadcrumb-sep, .breadcrumb-divider) {
+  font-size: 15px !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -350,6 +492,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -364,15 +507,15 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) > :is(.filter-bar, .repo-bar, .status-bar, .empty-state) {
-  margin: 12px 14px 0;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid #e8edf4 !important;
+) .breadcrumb :is(.el-icon, .icon, [class*="icon"]) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  color: var(--tb-primary) !important;
+  font-size: 15px !important;
 }
 
+/* Unified content frame: no border/padding/card, only line separators */
 .app-content.toolbox-unified-shell :is(
   .toolbox-wrapper,
   .sdk-manager-wrapper,
@@ -388,6 +531,7 @@
   .perf-test-wrapper,
   .auto-test-wrapper,
   .ebook-shelf,
+  .ebook-reader,
   .screenshot-mgr-wrapper,
   .redis-client,
   .img-b64-wrapper,
@@ -402,608 +546,436 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) > :is(.filter-bar, .repo-bar) {
-  padding: 10px 12px;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) > .status-bar {
-  padding: 8px 12px;
-}
-
-/* For pages like CodeFormatter: sibling work areas use dividers, not cards */
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) > :is(
-  .toolbar,
-  .editor-area,
-  .status-bar,
-  .filter-bar,
-  .repo-bar,
-  .table-area,
-  .url-bar,
-  .request-area,
-  .response-area,
-  .action-bar,
-  .control-bar
-) {
-  margin: 0 14px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) > :is(
-  .toolbar,
-  .editor-area,
-  .status-bar,
-  .filter-bar,
-  .repo-bar,
-  .table-area,
-  .url-bar,
-  .request-area,
-  .response-area,
-  .action-bar,
-  .control-bar
-):last-child {
-  border-bottom: 0 !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) :is(.content-card, .panel, .panel-box, .tool-card) {
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 14px 0 !important;
+) > :not(.header):not(.page-header):not(.wp-header):not(.reader-header) {
   margin: 0 !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) :is(.content-card, .panel, .panel-box, .tool-card):last-child {
-  border-bottom: 0 !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) .el-card {
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) .el-card + .el-card {
-  border-top: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) .el-card__body {
-  padding: 14px 0 !important;
-}
-
-/* Fallback: enforce divider layout by structure for toolbox pages */
-.app-content.toolbox-unified-shell :is(.content-area, .main-container, .workspace-shell, .table-area) > :is(
-  [class*="card"],
-  [class*="panel"],
-  [class*="section"],
-  [class*="block"]
-) {
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding-top: 14px !important;
-  padding-bottom: 14px !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell :is(.content-area, .main-container, .workspace-shell, .table-area) > :is(
-  [class*="card"],
-  [class*="panel"],
-  [class*="section"],
-  [class*="block"]
-):last-child {
-  border-bottom: 0 !important;
-}
-
-.app-content.toolbox-unified-shell :is(.content-area, .main-container, .workspace-shell, .table-area) > :is(
-  [class*="card"],
-  [class*="panel"],
-  [class*="section"],
-  [class*="block"]
-) > :is(
-  [class*="card"],
-  [class*="panel"],
-  [class*="section"],
-  [class*="block"]
-) {
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding-top: 12px !important;
-  padding-bottom: 12px !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell :is(.content-area, .main-container, .workspace-shell, .table-area) > :is(
-  [class*="card"],
-  [class*="panel"],
-  [class*="section"],
-  [class*="block"]
-) > :is(
-  [class*="card"],
-  [class*="panel"],
-  [class*="section"],
-  [class*="block"]
-):last-child {
-  border-bottom: 0 !important;
-}
-
-/* Explicit multi-region toolbox pages: use divider sections instead of card blocks */
-.app-content.toolbox-unified-shell :is(.regex-wrapper, .hex-converter-wrapper, .code-fmt-wrapper) > :is(
-  .toolbar,
-  .regex-input-area,
-  .hint-row,
-  .summary-strip,
-  .main-area,
-  .editor-area,
-  .status-bar
-) {
-  margin: 0 14px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell :is(.regex-wrapper, .hex-converter-wrapper, .code-fmt-wrapper) > :is(
-  .toolbar,
-  .regex-input-area,
-  .hint-row,
-  .summary-strip,
-  .main-area,
-  .editor-area,
-  .status-bar
-):last-child {
-  border-bottom: 0 !important;
-}
-
-.app-content.toolbox-unified-shell :is(.regex-wrapper, .hex-converter-wrapper) > .main-area {
-  padding: 12px 0 0 !important;
-  gap: 0 !important;
-}
-
-.app-content.toolbox-unified-shell .regex-wrapper .main-area > :is(.text-panel, .result-panel),
-.app-content.toolbox-unified-shell .hex-converter-wrapper .main-area > :is(.panel, .input-panel, .output-panel) {
-  margin: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.app-content.toolbox-unified-shell .regex-wrapper .main-area > :not(:first-child),
-.app-content.toolbox-unified-shell .hex-converter-wrapper .main-area > :not(:first-child) {
-  border-left: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell .regex-wrapper .match-item {
-  margin: 0 !important;
-  padding: 12px 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell .regex-wrapper .result-scroll {
-  padding: 0 12px !important;
-}
-
-.app-content.toolbox-unified-shell .regex-wrapper .match-item:last-child {
-  border-bottom: 0 !important;
-}
-
-.app-content.toolbox-unified-shell .regex-wrapper .no-match {
-  margin: 12px 0 !important;
-  padding: 10px 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-}
-
-/* API Debug: cleaner white workbench */
-.app-content.toolbox-unified-shell .api-debug-wrapper > .content-area {
-  margin: 0 14px !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout {
   padding: 0 !important;
-  gap: 0 !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area {
-  border-right: 1px solid #e8edf4 !important;
-  background: transparent !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .left-sidebar,
-.app-content.toolbox-unified-shell .api-debug-wrapper .main-panel {
   border: 0 !important;
   border-radius: 0 !important;
-  background: transparent !important;
   box-shadow: none !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .main-panel {
-  border-left: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .url-bar,
-.app-content.toolbox-unified-shell .api-debug-wrapper .request-panel,
-.app-content.toolbox-unified-shell .api-debug-wrapper .response-status-bar,
-.app-content.toolbox-unified-shell .api-debug-wrapper .response-toolbar {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-  border-bottom: 1px solid #e8edf4 !important;
   background: transparent !important;
 }
 
-.app-content.toolbox-unified-shell .api-debug-wrapper .panel-resizer {
-  height: 10px !important;
-  background: linear-gradient(180deg, transparent, #e8edf4, transparent) !important;
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :not(.header):not(.page-header):not(.wp-header):not(.reader-header):not(:last-child) {
+  border-bottom: 1px solid var(--tb-line) !important;
 }
 
-.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tabs {
-  padding: 8px 8px 6px !important;
-  border-bottom: 1px solid #e8edf4 !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tab {
+/* Common section containers all become divider blocks */
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .workspace-shell,
+  .table-area,
+  .toolbar,
+  .editor-area,
+  .status-bar,
+  .filter-bar,
+  .repo-bar,
+  .url-bar,
+  .request-area,
+  .response-area,
+  .action-bar,
+  .control-bar,
+  .operation-area,
+  .code-area,
+  .input-area,
+  .output-area,
+  .preview-area,
+  .result-area,
+  .work-area,
+  .regex-input-area,
+  .hint-row,
+  .summary-strip,
+  .main-area,
+  .empty-state
+) {
+  margin: 0 !important;
+  padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
+  box-shadow: none !important;
   background: transparent !important;
 }
 
-.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tab.active {
-  border-bottom: 2px solid #2563eb !important;
-  color: #0f172a !important;
-  font-weight: 600 !important;
-  box-shadow: none !important;
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .workspace-shell,
+  .table-area,
+  .toolbar,
+  .editor-area,
+  .status-bar,
+  .filter-bar,
+  .repo-bar,
+  .url-bar,
+  .request-area,
+  .response-area,
+  .action-bar,
+  .control-bar,
+  .operation-area,
+  .code-area,
+  .input-area,
+  .output-area,
+  .preview-area,
+  .result-area,
+  .work-area,
+  .regex-input-area,
+  .hint-row,
+  .summary-strip,
+  .main-area,
+  .empty-state
+) > :not(:last-child) {
+  border-bottom: 1px solid var(--tb-line);
 }
 
+/* Remove cardized visuals everywhere inside toolbox pages */
+.app-content.toolbox-unified-shell :is(
+  .el-card,
+  .content-card,
+  .panel,
+  .panel-box,
+  .tool-card,
+  [class*="card"],
+  [class*="panel"],
+  [class*="section"],
+  [class*="block"]
+) {
+  margin: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .el-card,
+  .content-card,
+  .panel,
+  .panel-box,
+  .tool-card,
+  [class*="card"],
+  [class*="panel"],
+  [class*="section"],
+  [class*="block"]
+):not(:last-child) {
+  border-bottom: 1px solid var(--tb-line) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-card, .el-card__body) {
+  border: 0 !important;
+  padding: 0 !important;
+}
+
+/* Multi-column work areas keep only divider lines */
+.app-content.toolbox-unified-shell :is(
+  .main-area,
+  .work-area,
+  .content-area,
+  .workspace-shell,
+  .editor-area,
+  .debug-layout
+) > :is(
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .result-panel,
+  .left-sidebar,
+  .main-panel,
+  .sidebar-area,
+  .request-panel,
+  .response-panel
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .main-area,
+  .work-area,
+  .content-area,
+  .workspace-shell,
+  .editor-area,
+  .debug-layout
+) > :is(
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .result-panel,
+  .left-sidebar,
+  .main-panel,
+  .sidebar-area,
+  .request-panel,
+  .response-panel
+):not(:first-child) {
+  border-left: 1px solid var(--tb-line) !important;
+}
+
+/* API debug gets strict unified frame too */
+.app-content.toolbox-unified-shell .api-debug-wrapper .panel-resizer,
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tabs,
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tab,
 .app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-toolbar,
-.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-list {
-  padding-left: 8px !important;
-  padding-right: 8px !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper :is(.history-item, .collection-tree-row) {
-  border-radius: 0 !important;
-  border-bottom: 1px solid #eef2f7 !important;
-  background: transparent !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper :is(.history-item, .collection-tree-row):hover {
-  background: #f8fafc !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .response-empty {
-  margin: 12px !important;
-  border: 1px dashed #dbe3ee !important;
-  border-radius: 10px !important;
-  background: #fbfdff !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .response-empty-icon {
-  font-size: 34px !important;
-}
-
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-list,
+.app-content.toolbox-unified-shell .api-debug-wrapper .response-toolbar,
 .app-content.toolbox-unified-shell .api-debug-wrapper .response-body,
 .app-content.toolbox-unified-shell .api-debug-wrapper .response-headers-table,
-.app-content.toolbox-unified-shell .api-debug-wrapper .compact-tabs .el-tab-pane {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper .res-header-row {
-  border-bottom: 1px solid #eef2f7 !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper :is(.status-badge.ok, .history-status.ok) {
-  color: #16a34a !important;
-}
-
-.app-content.toolbox-unified-shell .api-debug-wrapper :is(.status-badge.err, .history-status.err) {
-  color: #dc2626 !important;
-}
-
-/* Generic toolbox multi-zone sections */
-.app-content.toolbox-unified-shell :is(
-  .toolbox-wrapper,
-  .sdk-manager-wrapper,
-  .port-manager-wrapper,
-  .network-tool-page,
-  .code-fmt-wrapper,
-  .git-manager-wrapper,
-  .git-report-wrapper,
-  .file-diff-wrapper,
-  .api-debug-wrapper,
-  .api-docs-wrapper,
-  .mock-service-wrapper,
-  .perf-test-wrapper,
-  .auto-test-wrapper,
-  .ebook-shelf,
-  .ebook-reader,
-  .screenshot-mgr-wrapper,
-  .redis-client,
-  .img-b64-wrapper,
-  .hex-converter-wrapper,
-  .img-cvt-wrapper,
-  .regex-wrapper,
-  .crypto-wrapper,
-  .sqlite-mgr,
-  .maven-wrapper,
-  .wallpaper-wrapper,
-  .log-analyzer-wrapper,
-  .hardware-info-page,
-  .download-manager-wrapper,
-  .ssh-terminal-wrapper
-) > :is(
-  .operation-area,
-  .code-area,
-  .input-area,
-  .output-area,
-  .preview-area,
-  .result-area,
-  .work-area
-) {
-  margin: 0 14px !important;
-  border: 0 !important;
+.app-content.toolbox-unified-shell .api-debug-wrapper .history-item,
+.app-content.toolbox-unified-shell .api-debug-wrapper .collection-tree-row,
+.app-content.toolbox-unified-shell .api-debug-wrapper .res-header-row,
+.app-content.toolbox-unified-shell .api-debug-wrapper .response-empty {
+  margin: 0 !important;
+  padding: 0 !important;
   border-radius: 0 !important;
-  background: transparent !important;
+  border: 0 !important;
   box-shadow: none !important;
-  border-bottom: 1px solid #e8edf4 !important;
+  background: transparent !important;
 }
 
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.history-item, .collection-tree-row, .res-header-row):not(:last-child) {
+  border-bottom: 1px solid var(--tb-line) !important;
+}
+
+/* Soft row polish: still divider layout, not cards */
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .workspace-shell,
+  .table-area,
+  .toolbar,
+  .editor-area,
+  .status-bar,
+  .filter-bar,
+  .repo-bar,
+  .url-bar,
+  .request-area,
+  .response-area,
+  .action-bar,
+  .control-bar,
+  .operation-area,
+  .code-area,
+  .input-area,
+  .output-area,
+  .preview-area,
+  .result-area,
+  .work-area,
+  .regex-input-area,
+  .hint-row,
+  .summary-strip,
+  .main-area,
+  .empty-state
+) > * {
+  transition: background-color 0.16s ease;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .workspace-shell,
+  .table-area,
+  .toolbar,
+  .editor-area,
+  .status-bar,
+  .filter-bar,
+  .repo-bar,
+  .url-bar,
+  .request-area,
+  .response-area,
+  .action-bar,
+  .control-bar,
+  .operation-area,
+  .code-area,
+  .input-area,
+  .output-area,
+  .preview-area,
+  .result-area,
+  .work-area,
+  .regex-input-area,
+  .hint-row,
+  .summary-strip,
+  .main-area,
+  .empty-state
+) > *:hover {
+  background: var(--tb-hover);
+}
+
+/* Shared controls style for all toolbox pages */
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-textarea__inner, .el-select__wrapper) {
+  border: 1px solid var(--tb-line) !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-textarea__inner, .el-select__wrapper):hover {
+  border-color: var(--tb-line-strong) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-textarea__inner:focus) {
+  border-color: var(--tb-primary) !important;
+  box-shadow: 0 0 0 2px rgba(47, 111, 228, 0.14) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button {
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  border-color: var(--tb-line) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--primary {
+  border-color: #2f6fe4 !important;
+  background: linear-gradient(180deg, #3b7cf0 0%, #2f6fe4 100%) !important;
+}
+
+/* Form controls polish (global toolbox pages) */
+.app-content.toolbox-unified-shell :is(.el-form-item__label) {
+  color: #475569 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-date-editor.el-input__wrapper) {
+  min-height: 36px !important;
+  border: 1px solid #d8e2ef !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper:hover, .el-select__wrapper:hover, .el-date-editor.el-input__wrapper:hover) {
+  border-color: #c1d0e2 !important;
+  background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus) {
+  border-color: #2f6fe4 !important;
+  box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.12) !important;
+  background: #ffffff !important;
+}
+
+.app-content.toolbox-unified-shell .el-input__inner {
+  color: #0f172a !important;
+  font-size: 13px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input__inner::placeholder {
+  color: #94a3b8 !important;
+}
+
+.app-content.toolbox-unified-shell .el-textarea__inner {
+  border: 1px solid #d8e2ef !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
+  padding: 10px 12px !important;
+  line-height: 1.6 !important;
+  font-size: 13px !important;
+  color: #0f172a !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.app-content.toolbox-unified-shell .el-textarea__inner:hover {
+  border-color: #c1d0e2 !important;
+}
+
+.app-content.toolbox-unified-shell .el-textarea__inner:focus {
+  border-color: #2f6fe4 !important;
+  box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.12) !important;
+  background: #ffffff !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number {
+  border: 1px solid #d8e2ef !important;
+  border-radius: 10px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button {
+  min-height: 34px !important;
+  padding: 0 14px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  color: #334155 !important;
+  border-color: #d5e0ec !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 255, 0.92)) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default:hover {
+  color: #0f172a !important;
+  border-color: #b9c9de !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--primary:hover {
+  box-shadow: 0 8px 18px rgba(47, 111, 228, 0.28) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.quick-actions, .action-row, .panel-actions, .repo-actions, .empty-actions) {
+  display: flex !important;
+  align-items: center;
+  gap: 8px !important;
+  flex-wrap: wrap;
+}
+
+.app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper) :is(.hint, .empty-hint) {
+  color: #64748b !important;
+  font-size: 12px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .log-item {
+  padding: 8px 0 !important;
+}
+
+/* Workspace layout polish for all toolbox pages (including WebSocket test) */
 .app-content.toolbox-unified-shell :is(
   .toolbox-wrapper,
   .sdk-manager-wrapper,
@@ -1034,143 +1006,133 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) > :is(
-  .operation-area,
-  .code-area,
-  .input-area,
-  .output-area,
-  .preview-area,
-  .result-area,
-  .work-area
-):last-child {
-  border-bottom: 0 !important;
+) :is(.content-area, .main-content, .bench-layout, .workspace-shell, .main-area, .work-area) {
+  gap: 0 !important;
+  padding: 0 !important;
 }
 
-.app-content.toolbox-unified-shell :is(.main-area, .work-area, .content-area, .workspace-shell, .editor-area) > :is(
-  .left-panel,
-  .right-panel,
-  .center-panel,
-  .input-panel,
-  .output-panel,
-  .text-panel,
-  .result-panel
+.app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper, .api-debug-wrapper, .git-manager-wrapper) :is(
+  .config-panel,
+  .result-panel,
+  .bench-config,
+  .bench-results,
+  .file-panel,
+  .diff-panel,
+  .left-sidebar,
+  .main-panel,
+  .sidebar-area,
+  .request-panel,
+  .response-panel
 ) {
   margin: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 12px 14px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper, .api-debug-wrapper, .git-manager-wrapper) :is(
+  .content-area,
+  .main-content,
+  .bench-layout,
+  .debug-layout
+) > :not(:first-child) {
+  border-left: 1px solid var(--tb-line) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper, .api-debug-wrapper, .git-manager-wrapper) :is(
+  .panel-title,
+  .result-title,
+  .sub-title,
+  .section-label
+) {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--tb-text) !important;
+  margin: 0 0 10px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper) :is(
+  .stat-card,
+  .history-item,
+  .log-item,
+  .empty-hint,
+  .history-card
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
-.app-content.toolbox-unified-shell :is(.main-area, .work-area, .content-area, .workspace-shell, .editor-area) > :is(
-  .left-panel,
-  .right-panel,
-  .center-panel,
-  .input-panel,
-  .output-panel,
-  .text-panel,
-  .result-panel
-):not(:first-child) {
-  border-left: 1px solid #e8edf4 !important;
+.app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper) :is(.stat-card, .history-item, .log-item):not(:last-child) {
+  border-bottom: 1px solid var(--tb-line) !important;
 }
 
-@media (max-width: 900px) {
-  .app-content.toolbox-unified-shell :is(
-    .toolbox-wrapper,
-    .sdk-manager-wrapper,
-    .port-manager-wrapper,
-    .network-tool-page,
-    .code-fmt-wrapper,
-    .git-manager-wrapper,
-    .git-report-wrapper,
-    .file-diff-wrapper,
-    .api-debug-wrapper,
-    .api-docs-wrapper,
-    .mock-service-wrapper,
-    .perf-test-wrapper,
-    .auto-test-wrapper,
-    .ebook-shelf,
-    .screenshot-mgr-wrapper,
-    .redis-client,
-    .img-b64-wrapper,
-    .hex-converter-wrapper,
-    .img-cvt-wrapper,
-    .regex-wrapper,
-    .crypto-wrapper,
-    .sqlite-mgr,
-    .maven-wrapper,
-    .wallpaper-wrapper,
-    .log-analyzer-wrapper,
-    .hardware-info-page,
-    .download-manager-wrapper,
-    .ssh-terminal-wrapper
-  ) > :is(.header, .wp-header, .page-header, .reader-header) {
-    min-height: 56px;
-    padding: 8px;
-  }
-
-  .app-content.toolbox-unified-shell :is(
-    .toolbox-wrapper,
-    .sdk-manager-wrapper,
-    .port-manager-wrapper,
-    .network-tool-page,
-    .code-fmt-wrapper,
-    .git-manager-wrapper,
-    .git-report-wrapper,
-    .file-diff-wrapper,
-    .api-debug-wrapper,
-    .api-docs-wrapper,
-    .mock-service-wrapper,
-    .perf-test-wrapper,
-    .auto-test-wrapper,
-    .ebook-shelf,
-    .screenshot-mgr-wrapper,
-    .redis-client,
-    .img-b64-wrapper,
-    .hex-converter-wrapper,
-    .img-cvt-wrapper,
-    .regex-wrapper,
-    .crypto-wrapper,
-    .sqlite-mgr,
-    .maven-wrapper,
-    .wallpaper-wrapper,
-    .log-analyzer-wrapper,
-    .hardware-info-page,
-    .download-manager-wrapper,
-    .ssh-terminal-wrapper
-  ) > :is(.content-area, .main-container, .workspace-shell, .table-area, .filter-bar, .repo-bar, .status-bar, .empty-state) {
-    margin: 10px 10px 0;
-  }
+.app-content.toolbox-unified-shell :is(.network-tool-page) :is(.config-panel, .result-panel) {
+  min-height: 0 !important;
+  overflow: auto !important;
 }
 
-@media (max-width: 1100px) {
-  .app-content.toolbox-unified-shell .hex-converter-wrapper .main-area > :not(:first-child) {
+.app-content.toolbox-unified-shell :is(.network-tool-page) .log-list {
+  border-top: 1px solid var(--tb-line) !important;
+  margin-top: 8px !important;
+}
+
+@media (max-width: 980px) {
+  .app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper, .api-debug-wrapper, .git-manager-wrapper) :is(
+    .content-area,
+    .main-content,
+    .bench-layout,
+    .debug-layout
+  ) > :not(:first-child) {
     border-left: 0 !important;
-    border-top: 1px solid #e8edf4 !important;
+    border-top: 1px solid var(--tb-line) !important;
   }
 }
 
 @media (max-width: 980px) {
-  .app-content.toolbox-unified-shell .regex-wrapper .main-area > :not(:first-child) {
-    border-left: 0 !important;
-    border-top: 1px solid #e8edf4 !important;
-  }
-
-  .app-content.toolbox-unified-shell :is(.main-area, .work-area, .content-area, .workspace-shell, .editor-area) > :is(
+  .app-content.toolbox-unified-shell :is(
+    .main-area,
+    .work-area,
+    .content-area,
+    .workspace-shell,
+    .editor-area,
+    .debug-layout
+  ) > :is(
     .left-panel,
     .right-panel,
     .center-panel,
     .input-panel,
     .output-panel,
     .text-panel,
-    .result-panel
+    .result-panel,
+    .left-sidebar,
+    .main-panel,
+    .sidebar-area,
+    .request-panel,
+    .response-panel
   ):not(:first-child) {
     border-left: 0 !important;
-    border-top: 1px solid #e8edf4 !important;
+    border-top: 1px solid var(--tb-line) !important;
   }
 }
 
-/* Final override: remove all inner spacing for toolbox pages */
+/* ==========================================================================
+   Final unified toolbox layout (layout-only override)
+   - Focuses on framework consistency across all toolbox pages.
+   - Avoids card splitting in favor of divider-based sections.
+   ========================================================================== */
+
+.app-content.toolbox-unified-shell {
+  --tb-layout-gap: 14px;
+  --tb-layout-pad-x: 18px;
+  --tb-layout-pad-y: 14px;
+  --tb-divider: 1px solid rgba(148, 163, 184, 0.35);
+  --tb-divider-strong: 1px solid rgba(100, 116, 139, 0.35);
+}
+
 .app-content.toolbox-unified-shell :is(
   .toolbox-wrapper,
   .sdk-manager-wrapper,
@@ -1201,62 +1163,2578 @@
   .hardware-info-page,
   .download-manager-wrapper,
   .ssh-terminal-wrapper
-) > :is(
-  .content-area,
+) :is(
   .main-container,
+  .content-area,
   .workspace-shell,
-  .table-area,
-  .filter-bar,
+  .main-content,
+  .bench-layout,
+  .debug-layout,
+  .main-area,
+  .work-area,
+  .mock-layout,
+  .docs-edit,
+  .docs-preview,
+  .content-inner
+) {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+/* main content frame under header */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.main-container, .content-area, .workspace-shell, .main-content, .work-area) {
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* unify inner split panes and replace card split with divider split */
+.app-content.toolbox-unified-shell :is(
+  .main-container,
+  .content-area,
+  .workspace-shell,
+  .main-content,
+  .bench-layout,
+  .debug-layout,
+  .main-area,
+  .work-area,
+  .mock-layout,
+  .docs-edit,
+  .content-inner
+) > :is(
+  .sidebar-left,
+  .sidebar-area,
+  .left-sidebar,
+  .left-panel,
+  .file-panel,
+  .config-panel,
+  .request-panel,
+  .bench-config,
+  .docs-list-panel,
+  .mock-rules-panel,
+  .text-panel,
+  .input-panel,
+  .right-panel,
+  .main-panel,
+  .result-panel,
+  .diff-panel,
+  .response-panel,
+  .bench-results,
+  .docs-form-panel,
+  .mock-edit-panel,
+  .output-panel
+) {
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: var(--tb-layout-pad-y) var(--tb-layout-pad-x) !important;
+  overflow: auto !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .main-container,
+  .content-area,
+  .workspace-shell,
+  .main-content,
+  .bench-layout,
+  .debug-layout,
+  .main-area,
+  .work-area,
+  .mock-layout,
+  .docs-edit,
+  .content-inner
+) > :is(
+  .sidebar-left,
+  .sidebar-area,
+  .left-sidebar,
+  .left-panel,
+  .file-panel,
+  .config-panel,
+  .request-panel,
+  .bench-config,
+  .docs-list-panel,
+  .mock-rules-panel,
+  .text-panel,
+  .input-panel,
+  .right-panel,
+  .main-panel,
+  .result-panel,
+  .diff-panel,
+  .response-panel,
+  .bench-results,
+  .docs-form-panel,
+  .mock-edit-panel,
+  .output-panel
+):not(:first-child) {
+  border-left: var(--tb-divider) !important;
+}
+
+/* unified top toolbars inside pages */
+.app-content.toolbox-unified-shell :is(
   .repo-bar,
-  .status-bar,
-  .empty-state,
   .toolbar,
-  .editor-area,
+  .wp-toolbar,
   .url-bar,
-  .request-area,
-  .response-area,
-  .action-bar,
-  .control-bar,
-  .regex-input-area,
+  .filter-bar,
   .hint-row,
   .summary-strip,
-  .main-area,
-  .operation-area,
-  .code-area,
-  .input-area,
-  .output-area,
-  .preview-area,
-  .result-area,
-  .work-area
+  .regex-input-area
 ) {
   margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: rgba(248, 251, 255, 0.45) !important;
+  border-bottom: var(--tb-divider) !important;
+  padding-left: var(--tb-layout-pad-x) !important;
+  padding-right: var(--tb-layout-pad-x) !important;
+}
+
+/* bottom status/action strip alignment */
+.app-content.toolbox-unified-shell :is(.status-bar, .bottom-bar) {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-top: var(--tb-divider-strong) !important;
+  background: rgba(246, 250, 255, 0.7) !important;
+  padding: 8px var(--tb-layout-pad-x) !important;
+  min-height: 42px !important;
+}
+
+/* remove card containers in sdk/bench/download and switch to line sections */
+.app-content.toolbox-unified-shell :is(
+  .env-card,
+  .versions-panel,
+  .bench-stat-card,
+  .stat-card,
+  .doc-preview-card,
+  .connect-card,
+  .expectation-card
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .env-card,
+  .version-row,
+  .bench-stat-card,
+  .stat-card,
+  .doc-preview-card,
+  .mock-rule-item,
+  .task-item,
+  .history-item,
+  .log-item,
+  .match-item
+):not(:last-child) {
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.bench-stat-grid, .stat-row) {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  border-top: var(--tb-divider) !important;
+}
+
+/* keep section headers simple and consistent */
+.app-content.toolbox-unified-shell :is(
+  .panel-header,
+  .panel-toolbar,
+  .response-status-bar,
+  .sidebar-toolbar,
+  .detail-toolbar,
+  .sftp-toolbar,
+  .response-toolbar
+) {
+  border: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* mobile: split panes stack with top dividers */
+@media (max-width: 980px) {
+  .app-content.toolbox-unified-shell :is(
+    .main-container,
+    .content-area,
+    .workspace-shell,
+    .main-content,
+    .bench-layout,
+    .debug-layout,
+    .main-area,
+    .work-area,
+    .mock-layout,
+    .docs-edit,
+    .content-inner
+  ) > :is(
+    .sidebar-left,
+    .sidebar-area,
+    .left-sidebar,
+    .left-panel,
+    .file-panel,
+    .config-panel,
+    .request-panel,
+    .bench-config,
+    .docs-list-panel,
+    .mock-rules-panel,
+    .text-panel,
+    .input-panel,
+    .right-panel,
+    .main-panel,
+    .result-panel,
+    .diff-panel,
+    .response-panel,
+    .bench-results,
+    .docs-form-panel,
+    .mock-edit-panel,
+    .output-panel
+  ):not(:first-child) {
+    border-left: 0 !important;
+    border-top: var(--tb-divider) !important;
+  }
+
+  .app-content.toolbox-unified-shell :is(.bench-stat-grid, .stat-row) {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Network toolbox pages: unified practical workspace layout */
+.app-content.toolbox-unified-shell .network-tool-page .content-area {
+  display: grid !important;
+  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.config-panel, .result-panel) {
+  padding: 14px 16px !important;
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .config-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .result-panel {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.panel-title, .result-title) {
+  padding-bottom: 8px !important;
+  border-bottom: var(--tb-divider) !important;
+  margin-bottom: 12px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.result-block + .result-block, .status-row + .log-list) {
+  margin-top: 0 !important;
+  border-top: var(--tb-divider) !important;
+  padding-top: 14px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.stat-card, .log-item) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .empty-hint {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  min-height: 180px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell .network-tool-page .content-area {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-content.toolbox-unified-shell .network-tool-page .config-panel {
+    border-right: 0 !important;
+    border-bottom: var(--tb-divider) !important;
+  }
+}
+
+/* Batch 2: layout refinements for high-frequency toolbox pages */
+
+/* Code formatter: toolbar + full-height editor + compact status */
+.app-content.toolbox-unified-shell .code-fmt-wrapper {
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) auto !important;
+}
+
+.app-content.toolbox-unified-shell .code-fmt-wrapper .toolbar {
+  border-bottom: var(--tb-divider) !important;
+  padding: 10px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .code-fmt-wrapper .editor-area {
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-top: var(--tb-divider) !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .code-fmt-wrapper .status-bar {
+  min-height: 38px !important;
+  padding: 6px 16px !important;
+}
+
+/* Regex tester: input area + split workspace with readable proportions */
+.app-content.toolbox-unified-shell .regex-wrapper {
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper :is(.toolbar, .regex-input-area) {
+  border-bottom: var(--tb-divider) !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper .main-area {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper :is(.text-panel, .result-panel) {
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper .result-panel {
+  border-left: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper :is(.text-container, .result-scroll) {
+  min-height: 0 !important;
+  overflow: auto !important;
+}
+
+/* Hex converter: summary + two-pane editor aligned with divider style */
+.app-content.toolbox-unified-shell .hex-converter-wrapper {
+  display: grid !important;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto !important;
+}
+
+.app-content.toolbox-unified-shell .hex-converter-wrapper :is(.toolbar, .hint-row, .summary-strip) {
+  border-bottom: var(--tb-divider) !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.app-content.toolbox-unified-shell .hex-converter-wrapper .main-area {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .hex-converter-wrapper :is(.input-panel, .output-panel) {
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .hex-converter-wrapper .output-panel {
+  border-left: var(--tb-divider) !important;
+}
+
+/* API debug: stabilize three-column workflow and request/response split */
+.app-content.toolbox-unified-shell .api-debug-wrapper .content-area {
   padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .main-panel {
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .split-panels {
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 8px minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.request-panel, .response-panel) {
+  min-height: 0 !important;
+  overflow: auto !important;
+  border: 0 !important;
   border-radius: 0 !important;
 }
 
-.app-content.toolbox-unified-shell :is(.content-area, .main-container, .workspace-shell, .table-area, .main-area, .work-area, .editor-area) > * {
+.app-content.toolbox-unified-shell .api-debug-wrapper .panel-resizer {
+  width: 8px !important;
+  background: linear-gradient(180deg, transparent 0%, rgba(148, 163, 184, 0.45) 48%, transparent 100%) !important;
+  border-left: var(--tb-divider) !important;
+  border-right: var(--tb-divider) !important;
+}
+
+/* Git manager: keep file list and diff area balanced */
+.app-content.toolbox-unified-shell .git-manager-wrapper .main-content {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .git-manager-wrapper .diff-panel {
+  border-left: var(--tb-divider) !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell .regex-wrapper .main-area,
+  .app-content.toolbox-unified-shell .hex-converter-wrapper .main-area,
+  .app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout,
+  .app-content.toolbox-unified-shell .api-debug-wrapper .split-panels,
+  .app-content.toolbox-unified-shell .git-manager-wrapper .main-content {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-content.toolbox-unified-shell .regex-wrapper .result-panel,
+  .app-content.toolbox-unified-shell .hex-converter-wrapper .output-panel,
+  .app-content.toolbox-unified-shell .git-manager-wrapper .diff-panel {
+    border-left: 0 !important;
+    border-top: var(--tb-divider) !important;
+  }
+
+  .app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area {
+    border-right: 0 !important;
+    border-bottom: var(--tb-divider) !important;
+  }
+
+  .app-content.toolbox-unified-shell .api-debug-wrapper .panel-resizer {
+    display: none !important;
+  }
+}
+
+/* Batch 3: MavenRepo / FileDiff / MockService / AutoTest / DownloadManager */
+
+/* Maven repo: left tree + right detail with linear section rhythm */
+.app-content.toolbox-unified-shell .maven-wrapper .main-area {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 420px) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .maven-wrapper :is(.left-panel, .right-panel) {
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .maven-wrapper .right-panel {
+  border-left: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .maven-wrapper :is(.stats-bar, .toolbar) {
+  border-bottom: var(--tb-divider) !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+/* File diff: toolbar + split editors + bottom strip in same frame */
+.app-content.toolbox-unified-shell .file-diff-wrapper {
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .file-diff-wrapper .workspace-shell {
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+}
+
+.app-content.toolbox-unified-shell .file-diff-wrapper .editor-container {
+  min-height: 0 !important;
+  border-top: var(--tb-divider) !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .file-diff-wrapper :is(.editor-pane, .merge-gutter) {
+  min-height: 0 !important;
+}
+
+/* Mock service: rules and editor two-pane workspace */
+.app-content.toolbox-unified-shell .mock-service-wrapper .mock-layout {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .mock-service-wrapper :is(.mock-rules-panel, .mock-edit-panel) {
+  min-height: 0 !important;
+  overflow: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .mock-service-wrapper .mock-edit-panel {
+  border-left: var(--tb-divider) !important;
+}
+
+/* Auto test: suite list + editor/report panel */
+.app-content.toolbox-unified-shell .auto-test-wrapper .auto-layout {
+  display: grid !important;
+  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr) !important;
+  min-height: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .auto-test-wrapper :is(.auto-sidebar, .auto-main) {
+  min-height: 0 !important;
+  overflow: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 12px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .auto-test-wrapper .auto-main {
+  border-left: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .auto-test-wrapper :is(.panel-toolbar, .suite-toolbar) {
+  border-bottom: var(--tb-divider) !important;
+}
+
+/* Download manager: single-column flow with clean dividers */
+.app-content.toolbox-unified-shell .download-manager-wrapper .content-area {
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .download-manager-wrapper .content-inner {
+  min-height: 0 !important;
+  overflow: auto !important;
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .download-manager-wrapper :is(.connect-card, .stat-row, .filter-bar, .task-list-area) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  margin: 0 !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+.app-content.toolbox-unified-shell .download-manager-wrapper :is(.connect-card, .stat-row, .filter-bar) {
+  border-bottom: var(--tb-divider) !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+.app-content.toolbox-unified-shell .download-manager-wrapper .task-item {
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  background: transparent !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell .maven-wrapper .main-area,
+  .app-content.toolbox-unified-shell .mock-service-wrapper .mock-layout,
+  .app-content.toolbox-unified-shell .auto-test-wrapper .auto-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-content.toolbox-unified-shell .maven-wrapper .right-panel,
+  .app-content.toolbox-unified-shell .mock-service-wrapper .mock-edit-panel,
+  .app-content.toolbox-unified-shell .auto-test-wrapper .auto-main {
+    border-left: 0 !important;
+    border-top: var(--tb-divider) !important;
+  }
+}
+
+/* Batch 4: final layout unification for SDK/Redis/SQLite/SSH/ApiDocs/GitReport */
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
+  padding: 0 !important;
+  gap: 0 !important;
+  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper :is(.sidebar-left, .content-area) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-workspace {
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-panel {
+  padding: 12px 16px !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client .main-body {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client :is(.left-panel, .right-area) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client .left-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client .tab-bar {
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client .key-list-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client .info-cards {
+  display: block !important;
   margin: 0 !important;
 }
 
-.app-content.toolbox-unified-shell :is(.content-area, .main-container, .workspace-shell, .table-area, .main-area, .work-area, .editor-area) *:is(
-  [class*="panel"],
-  [class*="card"],
-  [class*="section"],
-  [class*="block"],
-  .el-card__body,
-  .el-tab-pane,
-  .response-toolbar,
-  .response-body,
-  .response-headers-table,
-  .sidebar-tabs,
-  .sidebar-toolbar,
-  .sidebar-list
-) {
+.app-content.toolbox-unified-shell .redis-client .info-card {
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  padding: 12px 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .redis-client .status-bar {
+  margin: 0 !important;
+  border: 0 !important;
+  border-top: var(--tb-divider) !important;
+  border-radius: 0 !important;
+  background: rgba(248, 251, 255, 0.66) !important;
+}
+
+.app-content.toolbox-unified-shell .sqlite-mgr .main-body {
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .sqlite-mgr :is(.left-panel, .right-area) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sqlite-mgr .left-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .sqlite-mgr :is(.tab-bar, .sql-toolbar, .pagination-bar) {
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .sqlite-mgr .status-bar {
+  margin: 0 !important;
+  border: 0 !important;
+  border-top: var(--tb-divider) !important;
+  border-radius: 0 !important;
+  background: rgba(248, 251, 255, 0.66) !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper .content-area {
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper .docs-edit {
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper :is(.docs-list-panel, .docs-form-panel, .docs-preview) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper .docs-list-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper .doc-item {
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper .doc-preview-card {
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  padding: 12px 16px !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper :is(.filter-bar, .status-bar) {
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .main-content {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper :is(.left-panel, .right-panel) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .right-panel {
+  border-left: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .stat-card {
+  border: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .main-body {
+  padding: 0 !important;
+  gap: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper :is(.left-panel, .right-area) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .left-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .tab-bar {
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .terminal-area {
+  padding: 0 !important;
+  background: #0f172a !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .xterm-container {
+  height: 100% !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .sftp-area {
+  padding: 12px 16px !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper :is(.status-bar, .bottom-panel, .panel-header) {
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+}
+
+/* Batch 5: WebSocket page layout polish */
+.app-content.toolbox-unified-shell .network-tool-page .config-panel :is(.el-form, .composer-input, .quick-actions) {
+  margin: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .config-panel .quick-actions {
+  padding-bottom: 6px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .result-panel .log-list {
+  padding: 0 16px 10px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .result-panel .log-item {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 
-/* Final override: remove borders/shadows for all toolbox inner regions */
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container,
+  .app-content.toolbox-unified-shell .api-docs-wrapper .docs-edit {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left,
+  .app-content.toolbox-unified-shell .api-docs-wrapper .docs-list-panel,
+  .app-content.toolbox-unified-shell .git-report-wrapper .right-panel {
+    border-right: 0 !important;
+    border-left: 0 !important;
+    border-bottom: var(--tb-divider) !important;
+  }
+}
+
+/* Final pass: calm mac-style toolbox surface across every toolbox route. */
+.app-content.toolbox-unified-shell {
+  --tb-bg: #f5f5f7;
+  --tb-surface: #fbfbfd;
+  --tb-surface-muted: #f0f1f4;
+  --tb-line: #d8dce3;
+  --tb-line-strong: #c7ccd5;
+  --tb-text: #1d1d1f;
+  --tb-muted: #6e6e73;
+  --tb-muted-2: #8a8d93;
+  --tb-primary: #0a84ff;
+  --tb-hover: rgba(10, 132, 255, 0.08);
+  --tb-divider: 1px solid var(--tb-line);
+  background: #f5f5f7 !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  background: #f5f5f7 !important;
+  color: var(--tb-text) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  min-height: 52px !important;
+  padding: 0 18px !important;
+  background: rgba(245, 245, 247, 0.86) !important;
+  border-bottom: 1px solid rgba(60, 60, 67, 0.18) !important;
+  box-shadow: none !important;
+  backdrop-filter: saturate(180%) blur(20px) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.page-eyebrow, .fav-hint) {
+  display: none !important;
+}
+
+.app-content.toolbox-unified-shell .breadcrumb {
+  gap: 7px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+  color: var(--tb-muted) !important;
+}
+
+.app-content.toolbox-unified-shell .breadcrumb > .el-icon {
+  display: none !important;
+}
+
+.app-content.toolbox-unified-shell .breadcrumb-link {
+  color: var(--tb-muted) !important;
+  text-decoration: none !important;
+}
+
+.app-content.toolbox-unified-shell .breadcrumb-link:hover {
+  color: var(--tb-text) !important;
+}
+
+.app-content.toolbox-unified-shell .breadcrumb-sep {
+  color: #b0b3ba !important;
+  margin: 0 1px !important;
+}
+
+.app-content.toolbox-unified-shell .breadcrumb span:last-child {
+  color: var(--tb-text) !important;
+  font-weight: 600 !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .main-body,
+  .main-area,
+  .main-content,
+  .workspace,
+  .workspace-shell,
+  .work-area,
+  .wp-content,
+  .sdk-workspace,
+  .toolbox-workspace
+) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbar,
+  .wp-toolbar,
+  .filter-bar,
+  .status-bar,
+  .tab-bar,
+  .result-toolbar,
+  .summary-strip,
+  .stats-bar,
+  .algo-bar,
+  .params-bar,
+  .panel-header,
+  .section-header,
+  .output-header,
+  .detail-header,
+  .sql-toolbar,
+  .key-search,
+  .sftp-toolbar
+) {
+  background: rgba(251, 251, 253, 0.72) !important;
+  border-radius: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .left-panel,
+  .right-panel,
+  .right-area,
+  .sidebar-left,
+  .category-nav,
+  .config-panel,
+  .result-panel,
+  .input-panel,
+  .output-panel,
+  .io-panel,
+  .info-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .main-panel,
+  .bench-config,
+  .bench-results,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .block-summary-list
+) {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .el-card,
+  .content-card,
+  .tool-card,
+  .action-card,
+  .history-card,
+  .color-card,
+  .stat-card,
+  .bench-stat-card,
+  .doc-preview-card,
+  .connect-card,
+  .preview-card,
+  .info-card,
+  .info-section,
+  .settings-section,
+  .section,
+  .progress-card,
+  .core-analysis-card,
+  .source-context-card,
+  .root-cause-hero,
+  .hero-card,
+  .analysis-section,
+  .summary-stat,
+  .sub-card,
+  .drop-zone,
+  .task-item,
+  .wp-card,
+  .empty-state,
+  .empty-hint
+) {
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .content-card,
+  .section,
+  .settings-section,
+  .info-section,
+  .progress-card,
+  .core-analysis-card,
+  .source-context-card,
+  .root-cause-hero,
+  .analysis-section,
+  .connect-card
+) {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  margin: 0 !important;
+  padding: 16px 18px !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .stat-card,
+  .bench-stat-card,
+  .doc-preview-card,
+  .info-card,
+  .summary-stat,
+  .sub-card,
+  .history-card,
+  .action-card,
+  .color-card,
+  .preview-card,
+  .hero-card,
+  .task-item,
+  .block-summary-item,
+  .matched-source-item,
+  .commit-item,
+  .tool-card
+) {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(60, 60, 67, 0.13) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-button, .el-input__wrapper, .el-textarea__inner, .el-select__wrapper) {
+  border-radius: 7px !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-textarea__inner, .el-select__wrapper) {
+  background: rgba(255, 255, 255, 0.82) !important;
+  border: 1px solid rgba(60, 60, 67, 0.16) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button {
+  min-height: 28px !important;
+  font-weight: 500 !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--primary {
+  background: #007aff !important;
+  border-color: #007aff !important;
+}
+
+.app-content.toolbox-unified-shell :is(.tab, .tab-btn, .menu-item, .conn-item, .db-item, .table-item, .doc-item, .category-item, .compact-file-row) {
+  border-radius: 7px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.tab.active, .tab-btn.active, .menu-item.active, .conn-item.active, .db-item.active, .table-item.active, .doc-item.active, .category-item.active, .compact-file-row.active) {
+  background: rgba(10, 132, 255, 0.1) !important;
+  color: var(--tb-text) !important;
+  border-color: transparent !important;
+}
+
+.app-content.toolbox-unified-shell :is(.empty-state, .empty-hint, .empty-right, .key-detail-empty, .empty-preview, .wp-empty) {
+  background: transparent !important;
+  border: 0 !important;
+  color: var(--tb-muted) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.empty-icon, .tool-icon, .action-icon) {
+  filter: grayscale(1) saturate(0.3) !important;
+  opacity: 0.72 !important;
+}
+
+/* Toolbox index: list-like groups instead of decorative cards. */
+.app-content.toolbox-unified-shell .toolbox-wrapper .content-area {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .toolbox-workspace {
+  overflow: auto !important;
+  padding: 10px 0 22px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-category {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .category-header {
+  height: 34px !important;
+  padding: 0 18px !important;
+  margin: 0 !important;
+  border: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  color: var(--tb-muted) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 0 !important;
+  padding: 0 18px 12px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card {
+  min-height: 42px !important;
+  padding: 0 10px !important;
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) 24px !important;
+  align-items: center !important;
+  gap: 8px !important;
+  border-radius: 7px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover {
+  background: rgba(60, 60, 67, 0.07) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-icon {
+  width: 22px !important;
+  height: 22px !important;
+  display: grid !important;
+  place-items: center !important;
+  font-size: 14px !important;
+  background: rgba(60, 60, 67, 0.08) !important;
+  border-radius: 6px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-name {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--tb-text) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn {
+  position: static !important;
+  width: 24px !important;
+  height: 24px !important;
+  opacity: 0.55 !important;
+}
+
+@media (max-width: 900px) {
+  .app-content.toolbox-unified-shell .toolbox-wrapper .tool-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Final tighten: remove remaining card-like visuals on high-variance toolbox pages */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .toolbox-sticky-notes,
+  .screenshot-mgr-wrapper,
+  .download-manager-wrapper,
+  .hardware-info-page,
+  .log-analyzer-wrapper,
+  .img-b64-wrapper,
+  .img-cvt-wrapper,
+  .hex-converter-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .redis-client,
+  .sqlite-mgr
+) :is(
+  .content-area,
+  .main-body,
+  .main-area,
+  .main-content,
+  .workspace,
+  .workspace-shell,
+  .left-panel,
+  .right-panel,
+  .right-area,
+  .section,
+  .settings-section,
+  .status-bar,
+  .filter-bar,
+  .toolbar,
+  .panel-header,
+  .tab-bar,
+  .summary-strip,
+  .stats-cards,
+  .stat-row,
+  .action-grid,
+  .history-grid,
+  .color-grid,
+  .bench-layout,
+  .bench-config,
+  .bench-results,
+  .mock-layout,
+  .auto-layout,
+  .docs-edit,
+  .debug-layout,
+  .key-browser,
+  .table-area
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .screenshot-mgr-wrapper,
+  .download-manager-wrapper,
+  .hardware-info-page,
+  .log-analyzer-wrapper,
+  .img-b64-wrapper,
+  .img-cvt-wrapper,
+  .hex-converter-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .redis-client,
+  .sqlite-mgr
+) :is(
+  .action-card,
+  .history-card,
+  .color-card,
+  .stat-card,
+  .bench-stat-card,
+  .expectation-card,
+  .doc-preview-card,
+  .connect-card,
+  .sub-card,
+  .info-card,
+  .hero-card,
+  .block-summary-item,
+  .matched-source-item,
+  .task-item,
+  .history-item,
+  .commit-item
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .screenshot-mgr-wrapper,
+  .download-manager-wrapper,
+  .hardware-info-page,
+  .log-analyzer-wrapper,
+  .img-b64-wrapper,
+  .img-cvt-wrapper,
+  .hex-converter-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .redis-client,
+  .sqlite-mgr
+) :is(
+  .drop-zone,
+  .preview-area,
+  .preview-card,
+  .source-context-card,
+  .core-analysis-card,
+  .root-cause-hero,
+  .info-section,
+  .settings-section,
+  .empty-state,
+  .empty-hint
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-image: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .screenshot-mgr-wrapper,
+  .download-manager-wrapper,
+  .hardware-info-page,
+  .log-analyzer-wrapper,
+  .img-b64-wrapper,
+  .img-cvt-wrapper,
+  .hex-converter-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .redis-client,
+  .sqlite-mgr
+) :is(.menu-item.active, .db-item.active, .table-item.active, .doc-item.active, .tab.active, .tab-btn.active) {
+  background: rgba(0, 122, 255, 0.1) !important;
+  color: var(--tb-text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell :is(
+    .api-debug-wrapper .debug-layout,
+    .api-docs-wrapper .docs-edit,
+    .mock-service-wrapper .mock-layout,
+    .auto-test-wrapper .auto-layout,
+    .perf-test-wrapper .bench-layout,
+    .redis-client .main-body,
+    .sqlite-mgr .main-body,
+    .crypto-wrapper .main-body,
+    .img-cvt-wrapper .main-area,
+    .img-b64-wrapper .main-area,
+    .regex-wrapper .main-area,
+    .hex-converter-wrapper .main-area
+  ) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Palette override at absolute end: this wins over every older toolbox rule above. */
+.app-content.toolbox-unified-shell {
+  --tb-bg: #f6f9fc !important;
+  --tb-bg-soft: #fbfdff !important;
+  --tb-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-line-strong: rgba(111, 128, 151, 0.18) !important;
+  --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
+  --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
+  --tb-panel-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
+  --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(31, 45, 61, 0.025) !important;
+  background:
+    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  background:
+    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
+  border-bottom-color: var(--tb-line-strong) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-row,
+  .summary-strip,
+  .connect-card,
+  .import-card,
+  .empty-state,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .action-card,
+  .history-card,
+  .preview-card,
+  .wp-card,
+  .stat-card,
+  .bench-stat-card,
+  .task-item,
+  .info-section,
+  .sub-card
+) {
+  border-color: var(--tb-panel-line) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(250, 253, 255, 0.46)) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
+  border-color: rgba(111, 128, 151, 0.16) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  border-color: rgba(111, 128, 151, 0.16) !important;
+}
+
+/* Actual final palette: keep this block last so page/component styles cannot restore the old gray tone. */
+.app-content.toolbox-unified-shell {
+  --tb-bg: #f6f9fc !important;
+  --tb-bg-soft: #fbfdff !important;
+  --tb-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-line-strong: rgba(111, 128, 151, 0.18) !important;
+  --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
+  --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
+  --tb-panel-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
+  --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(31, 45, 61, 0.025) !important;
+  background:
+    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  background:
+    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
+  border-bottom-color: var(--tb-line-strong) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-row,
+  .summary-strip,
+  .connect-card,
+  .import-card,
+  .empty-state,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .action-card,
+  .history-card,
+  .preview-card,
+  .wp-card,
+  .stat-card,
+  .bench-stat-card,
+  .task-item,
+  .info-section,
+  .sub-card
+) {
+  border-color: var(--tb-panel-line) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(250, 253, 255, 0.46)) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
+  border-color: rgba(111, 128, 151, 0.16) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  border-color: rgba(111, 128, 151, 0.16) !important;
+}
+
+/* Final soft palette: lighter toolbox pages with a subtle app-like gradient */
+.app-content.toolbox-unified-shell {
+  --tb-bg: #f5f8fb;
+  --tb-bg-soft: #fbfdff;
+  --tb-line: rgba(112, 130, 153, 0.14);
+  --tb-line-strong: rgba(112, 130, 153, 0.18);
+  --tb-panel-bg: rgba(255, 255, 255, 0.56);
+  --tb-panel-bg-strong: rgba(255, 255, 255, 0.68);
+  --tb-panel-line: rgba(112, 130, 153, 0.14);
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 8px 22px rgba(31, 45, 61, 0.025);
+  --tb-control-bg: rgba(255, 255, 255, 0.62);
+  --tb-row-hover: rgba(255, 255, 255, 0.42);
+  background:
+    linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f3f7fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  background:
+    linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f3f7fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.62)) !important;
+  border-bottom-color: var(--tb-line-strong) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .settings-section,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-row,
+  .summary-strip,
+  .connect-card,
+  .import-card,
+  .empty-state,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .action-card,
+  .history-card,
+  .preview-card,
+  .wp-card,
+  .stat-card,
+  .bench-stat-card,
+  .task-item,
+  .info-section,
+  .sub-card
+) {
+  border-color: var(--tb-panel-line) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(250, 253, 255, 0.48)) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(249, 252, 255, 0.58)) !important;
+  border-color: rgba(112, 130, 153, 0.16) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  border-color: rgba(112, 130, 153, 0.16) !important;
+}
+
+/* Screenshot tool reference layout: one consistent mac-like workbench frame */
+.app-content.toolbox-unified-shell {
+  --tb-layout-pad-x: 18px;
+  --tb-layout-pad-y: 14px;
+  --tb-panel-bg: rgba(255, 255, 255, 0.72);
+  --tb-panel-bg-strong: rgba(255, 255, 255, 0.82);
+  --tb-panel-line: rgba(15, 23, 42, 0.08);
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 10px 24px rgba(15, 23, 42, 0.04);
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%) !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  min-height: 58px !important;
+  padding: 0 18px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82)) !important;
+  border-bottom: 1px solid var(--tb-panel-line) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .workspace-shell,
+  .main-content,
+  .main-body,
+  .main-area,
+  .work-area,
+  .content-inner,
+  .bench-layout,
+  .debug-layout,
+  .mock-layout,
+  .auto-layout,
+  .docs-edit
+) {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-container,
+  .workspace-shell,
+  .main-body
+) {
+  flex: 1 1 auto !important;
+  height: 100% !important;
+  padding: var(--tb-layout-pad-y) var(--tb-layout-pad-x) 0 !important;
+  overflow: hidden auto !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .settings-section,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-row,
+  .summary-strip,
+  .connect-card,
+  .import-card,
+  .empty-state,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .action-card,
+  .history-card,
+  .preview-card,
+  .wp-card,
+  .stat-card,
+  .bench-stat-card,
+  .task-item,
+  .info-section,
+  .sub-card
+) {
+  border: 1px solid var(--tb-panel-line) !important;
+  border-radius: 18px !important;
+  background: var(--tb-panel-bg) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .settings-section,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel
+) {
+  padding: 16px 18px 18px !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .content-area,
+  .regex-wrapper .main-area,
+  .hex-converter-wrapper .main-area,
+  .crypto-wrapper .main-body,
+  .git-manager-wrapper .main-content,
+  .git-report-wrapper .main-content,
+  .api-debug-wrapper .debug-layout,
+  .api-debug-wrapper .split-panels,
+  .api-docs-wrapper .docs-edit,
+  .mock-service-wrapper .mock-layout,
+  .perf-test-wrapper .bench-layout,
+  .auto-test-wrapper .auto-layout,
+  .img-b64-wrapper .main-area,
+  .img-cvt-wrapper .main-area,
+  .redis-client .main-body,
+  .sqlite-mgr .main-body,
+  .ssh-terminal-wrapper .main-body,
+  .sdk-manager-wrapper .main-container,
+  .maven-wrapper .main-area
+) {
+  gap: 14px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.status-bar, .bottom-bar) {
+  height: 30px !important;
+  min-height: 30px !important;
+  margin: 0 18px 18px !important;
+  padding: 0 16px !important;
+  border: 1px solid var(--tb-panel-line) !important;
+  border-top: 0 !important;
+  border-radius: 0 0 18px 18px !important;
+  background: var(--tb-panel-bg) !important;
+  box-shadow: none !important;
+}
+
+/* Local hardcoded pages: align their own nested work areas with ScreenshotManager */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .content-area {
+  padding: 14px 18px 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-section {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 18px 0 6px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--tb-panel-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-section:first-child {
+  padding-top: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-section:last-child {
+  border-bottom: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .section-header {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 0 10px !important;
+  color: var(--tb-text) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .section-icon {
+  display: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px) !important;
+  align-items: center !important;
+  gap: 28px !important;
+  min-height: 58px !important;
+  padding: 12px 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-control {
+  display: flex !important;
+  justify-content: flex-end !important;
+  min-width: 0 !important;
+  padding-right: 2px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-control :is(.el-select, .el-input-number) {
+  width: 100% !important;
+  max-width: 240px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-input {
+  width: 100% !important;
+  max-width: 240px !important;
+  min-width: 160px !important;
+}
+
+@media (max-width: 860px) {
+  .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 12px 0 !important;
+    align-items: flex-start !important;
+  }
+
+  .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-control {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
+  padding: 14px 18px 0 !important;
+  gap: 14px !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper :is(.sidebar-left, .content-area) {
+  border: 1px solid var(--tb-panel-line) !important;
+  border-radius: 18px !important;
+  background: var(--tb-panel-bg) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-workspace {
+  padding: 16px 18px 18px !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper :is(.env-card, .versions-panel) {
+  border: 1px solid var(--tb-panel-line) !important;
+  border-radius: 18px !important;
+  background: var(--tb-panel-bg-strong) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+/* Global tighten pass: smaller page padding + near full-bleed 100% workspace */
+.app-content.toolbox-unified-shell {
+  --tb-layout-pad-x: 10px;
+  --tb-layout-pad-y: 8px;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 100% !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .main-container,
+  .content-area,
+  .workspace-shell,
+  .main-content,
+  .work-area,
+  .main-area,
+  .content-inner,
+  .main-body
+) {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--tb-layout-pad-y) var(--tb-layout-pad-x) !important;
+  box-sizing: border-box !important;
+}
+
+/* Visual polish v2: typography, control rhythm, interaction feedback */
+.app-content.toolbox-unified-shell {
+  --tb-control-bg: #f6f9fd;
+  --tb-control-border: #d7e1ee;
+  --tb-control-border-hover: #c4d3e5;
+  --tb-control-focus: rgba(47, 111, 228, 0.14);
+  --tb-row-hover: rgba(47, 111, 228, 0.06);
+}
+
+.app-content.toolbox-unified-shell :is(.breadcrumb, .wp-breadcrumb) {
+  font-size: 14px !important;
+  line-height: 1.25 !important;
+  font-weight: 600 !important;
+  color: var(--tb-text) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.breadcrumb-link, .wp-breadcrumb-link) {
+  color: #2d5fc9 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.breadcrumb-link, .wp-breadcrumb-link):hover {
+  color: #234ea8 !important;
+  text-decoration: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(.page-title, .panel-title, .section-title, .sub-title, .overview-title) {
+  letter-spacing: 0.01em !important;
+}
+
+.app-content.toolbox-unified-shell :is(.toolbar, .filter-bar, .panel-toolbar, .suite-toolbar, .detail-toolbar, .result-toolbar) {
+  flex-wrap: wrap !important;
+  row-gap: 8px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.toolbar-group, .action-row, .quick-actions, .panel-actions, .header-actions, .toolbar-actions) {
+  gap: 8px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-date-editor.el-input__wrapper, .el-textarea__inner) {
+  background: var(--tb-control-bg) !important;
+  border-color: var(--tb-control-border) !important;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper:hover, .el-select__wrapper:hover, .el-date-editor.el-input__wrapper:hover, .el-textarea__inner:hover) {
+  border-color: var(--tb-control-border-hover) !important;
+  background: #f8fbff !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus, .el-textarea__inner:focus) {
+  border-color: #4a78d9 !important;
+  box-shadow: 0 0 0 3px var(--tb-control-focus) !important;
+  background: #fbfdff !important;
+}
+
+.app-content.toolbox-unified-shell .el-button {
+  border-radius: 9px !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  background: #f4f8fc !important;
+  border: 1px solid #d6e0ec !important;
+  color: #1f2937 !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default:hover {
+  background: #edf4fb !important;
+  border-color: #c8d8ea !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--primary {
+  background: #2f6fe4 !important;
+  border-color: #2f6fe4 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--primary:hover {
+  background: #275fcc !important;
+  border-color: #275fcc !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .menu-item,
+  .conn-item,
+  .db-item,
+  .table-item,
+  .doc-item,
+  .tab,
+  .tab-btn,
+  .compact-file-row,
+  .history-item,
+  .log-item,
+  .task-item,
+  .mock-rule-item,
+  .mock-log-item,
+  .dir-item,
+  .file-item
+) {
+  transition: background 0.14s ease, color 0.14s ease !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .menu-item:hover,
+  .conn-item:hover,
+  .db-item:hover,
+  .table-item:hover,
+  .doc-item:hover,
+  .tab:hover,
+  .tab-btn:hover,
+  .compact-file-row:hover,
+  .history-item:hover,
+  .log-item:hover,
+  .task-item:hover,
+  .mock-rule-item:hover,
+  .mock-log-item:hover,
+  .dir-item:hover,
+  .file-item:hover
+) {
+  background: var(--tb-row-hover) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.status-bar, .bottom-bar) {
+  font-size: 12px !important;
+  color: #61758d !important;
+}
+
+.app-content.toolbox-unified-shell :is(.empty-state, .empty-hint, .empty-right, .key-detail-empty, .empty-preview, .wp-empty) {
+  min-height: 180px !important;
+  color: #73889f !important;
+}
+
+.app-content.toolbox-unified-shell :is(.network-tool-page, .api-debug-wrapper, .api-docs-wrapper, .mock-service-wrapper) :is(.panel-title, .panel-header, .result-title, .sub-title) {
+  min-height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .composer-input .el-textarea__inner {
+  min-height: 140px !important;
+}
+
+.app-content.toolbox-unified-shell .code-fmt-wrapper .status-bar {
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper :is(.match-item, .match-text, .match-range) {
+  font-size: 12px !important;
+}
+
+.app-content.toolbox-unified-shell .hex-converter-wrapper :is(.summary-item, .panel-tag) {
+  font-size: 11px !important;
+}
+
+/* Final harmonization pass: one shared toolbox skeleton */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) :is(
+  .header,
+  .page-header,
+  .wp-header,
+  .reader-header,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-strip,
+  .hint-row,
+  .regex-input-area,
+  .result-toolbar,
+  .status-bar,
+  .bottom-bar,
+  .bottom-panel,
+  .panel-header,
+  .panel-toolbar,
+  .tab-bar,
+  .sql-toolbar,
+  .pagination-bar
+) {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.toolbar, .filter-bar, .stats-bar, .summary-strip, .hint-row, .regex-input-area, .status-bar, .bottom-bar) {
+  padding: 10px 18px !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
 .app-content.toolbox-unified-shell :is(
   .toolbox-wrapper,
   .sdk-manager-wrapper,
@@ -1289,60 +3767,1863 @@
   .ssh-terminal-wrapper
 ) :is(
   .content-area,
-  .main-container,
-  .workspace-shell,
-  .table-area,
-  .filter-bar,
-  .repo-bar,
-  .status-bar,
-  .empty-state,
-  .toolbar,
-  .editor-area,
-  .url-bar,
-  .request-area,
-  .response-area,
-  .action-bar,
-  .control-bar,
-  .regex-input-area,
-  .hint-row,
-  .summary-strip,
   .main-area,
-  .operation-area,
-  .code-area,
-  .input-area,
-  .output-area,
-  .preview-area,
-  .result-area,
+  .main-body,
+  .main-content,
+  .main-container,
   .work-area,
-  .left-sidebar,
-  .main-panel,
-  .sidebar-area,
-  .request-panel,
-  .response-panel,
-  .panel-resizer,
-  .panel,
-  .panel-box,
-  .content-card,
-  .tool-card,
+  .workspace,
+  .workspace-shell,
+  .editor-area,
+  .debug-layout,
+  .docs-edit,
+  .mock-layout,
+  .auto-layout,
+  .bench-layout
+) {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell :is(
   .left-panel,
   .right-panel,
   .center-panel,
+  .config-panel,
+  .result-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
   .input-panel,
   .output-panel,
   .text-panel,
-  .result-panel,
-  .history-item,
-  .collection-tree-row,
-  .res-header-row,
-  .sidebar-tabs,
-  .sidebar-tab,
-  .sidebar-toolbar,
-  .sidebar-list
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel
 ) {
   border: 0 !important;
-  border-left: 0 !important;
-  border-right: 0 !important;
-  border-top: 0 !important;
-  border-bottom: 0 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .config-panel,
+  .result-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel
+) + :is(
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .config-panel,
+  .result-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel
+) {
+  border-left: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .code-fmt-wrapper .editor-area {
+  border-top: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .content-area,
+.app-content.toolbox-unified-shell .regex-wrapper .main-area,
+.app-content.toolbox-unified-shell .hex-converter-wrapper .main-area,
+.app-content.toolbox-unified-shell .git-manager-wrapper .main-content,
+.app-content.toolbox-unified-shell .git-report-wrapper .main-content {
+  gap: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .config-panel,
+.app-content.toolbox-unified-shell .regex-wrapper .text-panel,
+.app-content.toolbox-unified-shell .hex-converter-wrapper .input-panel,
+.app-content.toolbox-unified-shell .git-manager-wrapper .file-panel,
+.app-content.toolbox-unified-shell .git-report-wrapper .left-panel {
+  border-right: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.log-item, .stat-card),
+.app-content.toolbox-unified-shell .regex-wrapper :is(.match-item, .replace-result, .no-match),
+.app-content.toolbox-unified-shell .hex-converter-wrapper :is(.summary-item, .status-msg),
+.app-content.toolbox-unified-shell .git-report-wrapper :is(.stat-card, .commit-item),
+.app-content.toolbox-unified-shell .download-manager-wrapper :is(.task-item, .connect-card, .history-item) {
+  border: 0 !important;
+  border-bottom: var(--tb-divider) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.el-input__wrapper, .el-textarea__inner),
+.app-content.toolbox-unified-shell .regex-wrapper :is(.regex-row, .replace-field),
+.app-content.toolbox-unified-shell .hex-converter-wrapper :is(.field-inline, .toolbar-actions),
+.app-content.toolbox-unified-shell .code-fmt-wrapper :is(.el-select__wrapper),
+.app-content.toolbox-unified-shell .git-manager-wrapper :is(.el-input__wrapper, .el-select__wrapper) {
+  border-radius: 10px !important;
+  background: #f7fafc !important;
+  border: 1px solid #d8e2ef !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell :is(
+    .network-tool-page .content-area,
+    .regex-wrapper .main-area,
+    .hex-converter-wrapper .main-area,
+    .git-manager-wrapper .main-content,
+    .git-report-wrapper .main-content
+  ) {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+  }
+
+  .app-content.toolbox-unified-shell .network-tool-page .config-panel,
+  .app-content.toolbox-unified-shell .regex-wrapper .text-panel,
+  .app-content.toolbox-unified-shell .hex-converter-wrapper .input-panel,
+  .app-content.toolbox-unified-shell .git-manager-wrapper .file-panel,
+  .app-content.toolbox-unified-shell .git-report-wrapper .left-panel {
+    border-right: 0 !important;
+    border-bottom: var(--tb-divider) !important;
+  }
+}
+
+/* Page polish pack: spacing, controls, typography and panel rhythm */
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .toolbox-wrapper
+) :is(.toolbar, .filter-bar, .panel-toolbar, .suite-toolbar, .detail-toolbar, .result-toolbar, .status-bar, .bottom-bar) {
+  min-height: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-form-item, .setting-row, .param-row, .kv-row) {
+  margin-bottom: 10px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-form-item__label, .setting-label, .toolbar-label, .param-label, .section-label) {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--tb-muted) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-date-editor.el-input__wrapper) {
+  min-height: 34px !important;
+  padding: 0 10px !important;
+}
+
+.app-content.toolbox-unified-shell .el-textarea__inner {
+  min-height: 92px !important;
+  padding: 10px 12px !important;
+  line-height: 1.55 !important;
+}
+
+.app-content.toolbox-unified-shell .el-button {
+  min-height: 32px !important;
+  padding: 0 12px !important;
+  font-weight: 600 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbar-icon-btn {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  padding: 0 !important;
+}
+
+/* Network family: IP / DNS / Speed / WebSocket */
+.app-content.toolbox-unified-shell .network-tool-page .content-area {
+  grid-template-columns: minmax(360px, 430px) minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.config-panel, .result-panel) {
+  padding: 12px 14px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page .quick-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+}
+
+.app-content.toolbox-unified-shell .network-tool-page :is(.stat-grid, .sample-list, .history-list, .log-list) {
+  display: grid !important;
+  gap: 0 !important;
+}
+
+/* Code formatter / regex / hex / crypto */
+.app-content.toolbox-unified-shell .code-fmt-wrapper .toolbar {
+  padding: 8px 14px !important;
+}
+
+.app-content.toolbox-unified-shell .code-fmt-wrapper .editor-area {
+  margin: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.regex-wrapper, .hex-converter-wrapper, .crypto-wrapper) :is(.toolbar, .params-bar, .summary-strip, .hint-row, .regex-input-area) {
+  padding: 8px 14px !important;
+}
+
+.app-content.toolbox-unified-shell .regex-wrapper .main-area {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.95fr) !important;
+}
+
+.app-content.toolbox-unified-shell .hex-converter-wrapper .main-area {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+.app-content.toolbox-unified-shell .crypto-wrapper .main-body {
+  grid-template-columns: minmax(350px, 0.95fr) minmax(0, 1fr) !important;
+}
+
+/* Git / diff */
+.app-content.toolbox-unified-shell .git-manager-wrapper .main-content {
+  grid-template-columns: minmax(330px, 0.8fr) minmax(0, 1.2fr) !important;
+}
+
+.app-content.toolbox-unified-shell .git-manager-wrapper :is(.dir-item, .file-item, .log-item) {
+  min-height: 34px !important;
+  padding: 7px 10px !important;
+  border-bottom: var(--tb-divider) !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .main-content {
+  grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr) !important;
+}
+
+.app-content.toolbox-unified-shell .file-diff-wrapper :is(.toolbar, .status-bar) {
+  padding: 8px 12px !important;
+}
+
+.app-content.toolbox-unified-shell .file-diff-wrapper .editor-container {
+  gap: 0 !important;
+}
+
+/* API workbench pages */
+.app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout {
+  grid-template-columns: minmax(300px, 0.7fr) minmax(0, 1.3fr) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .split-panels {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.api-debug-wrapper, .api-docs-wrapper, .mock-service-wrapper) :is(.sidebar-list, .doc-list, .mock-log-list) :is(.item-name, .doc-item, .mock-rule-item, .mock-log-item) {
+  min-height: 34px !important;
+  padding: 7px 10px !important;
+}
+
+.app-content.toolbox-unified-shell .api-docs-wrapper .docs-edit {
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr) !important;
+}
+
+.app-content.toolbox-unified-shell .mock-service-wrapper .mock-layout {
+  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr) !important;
+}
+
+/* Perf / auto test */
+.app-content.toolbox-unified-shell .perf-test-wrapper .bench-layout {
+  grid-template-columns: minmax(330px, 0.78fr) minmax(0, 1.22fr) !important;
+}
+
+.app-content.toolbox-unified-shell .auto-test-wrapper .auto-layout {
+  grid-template-columns: minmax(300px, 0.74fr) minmax(0, 1.26fr) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.perf-test-wrapper, .auto-test-wrapper) :is(.bench-stat-card, .stat-card) {
+  padding: 10px 12px !important;
+}
+
+/* Resource / media pages */
+.app-content.toolbox-unified-shell .img-b64-wrapper .main-area,
+.app-content.toolbox-unified-shell .img-cvt-wrapper .main-area {
+  grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.img-b64-wrapper, .img-cvt-wrapper, .screenshot-mgr-wrapper, .wallpaper-wrapper) :is(.drop-zone, .preview-card, .preview-area, .history-card, .action-card, .wp-card) {
+  padding: 10px 12px !important;
+}
+
+/* Data clients */
+.app-content.toolbox-unified-shell .redis-client .main-body,
+.app-content.toolbox-unified-shell .sqlite-mgr .main-body,
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .main-body {
+  grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.redis-client, .sqlite-mgr, .ssh-terminal-wrapper) :is(.tab, .tab-btn, .menu-item, .db-item, .table-item, .conn-item, .sftp-item) {
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.redis-client, .sqlite-mgr, .ssh-terminal-wrapper) :is(.detail-toolbar, .tab-toolbar, .sftp-toolbar) {
+  padding: 8px 10px !important;
+}
+
+/* System and manager pages */
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
+  grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr) !important;
+}
+
+.app-content.toolbox-unified-shell .port-manager-wrapper .table-area,
+.app-content.toolbox-unified-shell .download-manager-wrapper .task-list-area,
+.app-content.toolbox-unified-shell .log-analyzer-wrapper .content-area,
+.app-content.toolbox-unified-shell .hardware-info-page .content-area,
+.app-content.toolbox-unified-shell .maven-wrapper .main-area {
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.port-manager-wrapper, .download-manager-wrapper, .log-analyzer-wrapper, .hardware-info-page, .maven-wrapper) :is(.filter-bar, .stats-bar, .status-bar, .summary-row, .summary-strip) {
+  padding: 8px 14px !important;
+}
+
+.app-content.toolbox-unified-shell .hardware-info-page :is(.info-section, .sub-card) {
+  padding: 10px 12px !important;
+}
+
+.app-content.toolbox-unified-shell .download-manager-wrapper :is(.task-item, .stat-card) {
+  padding: 10px 12px !important;
+}
+
+/* Toolbox sticky notes / shelf */
+.app-content.toolbox-unified-shell .toolbox-wrapper :is(.settings-group, .settings-section, .setting-row) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .ebook-shelf :is(.import-card, .book-card, .empty-state) {
+  padding: 10px 12px !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell :is(
+    .network-tool-page .content-area,
+    .regex-wrapper .main-area,
+    .hex-converter-wrapper .main-area,
+    .crypto-wrapper .main-body,
+    .git-manager-wrapper .main-content,
+    .git-report-wrapper .main-content,
+    .api-debug-wrapper .debug-layout,
+    .api-debug-wrapper .split-panels,
+    .api-docs-wrapper .docs-edit,
+    .mock-service-wrapper .mock-layout,
+    .perf-test-wrapper .bench-layout,
+    .auto-test-wrapper .auto-layout,
+    .img-b64-wrapper .main-area,
+    .img-cvt-wrapper .main-area,
+    .redis-client .main-body,
+    .sqlite-mgr .main-body,
+    .ssh-terminal-wrapper .main-body,
+    .sdk-manager-wrapper .main-container
+  ) {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* LAST PALETTE OVERRIDE - must stay at file end. */
+.app-content.toolbox-unified-shell,
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  background:
+    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
+    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+}
+
+.app-content.toolbox-unified-shell {
+  --tb-bg: #f6f9fc !important;
+  --tb-bg-soft: #fbfdff !important;
+  --tb-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-line-strong: rgba(111, 128, 151, 0.18) !important;
+  --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
+  --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
+  --tb-panel-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
+  --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(31, 45, 61, 0.025) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
+  border-bottom-color: var(--tb-line-strong) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-row,
+  .summary-strip,
+  .connect-card,
+  .import-card,
+  .empty-state,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .action-card,
+  .history-card,
+  .preview-card,
+  .wp-card,
+  .stat-card,
+  .bench-stat-card,
+  .task-item,
+  .info-section,
+  .sub-card
+) {
+  border-color: var(--tb-panel-line) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(250, 253, 255, 0.46)) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
+  border-color: rgba(111, 128, 151, 0.16) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  border-color: rgba(111, 128, 151, 0.16) !important;
+}
+
+/* FINAL TOOLBOX SOFT PALETTE - keep at absolute file end. */
+.app-content.toolbox-unified-shell {
+  --tb-bg: #f4f8fc !important;
+  --tb-bg-soft: #fbfdff !important;
+  --tb-line: rgba(100, 116, 139, 0.11) !important;
+  --tb-line-strong: rgba(100, 116, 139, 0.17) !important;
+  --tb-panel-bg: rgba(255, 255, 255, 0.48) !important;
+  --tb-panel-bg-strong: rgba(255, 255, 255, 0.62) !important;
+  --tb-panel-line: rgba(100, 116, 139, 0.12) !important;
+  --tb-control-bg: rgba(255, 255, 255, 0.64) !important;
+  --tb-hover: rgba(255, 255, 255, 0.34) !important;
+  --tb-row-hover: rgba(255, 255, 255, 0.34) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66), 0 10px 24px rgba(31, 45, 61, 0.025) !important;
+}
+
+.app-content.toolbox-unified-shell,
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) {
+  background:
+    radial-gradient(circle at 10% 0%, rgba(219, 234, 254, 0.42) 0%, transparent 34%),
+    radial-gradient(circle at 94% 4%, rgba(220, 252, 231, 0.34) 0%, transparent 30%),
+    linear-gradient(135deg, rgba(243, 248, 255, 0.98) 0%, rgba(251, 253, 255, 0.92) 48%, rgba(243, 250, 247, 0.95) 100%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 252, 255, 0.5)) !important;
+  border-bottom-color: var(--tb-line-strong) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .section,
+  .toolbar,
+  .filter-bar,
+  .stats-bar,
+  .summary-row,
+  .summary-strip,
+  .connect-card,
+  .import-card,
+  .empty-state,
+  .config-panel,
+  .result-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .file-panel,
+  .diff-panel,
+  .request-panel,
+  .response-panel,
+  .docs-list-panel,
+  .docs-form-panel,
+  .mock-rules-panel,
+  .mock-edit-panel,
+  .auto-sidebar,
+  .auto-main,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .io-panel,
+  .info-panel,
+  .sidebar-left,
+  .sidebar-area,
+  .right-area,
+  .table-area,
+  .key-list-panel,
+  .key-detail-panel,
+  .block-detail-panel,
+  .action-card,
+  .history-card,
+  .preview-card,
+  .wp-card,
+  .stat-card,
+  .bench-stat-card,
+  .task-item,
+  .info-section,
+  .sub-card
+) {
+  border-color: var(--tb-panel-line) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(248, 252, 255, 0.36)) !important;
+  box-shadow: var(--tb-panel-shadow) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 252, 255, 0.52)) !important;
+  border-color: rgba(100, 116, 139, 0.15) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(247, 251, 255, 0.5)) !important;
+  border-color: rgba(100, 116, 139, 0.15) !important;
+}
+
+/* FINAL TOOLBOX TYPOGRAPHY AND CONTROL FIXES - keep after palette overrides. */
+.app-content.toolbox-unified-shell,
+.app-content.toolbox-unified-shell * {
+  font-family: "Segoe UI Variable Text", "SF Pro Text", "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.app-content.toolbox-unified-shell :is(.code, code, pre, .monaco-editor, .cm-editor, .cm-content, .terminal, .log-content, .json-viewer, .sql-editor, .cli-output, .cli-input, .hash-value, .info-key, .info-val) {
+  font-family: "Cascadia Code", "SF Mono", "JetBrains Mono", Consolas, monospace !important;
+}
+
+.app-content.toolbox-unified-shell {
+  font-size: 13px !important;
+  line-height: 1.45 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.label-text, .setting-label, .field-label, .toolbar-label, .param-label, .section-label, .el-form-item__label) {
+  color: #334155 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.35 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.label-desc, .setting-desc, .hint, .empty-hint, .status-bar, .bottom-bar) {
+  color: #718096 !important;
+  font-size: 12px !important;
+  line-height: 1.45 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input, .el-select, .el-date-editor, .el-input-number) {
+  --el-component-size-small: 30px;
+  --el-component-size: 32px;
+  --el-component-size-large: 36px;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-date-editor.el-input__wrapper) {
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input--small .el-input__wrapper, .el-select--small .el-select__wrapper, .el-date-editor--small.el-input__wrapper) {
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__inner, .el-select__placeholder, .el-select__selected-item, .el-select__input) {
+  height: 30px !important;
+  min-height: 0 !important;
+  line-height: 30px !important;
+  font-size: 13px !important;
+  color: #172033 !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__wrapper {
+  flex-wrap: nowrap !important;
+  align-content: center !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__selected-item {
+  display: inline-flex !important;
+  align-items: center !important;
+  max-width: 100% !important;
+  white-space: nowrap !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number {
+  height: 32px !important;
+  min-height: 32px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  overflow: visible !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input {
+  height: 32px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper {
+  height: 32px !important;
+  min-height: 32px !important;
+  width: 100% !important;
+  border: 1px solid rgba(100, 116, 139, 0.15) !important;
+  border-radius: 8px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 252, 255, 0.52)) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input__inner {
+  height: 30px !important;
+  line-height: 30px !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-size: 13px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input__wrapper {
+  padding-left: 10px !important;
+  padding-right: 34px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number__increase {
+  width: 28px !important;
+  height: 15px !important;
+  min-height: 0 !important;
+  right: 1px !important;
+  border-color: rgba(100, 116, 139, 0.14) !important;
+  background: rgba(248, 251, 255, 0.64) !important;
+  color: #64748b !important;
+  line-height: 15px !important;
+  box-sizing: border-box !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number__increase {
+  top: 1px !important;
+  border-radius: 0 7px 0 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number__decrease {
+  bottom: 1px !important;
+  border-radius: 0 0 7px 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .content-area {
+  padding: 12px 14px 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-section {
+  padding: 14px 0 4px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .section-header {
+  padding: 0 10px 10px !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row {
+  min-height: 54px !important;
+  padding: 11px 12px !important;
+  gap: 24px !important;
+  border-radius: 9px !important;
+  box-sizing: border-box !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row:not(:last-child) {
+  border-bottom: 1px solid rgba(100, 116, 139, 0.1) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row:hover {
+  background: rgba(255, 255, 255, 0.42) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .label-text {
+  color: #1f2937 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .label-desc {
+  color: #7b8797 !important;
+  font-size: 12px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-control :is(.el-select, .el-input-number) {
+  max-width: 230px !important;
+}
+
+@media (max-width: 860px) {
+  .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row {
+    grid-template-columns: 1fr !important;
+    padding: 12px !important;
+  }
+}
+
+/* FINAL ELEMENT PLUS CONTROL STRUCTURE FIX - select and number input. */
+.app-content.toolbox-unified-shell .el-select {
+  --el-select-input-font-size: 13px;
+  vertical-align: middle !important;
+  line-height: 1 !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__wrapper {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 10px !important;
+  gap: 4px !important;
+  line-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .el-select--small .el-select__wrapper {
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 0 9px !important;
+  line-height: 28px !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__selection {
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__selected-item {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: nowrap !important;
+  overflow: hidden !important;
+  line-height: 30px !important;
+}
+
+.app-content.toolbox-unified-shell .el-select--small .el-select__selected-item {
+  line-height: 28px !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-select__placeholder, .el-select__selected-item span, .el-select__tags-text) {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  line-height: inherit !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__input-wrapper {
+  min-width: 0 !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__input {
+  height: 28px !important;
+  line-height: 28px !important;
+  font-size: 13px !important;
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__suffix,
+.app-content.toolbox-unified-shell .el-select__prefix {
+  height: 100% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number {
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 32px !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  position: relative !important;
+  display: inline-flex !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small {
+  height: 30px !important;
+  min-height: 30px !important;
+  line-height: 30px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input {
+  height: 100% !important;
+  line-height: inherit !important;
+  display: inline-flex !important;
+  align-items: stretch !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper {
+  height: 100% !important;
+  min-height: 0 !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0 0 1px rgba(100, 116, 139, 0.15) inset !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 252, 255, 0.52)) !important;
+  box-sizing: border-box !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input__inner {
+  height: 100% !important;
+  min-height: 0 !important;
+  line-height: 1 !important;
+  font-size: 13px !important;
+  text-align: center !important;
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right):not(.is-without-controls) .el-input__wrapper {
+  padding-left: 34px !important;
+  padding-right: 34px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small:not(.is-controls-right):not(.is-without-controls) .el-input__wrapper {
+  padding-left: 28px !important;
+  padding-right: 28px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input__wrapper {
+  padding-left: 10px !important;
+  padding-right: 34px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small.is-controls-right .el-input__wrapper {
+  padding-left: 9px !important;
+  padding-right: 30px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number__increase {
+  position: absolute !important;
+  z-index: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  color: #64748b !important;
+  background: rgba(248, 251, 255, 0.72) !important;
+  border-color: rgba(100, 116, 139, 0.14) !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__increase {
+  top: 1px !important;
+  bottom: 1px !important;
+  height: auto !important;
+  width: 30px !important;
+  line-height: 30px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small:not(.is-controls-right) .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number--small:not(.is-controls-right) .el-input-number__increase {
+  width: 26px !important;
+  line-height: 28px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__decrease {
+  left: 1px !important;
+  right: auto !important;
+  border-right: 1px solid rgba(100, 116, 139, 0.14) !important;
+  border-left: 0 !important;
+  border-radius: 7px 0 0 7px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__increase {
+  left: auto !important;
+  right: 1px !important;
+  border-left: 1px solid rgba(100, 116, 139, 0.14) !important;
+  border-right: 0 !important;
+  border-radius: 0 7px 7px 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__increase {
+  left: auto !important;
+  right: 1px !important;
+  width: 28px !important;
+  height: 15px !important;
+  line-height: 15px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small.is-controls-right .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number--small.is-controls-right .el-input-number__increase {
+  width: 26px !important;
+  height: 14px !important;
+  line-height: 14px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__increase {
+  top: 1px !important;
+  bottom: auto !important;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.14) !important;
+  border-left: 1px solid rgba(100, 116, 139, 0.14) !important;
+  border-radius: 0 7px 0 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__decrease {
+  top: auto !important;
+  bottom: 1px !important;
+  border-left: 1px solid rgba(100, 116, 139, 0.14) !important;
+  border-radius: 0 0 7px 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-control :is(.el-select, .el-input-number) {
+  width: 230px !important;
+  max-width: 230px !important;
+}
+
+/* FINAL INPUT NUMBER INTEGRATED CONTROL FIX - one visible shell. */
+.app-content.toolbox-unified-shell .el-input-number {
+  height: 32px !important;
+  min-height: 32px !important;
+  line-height: 32px !important;
+  border: 1px solid rgba(100, 116, 139, 0.16) !important;
+  border-radius: 8px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 252, 255, 0.58)) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64) !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  display: inline-flex !important;
+  align-items: stretch !important;
+  position: relative !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small {
+  height: 30px !important;
+  min-height: 30px !important;
+  line-height: 30px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:hover {
+  border-color: rgba(100, 116, 139, 0.24) !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 252, 255, 0.68)) !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:focus-within {
+  border-color: #4a78d9 !important;
+  box-shadow: 0 0 0 3px rgba(74, 120, 217, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input,
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper {
+  height: 100% !important;
+  min-height: 0 !important;
+  line-height: inherit !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper:hover,
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper.is-focus {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input__inner {
+  height: 100% !important;
+  line-height: 1 !important;
+  padding: 0 !important;
+  color: #172033 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number__increase {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: rgba(241, 246, 252, 0.68) !important;
+  color: #64748b !important;
+  box-shadow: none !important;
+  transition: background 0.15s ease, color 0.15s ease !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number__decrease:hover,
+.app-content.toolbox-unified-shell .el-input-number__increase:hover {
+  background: rgba(231, 240, 251, 0.9) !important;
+  color: #2f6fe4 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right):not(.is-without-controls) .el-input__wrapper {
+  padding-left: 31px !important;
+  padding-right: 31px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small:not(.is-controls-right):not(.is-without-controls) .el-input__wrapper {
+  padding-left: 27px !important;
+  padding-right: 27px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__increase {
+  top: 0 !important;
+  bottom: 0 !important;
+  height: auto !important;
+  width: 30px !important;
+  line-height: inherit !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small:not(.is-controls-right) .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number--small:not(.is-controls-right) .el-input-number__increase {
+  width: 26px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__decrease {
+  left: 0 !important;
+  right: auto !important;
+  border-right: 1px solid rgba(100, 116, 139, 0.14) !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right) .el-input-number__increase {
+  left: auto !important;
+  right: 0 !important;
+  border-left: 1px solid rgba(100, 116, 139, 0.14) !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input__wrapper {
+  padding-left: 10px !important;
+  padding-right: 31px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small.is-controls-right .el-input__wrapper {
+  padding-left: 9px !important;
+  padding-right: 28px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__increase {
+  left: auto !important;
+  right: 0 !important;
+  width: 28px !important;
+  height: 50% !important;
+  line-height: 1 !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number--small.is-controls-right .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number--small.is-controls-right .el-input-number__increase {
+  width: 26px !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__increase {
+  top: 0 !important;
+  bottom: auto !important;
+  border-left: 1px solid rgba(100, 116, 139, 0.14) !important;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.14) !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number.is-controls-right .el-input-number__decrease {
+  top: auto !important;
+  bottom: 0 !important;
+  border-left: 1px solid rgba(100, 116, 139, 0.14) !important;
+}
+
+/* FINAL SELECT CARET FIX - dropdowns should not look like text inputs. */
+.app-content.toolbox-unified-shell .el-select__input {
+  caret-color: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__input-wrapper.is-hidden {
+  display: none !important;
+  opacity: 0 !important;
+  position: absolute !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__wrapper:not(.is-filterable) .el-select__input-wrapper,
+.app-content.toolbox-unified-shell .el-select__wrapper:not(.is-filterable) .el-select__input {
+  display: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__wrapper {
+  cursor: pointer !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__wrapper.is-filterable {
+  cursor: pointer !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-select__input-wrapper,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-select__input {
+  display: none !important;
+}
+
+/* FINAL SELECT TEXT VISIBILITY FIX - restore selected labels above the control background. */
+.app-content.toolbox-unified-shell .el-select__selection {
+  position: relative !important;
+  z-index: 1 !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__selected-item {
+  position: relative !important;
+  z-index: 2 !important;
+  color: #172033 !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__placeholder {
+  position: static !important;
+  z-index: 2 !important;
+  transform: none !important;
+  width: auto !important;
+  max-width: 100% !important;
+  display: block !important;
+  color: #172033 !important;
+  line-height: 30px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.app-content.toolbox-unified-shell .el-select--small .el-select__placeholder {
+  line-height: 28px !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__placeholder.is-transparent {
+  color: #8a97aa !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__selected-item :is(span, div, p) {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  display: inline-block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  vertical-align: middle !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__suffix {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+/* FINAL SDK MANAGER POLISH - divider layout, narrow nav and full-width work area. */
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
+  display: grid !important;
+  grid-template-columns: 152px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  height: calc(100% - 58px) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left {
+  width: 152px !important;
+  min-width: 152px !important;
+  max-width: 152px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--tb-line-strong) !important;
+  border-radius: 0 !important;
+  background: linear-gradient(180deg, rgba(248, 252, 255, 0.42), rgba(241, 247, 252, 0.28)) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-list {
+  padding: 8px 6px !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item {
+  min-height: 34px !important;
+  margin: 0 !important;
+  padding: 7px 9px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item:not(:last-child) {
+  border-bottom: 1px solid rgba(100, 116, 139, 0.08) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item:hover {
+  background: rgba(255, 255, 255, 0.34) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item.active {
+  color: #245fca !important;
+  background: linear-gradient(90deg, rgba(47, 111, 228, 0.12), rgba(255, 255, 255, 0.24)) !important;
+  box-shadow: inset 3px 0 0 rgba(47, 111, 228, 0.76) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-badge {
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .content-area {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-workspace {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow-y: auto !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-panel {
+  width: 100% !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper :is(.env-card, .versions-panel) {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 14px 18px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  box-sizing: border-box !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .env-card {
+  border-bottom: 1px solid var(--tb-line-strong) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .versions-panel {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .panel-header {
+  min-height: 44px !important;
+  padding: 0 0 10px !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--tb-line) !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .version-list {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .version-row {
+  min-height: 42px !important;
+  padding: 9px 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.11) !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .version-row:hover {
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .version-row.active {
+  background: linear-gradient(90deg, rgba(47, 111, 228, 0.08), transparent) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .env-path {
+  border-radius: 8px !important;
+  border: 1px solid rgba(100, 116, 139, 0.12) !important;
+  background: rgba(255, 255, 255, 0.42) !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--tb-line-strong) !important;
+  }
+
+  .app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-list {
+    display: flex !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+  }
+
+  .app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item {
+    flex: 0 0 auto !important;
+    border-bottom: 0 !important;
+  }
+}
+
+/* FINAL SDK STACKING LOCK - keep SDK detail content vertical and full-width. */
+.app-content.toolbox-unified-shell [style*="display: none"] {
+  display: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-workspace,
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-panel {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  grid-template-columns: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-panel > * {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  flex-basis: auto !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-panel > .versions-panel {
+  flex: 1 1 auto !important;
+}
+
+/* FINAL SELECT LABEL LOCK - hide only the editable input, never the selected text. */
+.app-content.toolbox-unified-shell .el-select__wrapper:not(.is-filterable) .el-select__input-wrapper {
+  display: inline-flex !important;
+  flex: 0 0 0 !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__wrapper:not(.is-filterable) .el-select__input {
+  display: block !important;
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .el-select__selected-item,
+.app-content.toolbox-unified-shell .el-select__selected-item span,
+.app-content.toolbox-unified-shell .el-select__placeholder {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: #172033 !important;
+}
+
+/* FINAL GIT DAILY REPORT PREVIEW LOCK - let the preview editor fill the right workspace. */
+.app-content.toolbox-unified-shell .git-report-wrapper .main-content {
+  display: flex !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .left-panel {
+  flex: 0 0 340px !important;
+  width: 340px !important;
+  min-width: 280px !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .right-panel {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .report-preview,
+.app-content.toolbox-unified-shell .git-report-wrapper .report-textarea {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex !important;
+}
+
+.app-content.toolbox-unified-shell .git-report-wrapper .report-textarea .el-textarea__inner {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  resize: none !important;
+}
+
+@media (max-width: 1100px) {
+  .app-content.toolbox-unified-shell .git-report-wrapper .main-content {
+    flex-direction: column !important;
+  }
+
+  .app-content.toolbox-unified-shell .git-report-wrapper .left-panel {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
+/* FINAL SSH CONNECTION LIST CONTRAST - keep saved connection text readable on light panels. */
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-item {
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-item:hover {
+  background: rgba(74, 120, 217, 0.1) !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-item.active {
+  background: linear-gradient(90deg, rgba(74, 120, 217, 0.16), rgba(255, 255, 255, 0.18)) !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-name {
+  color: #172033 !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-host {
+  color: #516174 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+}
+
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-empty,
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .panel-title {
+  color: #667386 !important;
+}
+
+/* FINAL API DEBUG POLISH - lighter buttons and calmer workbench spacing. */
+.app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout {
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  flex: 0 0 260px !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  max-width: 0 !important;
+  flex-basis: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .left-sidebar {
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
+  background: linear-gradient(180deg, rgba(248, 252, 255, 0.72), rgba(241, 247, 252, 0.52)) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .main-panel {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 1 1 auto !important;
+  background: linear-gradient(180deg, rgba(252,253,255,0.7), rgba(246,249,252,0.5)) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .url-bar {
+  gap: 10px !important;
+  padding: 12px 14px !important;
+  background: rgba(255,255,255,0.58) !important;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .url-actions {
+  gap: 5px !important;
+  padding: 4px !important;
+  border: 1px solid rgba(100, 116, 139, 0.12) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.url-actions, .sidebar-toolbar-create) .el-button {
+  height: 32px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.el-button--primary, .create-action-btn.el-button--primary) {
+  color: #fff !important;
+  background: linear-gradient(180deg, #4c82e6 0%, #316bd0 100%) !important;
+  border-color: rgba(49, 107, 208, 0.85) !important;
+  box-shadow: 0 6px 14px rgba(49, 107, 208, 0.18), inset 0 1px 0 rgba(255,255,255,0.26) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.el-button--primary, .create-action-btn.el-button--primary):hover {
+  color: #fff !important;
+  background: linear-gradient(180deg, #5a8dea 0%, #3a72d6 100%) !important;
+  border-color: rgba(58, 114, 214, 0.9) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .url-more-btn {
+  min-width: 32px !important;
+  color: #526174 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-actions-grid {
+  display: flex !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-action-btn {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  border: 1px solid rgba(49, 107, 208, 0.2) !important;
+  border-radius: 10px !important;
+  background: rgba(74, 120, 217, 0.1) !important;
+  color: #245fca !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-action-btn:hover {
+  color: #245fca !important;
+  border-color: rgba(49, 107, 208, 0.28) !important;
+  background: rgba(74, 120, 217, 0.15) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.request-panel, .response-panel) {
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .split-panels {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  grid-template-rows: minmax(180px, 45%) minmax(0, 1fr) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .panel-resizer {
+  display: none !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .request-panel {
+  flex: 0 0 45% !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .response-panel {
+  flex: 1 1 55% !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .response-empty {
+  margin: 18px !important;
+  background: rgba(255,255,255,0.36) !important;
+  border: 1px dashed rgba(100, 116, 139, 0.16) !important;
 }

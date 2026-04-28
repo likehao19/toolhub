@@ -1,6 +1,5 @@
-<template>
-  <div class="toolbox-wrapper">
-    <!-- 顶部工具栏 -->
+﻿<template>
+  <div class="toolbox-wrapper toolbox-sticky-notes-wrapper">
     <div class="header">
       <div class="header-left">
         <div class="page-title-block">
@@ -27,25 +26,20 @@
     </div>
 
     <div class="content-area">
-      <!-- 存储设置 -->
       <div class="settings-section">
         <div class="section-header">
-          <el-icon class="section-icon"><FolderOpened /></el-icon>
           <span>存储</span>
         </div>
         <div class="settings-group">
           <div class="setting-row">
             <div class="setting-label">
               <span class="label-text">笔记文件夹</span>
-              <span class="label-desc">选择已有文件夹或输入新名称，将自动创建</span>
+              <span class="label-desc">选择已有文件夹作为便签存储位置</span>
             </div>
             <div class="setting-control">
               <el-select
                 v-model="config.noteFolder"
-                filterable
-                allow-create
-                default-first-option
-                placeholder="输入或选择文件夹"
+                placeholder="选择文件夹"
                 style="width: 240px;"
                 :loading="foldersLoading"
               >
@@ -56,7 +50,7 @@
                   :value="opt.value"
                 >
                   <span :style="{ paddingLeft: opt.depth * 16 + 'px' }" class="folder-option">
-                    <span class="folder-indent" v-if="opt.depth > 0">└ </span>
+                    <span class="folder-indent" v-if="opt.depth > 0">└</span>
                     <span>{{ opt.label }}</span>
                   </span>
                 </el-option>
@@ -66,10 +60,8 @@
         </div>
       </div>
 
-      <!-- 快捷键设置 -->
       <div class="settings-section">
         <div class="section-header">
-          <el-icon class="section-icon"><Keyboard /></el-icon>
           <span>快捷键</span>
         </div>
         <div class="settings-group">
@@ -85,7 +77,6 @@
                 :class="{ recording: isRecording }"
                 @click="toggleRecording"
               >
-                <!-- 录入中：实时显示按下的修饰键 -->
                 <template v-if="isRecording">
                   <template v-if="liveModifiers.length > 0">
                     <template v-for="(mod, i) in liveModifiers" :key="mod">
@@ -97,7 +88,6 @@
                   </template>
                   <span v-else class="recording-hint">请按下组合键...</span>
                 </template>
-                <!-- 已设置：显示键位 -->
                 <template v-else-if="config.shortcut">
                   <template v-for="(key, i) in config.shortcut.split('+')" :key="i">
                     <span v-if="i > 0" class="keycap-sep">+</span>
@@ -117,10 +107,8 @@
         </div>
       </div>
 
-      <!-- 窗口设置 -->
       <div class="settings-section">
         <div class="section-header">
-          <el-icon class="section-icon"><Monitor /></el-icon>
           <span>窗口</span>
         </div>
         <div class="settings-group">
@@ -145,7 +133,7 @@
           <div class="setting-row">
             <div class="setting-label">
               <span class="label-text">默认宽度</span>
-              <span class="label-desc">新建便签窗口的初始宽度（px）</span>
+              <span class="label-desc">新建便签窗口的初始宽度(px)</span>
             </div>
             <div class="setting-control">
               <el-input-number v-model="config.defaultWidth" :min="200" :max="800" :step="10" size="small" />
@@ -154,7 +142,7 @@
           <div class="setting-row">
             <div class="setting-label">
               <span class="label-text">默认高度</span>
-              <span class="label-desc">新建便签窗口的初始高度（px）</span>
+              <span class="label-desc">新建便签窗口的初始高度(px)</span>
             </div>
             <div class="setting-control">
               <el-input-number v-model="config.defaultHeight" :min="200" :max="800" :step="10" size="small" />
@@ -163,25 +151,27 @@
         </div>
       </div>
     </div>
+
+    <div class="status-bar">
+      <span>文件夹：{{ config.noteFolder || '未设置' }}</span>
+      <span>快捷键：{{ config.shortcut || '未设置' }}</span>
+      <span>窗口上限：{{ config.maxWindows }}</span>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, Promotion, Briefcase, FolderOpened, Monitor, RefreshLeft } from '@element-plus/icons-vue'
+import { Check, Promotion, Briefcase, RefreshLeft } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-
-const Keyboard = {
-  template: `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor"><path d="M896 128H128c-35.3 0-64 28.7-64 64v512c0 35.3 28.7 64 64 64h768c35.3 0 64-28.7 64-64V192c0-35.3-28.7-64-64-64z m0 576H128V192h768v512zM256 288h64v64h-64z m0 128h64v64h-64z m128-128h64v64h-64z m0 128h64v64h-64z m128-128h64v64h-64z m0 128h64v64h-64z m128-128h64v64h-64z m0 128h64v64h-64z m128-128h64v64h-64z m0 128h64v64h-64z m-384 128h384v64H384z"/></svg>`
-}
 
 const router = useRouter()
 
 const STORAGE_KEY = 'sticky_notes_config'
 
 const DEFAULT_CONFIG = {
-  noteFolder: '便签',
+  noteFolder: '渚跨',
   shortcut: 'Ctrl+Alt+N',
   maxWindows: 10,
   alwaysOnTop: true,
@@ -191,11 +181,11 @@ const DEFAULT_CONFIG = {
 
 const config = ref({ ...DEFAULT_CONFIG })
 
-// ---- 文件夹选择 ----
+// ---- 鏂囦欢澶归€夋嫨 ----
 const folderOptions = ref([])
 const foldersLoading = ref(false)
 
-// 资源/系统文件夹，不应出现在选择列表中
+// 璧勬簮/绯荤粺鏂囦欢澶癸紝涓嶅簲鍑虹幇鍦ㄩ€夋嫨鍒楄〃涓?
 const EXCLUDED_FOLDERS = new Set([
   'images', 'videos', 'assets', 'attachments',
   '.git', '.svn', 'node_modules', '.DS_Store', 'Thumbs.db'
@@ -210,7 +200,7 @@ const loadFolders = async () => {
 
     const rootDir = await getNotesDir()
 
-    // 递归扫描文件夹，构建树并展平为带缩进的列表
+    // 閫掑綊鎵弿鏂囦欢澶癸紝鏋勫缓鏍戝苟灞曞钩涓哄甫缂╄繘鐨勫垪琛?
     const scanDir = async (dirPath, depth, prefix) => {
       const entries = await readDir(dirPath)
       const result = []
@@ -223,7 +213,7 @@ const loadFolders = async () => {
         const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name
         result.push({ value: relativePath, label: entry.name, depth })
 
-        // 递归子文件夹（限制深度防止过深）
+        // 閫掑綊瀛愭枃浠跺す锛堥檺鍒舵繁搴﹂槻姝㈣繃娣憋級
         if (depth < 3) {
           const childPath = await join(dirPath, entry.name)
           const children = await scanDir(childPath, depth + 1, relativePath)
@@ -235,7 +225,7 @@ const loadFolders = async () => {
 
     const options = await scanDir(rootDir, 0, '')
 
-    // 确保当前选中值在列表中
+    // 纭繚褰撳墠閫変腑鍊煎湪鍒楄〃涓?
     if (config.value.noteFolder && !options.some(o => o.value === config.value.noteFolder)) {
       options.unshift({ value: config.value.noteFolder, label: config.value.noteFolder, depth: 0 })
     }
@@ -244,13 +234,13 @@ const loadFolders = async () => {
   } catch {
     folderOptions.value = config.value.noteFolder
       ? [{ value: config.value.noteFolder, label: config.value.noteFolder, depth: 0 }]
-      : [{ value: '便签', label: '便签', depth: 0 }]
+      : [{ value: '渚跨', label: '渚跨', depth: 0 }]
   } finally {
     foldersLoading.value = false
   }
 }
 
-// ---- 快捷键录入 ----
+// ---- 蹇嵎閿綍鍏?----
 const shortcutRef = ref(null)
 const isRecording = ref(false)
 const liveModifiers = ref([])
@@ -290,23 +280,23 @@ const onRecordKeyDown = (e) => {
   e.preventDefault()
   e.stopPropagation()
 
-  // Esc 取消录入
+  // Esc 鍙栨秷褰曞叆
   if (e.key === 'Escape') {
     stopRecording()
     return
   }
 
-  // 实时更新修饰键显示
+  // 瀹炴椂鏇存柊淇グ閿樉绀?
   liveModifiers.value = getModifiers(e)
 
-  // 判断是否按下了非修饰键
+  // 鍒ゆ柇鏄惁鎸変笅浜嗛潪淇グ閿?
   if (MODIFIER_KEYS.has(e.key)) return
 
   const key = normalizeKey(e.key)
   if (!key) return
 
   const mods = getModifiers(e)
-  if (mods.length === 0) return // 必须含修饰键
+  if (mods.length === 0) return // 蹇呴』鍚慨楗伴敭
 
   config.value.shortcut = [...mods, key].join('+')
   stopRecording()
@@ -349,7 +339,7 @@ const stopRecording = () => {
   document.removeEventListener('mousedown', onClickOutside, true)
 }
 
-// ---- 重置 ----
+// ---- 閲嶇疆 ----
 const resetConfig = async () => {
   try {
     await ElMessageBox.confirm('确定要将所有设置恢复为默认值吗？', '重置设置', {
@@ -358,13 +348,13 @@ const resetConfig = async () => {
       type: 'warning'
     })
     config.value = { ...DEFAULT_CONFIG }
-    ElMessage.info('已恢复默认设置，点击保存生效')
+    ElMessage.info('已恢复默认设置，点击保存后生效')
   } catch {
-    // 用户取消
+    // 鐢ㄦ埛鍙栨秷
   }
 }
 
-// ---- 初始化 ----
+// ---- 鍒濆鍖?----
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
@@ -382,17 +372,17 @@ onBeforeUnmount(() => {
   stopRecording()
 })
 
-// ---- 保存并立即生效 ----
+// ---- 淇濆瓨骞剁珛鍗崇敓鏁?----
 const saveConfig = async () => {
-  // 读取旧配置中的快捷键
+  // 璇诲彇鏃ч厤缃腑鐨勫揩鎹烽敭
   const oldCfg = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}')
   const oldShortcut = (oldCfg.shortcut || 'Ctrl+Alt+N').replace('Ctrl', 'CommandOrControl')
   const newShortcut = (config.value.shortcut || 'Ctrl+Alt+N').replace('Ctrl', 'CommandOrControl')
 
-  // 写入 localStorage
+  // 鍐欏叆 localStorage
   localStorage.setItem(STORAGE_KEY, JSON.stringify(config.value))
 
-  // 通知 App.vue 重新注册快捷键
+  // 閫氱煡 App.vue 閲嶆柊娉ㄥ唽蹇嵎閿?
   try {
     const { emit } = await import('@tauri-apps/api/event')
     await emit('sticky-notes-config-changed', {
@@ -438,7 +428,7 @@ const openStickyNotes = async () => {
     }
 
     if (!label) {
-      ElMessage.warning('已达到最大便签窗口数')
+      ElMessage.warning('宸茶揪鍒版渶澶т究绛剧獥鍙ｆ暟')
       return
     }
 
@@ -456,7 +446,7 @@ const openStickyNotes = async () => {
     const stickyUrl = `${window.location.origin}/sticky-notes?id=${timestamp}`
     const stickyWindow = new WebviewWindow(label, {
       url: stickyUrl,
-      title: '便签',
+      title: '渚跨',
       x, y,
       width: config.value.defaultWidth,
       height: config.value.defaultHeight,
@@ -474,12 +464,12 @@ const openStickyNotes = async () => {
     })
 
     stickyWindow.once('tauri://error', (e) => {
-      console.error('[便签] 窗口创建失败:', e)
-      ElMessage.error('打开便签失败')
+      console.error('[渚跨] 绐楀彛鍒涘缓澶辫触:', e)
+      ElMessage.error('鎵撳紑渚跨澶辫触')
     })
   } catch (e) {
-    console.error('[便签] 打开失败:', e)
-    ElMessage.error('打开便签失败')
+    console.error('[渚跨] 鎵撳紑澶辫触:', e)
+    ElMessage.error('鎵撳紑渚跨澶辫触')
   }
 }
 </script>
@@ -544,38 +534,42 @@ const openStickyNotes = async () => {
 .content-area::-webkit-scrollbar-thumb:hover { background: #c0c4cc; }
 
 .settings-section {
-  margin-bottom: 18px;
-  max-width: 760px;
-  padding: 16px 18px 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  background: rgba(255,255,255,0.72);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
+  width: 100%;
+  margin-bottom: 0;
+  padding: 18px 0 6px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  box-sizing: border-box;
 }
+.settings-section:first-child { padding-top: 0; }
+.settings-section:not(:last-child) { border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
 .section-header {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #606266;
-  padding-bottom: 12px;
+  color: var(--text-primary);
+  padding: 0 0 10px;
+  line-height: 1.3;
 }
-.section-icon { font-size: 15px; color: #909399; }
 .settings-group {
-  background: rgba(255,255,255,0.82);
-  border-radius: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: transparent;
+  border-radius: 0;
+  border: 0;
 }
 .setting-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
+  gap: 28px;
+  min-height: 58px;
+  padding: 12px 0;
   transition: background 0.15s;
 }
-.setting-row:not(:last-child) { border-bottom: 1px solid rgba(15, 23, 42, 0.05); }
-.setting-row:hover { background: rgba(248,250,252,0.8); }
+.setting-row:not(:last-child) { border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.setting-row:hover { background: rgba(255,255,255,0.34); }
 .setting-label {
   display: flex;
   flex-direction: column;
@@ -585,10 +579,22 @@ const openStickyNotes = async () => {
 }
 .label-text { font-size: 13px; color: #303133; font-weight: 500; }
 .label-desc { font-size: 12px; color: #a8abb2; line-height: 1.4; }
-.setting-control { flex-shrink: 0; margin-left: 24px; }
+.setting-control {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  padding-right: 2px;
+}
+.setting-control :deep(.el-select),
+.setting-control :deep(.el-input-number) {
+  width: 100% !important;
+  max-width: 240px;
+}
 .shortcut-control { display: flex; align-items: center; gap: 6px; }
 .shortcut-input {
-  min-width: 140px;
+  width: 100%;
+  max-width: 240px;
+  min-width: 160px;
   height: 32px;
   display: flex;
   align-items: center;
@@ -632,4 +638,41 @@ const openStickyNotes = async () => {
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 .folder-option { display: inline-flex; align-items: center; font-size: 13px; }
 .folder-indent { color: #c0c4cc; margin-right: 2px; }
+
+.status-bar {
+  height: 30px;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 18px 18px;
+  padding: 0 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: 0;
+  border-radius: 0 0 18px 18px;
+  background: rgba(255,255,255,0.72);
+  color: var(--text-tertiary);
+  font-size: 11px;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+@media (max-width: 860px) {
+  .content-area {
+    padding: 14px 14px 8px;
+  }
+
+  .setting-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 0;
+    align-items: flex-start;
+  }
+
+  .setting-control {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
 </style>
+

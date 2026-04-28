@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="network-tool-page">
     <div class="header">
       <div class="header-left">
@@ -18,9 +18,9 @@
     </div>
 
     <div class="content-area">
-      <div class="config-panel">
+      <aside class="config-panel">
         <div class="panel-title">查询配置</div>
-        <el-form label-width="88px" size="small">
+        <el-form label-width="72px" size="small">
           <el-form-item label="IP/域名">
             <el-input v-model="target" placeholder="例如：8.8.8.8 / example.com" clearable @keyup.enter="submit" />
           </el-form-item>
@@ -34,16 +34,24 @@
         <div class="history-card">
           <div class="sub-title">最近查询</div>
           <div v-if="historyList.length" class="history-list">
-            <div v-for="item in historyList" :key="item" class="history-item">
-              <span class="history-text" @click="selectHistory(item)">{{ item }}</span>
+            <div v-for="item in historyList" :key="item" class="history-item" @click="selectHistory(item)">
+              <span class="history-text">{{ item }}</span>
             </div>
           </div>
           <div v-else class="hint">暂无查询历史</div>
         </div>
-      </div>
+      </aside>
 
-      <div class="result-panel" v-loading="loading">
+      <section class="result-panel" v-loading="loading">
         <template v-if="result">
+          <div class="result-toolbar">
+            <div class="meta-row">
+              <el-tag size="small">{{ result.query || '-' }}</el-tag>
+              <el-tag size="small" type="success">{{ result.ip || '-' }}</el-tag>
+              <el-tag size="small" type="info">{{ result.country || '-' }}</el-tag>
+            </div>
+          </div>
+
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-val">{{ result.ip || '-' }}</div>
@@ -73,7 +81,7 @@
           </el-descriptions>
         </template>
         <div v-else class="empty-hint">输入 IP 或域名后开始查询</div>
-      </div>
+      </section>
     </div>
   </div>
 </template>
@@ -152,124 +160,136 @@ function reset() {
 </script>
 
 <style scoped>
-.network-tool-page {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
-}
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
-  box-sizing: border-box;
-  backdrop-filter: blur(18px);
-}
-.header-left { display: flex; align-items: center; min-width: 0; }
-.header-actions { display: flex; align-items: center; gap: 8px; }
-.page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.page-eyebrow {
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-}
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
-.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
-.breadcrumb-link:hover { text-decoration: underline; }
-.breadcrumb-sep { color: var(--text-tertiary); }
-.header-actions :deep(.el-button) { --el-border-radius-base: 10px; }
 .content-area {
   flex: 1;
-  display: flex;
-  overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
-  gap: 0;
+  display: grid;
+  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+  overflow: hidden;
 }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .config-panel {
-  width: 340px;
-  min-width: 300px;
-  padding: 16px;
-  overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-}
-.result-panel {
-  flex: 1;
-  min-width: 0;
-  padding: 16px;
+  min-height: 0;
   overflow: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 18px 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  padding: 16px 18px;
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
 }
-.panel-title {
-  font-size: 13px;
+
+.panel-title,
+.sub-title {
+  font-size: 14px;
   font-weight: 600;
-  color: var(--text-primary);
   margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
 }
+
 .hint {
   font-size: 12px;
-  color: var(--text-tertiary);
   line-height: 1.5;
-  padding: 10px 12px;
-  background: rgba(255,255,255,0.64);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
+  color: var(--text-tertiary);
 }
+
+.history-card {
+  margin-top: 14px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+}
+
+.history-text {
+  word-break: break-all;
+}
+
+.result-panel {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+}
+
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+.stat-card {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.stat-val {
+  font-size: 15px;
+  font-weight: 700;
+  word-break: break-all;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.stat-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.result-panel :deep(.el-descriptions) {
+  margin: 12px 16px 16px;
+}
+
+.desc-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .empty-hint {
+  min-height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
-  color: var(--text-quaternary);
-  font-size: 12px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  background: rgba(255,255,255,0.5);
+  font-size: 13px;
+  color: var(--text-tertiary);
 }
-.stat-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-bottom:16px; }
-.stat-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  padding: 12px;
-  text-align: center;
-  background: rgba(255,255,255,0.68);
+
+@media (max-width: 1100px) {
+  .content-area { grid-template-columns: 1fr; }
+  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-.stat-val { font-size:16px; font-weight:700; color:var(--text-primary); word-break:break-all; }
-.stat-label { font-size:11px; color:var(--text-tertiary); margin-top:2px; }
-.stat-label-row { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:2px; }
-.history-card { margin-top:20px; }
-.sub-title { font-weight:600; font-size:13px; margin-bottom:8px; color: var(--text-primary); }
-.history-list { display:flex; flex-direction:column; gap:8px; }
-.history-item {
-  padding: 8px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 10px;
-  background: rgba(255,255,255,0.74);
-}
-.history-text { color:var(--text-primary); cursor:pointer; word-break:break-all; }
-.history-text:hover { color:var(--accent-blue); }
-.desc-cell { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 </style>

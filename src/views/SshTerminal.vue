@@ -123,11 +123,8 @@
             <el-button v-if="activeTab.connId" size="small" text @click="openSftp(activeTab.connId)">
               <el-icon><FolderOpened /></el-icon> SFTP
             </el-button>
-            <el-button v-if="activeTab.type === 'terminal'" size="small" text @click="historyPanelOpen = !historyPanelOpen; if (historyPanelOpen) aiPanelOpen = false">
+            <el-button v-if="activeTab.type === 'terminal'" size="small" text @click="historyPanelOpen = !historyPanelOpen">
               <el-icon><Clock /></el-icon> 历史
-            </el-button>
-            <el-button v-if="activeTab.type === 'terminal'" size="small" text @click="aiPanelOpen = !aiPanelOpen; if (aiPanelOpen) historyPanelOpen = false">
-              <el-icon><ChatDotRound /></el-icon> AI
             </el-button>
           </div>
         </div>
@@ -148,23 +145,6 @@
           </div>
         </div>
 
-        <!-- AI 命令助手面板 -->
-        <div class="bottom-panel" v-if="aiPanelOpen">
-          <div class="panel-header">
-            <span>AI 命令助手</span>
-            <span class="panel-close" @click="aiPanelOpen = false">&times;</span>
-          </div>
-          <div class="panel-body ai-panel">
-            <div class="ai-input-row">
-              <el-input v-model="aiQuery" placeholder="描述你想执行的操作，如：查看磁盘使用情况" size="small" @keyup.enter="askAI" clearable />
-              <el-button type="primary" size="small" @click="askAI" :loading="aiLoading">查询</el-button>
-            </div>
-            <div v-if="aiAnswer" class="ai-result">
-              <div class="ai-md" v-html="marked(aiAnswer)"></div>
-              <el-button size="small" type="success" @click="insertAICommand" style="margin-top:8px">插入到终端</el-button>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -229,7 +209,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Monitor, Plus, FolderOpened, Refresh, Upload, Back, Folder, Document, Edit as EditIcon, Delete, Connection, Download, Search, Clock, ChatDotRound } from '@element-plus/icons-vue'
+import { Monitor, Plus, FolderOpened, Refresh, Upload, Back, Folder, Document, Edit as EditIcon, Delete, Connection, Download, Search, Clock } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
@@ -238,8 +218,6 @@ import { Terminal } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import { WebLinksAddon } from '@xterm/addon-web-links'
 import '@xterm/xterm/css/xterm.css'
-import { chatWithAI } from '@/services/aiService'
-import { marked } from 'marked'
 
 const router = useRouter()
 
@@ -277,11 +255,6 @@ const filteredHistory = computed(() => {
   return list.slice(-200).reverse()
 })
 
-// AI 命令助手
-const aiPanelOpen = ref(false)
-const aiQuery = ref('')
-const aiAnswer = ref('')
-const aiLoading = ref(false)
 
 // 命令行缓冲（用于收集用户输入直到回车）
 const cmdBuffers = {}
@@ -724,34 +697,6 @@ function insertToTerminal(cmd) {
   historyPanelOpen.value = false
 }
 
-// === AI 命令助手 ===
-async function askAI() {
-  if (!aiQuery.value.trim() || aiLoading.value) return
-  aiLoading.value = true
-  aiAnswer.value = ''
-  try {
-    const messages = [
-      { role: 'system', content: '你是一个 Linux/SSH 命令助手。用户描述想做的操作，你返回对应的命令。格式要求：先给出命令（用 ```bash 代码块包裹），再用一句话简要说明。只回答命令相关内容，不要多余废话。' },
-      { role: 'user', content: aiQuery.value }
-    ]
-    const result = await chatWithAI(messages, { max_tokens: 500, temperature: 0.3 })
-    aiAnswer.value = result
-  } catch (e) {
-    aiAnswer.value = `查询失败: ${e.message || e}`
-  } finally {
-    aiLoading.value = false
-  }
-}
-
-function insertAICommand() {
-  // 从 AI 回答中提取代码块里的命令
-  const match = aiAnswer.value.match(/```(?:bash|shell|sh)?\s*\n([\s\S]*?)```/)
-  if (match) {
-    insertToTerminal(match[1].trim())
-    aiPanelOpen.value = false
-  }
-}
-
 function formatFileSize(bytes) {
   if (!bytes) return '0 B'
   const units = ['B', 'KB', 'MB', 'GB']
@@ -847,8 +792,8 @@ onBeforeUnmount(() => {
   transition: background .15s;
   margin-bottom: 2px;
 }
-.conn-item:hover { background: rgba(137,180,250,0.08); }
-.conn-item.active { background: rgba(137,180,250,0.12); }
+.conn-item:hover { background: rgba(74, 120, 217, 0.1); }
+.conn-item.active { background: rgba(74, 120, 217, 0.14); }
 .conn-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
@@ -858,8 +803,8 @@ onBeforeUnmount(() => {
 }
 .conn-dot.connected { background: #a6e3a1; box-shadow: 0 0 6px rgba(166,227,161,0.4); }
 .conn-info { min-width: 0; }
-.conn-name { display: block; font-size: 12px; font-weight: 500; color: #cdd6f4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.conn-host { display: block; font-size: 10px; color: rgba(205,214,244,0.4); }
+.conn-name { display: block; font-size: 12px; font-weight: 650; color: #172033; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conn-host { display: block; font-size: 11px; font-weight: 500; color: #516174; }
 .conn-empty { padding: 20px 10px; font-size: 12px; color: rgba(205,214,244,0.3); text-align: center; }
 
 /* Right area */
@@ -981,7 +926,7 @@ onBeforeUnmount(() => {
 .ctx-item.ctx-danger { color: #f38ba8; }
 .ctx-item.ctx-danger:hover { background: rgba(243,139,168,0.12); }
 
-/* Bottom panels (history / AI) */
+/* Bottom panels */
 .bottom-panel {
   border-top: 1px solid rgba(255,255,255,0.08);
   background: rgba(24,24,37,0.95);
@@ -1027,12 +972,4 @@ onBeforeUnmount(() => {
 .history-cmd { font-family: 'JetBrains Mono', Consolas, monospace; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .history-time { color: rgba(205,214,244,0.3); font-size: 10px; margin-left: 12px; flex-shrink: 0; }
 
-/* AI panel */
-.ai-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-.ai-input-row .el-input { flex: 1; }
-.ai-result { background: rgba(30,30,46,0.6); border-radius: 8px; padding: 10px 14px; }
-.ai-md { font-size: 12px; color: #cdd6f4; line-height: 1.6; }
-.ai-md :deep(code) { background: rgba(137,180,250,0.12); padding: 1px 5px; border-radius: 4px; font-family: 'JetBrains Mono', Consolas, monospace; font-size: 12px; }
-.ai-md :deep(pre) { background: rgba(30,30,46,0.8); border-radius: 6px; padding: 10px 14px; overflow-x: auto; margin: 6px 0; }
-.ai-md :deep(pre code) { background: none; padding: 0; }
 </style>

@@ -137,10 +137,6 @@
         <div class="panel-header">
           <span class="panel-title">{{ t('gitReport.preview') }}</span>
           <div class="panel-actions">
-            <el-button size="small" text @click="optimizeAI" :loading="aiLoading" :disabled="!reportMarkdown">
-              <el-icon><MagicStick /></el-icon>
-              {{ t('gitReport.aiOptimize') }}
-            </el-button>
             <el-button size="small" text @click="copyReport" :disabled="!reportMarkdown">
               <el-icon><CopyDocument /></el-icon>
               {{ t('gitReport.copy') }}
@@ -177,12 +173,11 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Monitor, FolderAdd, Document, MagicStick, CopyDocument, Download, Search } from '@element-plus/icons-vue'
+import { Monitor, FolderAdd, Document, CopyDocument, Download, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
 import * as report from '@/utils/gitReportManager.js'
 import { discoverRepos } from '@/utils/gitManager.js'
-import { checkAIConfig } from '@/utils/ai/api'
 
 const router = useRouter()
 
@@ -200,7 +195,6 @@ const stats = ref(null)
 const groupedCommits = ref([])
 const reportMarkdown = ref('')
 const generating = ref(false)
-const aiLoading = ref(false)
 const lastGenerated = ref('')
 
 function repoName(path) {
@@ -352,24 +346,6 @@ async function generate() {
     ElMessage.error(e.message || t('gitReport.generateFail'))
   } finally {
     generating.value = false
-  }
-}
-
-async function optimizeAI() {
-  if (!reportMarkdown.value) return
-  if (!(await checkAIConfig())) {
-    ElMessage.warning(t('gitReport.aiNotConfigured'))
-    return
-  }
-  aiLoading.value = true
-  try {
-    const optimized = await report.optimizeWithAI(reportMarkdown.value)
-    reportMarkdown.value = optimized
-    ElMessage.success(t('gitReport.aiSuccess'))
-  } catch (e) {
-    ElMessage.error(e.message || t('gitReport.aiFail'))
-  } finally {
-    aiLoading.value = false
   }
 }
 
@@ -543,6 +519,8 @@ onMounted(async () => {
 
 .main-content {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   display: flex;
   overflow: hidden;
   min-height: 0;
@@ -635,6 +613,8 @@ onMounted(async () => {
 
 .right-panel {
   flex: 1;
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -655,10 +635,26 @@ onMounted(async () => {
 .panel-actions { display: flex; gap: 2px; }
 .report-preview {
   flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
   overflow: auto;
   padding: 14px;
+  box-sizing: border-box;
+}
+.report-textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
 }
 .report-textarea :deep(.el-textarea__inner) {
+  flex: 1;
+  width: 100%;
+  height: 100% !important;
+  min-height: 100% !important;
+  box-sizing: border-box;
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 12px;
   line-height: 1.7;
