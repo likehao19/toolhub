@@ -5,8 +5,8 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const REMOTES = [
-  { name: 'origin', branch: 'toolhub-dev-style' },  // gitee
-  { name: 'github', branch: 'main' },                // github
+  { name: 'origin', branch: 'toolhub-dev-style', noProxy: true },  // gitee
+  { name: 'github', branch: 'main', noProxy: false },               // github
 ];
 
 function sh(cmd, opts = {}) {
@@ -70,13 +70,15 @@ sh(`git commit -m "chore: release ${tag}"`);
 const localBranch = sh('git rev-parse --abbrev-ref HEAD', { silent: true });
 for (const r of REMOTES) {
   console.log(`\n--- push commits to ${r.name}/${r.branch} ---`);
-  sh(`git push ${r.name} ${localBranch}:${r.branch}`);
+  const proxyOverride = r.noProxy ? '-c http.proxy= -c https.proxy= ' : '';
+  sh(`git ${proxyOverride}push ${r.name} ${localBranch}:${r.branch}`);
 }
 
 sh(`git tag ${tag}`);
 for (const r of REMOTES) {
   console.log(`\n--- push tag ${tag} to ${r.name} ---`);
-  sh(`git push ${r.name} ${tag}`);
+  const proxyOverride = r.noProxy ? '-c http.proxy= -c https.proxy= ' : '';
+  sh(`git ${proxyOverride}push ${r.name} ${tag}`);
 }
 
 console.log(`\nDone. Watch: https://github.com/likehao19/toolhub/actions`);

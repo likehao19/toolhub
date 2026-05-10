@@ -3,8 +3,8 @@
 const { execSync } = require('child_process');
 
 const TARGETS = [
-  { remote: 'origin', branch: 'toolhub-dev-style', label: 'gitee' },
-  { remote: 'github', branch: 'main', label: 'github' },
+  { remote: 'origin', branch: 'toolhub-dev-style', label: 'gitee', noProxy: true },
+  { remote: 'github', branch: 'main', label: 'github', noProxy: false },
 ];
 
 function sh(cmd) {
@@ -24,7 +24,8 @@ const results = [];
 
 for (const t of TARGETS) {
   console.log(`--- pushing to ${t.label} (${t.remote}/${t.branch}) ---`);
-  const ok = sh(`git push ${extraArgs} ${t.remote} ${localBranch}:${t.branch}`);
+  const proxyOverride = t.noProxy ? '-c http.proxy= -c https.proxy= ' : '';
+  const ok = sh(`git ${proxyOverride}push ${extraArgs} ${t.remote} ${localBranch}:${t.branch}`);
   results.push({ ...t, ok });
   console.log('');
 }
