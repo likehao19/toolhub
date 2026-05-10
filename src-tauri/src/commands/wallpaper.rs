@@ -73,7 +73,19 @@ pub fn get_current_wallpaper() -> Result<String, String> {
             Err(e) => Err(format!("Failed to get wallpaper: {}", e)),
         }
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        let script = r#"tell application "System Events" to get picture of current desktop"#;
+        let output = std::process::Command::new("osascript")
+            .args(["-e", script])
+            .output()
+            .map_err(|e| format!("osascript failed: {}", e))?;
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
+        }
+        Ok(String::from_utf8_lossy(&output.stdout).trim().to_string())
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         Err("Not supported on this platform".into())
     }
@@ -114,7 +126,27 @@ pub fn set_wallpaper(path: String) -> Result<String, String> {
             Err(e) => Err(format!("Failed to set wallpaper: {}", e)),
         }
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        let abs_path = p
+            .canonicalize()
+            .map_err(|e| format!("Failed to resolve path: {}", e))?;
+        let path_str = abs_path.to_string_lossy().to_string();
+        let escaped = path_str.replace('\\', "\\\\").replace('"', "\\\"");
+        let script = format!(
+            r#"tell application "System Events" to set picture of every desktop to "{}""#,
+            escaped
+        );
+        let output = std::process::Command::new("osascript")
+            .args(["-e", &script])
+            .output()
+            .map_err(|e| format!("osascript failed: {}", e))?;
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
+        }
+        Ok(path_str)
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         Err("Not supported on this platform".into())
     }

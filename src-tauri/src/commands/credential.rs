@@ -515,6 +515,119 @@ mod win {
     }
 }
 
+// ─── macOS 实现（Keychain via `security` CLI）──────────────────
+
+#[cfg(target_os = "macos")]
+mod mac {
+    use super::*;
+
+    /// list 在 macOS 上返回空：Keychain 含大量系统凭据，
+    /// 全量枚举 UX 差且会触发授权弹窗；让前端显示"暂无"，由用户按名添加/读取。
+    pub fn list_credentials_impl() -> Result<Vec<CredentialInfo>, String> {
+        Ok(Vec::new())
+    }
+
+    /// 从 `security find-generic-password` 输出中按 `"<key>"<blob>=` 模式提取 attribute
+    fn extract_attr(stdout: &str, key: &str) -> String {
+        let needle = format!("\"{}\"<blob>=", key);
+        for line in stdout.lines() {
+            let t = line.trim();
+            if let Some(rest) = t.strip_prefix(&needle) {
+                let val = rest.trim();
+                if val == "<NULL>" { return String::new(); }
+                return val.trim_matches('"').to_string();
+            }
+        }
+        String::new()
+    }
+
+    pub fn read_credential_impl(target_name: &str) -> Result<CredentialDetail, String> {
+        // 元信息（不需要授权）
+        let info_out = std::process::Command::new("security")
+            .args(["find-generic-password", "-s", target_name])
+            .output()
+            .map_err(|e| format!("security 命令失败: {}", e))?;
+
+        if !info_out.status.success() {
+            let stderr = String::from_utf8_lossy(&info_out.stderr);
+            return Err(format!("找不到凭据 '{}': {}", target_name, stderr.trim()));
+        }
+        let stdout = String::from_utf8_lossy(&info_out.stdout);
+        let username = extract_attr(&stdout, "acct");
+        let comment = extract_attr(&stdout, "icmt");
+
+        // 密码（-w 直接打到 stdout；首次访问会弹"始终允许/允许"授权框）
+        let pwd_out = std::process::Command::new("security")
+            .args(["find-generic-password", "-s", target_name, "-w"])
+            .output()
+            .map_err(|e| format!("security 命令失败: {}", e))?;
+        let password = if pwd_out.status.success() {
+            String::from_utf8_lossy(&pwd_out.stdout).trim().to_string()
+        } else {
+            // 用户拒绝授权或密码为空都走这里 — 给空字符串而不是 Err，前端能正常展示元信息
+            String::new()
+        };
+
+        Ok(CredentialDetail {
+            target_name: target_name.to_string(),
+            username,
+            credential_type: "Generic".to_string(),
+            persist: "LocalMachine".to_string(),
+            last_written: String::new(),
+            comment,
+            password,
+        })
+    }
+
+    pub fn add_credential_impl(
+        target_name: &str,
+        username: &str,
+        password: &str,
+        comment: &str,
+    ) -> Result<(), String> {
+        let mut args: Vec<&str> = vec![
+            "add-generic-password",
+            "-U", // 已存在则更新（避免 errSecDuplicateItem 47）
+            "-a", username,
+            "-s", target_name,
+            "-w", password,
+        ];
+        if !comment.is_empty() {
+            args.push("-j");
+            args.push(comment);
+        }
+        let output = std::process::Command::new("security")
+            .args(&args)
+            .output()
+            .map_err(|e| format!("security 命令失败: {}", e))?;
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
+        }
+        Ok(())
+    }
+
+    pub fn delete_credential_impl(target_name: &str, _cred_type: &str) -> Result<(), String> {
+        // mac 的 Keychain 不区分 Windows 那些 cred_type，统一按 -s 删
+        let output = std::process::Command::new("security")
+            .args(["delete-generic-password", "-s", target_name])
+            .output()
+            .map_err(|e| format!("security 命令失败: {}", e))?;
+        if !output.status.success() {
+            return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
+        }
+        Ok(())
+    }
+
+    pub fn open_passkey_settings_impl() -> Result<(), String> {
+        // 打开"密码"设置（macOS 13+ 的通行密钥也在这里）
+        std::process::Command::new("open")
+            .arg("x-apple.systempreferences:com.apple.Passwords-Settings.extension")
+            .spawn()
+            .map_err(|e| format!("打开 Passkey 设置失败: {}", e))?;
+        Ok(())
+    }
+}
+
 // ─── Tauri 命令 ─────────────────────────────────────────────────
 
 /// 列出所有系统凭据（不含密码）
@@ -526,7 +639,13 @@ pub async fn list_credentials() -> Result<Vec<CredentialInfo>, String> {
             .await
             .map_err(|e| format!("任务执行失败: {}", e))?
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        tokio::task::spawn_blocking(mac::list_credentials_impl)
+            .await
+            .map_err(|e| format!("任务执行失败: {}", e))?
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         Err("当前系统不支持凭据管理".to_string())
     }
@@ -541,7 +660,13 @@ pub async fn read_credential(target_name: String) -> Result<CredentialDetail, St
             .await
             .map_err(|e| format!("任务执行失败: {}", e))?
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        tokio::task::spawn_blocking(move || mac::read_credential_impl(&target_name))
+            .await
+            .map_err(|e| format!("任务执行失败: {}", e))?
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         let _ = target_name;
         Err("当前系统不支持凭据管理".to_string())
@@ -564,7 +689,15 @@ pub async fn add_credential(
         .await
         .map_err(|e| format!("任务执行失败: {}", e))?
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        tokio::task::spawn_blocking(move || {
+            mac::add_credential_impl(&target_name, &username, &password, &comment)
+        })
+        .await
+        .map_err(|e| format!("任务执行失败: {}", e))?
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         let _ = (target_name, username, password, comment);
         Err("当前系统不支持凭据管理".to_string())
@@ -582,7 +715,15 @@ pub async fn delete_credential(target_name: String, cred_type: String) -> Result
         .await
         .map_err(|e| format!("任务执行失败: {}", e))?
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        tokio::task::spawn_blocking(move || {
+            mac::delete_credential_impl(&target_name, &cred_type)
+        })
+        .await
+        .map_err(|e| format!("任务执行失败: {}", e))?
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         let _ = (target_name, cred_type);
         Err("当前系统不支持凭据管理".to_string())
@@ -596,7 +737,11 @@ pub async fn open_passkey_settings() -> Result<(), String> {
     {
         win::open_passkey_settings_impl()
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        mac::open_passkey_settings_impl()
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         Err("当前系统不支持".to_string())
     }
@@ -611,7 +756,13 @@ pub async fn list_passkeys() -> Result<Vec<PasskeyInfo>, String> {
             .await
             .map_err(|e| format!("任务执行失败: {}", e))?
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        // macOS 的通行密钥存在 iCloud Keychain，没有公开 CLI/SPI 枚举接口；
+        // 引导用户去系统设置查看
+        Err("macOS 请在「系统设置 → 密码」中查看和管理通行密钥".to_string())
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         Err("当前系统不支持通行密钥管理".to_string())
     }
@@ -626,7 +777,12 @@ pub async fn delete_passkey(rp_id: String, credential_id: String) -> Result<(), 
             .await
             .map_err(|e| format!("任务执行失败: {}", e))?
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        let _ = (rp_id, credential_id);
+        Err("macOS 请在「系统设置 → 密码」中删除通行密钥".to_string())
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos")))]
     {
         let _ = (rp_id, credential_id);
         Err("当前系统不支持通行密钥管理".to_string())

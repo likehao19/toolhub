@@ -47,8 +47,11 @@ fn taskkill_hidden(pid: u32) -> Result<std::process::Output, String> {
 }
 
 #[cfg(not(target_os = "windows"))]
-fn taskkill_hidden(_pid: u32) -> Result<std::process::Output, String> {
-    Err("Unsupported platform".to_string())
+fn taskkill_hidden(pid: u32) -> Result<std::process::Output, String> {
+    std::process::Command::new("kill")
+        .args(["-9", &pid.to_string()])
+        .output()
+        .map_err(|e| format!("Failed to run kill: {}", e))
 }
 
 #[cfg(target_os = "windows")]

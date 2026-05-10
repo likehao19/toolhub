@@ -342,11 +342,13 @@ fn dns_lookup_sync(domain: String, record_type: String) -> Result<DnsLookupResul
 
 #[cfg(not(target_os = "windows"))]
 fn dns_lookup_sync(domain: String, record_type: String) -> Result<DnsLookupResult, String> {
+    let query_type = normalize_record_type(&record_type)?;
     let started = Instant::now();
-    let output = std::process::Command::new("nslookup")
-        .args(["-type", &record_type, &domain])
+
+    let output = std::process::Command::new("dig")
+        .args([&domain, query_type, "+noall", "+answer", "+nocomments"])
         .output()
-        .map_err(|e| format!("Failed to run nslookup: {}", e))?;
+        .map_err(|e| format!("Failed to run dig (macOS/Linux): {}. 请确认系统已安装 dig (mac 自带, Linux 需安装 dnsutils/bind-utils)", e))?;
 
     if !output.status.success() {
         return Err(String::from_utf8_lossy(&output.stderr).trim().to_string());
@@ -354,21 +356,37 @@ fn dns_lookup_sync(domain: String, record_type: String) -> Result<DnsLookupResul
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     let mut answers = Vec::new();
+
     for line in stdout.lines() {
         let trimmed = line.trim();
-        if let Some(value) = trimmed.strip_prefix("Address: ") {
-            answers.push(DnsAnswer {
-                name: domain.clone(),
-                record_type: record_type.to_uppercase(),
-                ttl: None,
-                value: value.to_string(),
-            });
+        if trimmed.is_empty() || trimmed.starts_with(';') {
+            continue;
         }
+        // dig +noall +answer 行格式: name TTL class type value...
+        let parts: Vec<&str> = trimmed.split_whitespace().collect();
+        if parts.len() < 5 {
+            continue;
+        }
+        let name = parts[0].trim_end_matches('.').to_string();
+        let ttl = parts[1].parse::<u32>().ok();
+        let typ = parts[3].to_string();
+        let raw_value = parts[4..].join(" ");
+        let value = raw_value.trim_end_matches('.').trim_matches('"').to_string();
+
+        if value.is_empty() {
+            continue;
+        }
+        answers.push(DnsAnswer {
+            name,
+            record_type: typ,
+            ttl,
+            value,
+        });
     }
 
     Ok(DnsLookupResult {
         domain,
-        record_type: record_type.to_uppercase(),
+        record_type: query_type.to_string(),
         elapsed_ms: started.elapsed().as_millis(),
         answers,
     })

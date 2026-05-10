@@ -14,8 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
-            args: '--target universal-apple-darwin'
+          - platform: 'macos-14'           # ARM runner — native Apple Silicon build
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-13'           # Intel runner — native x86_64 build
+            args: '--target x86_64-apple-darwin'
           - platform: 'windows-latest'
             args: ''
 
@@ -31,8 +33,7 @@ jobs:
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+        # 不指定 targets：每个 runner 默认装 host target，刚好和 matrix args 一致
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
@@ -75,7 +76,8 @@ jobs:
 
             ## Downloads
             - **Windows**: `.msi` (WiX) or `.exe` (NSIS)
-            - **macOS**: `.dmg` (universal: Intel + Apple Silicon)
+            - **macOS Apple Silicon (M1/M2/M3)**: `aarch64.dmg`
+            - **macOS Intel**: `x64.dmg`
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
