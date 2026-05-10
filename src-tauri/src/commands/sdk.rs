@@ -1098,11 +1098,12 @@ fn read_env_var_sync(name: &str) -> Result<EnvVarInfo, String> {
 
     // 2. Fallback to process environment
     let value = std::env::var(name).unwrap_or_default();
+    let exists = !value.is_empty();
     Ok(EnvVarInfo {
         name: name.to_string(),
-        exists: !value.is_empty(),
+        exists,
+        scope: if exists { "process" } else { "none" }.to_string(),
         value,
-        scope: if value.is_empty() { "none" } else { "process" }.to_string(),
     })
 }
 

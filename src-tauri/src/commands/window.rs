@@ -388,11 +388,14 @@ pub async fn create_custom_notification_window(
         .inner_size(notif_width, notif_height)
         .position(x, y)
         .decorations(false) // 禁用系统标题栏
-        .transparent(true) // 透明背景
         .always_on_top(true) // 始终置顶
         .skip_taskbar(true) // 不在任务栏显示
         .resizable(false) // 不可调整大小
         .shadow(false); // 禁用窗口阴影（Windows）
+    #[cfg(not(target_os = "macos"))]
+    {
+        notif_builder = notif_builder.transparent(true); // 透明背景（macOS 需要 macos-private-api feature，跳过）
+    }
     if let Some(icon) = app.default_window_icon().cloned() {
         notif_builder = notif_builder.icon(icon).map_err(|e| format!("应用窗口图标失败: {}", e))?;
     }
