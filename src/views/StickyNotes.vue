@@ -95,7 +95,7 @@ const tabs = computed(() => [
 
 const currentTabBg = computed(() => {
   const tab = tabs.value.find(item => item.id === activeTab.value)
-  return tab ? tab.bg : '#f8fafc'
+  return tab ? tab.bg : '#fdfbf6'
 })
 
 // 计算当前组件
@@ -404,12 +404,12 @@ onUnmounted(() => {
 }
 
 .control-buttons .icon-btn.is-pinned {
-  color: #3b82f6;
+  color: var(--accent-blue);
 }
 
 .control-buttons .icon-btn.is-pinned:hover {
-  color: #2563eb;
-  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent-blue-hover);
+  background: rgba(194, 65, 12, 0.1);
 }
 
 /* 内容区 */

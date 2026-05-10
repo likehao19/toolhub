@@ -1181,7 +1181,7 @@ onMounted(async () => {
 .header {
   min-height: 58px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   padding: 0 18px;
   display: flex;
   justify-content: space-between;
@@ -1200,7 +1200,7 @@ onMounted(async () => {
 }
 
 .sidebar-toggle-btn {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(242, 246, 251, 0.92));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
@@ -1244,7 +1244,7 @@ onMounted(async () => {
 
 .main-container {
   display: grid;
-  grid-template-columns: 272px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   flex: 1;
   overflow: hidden;
   min-height: 0;
@@ -1258,8 +1258,8 @@ onMounted(async () => {
 
 .sidebar-left {
   min-width: 0;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 96%, var(--accent-warm-soft) 4%), var(--bg-secondary));
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-right: none;
   border-radius: 18px 0 0 18px;
   display: flex;
@@ -1270,7 +1270,7 @@ onMounted(async () => {
 
 .sidebar-toolbar {
   padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -1322,8 +1322,8 @@ onMounted(async () => {
 .category-item.active {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
   color: var(--accent-blue);
-  border-color: rgba(10, 132, 255, 0.15);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(15, 23, 42, 0.05);
+  border-color: rgba(194, 65, 12, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(60, 40, 20, 0.05);
 }
 
 .category-item.active .category-icon {
@@ -1384,8 +1384,8 @@ onMounted(async () => {
   overflow: hidden;
   min-width: 0;
   min-height: 0;
-  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 18px 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   display: flex;
@@ -1405,9 +1405,9 @@ onMounted(async () => {
 
 .todo-list :deep(.el-empty) {
   min-height: 320px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248, 244, 232,0.92));
 }
 
 .todo-list::-webkit-scrollbar {
@@ -1437,13 +1437,13 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.92);
   border-radius: 18px;
   padding: 18px 20px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
   transition: box-shadow var(--transition-smooth), transform var(--transition-fast);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .todo-card:hover {
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 34px rgba(60, 40, 20, 0.08);
   transform: translateY(-1px);
 }
 

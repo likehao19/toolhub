@@ -35,9 +35,9 @@ const defaultConfig = {
   splashAnimation: 'default', // 默认动画
   
   // Markdown 主题设置
-  previewTheme: 'mk-cute',
+  previewTheme: 'default',
   previewCodeTheme: 'github',
-  editorPreviewTheme: 'mk-cute',
+  editorPreviewTheme: 'default',
   editorCodeTheme: 'github',
   
   // 其他设置

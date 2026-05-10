@@ -54,7 +54,7 @@ const handleInput = () => {
   font-size: 14px;
   line-height: 1.6;
   resize: none;
-  background: #fff;
+  background: var(--bg-primary);
   color: #333;
 }
 

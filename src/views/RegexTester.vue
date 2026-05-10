@@ -147,16 +147,16 @@ const FLAG_OPTIONS = [
   { label: 'u', value: 'u' },
 ]
 
-const PRESETS = [
-  { name: '邮箱 Email', regex: '[\\w.-]+@[\\w.-]+\\.\\w+', flags: ['g'], sample: 'user@example.com 测试 test@test.cn' },
-  { name: '手机号 Phone', regex: '1[3-9]\\d{9}', flags: ['g'], sample: '联系方式：13812345678 或 15900001111' },
-  { name: 'URL', regex: 'https?://[\\w.-]+(?:/[\\w./?#&=-]*)?', flags: ['g'], sample: '访问 https://example.com/path?q=1 或 http://test.cn' },
-  { name: 'IPv4', regex: '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}', flags: ['g'], sample: '服务器 192.168.1.1 和 10.0.0.1' },
-  { name: '日期 Date', regex: '\\d{4}-\\d{2}-\\d{2}', flags: ['g'], sample: '日期：2026-03-26 和 2025-12-31' },
-  { name: 'HTML 标签', regex: '<([a-z][a-z0-9]*)\\b[^>]*>(.*?)</\\1>', flags: ['g', 'i'], sample: '<div class="a">hello</div> <span>world</span>' },
-  { name: '中文 Chinese', regex: '[\\u4e00-\\u9fa5]+', flags: ['g'], sample: 'Hello 你好世界 Test 测试文字' },
-  { name: '十六进制颜色 Hex', regex: '#[0-9a-fA-F]{3,8}', flags: ['g'], sample: '颜色：#fff #00aaff #123456' },
-]
+const PRESETS = computed(() => [
+  { name: t('regexTester.presetEmail'),   regex: '[\\w.-]+@[\\w.-]+\\.\\w+',                              flags: ['g'],      sample: t('regexTester.sampleEmail') },
+  { name: t('regexTester.presetPhone'),   regex: '1[3-9]\\d{9}',                                          flags: ['g'],      sample: t('regexTester.samplePhone') },
+  { name: t('regexTester.presetUrl'),     regex: 'https?://[\\w.-]+(?:/[\\w./?#&=-]*)?',                  flags: ['g'],      sample: t('regexTester.sampleUrl') },
+  { name: t('regexTester.presetIpv4'),    regex: '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}',             flags: ['g'],      sample: t('regexTester.sampleIpv4') },
+  { name: t('regexTester.presetDate'),    regex: '\\d{4}-\\d{2}-\\d{2}',                                  flags: ['g'],      sample: t('regexTester.sampleDate') },
+  { name: t('regexTester.presetHtmlTag'), regex: '<([a-z][a-z0-9]*)\\b[^>]*>(.*?)</\\1>',                 flags: ['g', 'i'], sample: t('regexTester.sampleHtml') },
+  { name: t('regexTester.presetChinese'), regex: '[\\u4e00-\\u9fa5]+',                                    flags: ['g'],      sample: t('regexTester.sampleChinese') },
+  { name: t('regexTester.presetHex'),     regex: '#[0-9a-fA-F]{3,8}',                                     flags: ['g'],      sample: t('regexTester.sampleHex') },
+])
 
 // ---- state ----
 const pattern = ref('')
@@ -277,7 +277,7 @@ const syncScroll = (e) => {
 
 // ---- actions ----
 const applyPreset = (index) => {
-  const p = PRESETS[index]
+  const p = PRESETS.value[index]
   pattern.value = p.regex
   flags.value = [...p.flags]
   testText.value = p.sample
@@ -300,7 +300,7 @@ const doClear = () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
 .header {
@@ -309,11 +309,10 @@ const doClear = () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  min-height: 52px;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
 }
 
 .header-left { display: flex; align-items: center; min-width: 0; }
@@ -329,26 +328,24 @@ const doClear = () => {
 
 .breadcrumb {
   display: flex; align-items: center; gap: 6px;
-  font-size: 15px; font-weight: 600; color: var(--text-primary);
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); transition: opacity 0.15s; }
 .breadcrumb-link:hover { text-decoration: underline; opacity: 0.85; }
 .breadcrumb-sep { color: var(--text-quaternary); margin: 0 2px; }
 
+/* 工具栏：去除卡片，仅留底部分割线 */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 14px 18px 0;
-  padding: 10px 12px;
+  padding: 8px 18px;
   flex-wrap: wrap;
-  min-height: 52px;
+  min-height: 44px;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.58);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 22px rgba(15,23,42,0.03);
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .toolbar-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
 .toolbar-label {
@@ -359,35 +356,31 @@ const doClear = () => {
   text-transform: uppercase;
 }
 .toolbar-spacer { flex: 1; }
-.toolbar-group :deep(.el-button) { --el-border-radius-base: 10px; }
-.toolbar-secondary-btn :deep(span) {
-  font-weight: 600;
-}
+.toolbar-group :deep(.el-button) { --el-border-radius-base: 8px; }
+.toolbar-secondary-btn :deep(span) { font-weight: 600; }
 .toolbar-secondary-btn:not(.is-disabled) {
-  background: rgba(248,250,252,0.9);
-  border-color: rgba(15, 23, 42, 0.08);
   color: var(--text-primary);
 }
 .toolbar-icon-btn {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border-radius: 10px;
+  border-radius: 6px;
   color: var(--text-secondary);
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: transparent;
+  border: 1px solid transparent;
 }
 .toolbar-icon-btn:hover:not(.is-disabled) {
   color: var(--text-primary);
-  background: rgba(255,255,255,0.96);
-  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(60, 40, 20, 0.05);
+  border-color: rgba(60, 40, 20, 0.1);
 }
 .flags-group :deep(.el-checkbox-button__inner) {
   padding: 4px 10px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 12px;
-  background: rgba(248,250,252,0.92);
-  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(60, 40, 20, 0.12);
 }
 .flags-group :deep(.el-checkbox-button.is-checked .el-checkbox-button__inner) {
   background: rgba(64, 158, 255, 0.12);
@@ -402,13 +395,11 @@ const doClear = () => {
   font-family: 'Consolas', monospace;
 }
 
+/* 正则输入区：去除卡片外壳，保留输入框边框 */
 .regex-input-area {
-  margin: 14px 18px 0;
-  padding: 14px 16px;
-  background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
+  padding: 12px 18px;
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -418,11 +409,16 @@ const doClear = () => {
   display: flex;
   align-items: center;
   gap: 0;
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(60, 40, 20, 0.12);
+  border-radius: 8px;
   padding: 0 12px;
-  min-height: 40px;
+  min-height: 38px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.regex-row:focus-within {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.1);
 }
 .regex-slash {
   font-family: 'Consolas', 'Monaco', monospace;
@@ -451,38 +447,41 @@ const doClear = () => {
 }
 .replace-field {
   flex: 1;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 12px;
+  border: 1px solid rgba(60, 40, 20, 0.12);
+  border-radius: 8px;
   outline: none;
-  background: rgba(248,250,252,0.9);
+  background: rgba(255, 255, 255, 0.7);
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 13px;
   color: var(--text-primary);
   padding: 6px 10px;
   height: 34px;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.replace-field:focus { border-color: var(--accent-blue); }
+.replace-field:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.1);
+}
 .regex-error {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  min-height: 24px;
-  padding: 0 10px;
+  padding: 2px 0;
   font-size: 11px;
   font-weight: 600;
   color: #ef4444;
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.16);
-  border-radius: 999px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
+/* 主区：左右两栏用 border-right 分割 */
 .main-area {
   flex: 1;
   display: flex;
   overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
   gap: 0;
 }
 .text-panel {
@@ -490,27 +489,25 @@ const doClear = () => {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  border-right: 1px solid rgba(60, 40, 20, 0.1);
+  background: transparent;
 }
 .result-panel {
   width: 340px;
   min-width: 280px;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(248,250,252,0.94), rgba(241,245,249,0.98));
+  background: transparent;
 }
 .panel-header {
-  padding: 10px 16px;
+  padding: 8px 16px;
   font-size: var(--font-size-caption);
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: rgba(255,255,255,0.64);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .text-container { flex: 1; position: relative; overflow: hidden; }
@@ -548,80 +545,81 @@ const doClear = () => {
 }
 .text-input::placeholder { color: var(--text-quaternary); }
 
-.result-scroll { flex: 1; overflow-y: auto; padding: 8px 0; }
+.result-scroll { flex: 1; overflow-y: auto; padding: 0; }
 .no-match {
   margin: 16px;
-  padding: 18px 16px;
+  padding: 20px 16px;
   text-align: center;
   color: var(--text-tertiary);
   font-size: var(--font-size-caption);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(248,250,252,0.9));
+  border: 1px dashed rgba(60, 40, 20, 0.14);
+  border-radius: 8px;
+  background: transparent;
 }
+
+/* 匹配项：去除卡片，分割线分隔 */
 .match-item {
-  margin: 0 12px 10px;
-  padding: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  background: transparent;
+}
+.match-item:hover {
+  background: rgba(60, 40, 20, 0.025);
 }
 .match-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .match-index { font-size: 12px; font-weight: 700; color: var(--accent-blue); }
 .match-range {
-  display: inline-flex;
-  align-items: center;
-  min-height: 22px;
-  padding: 0 8px;
   font-size: 11px;
   color: var(--text-quaternary);
   font-family: 'Consolas', monospace;
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 999px;
 }
 .match-text {
   font-family: 'Consolas', monospace;
   font-size: 13px;
   color: var(--text-primary);
-  background: rgba(248,250,252,0.94);
-  padding: 8px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(60, 40, 20, 0.04);
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 0;
   word-break: break-all;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
-.match-group { font-size: 12px; padding: 5px 0 5px 12px; color: var(--text-tertiary); border-top: 1px dashed rgba(15, 23, 42, 0.06); }
+.match-group {
+  font-size: 12px;
+  padding: 4px 0 4px 12px;
+  color: var(--text-tertiary);
+  border-top: 1px dashed rgba(60, 40, 20, 0.08);
+}
 .match-group:first-of-type { border-top: none; }
 .group-label { color: var(--text-secondary); margin-right: 4px; font-weight: 600; }
 .group-value { font-family: 'Consolas', monospace; color: var(--text-primary); }
+
 .replace-divider {
   padding: 10px 16px 6px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-  margin-top: 6px;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
 }
 .replace-result {
-  padding: 12px 16px;
+  padding: 10px 16px 14px;
   font-family: 'Consolas', monospace;
   font-size: 13px;
   line-height: 1.6;
   color: var(--text-primary);
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
-  margin: 0 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: transparent;
+  margin: 0;
+  border-radius: 0;
+  border: 0;
   white-space: pre-wrap;
   word-break: break-all;
   max-height: 200px;
@@ -631,16 +629,12 @@ const doClear = () => {
 .status-bar {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  height: 32px;
-  margin: 0 18px 18px;
+  padding: 0 18px;
+  height: 30px;
   font-size: var(--font-size-caption);
   color: var(--text-tertiary);
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(247,249,252,0.9));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-top: none;
-  border-radius: 0 0 18px 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
 }
 .status-sep { margin: 0 8px; }
 .status-spacer { flex: 1; }
@@ -665,20 +659,17 @@ const doClear = () => {
 @media (max-width: 980px) {
   .main-area {
     flex-direction: column;
-    gap: 12px;
+  }
+
+  .text-panel {
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   }
 
   .text-panel,
   .result-panel {
     width: 100%;
     min-width: 0;
-    border-radius: 18px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-  }
-
-  .status-bar {
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
   }
 }
 </style>

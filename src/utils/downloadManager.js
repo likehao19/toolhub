@@ -10,13 +10,47 @@ let rpcId = 0
 const pendingRequests = new Map()
 let onNotification = null
 let reconnectTimer = null
+let reconnectAttempts = 0
+let isManualDisconnect = false
 let isConnected = false
+
+const RECONNECT_BASE_MS = 1000
+const RECONNECT_MAX_MS = 30000
+const RECONNECT_MAX_ATTEMPTS = 6
 
 /**
  * 生成 RPC 请求 ID
  */
 function nextId() {
   return `toolhub_${++rpcId}`
+}
+
+function clearReconnect() {
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer)
+    reconnectTimer = null
+  }
+}
+
+/**
+ * ws.onclose 触发后,如果不是手动 disconnect,按指数退避自动重连。
+ * aria2c 进程瞬时重启 / 网络抖动后,前端会自动恢复,不需要用户手动操作。
+ */
+function scheduleReconnect() {
+  if (isManualDisconnect) return
+  if (!ws?._aria2Config?.url) return
+  if (reconnectAttempts >= RECONNECT_MAX_ATTEMPTS) {
+    console.warn('[aria2] reached max reconnect attempts, giving up')
+    return
+  }
+  const delay = Math.min(RECONNECT_BASE_MS * Math.pow(2, reconnectAttempts), RECONNECT_MAX_MS)
+  reconnectAttempts += 1
+  console.info(`[aria2] reconnect ${reconnectAttempts}/${RECONNECT_MAX_ATTEMPTS} in ${delay}ms`)
+  clearReconnect()
+  const cfg = { ...ws._aria2Config }
+  reconnectTimer = setTimeout(() => {
+    connect(cfg).catch(() => { /* onclose 会再次 schedule */ })
+  }, delay)
 }
 
 /**
@@ -33,43 +67,54 @@ export function connect(options = {}) {
   } = options
 
   return new Promise((resolve, reject) => {
+    // 已连接:刷新 callbacks 让新的调用方能替换 handler,避免旧组件 ref 残留导致内存泄漏 / 误更新
     if (ws && ws.readyState === WebSocket.OPEN) {
+      onNotification = onNotify || onNotification
+      ws._aria2Config = { url, secret, onOpen, onClose, onError, onNotify }
       resolve()
       return
     }
 
-    // 清除之前的重连定时器
-    if (reconnectTimer) {
-      clearTimeout(reconnectTimer)
-      reconnectTimer = null
-    }
-
+    clearReconnect()
     onNotification = onNotify || null
+    isManualDisconnect = false
     ws = new WebSocket(url)
+    // 把 cfg 同时挂在 ws 上(给 call() 等地方读 secret)和绑进各 handler 闭包(避免 disconnect()
+    // 把模块级 ws 置 null 后,异步触发的 onclose 拿不到 callback)。
+    const cfg = { url, secret, onOpen, onClose, onError, onNotify }
+    ws._aria2Config = cfg
+    const boundWs = ws
 
-    ws.onopen = () => {
+    boundWs.onopen = () => {
       isConnected = true
-      onOpen?.()
+      reconnectAttempts = 0
+      // 通过 ws._aria2Config 读,这样多次 connect() 复用同一 socket 时新回调也能即时生效
+      boundWs._aria2Config?.onOpen?.()
       resolve()
     }
 
-    ws.onclose = (event) => {
+    boundWs.onclose = (event) => {
       isConnected = false
-      // 拒绝所有pending请求
-      for (const [id, { reject: rej }] of pendingRequests) {
-        rej(new Error('WebSocket closed'))
+      // 拒绝所有 pending 请求并清掉它们的超时 timer
+      for (const [, pending] of pendingRequests) {
+        if (pending.timer) clearTimeout(pending.timer)
+        pending.reject(new Error('WebSocket closed'))
       }
       pendingRequests.clear()
-      onClose?.(event)
+      // 关键:用 boundWs(本次连接的引用)而不是模块级 ws —— disconnect() 会把 ws 置 null,
+      // onclose 异步触发时 ws?.._aria2Config 短路成 undefined,用户回调就丢了。
+      // boundWs 始终持有自己的 _aria2Config,即使是同一对象,只要 boundWs 还活着就能拿到。
+      boundWs._aria2Config?.onClose?.(event)
+      scheduleReconnect()
     }
 
-    ws.onerror = (error) => {
+    boundWs.onerror = (error) => {
       isConnected = false
-      onError?.(error)
+      boundWs._aria2Config?.onError?.(error)
       reject(error)
     }
 
-    ws.onmessage = (event) => {
+    boundWs.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
 
@@ -82,6 +127,7 @@ export function connect(options = {}) {
         // 处理 RPC 响应
         const pending = pendingRequests.get(data.id)
         if (pending) {
+          if (pending.timer) clearTimeout(pending.timer)
           pendingRequests.delete(data.id)
           if (data.error) {
             pending.reject(new Error(data.error.message || JSON.stringify(data.error)))
@@ -93,25 +139,24 @@ export function connect(options = {}) {
         console.error('[aria2] 解析消息失败:', e)
       }
     }
-
-    // 存储配置以便重连
-    ws._aria2Config = { url, secret, onOpen, onClose, onError, onNotify }
   })
 }
 
 /**
- * 断开连接
+ * 断开连接 — 不再自动重连
  */
 export function disconnect() {
-  if (reconnectTimer) {
-    clearTimeout(reconnectTimer)
-    reconnectTimer = null
-  }
+  isManualDisconnect = true
+  clearReconnect()
+  reconnectAttempts = 0
   if (ws) {
     ws.close()
     ws = null
   }
   isConnected = false
+  for (const [, pending] of pendingRequests) {
+    if (pending.timer) clearTimeout(pending.timer)
+  }
   pendingRequests.clear()
 }
 
@@ -145,16 +190,15 @@ function call(method, params = []) {
       params: fullParams,
     }
 
-    pendingRequests.set(id, { resolve, reject })
-
-    // 超时处理
-    setTimeout(() => {
+    // 把 timer 存进 pending 里,响应到达时 clearTimeout,避免 30s 内每次 RPC 都驻留一个 closure
+    const timer = setTimeout(() => {
       if (pendingRequests.has(id)) {
         pendingRequests.delete(id)
         reject(new Error(`RPC 请求超时: ${method}`))
       }
     }, 30000)
 
+    pendingRequests.set(id, { resolve, reject, timer })
     ws.send(JSON.stringify(request))
   })
 }
@@ -364,13 +408,13 @@ export function multicall(calls) {
       method: 'system.multicall',
       params: [formatted],
     }
-    pendingRequests.set(id, { resolve, reject })
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (pendingRequests.has(id)) {
         pendingRequests.delete(id)
         reject(new Error('RPC 请求超时: system.multicall'))
       }
     }, 30000)
+    pendingRequests.set(id, { resolve, reject, timer })
     ws.send(JSON.stringify(request))
   })
 }

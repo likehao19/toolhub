@@ -24,6 +24,36 @@ function calculateContentHash(content) {
 }
 
 /**
+ * 兼容旧 key:历史版本曾用纯文件名(无路径)写入,
+ * 升级后改用相对 notes 根的路径(含 .md/.txt 扩展名)。
+ * 这里给一个候选列表,优先匹配新 key,匹配不到再回退到旧 key,
+ * 让既有数据继续可读。
+ */
+function fallbackKeys(noteName) {
+  if (!noteName) return []
+  const candidates = new Set([noteName])
+
+  // 去掉路径前缀,只留文件名
+  const lastSlash = Math.max(noteName.lastIndexOf('/'), noteName.lastIndexOf('\\'))
+  const basename = lastSlash >= 0 ? noteName.slice(lastSlash + 1) : noteName
+  candidates.add(basename)
+
+  // 去掉扩展名
+  const dot = basename.lastIndexOf('.')
+  if (dot > 0) candidates.add(basename.slice(0, dot))
+
+  return Array.from(candidates)
+}
+
+async function selectByKeys(db, sql, noteName) {
+  for (const key of fallbackKeys(noteName)) {
+    const result = await db.select(sql, [key])
+    if (result && result.length > 0) return { result, key }
+  }
+  return { result: [], key: noteName }
+}
+
+/**
  * 保存笔记版本
  */
 export async function saveNoteVersion(noteName, content, changeSummary = null) {
@@ -74,11 +104,12 @@ export async function saveNoteVersion(noteName, content, changeSummary = null) {
 export async function getNoteVersions(noteName) {
   try {
     const db = await getDatabase()
-    const result = await db.select(
+    const { result } = await selectByKeys(
+      db,
       'SELECT * FROM note_versions WHERE note_name = ? ORDER BY version_number DESC',
-      [noteName]
+      noteName
     )
-    return result || []
+    return result
   } catch (error) {
     return []
   }
@@ -90,11 +121,12 @@ export async function getNoteVersions(noteName) {
 export async function getLatestVersion(noteName) {
   try {
     const db = await getDatabase()
-    const result = await db.select(
+    const { result } = await selectByKeys(
+      db,
       'SELECT * FROM note_versions WHERE note_name = ? ORDER BY version_number DESC LIMIT 1',
-      [noteName]
+      noteName
     )
-    return result && result.length > 0 ? result[0] : null
+    return result.length > 0 ? result[0] : null
   } catch (error) {
     return null
   }
@@ -106,13 +138,16 @@ export async function getLatestVersion(noteName) {
 export async function getVersionContent(noteName, versionNumber) {
   try {
     const db = await getDatabase()
-    const result = await db.select(
-      'SELECT content, content_hash FROM note_versions WHERE note_name = ? AND version_number = ?',
-      [noteName, versionNumber]
-    )
-    
-    if (result && result.length > 0) {
-      const version = result[0]
+    let version = null
+    for (const key of fallbackKeys(noteName)) {
+      const rows = await db.select(
+        'SELECT content, content_hash FROM note_versions WHERE note_name = ? AND version_number = ?',
+        [key, versionNumber]
+      )
+      if (rows && rows.length > 0) { version = rows[0]; break }
+    }
+
+    if (version) {
       // 如果存储了完整内容，直接返回
       if (version.content) {
         return version.content
@@ -120,7 +155,7 @@ export async function getVersionContent(noteName, versionNumber) {
       // 如果没有存储内容，返回当前笔记内容（因为旧版本只保留哈希）
       return await notesAPI.readNote(noteName)
     }
-    
+
     // 如果版本不存在，返回当前内容
     return await notesAPI.readNote(noteName)
   } catch (error) {
@@ -183,22 +218,74 @@ export async function cleanupOldVersions(noteName, keepCount = 10) {
   try {
     const db = await getDatabase()
     const versions = await getNoteVersions(noteName)
-    
+
     if (versions.length <= keepCount) {
       return 0
     }
-    
+
     const versionsToDelete = versions.slice(keepCount)
     let deletedCount = 0
-    
+
     for (const version of versionsToDelete) {
       await deleteNoteVersion(noteName, version.version_number)
       deletedCount++
     }
-    
+
     return deletedCount
   } catch (error) {
     throw error
   }
+}
+
+/**
+ * 文件被重命名/移动后,把版本 key 一并迁移。
+ * 兼容旧 key:把所有候选 key 的版本都改写到新 key 下。
+ */
+export async function renameNoteVersionKey(oldKey, newKey) {
+  if (!oldKey || !newKey || oldKey === newKey) return
+  try {
+    const db = await getDatabase()
+    for (const key of fallbackKeys(oldKey)) {
+      try {
+        await db.execute(
+          'UPDATE note_versions SET note_name = ? WHERE note_name = ?',
+          [newKey, key]
+        )
+      } catch { /* ignore */ }
+    }
+  } catch { /* ignore */ }
+}
+
+/**
+ * 文件被删除时,清理所有相关版本。
+ * 兼容旧 key:删除所有候选 key 下的版本。
+ */
+export async function deleteNoteVersionsByKey(noteKey) {
+  if (!noteKey) return
+  try {
+    const db = await getDatabase()
+    for (const key of fallbackKeys(noteKey)) {
+      try {
+        await db.execute('DELETE FROM note_versions WHERE note_name = ?', [key])
+      } catch { /* ignore */ }
+    }
+  } catch { /* ignore */ }
+}
+
+/**
+ * 文件夹整体重命名/移动后,把以 oldPrefix 开头的所有版本 key 替换前缀。
+ * 用 SQL LIKE + substr 做一次性批量更新。
+ */
+export async function renameNoteVersionPrefix(oldPrefix, newPrefix) {
+  if (!oldPrefix || !newPrefix || oldPrefix === newPrefix) return
+  try {
+    const db = await getDatabase()
+    await db.execute(
+      `UPDATE note_versions
+         SET note_name = ? || substr(note_name, ?)
+       WHERE note_name LIKE ? || '%'`,
+      [newPrefix, oldPrefix.length + 1, oldPrefix]
+    )
+  } catch { /* ignore */ }
 }
 

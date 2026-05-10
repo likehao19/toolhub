@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const style = ref('circle')
 const isHovering = ref(false)
@@ -28,27 +28,31 @@ const mouseDownPos = ref({ x: 0, y: 0 })
 const mouseDownTime = ref(0)
 const isDragging = ref(false)
 
-// 鼠标按下
+let activeMove = null
+let activeUp = null
+
 const onMouseDown = (e) => {
   mouseDownPos.value = { x: e.clientX, y: e.clientY }
   mouseDownTime.value = Date.now()
   isDragging.value = false
-  
-  // 监听移动事件，如果移动了就标记为拖拽
+
   const handleMove = (moveEvent) => {
     const deltaX = Math.abs(moveEvent.clientX - mouseDownPos.value.x)
     const deltaY = Math.abs(moveEvent.clientY - mouseDownPos.value.y)
-    
     if (deltaX > 5 || deltaY > 5) {
       isDragging.value = true
     }
   }
-  
+
   const handleUp = () => {
     document.removeEventListener('mousemove', handleMove)
     document.removeEventListener('mouseup', handleUp)
+    activeMove = null
+    activeUp = null
   }
-  
+
+  activeMove = handleMove
+  activeUp = handleUp
   document.addEventListener('mousemove', handleMove)
   document.addEventListener('mouseup', handleUp)
 }
@@ -110,8 +114,10 @@ onMounted(async () => {
 })
 
 onUnmounted(() => {
-  document.removeEventListener('mousemove', onDrag)
-  document.removeEventListener('mouseup', stopDrag)
+  if (activeMove) document.removeEventListener('mousemove', activeMove)
+  if (activeUp) document.removeEventListener('mouseup', activeUp)
+  activeMove = null
+  activeUp = null
 })
 </script>
 

@@ -561,7 +561,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-bottom: 1px solid #e4e7ed;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
@@ -590,7 +590,7 @@ onMounted(async () => {
 
 .sidebar {
   width: 240px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-right: 1px solid #e4e7ed;
   display: flex;
   flex-direction: column;
@@ -642,7 +642,7 @@ onMounted(async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: var(--bg-primary);
   overflow: hidden;
 }
 
@@ -749,7 +749,7 @@ onMounted(async () => {
 .file-list {
   flex: 1;
   overflow: auto;
-  background: #ffffff;
+  background: var(--bg-primary);
 }
 
 /* ignore */
@@ -839,7 +839,7 @@ onMounted(async () => {
   cursor: pointer;
   transition: all 0.25s ease;
   border-bottom: 1px solid #f5f7fa;
-  background: #ffffff;
+  background: var(--bg-primary);
   position: relative;
   width: 100% !important;
   box-sizing: border-box;

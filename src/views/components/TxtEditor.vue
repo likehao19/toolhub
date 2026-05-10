@@ -72,6 +72,6 @@ defineExpose({
   font-size: 14px;
   line-height: 1.8;
   resize: none;
-  background: #fff;
+  background: var(--bg-primary);
 }
 </style>

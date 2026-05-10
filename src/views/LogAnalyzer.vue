@@ -14,25 +14,21 @@
       </div>
       <div class="header-actions">
         <el-button size="small" @click="selectLogFiles">
-          <el-icon><Upload /></el-icon>
-          {{ t('logAnalyzer.importLogs') }}
+          <el-icon style="margin-right: 6px;"><Upload /></el-icon>{{ t('logAnalyzer.importLogs') }}
         </el-button>
         <el-button size="small" @click="selectSourceFolder">
-          <el-icon><FolderOpened /></el-icon>
-          {{ t('logAnalyzer.importSourceFolder') }}
+          <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('logAnalyzer.importSourceFolder') }}
         </el-button>
         <el-button size="small" @click="selectSourceFiles">
-          <el-icon><FolderOpened /></el-icon>
-          {{ t('logAnalyzer.importSources') }}
+          <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('logAnalyzer.importSources') }}
         </el-button>
-        <el-button size="small" @click="clearAll" :disabled="!logFiles.length && !sourceFiles.length">
+        <el-button size="small" text @click="clearAll" :disabled="!logFiles.length && !sourceFiles.length" :title="t('common.clear')">
           <el-icon><Delete /></el-icon>
-          {{ t('common.clear') }}
         </el-button>
       </div>
     </div>
 
-    <div class="workspace">
+    <div class="workspace content-area">
       <aside class="left-panel">
         <div class="left-sidebar-section left-sidebar-tools">
           <div class="search-row">
@@ -207,7 +203,9 @@
                   <div class="hero-card-meta">{{ t('logAnalyzer.linesRange', { start: item.startLine, end: item.endLine }) }}</div>
                   <div class="hero-card-text">{{ item.rootCauseLine || item.previewText || item.headline }}</div>
                   <div class="hero-card-actions">
-                    <el-button size="small" text type="danger" @click="jumpToBlock(item)">{{ t('logAnalyzer.jumpToBlock') }}</el-button>
+                    <el-button size="small" text type="danger" @click="jumpToBlock(item)">
+                      <el-icon style="margin-right: 4px;"><Right /></el-icon>{{ t('logAnalyzer.jumpToBlock') }}
+                    </el-button>
                   </div>
                 </div>
               </div>
@@ -301,7 +299,9 @@
               <div class="section-header">
                 <span>{{ t('logAnalyzer.sourceContext') }}</span>
                 <div class="source-actions" v-if="activeSourceSnippet">
-                  <el-button size="small" text @click="copySourceSnippet">{{ t('logAnalyzer.copySnippet') }}</el-button>
+                  <el-button size="small" text @click="copySourceSnippet" :title="t('logAnalyzer.copySnippet')">
+                    <el-icon><CopyDocument /></el-icon>
+                  </el-button>
                   <el-tag size="small">{{ matchedSourceSnippets.length }}</el-tag>
                 </div>
                 <el-tag size="small" v-else-if="matchedSourceSnippets.length">{{ matchedSourceSnippets.length }}</el-tag>
@@ -339,7 +339,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Document, Upload, FolderOpened, Delete, Search } from '@element-plus/icons-vue'
+import { Document, Upload, FolderOpened, Delete, Search, CopyDocument, Right } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { t } from '@/i18n'
@@ -954,7 +954,7 @@ async function clearAll() {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
 }
@@ -988,8 +988,8 @@ async function clearAll() {
   min-height: 0;
   min-width: 0;
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
-  padding: 14px 18px 0;
+  grid-template-columns: 260px minmax(0, 1fr);
+  padding: 0;
   overflow: hidden;
 }
 
@@ -998,14 +998,13 @@ async function clearAll() {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   overflow: hidden;
 }
 
-.left-sidebar-section { padding: 12px; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.left-sidebar-section { padding: 12px; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .left-sidebar-list-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .left-sidebar-list-wrap.is-sources { flex: 0.9; min-height: 100px; }
 .left-sidebar-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -1097,9 +1096,9 @@ async function clearAll() {
   overflow-x: hidden;
   overflow-y: auto;
   padding: 0 0 18px 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
 }
 
 .summary-strip,
@@ -1107,7 +1106,7 @@ async function clearAll() {
 .root-cause-hero,
 .core-analysis-card,
 .source-context-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
   background: rgba(255,255,255,0.82);
 }
@@ -1160,7 +1159,7 @@ async function clearAll() {
 .hero-card-text { margin-top: 8px; line-height: 1.5; }
 .hero-card-actions { margin-top: 8px; }
 .analysis-columns { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; margin-top: 12px; }
-.analysis-section { border: 1px solid rgba(15, 23, 42, 0.06); border-radius: 14px; background: rgba(248, 250, 252, 0.7); padding: 14px; min-width: 0; }
+.analysis-section { border: 1px solid rgba(60, 40, 20, 0.06); border-radius: 14px; background: rgba(248, 244, 232, 0.7); padding: 14px; min-width: 0; }
 .subsection-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .block-query-toolbar,
@@ -1177,7 +1176,7 @@ async function clearAll() {
 }
 
 .block-summary-item {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 12px;
   padding: 12px;
   background: rgba(255,255,255,0.86);
@@ -1190,7 +1189,7 @@ async function clearAll() {
 .block-summary-meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 11px; color: var(--text-tertiary); }
 .block-summary-preview { margin-top: 8px; font-size: 12px; line-height: 1.5; color: var(--text-secondary); white-space: pre-wrap; word-break: break-word; }
 .block-detail-panel {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 12px;
   background: rgba(255,255,255,0.9);
   padding: 12px;
@@ -1210,7 +1209,7 @@ async function clearAll() {
   font-size: 12px;
   line-height: 1.6;
   color: var(--text-primary);
-  background: rgba(15, 23, 42, 0.03);
+  background: rgba(60, 40, 20, 0.03);
   border-radius: 12px;
   padding: 14px;
   min-height: 0;
@@ -1219,7 +1218,7 @@ async function clearAll() {
 
 .pagination-wrap { display: flex; justify-content: flex-end; margin-top: 12px; }
 .matched-source-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-.matched-source-item { border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 10px; padding: 10px 12px; cursor: pointer; background: rgba(255,255,255,0.88); }
+.matched-source-item { border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 10px; padding: 10px 12px; cursor: pointer; background: rgba(255,255,255,0.88); }
 .matched-source-item.active { border-color: rgba(64, 158, 255, 0.35); }
 .candidate-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .source-snippet-panel { margin-top: 12px; }

@@ -7,8 +7,6 @@
           <div class="page-eyebrow">Productivity</div>
           <div class="breadcrumb">
             <i class="fas fa-calendar-alt"></i>
-            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
-            <span class="breadcrumb-sep">/</span>
             <span>{{ t('calendar.title') }}</span>
           </div>
         </div>
@@ -366,6 +364,9 @@
       </el-descriptions>
       <template #footer>
         <el-button @click="viewDialogVisible = false">{{ t('common.close') }}</el-button>
+        <el-button type="danger" @click="deleteEvent(viewingEvent)" v-if="viewingEvent">
+          <el-icon><Delete /></el-icon>{{ t('common.delete') || '删除' }}
+        </el-button>
         <el-button type="primary" @click="editEvent(viewingEvent)">{{ t('common.edit') }}</el-button>
       </template>
     </el-dialog>
@@ -490,7 +491,9 @@ const events = ref([])
 const selectedDate = ref(new Date())
 const calendarView = ref('month')
 const listViewDateRange = ref([])
-const listViewEvents = ref([])
+// listViewEvents 改成 computed —— 旧实现是 ref + 手动 handleListViewDateChange 触发,
+// 用户改 selectedCategory / 在另一个视图里增删事件后,列表视图保持旧结果直到他重新选日期范围,
+// 体验上像"分类切了但事件没变"。
 const dialogVisible = ref(false)
 const viewDialogVisible = ref(false)
 const editingEvent = ref(null)
@@ -701,23 +704,25 @@ const testReminders = async () => {
   }
 }
 
-// 处理列表视图日期范围变化
-const handleListViewDateChange = () => {
+// 列表视图日程(自动响应 listViewDateRange / selectedCategory / events 变化)
+const listViewEvents = computed(() => {
   if (!listViewDateRange.value || listViewDateRange.value.length !== 2) {
-    listViewEvents.value = []
-    return
+    return []
   }
-
   const startDate = new Date(listViewDateRange.value[0])
   const endDate = new Date(listViewDateRange.value[1])
   endDate.setHours(23, 59, 59, 999)
 
   const eventList = selectedCategory.value ? filteredEvents.value : expandedEvents.value
-  listViewEvents.value = eventList.filter(e => {
+  return eventList.filter(e => {
     const eventDate = new Date(e.start_time)
     return eventDate >= startDate && eventDate <= endDate
   }).sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
-}
+})
+
+// 保留 handleListViewDateChange 作为 @change 钩子,实现仅扩展 expandedEvents 的范围窗口
+// (computed 已经自动响应,这里留空函数避免模板报错;真正想扩窗口需改 expandedEvents 实现)。
+const handleListViewDateChange = () => { /* computed 自动响应,留空 */ }
 
 // 获取事件颜色
 const getEventColor = (event) => {
@@ -758,10 +763,37 @@ const showCreateDialog = () => {
 }
 
 // 编辑日程
-const editEvent = (event) => {
+const editEvent = async (event) => {
+  // 重复事件保护:用户在月视图点的可能是 expandedEvents 里展开的"虚拟实例",
+  // 它的 start_time 已经被改写成那一次的日期,但 id 仍指向原始事件 ——
+  // 不处理直接编辑,UPDATE 会把整个系列的 start_time 改成"那一次"的日期。
+  // 旧实现完全没拦,用户改一次以为只改这次,实际把整个重复系列毁了。
+  if (event && event._isRecurrenceInstance) {
+    try {
+      await ElMessageBox.confirm(
+        t('calendar.editRecurringInstanceMsg') || '该事件属于一个重复系列。当前只支持编辑整个系列(原始事件),修改会影响所有展开的实例。',
+        t('calendar.editRecurringInstanceTitle') || '编辑重复事件',
+        {
+          confirmButtonText: t('calendar.editSeries') || '编辑整个系列',
+          cancelButtonText: t('common.cancel') || '取消',
+          type: 'warning'
+        }
+      )
+    } catch {
+      return // 用户取消
+    }
+    // 找回原始事件用它的 start_time/end_time 填表单,而不是用展开后的虚拟实例
+    const original = events.value.find(e => e.id === event._originalId)
+    if (!original) {
+      ElMessage.error(t('calendar.originalEventNotFound') || '找不到原始事件')
+      return
+    }
+    event = original
+  }
+
   editingEvent.value = event
   const recurrence = parseRecurrenceRule(event.repeat_rule)
-  
+
   // 解析提醒规则
   let reminderRules = []
   let customReminders = []
@@ -781,7 +813,7 @@ const editEvent = (event) => {
   } else if (event.reminder_minutes) {
     reminderRules = [event.reminder_minutes]
   }
-  
+
   eventForm.value = {
     title: event.title || '',
     description: event.description || '',
@@ -793,7 +825,10 @@ const editEvent = (event) => {
     customReminders,
     recurrenceType: recurrence?.type || 'none',
     recurrenceInterval: recurrence?.interval || 1,
-    recurrenceDaysOfWeek: recurrence?.daysOfWeek || [],
+    // 数据库存的是 int 数组(saveEvent 里 parseInt 过),但 template 的 el-checkbox label 是 string,
+    // 不转 String 的话 v-model 数组里的 1 跟 label "1" 严格比较不等,checkbox 全部不勾选 ——
+    // 用户看到没选任何一天,保存后 daysOfWeek 变成 [],配合 L6 的 fallback 才不会死循环但语义全丢。
+    recurrenceDaysOfWeek: (recurrence?.daysOfWeek || []).map(String),
     recurrenceEndType: recurrence?.endType || 'never',
     recurrenceCount: recurrence?.count || 10,
     recurrenceEndDate: recurrence?.endDate || '',
@@ -914,14 +949,25 @@ const saveEvent = async () => {
 
 // 删除日程
 const deleteEvent = async (event) => {
+  if (!event) return
   try {
-    await ElMessageBox.confirm(t('calendar.confirmDeleteMsg'), t('calendar.confirmDeleteTitle'), {
+    // 重复事件实例:跟编辑路径一样,实际删的是整个系列(原始 id)。
+    // 弹窗里明确告诉用户,避免他以为只是删了"这一次"。
+    const isInstance = !!event._isRecurrenceInstance
+    const msg = isInstance
+      ? (t('calendar.deleteRecurringMsg') || '该事件属于一个重复系列,删除将移除整个系列(所有日期都不再出现)。是否继续?')
+      : t('calendar.confirmDeleteMsg')
+    await ElMessageBox.confirm(msg, t('calendar.confirmDeleteTitle'), {
       type: 'warning'
     })
 
+    const targetId = isInstance ? event._originalId : event.id
     const db = await getDatabase()
-    await db.execute('DELETE FROM calendar_events WHERE id = ?', [event.id])
+    await db.execute('DELETE FROM calendar_events WHERE id = ?', [targetId])
     ElMessage.success(t('calendar.deleteSuccess'))
+    // 关掉详情对话框,否则它仍展示已删除的事件
+    viewDialogVisible.value = false
+    viewingEvent.value = null
     await loadEvents()
   } catch (error) {
     if (error !== 'cancel') {
@@ -1141,7 +1187,7 @@ onMounted(async () => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -1213,9 +1259,16 @@ onMounted(async () => {
 }
 
 .toolbar-btn {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 251, 0.95));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 新增(Plus)按钮 type="primary" 默认白图标,但 .toolbar-btn 把背景洗成白渐变 → 看不见。
+   四个按钮里只有 Plus 是 primary,其它(Bell/Upload/Download)本来就是深色图标,
+   统一指定深色不会影响它们。 */
+.toolbar-btn :deep(.el-icon) {
+  color: #303133;
 }
 
 .content-container {
@@ -1225,8 +1278,8 @@ onMounted(async () => {
   flex-direction: column;
   overflow: hidden;
   margin: 14px 18px 18px;
-  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
@@ -1236,6 +1289,12 @@ onMounted(async () => {
   overflow-y: auto;
   min-height: 0;
   padding: 20px;
+  /* design-refresh.css 把 .calendar-workspace 设成 display:flex 但没给方向,
+     默认 row 会让 .week-view / .day-view / .list-view 按内容宽收缩(只有月视图
+     因为 el-calendar 内部 <table width:100%> 才被撑满,看起来正常)。
+     显式声明 column 让子视图 stretch 到 100% 宽。 */
+  display: flex;
+  flex-direction: column;
 }
 
 .calendar-workspace::-webkit-scrollbar {
@@ -1260,8 +1319,8 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.94);
   border-radius: 18px;
   padding: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
+  border: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .calendar-container :deep(.el-calendar) {
@@ -1272,6 +1331,16 @@ onMounted(async () => {
 .calendar-container :deep(.el-calendar__header) {
   padding: 8px 12px;
   border-bottom: 1px solid var(--border-color);
+}
+
+/* el-calendar 头部 "上个月 / 今天 / 下个月" 默认是 el-button-group(三按钮粘连),
+   按设计要求加间距,并把每颗都恢复独立圆角。 */
+.calendar-container :deep(.el-calendar__button-group .el-button) {
+  border-radius: 6px !important;
+  margin-left: 0 !important;
+}
+.calendar-container :deep(.el-calendar__button-group .el-button + .el-button) {
+  margin-left: 8px !important;
 }
 
 .calendar-container :deep(.el-calendar__body) {
@@ -1286,8 +1355,9 @@ onMounted(async () => {
 }
 
 .calendar-container :deep(.el-calendar-table .el-calendar-day) {
-  height: auto;
-  min-height: 88px;
+  /* 与下面 .calendar-day 的 96px 保持一致,避免 td / div 高度错位。
+     从 110 收到 96,配合 .day-events 60→48,省 6 行 × 14px ≈ 84px,消月视图滚动条。 */
+  height: 96px;
   padding: 0;
 }
 
@@ -1296,7 +1366,8 @@ onMounted(async () => {
 }
 
 .calendar-container :deep(.el-calendar-table td.is-selected) {
-  background: transparent;
+  /* 选中日期:橙色淡底,跟 today 的蓝底区分。无边框。 */
+  background: color-mix(in srgb, var(--color-orange, #ff9500) 14%, transparent) !important;
 }
 
 .calendar-container :deep(.el-calendar-table .prev, .el-calendar-table .next) {
@@ -1306,7 +1377,11 @@ onMounted(async () => {
 /* ===== 日历单元格 ===== */
 .calendar-day {
   height: 100%;
-  min-height: 84px;
+  /* 限定上下界,避免一格 88px(0 事件) / 一格 134px(3 事件) 让整张表格行高错位。
+     固定 height + overflow:hidden 让网格规整;事件数过多走 +N 折叠提示。
+     从 110 收到 96 配合月视图消滚动条(见 .el-calendar-day 同步修改)。 */
+  height: 96px;
+  max-height: 96px;
   padding: 6px 8px;
   cursor: pointer;
   transition: background var(--transition-fast);
@@ -1314,6 +1389,7 @@ onMounted(async () => {
   flex-direction: column;
   gap: 2px;
   border-radius: 4px;
+  overflow: hidden;
 }
 
 .calendar-day:hover {
@@ -1361,10 +1437,12 @@ onMounted(async () => {
 }
 
 /* 日期状态 */
-.calendar-day.is-today {
-  background: var(--accent-blue-bg);
-  box-shadow: inset 0 0 0 1.5px var(--accent-blue);
-  border-radius: 6px;
+/* editorial-flat.css 用 .app-content ... :is(.calendar-day, ...) { border-radius:0 !important;
+   box-shadow:none !important } 把"今天"的视觉指示抹掉了。这里用 .calendar-container
+   后代把特异性提一档抢回来。今天用蓝底,选中用橙底,两种态颜色明确区分,无边框。 */
+.calendar-container .calendar-day.is-today {
+  background: var(--accent-blue-bg) !important;
+  border-radius: 6px !important;
 }
 
 .calendar-day.is-today .day-top .day-number {
@@ -1386,6 +1464,10 @@ onMounted(async () => {
   flex-direction: column;
   gap: 2px;
   margin-top: auto;
+  /* 与 .calendar-day 的固定高度配合:事件区上限 48px(随 96 同步收),超出由 .slice(0,3) +
+     event-more 接住,即便 slice 失效(数据异常)也被父级 overflow:hidden 兜住。 */
+  max-height: 48px;
+  overflow: hidden;
   min-height: 0;
 }
 
@@ -1422,96 +1504,13 @@ onMounted(async () => {
   line-height: 1.4;
 }
 
-/* ===== 月视图下方 - 选中日期的日程列表 ===== */
-.events-section {
-  margin-top: var(--space-lg);
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  box-shadow: var(--shadow-card);
-}
-
-.events-section h3 {
-  margin: 0 0 var(--space-md) 0;
-  font-size: var(--font-size-callout);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.event-item-card {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-lg);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--event-color, var(--accent-blue));
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  background: var(--bg-primary);
-}
-
-.event-item-card:hover {
-  border-color: var(--border-color-strong);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.event-item-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.event-item-time {
-  font-size: var(--font-size-caption);
-  color: var(--text-tertiary);
-  font-weight: 500;
-}
-
-.event-item-title {
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.event-item-location {
-  font-size: var(--font-size-caption);
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.event-item-actions {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.event-item-card:hover .event-item-actions {
-  opacity: 1;
-}
-
 /* ===== 周视图 ===== */
 .week-view {
   background: rgba(255, 255, 255, 0.94);
   border-radius: 18px;
   padding: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
+  border: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .week-header {
@@ -1622,8 +1621,8 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.94);
   border-radius: 18px;
   padding: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
+  border: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .day-header h3 {
@@ -1698,8 +1697,8 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.94);
   border-radius: 18px;
   padding: 16px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
+  border: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .list-toolbar {

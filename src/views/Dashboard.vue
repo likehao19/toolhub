@@ -54,8 +54,8 @@
 
     </header>
 
-    <div class="quick-strip" v-if="topBookmarks.length > 0 || topPasswords.length > 0">
-      <div class="quick-panel qs-bookmarks panel-surface panel-surface-soft" v-if="topBookmarks.length > 0">
+    <div class="quick-strip">
+      <div class="quick-panel qs-bookmarks panel-surface panel-surface-soft">
         <div class="quick-panel-head">
           <div class="quick-panel-title-row">
             <span class="quick-panel-label">{{ t('dashboard.statBookmarks') }}</span>
@@ -77,7 +77,7 @@
         </div>
       </div>
 
-      <div class="quick-panel qs-credentials panel-surface panel-surface-soft" v-if="topPasswords.length > 0">
+      <div class="quick-panel qs-credentials panel-surface panel-surface-soft">
         <div class="quick-panel-head">
           <div class="quick-panel-title-row">
             <span class="quick-panel-label">{{ t('dashboard.credentials') }}</span>
@@ -249,6 +249,15 @@ import { decryptPassword } from '@/utils/encryption'
 import { TauriShell } from '@/utils/tauri'
 import AIAssistant from '@/components/AIAssistant.vue'
 import { t, locale } from '@/i18n'
+import { parseRecurrenceRule, generateRecurrenceInstances } from '@/utils/recurrence'
+
+// 单例 DB,五个 loader 共享(原先每个 loader 调一次 Database.load)
+const DB_PATH = 'sqlite:productivity.db'
+let dbInstance = null
+async function getDatabase () {
+  if (!dbInstance) dbInstance = await Database.load(DB_PATH)
+  return dbInstance
+}
 
 const router = useRouter()
 const showAIAssistant = ref(false)
@@ -273,10 +282,15 @@ const currentYearMonth = computed(() => currentDate.value.toLocaleDateString(dat
 const upcomingTodoCount = computed(() => todayTodos.value.length)
 const upcomingEventCount = computed(() => todayEvents.value.length)
 
+const formatLocalDateTime = (date) => {
+  const d = date instanceof Date ? date : new Date(date)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}T${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:00`
+}
+
 // 加载待办
 const loadTodayTodos = async () => {
   try {
-    const db = await Database.load('sqlite:productivity.db')
+    const db = await getDatabase()
 
     // 获取主任务
     const parents = await db.select(
@@ -318,27 +332,67 @@ const loadTodayTodos = async () => {
 // 加载日程
 const loadTodayEvents = async () => {
   try {
-    const db = await Database.load('sqlite:productivity.db')
-    const today = new Date().toISOString().split('T')[0]
+    const db = await getDatabase()
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const rangeEnd = new Date(today)
+    rangeEnd.setDate(rangeEnd.getDate() + 90)
+    rangeEnd.setHours(23, 59, 59, 999)
+    const todayStr = today.toISOString().split('T')[0]
 
-    // 获取今天及之后的日程
     const events = await db.select(
       `SELECT * FROM calendar_events
-       WHERE DATE(start_time) >= ?
-       ORDER BY start_time ASC
-       LIMIT 8`,
-      [today]
+       WHERE DATE(start_time) >= ? OR repeat_rule IS NOT NULL
+       ORDER BY start_time ASC`,
+      [todayStr]
     )
-    todayEvents.value = events || []
 
+    const expanded = []
+    for (const event of events || []) {
+      const eventStart = new Date(event.start_time)
+      if (eventStart >= today) expanded.push(event)
+
+      if (!event.repeat_rule) continue
+      const rule = parseRecurrenceRule(event.repeat_rule)
+      if (!rule || rule.type === 'none') continue
+
+      const originalStart = new Date(event.start_time)
+      const originalEnd = event.end_time ? new Date(event.end_time) : null
+      const duration = originalEnd ? originalEnd - originalStart : 0
+      const instances = generateRecurrenceInstances(event.start_time, rule, rangeEnd.toISOString())
+
+      for (const instanceDate of instances) {
+        if (instanceDate < today) continue
+        if (instanceDate.getTime() === originalStart.getTime()) continue
+        expanded.push({
+          ...event,
+          id: `${event.id}-${instanceDate.getTime()}`,
+          _originalId: event.id,
+          _isRecurrenceInstance: true,
+          start_time: formatLocalDateTime(instanceDate),
+          end_time: duration > 0 ? formatLocalDateTime(new Date(instanceDate.getTime() + duration)) : null
+        })
+      }
+    }
+
+    todayEvents.value = expanded
+      .sort((a, b) => new Date(a.start_time) - new Date(b.start_time))
+      .slice(0, 8)
   } catch (error) {
     todayEvents.value = []
   }
 }
 
-// 加载最近笔记（从文件系统扫描）
+// 加载最近笔记
 const loadRecentNotes = async () => {
   try {
+    const db = await getDatabase()
+    const metadataRows = await db.select(
+      `SELECT note_name as name, title, updated_at
+       FROM note_metadata`
+    )
+    const metadataByName = new Map((metadataRows || []).map(note => [note.name, note]))
+
     const { getNotesDir } = await import('@/utils/notes')
     const { readDir, stat } = await import('@tauri-apps/plugin-fs')
     const { join } = await import('@tauri-apps/api/path')
@@ -346,31 +400,38 @@ const loadRecentNotes = async () => {
     const notesDir = await getNotesDir()
     const allFiles = []
 
-    const scanDir = async (dirPath, folder) => {
+    const scanDir = async (dirPath, folder, depth = 0) => {
+      if (depth > 5) return
       try {
         const entries = await readDir(dirPath)
         for (const entry of entries) {
           const fullPath = await join(dirPath, entry.name)
-          if (entry.isDirectory && entry.name !== 'images' && !entry.name.startsWith('_')) {
-            await scanDir(fullPath, entry.name)
-          } else if (/\.(md|txt)$/i.test(entry.name)) {
+          const noteName = folder ? `${folder}/${entry.name}` : entry.name
+          if (entry.isDirectory && entry.name !== 'images' && entry.name !== 'ebooks' && !entry.name.startsWith('_')) {
+            await scanDir(fullPath, noteName, depth + 1)
+          } else if (/\.(md|txt|docx|xlsx)$/i.test(entry.name)) {
             let mtime = null
             try {
               const s = await stat(fullPath)
               mtime = s.mtime
             } catch { /* ignore */ }
+            const metadata = metadataByName.get(noteName)
+            const fileUpdatedAt = mtime ? new Date(mtime).toISOString() : null
+            const ext = entry.name.match(/\.(md|txt|docx|xlsx)$/i)?.[1].toLowerCase() || 'md'
             allFiles.push({
-              name: (folder ? folder + '/' : '') + entry.name,
-              title: entry.name.replace(/\.(md|txt)$/i, ''),
+              name: noteName,
+              path: fullPath,
+              extension: ext,
+              title: metadata?.title || entry.name.replace(/\.(md|txt|docx|xlsx)$/i, ''),
               folder,
-              updated_at: mtime ? new Date(mtime).toISOString() : new Date().toISOString()
+              updated_at: fileUpdatedAt || metadata?.updated_at || new Date().toISOString()
             })
           }
         }
       } catch { /* ignore */ }
     }
 
-    await scanDir(notesDir, null)
+    await scanDir(notesDir, null, 0)
     allFiles.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
     recentNotes.value = allFiles.slice(0, 20)
   } catch {
@@ -381,7 +442,7 @@ const loadRecentNotes = async () => {
 // 加载常用书签（quick-strip 展示）
 const loadTopBookmarks = async () => {
   try {
-    const db = await Database.load('sqlite:productivity.db')
+    const db = await getDatabase()
     const bookmarks = await db.select(
       `SELECT id, title, url, favicon_url, favicon_data
        FROM bookmarks
@@ -397,7 +458,7 @@ const loadTopBookmarks = async () => {
 // 加载常用凭据（quick-strip 展示）
 const loadTopPasswords = async () => {
   try {
-    const db = await Database.load('sqlite:productivity.db')
+    const db = await getDatabase()
     let passwords = []
     try {
       passwords = await db.select(
@@ -440,7 +501,7 @@ const refreshAll = async () => {
 // 切换待办完成状态
 const toggleTodo = async (todo) => {
   try {
-    const db = await Database.load('sqlite:productivity.db')
+    const db = await getDatabase()
     const newStatus = todo.completed ? 1 : 0
     await db.execute(
       'UPDATE todos SET status = ?, updated_at = ?, completed_at = ? WHERE id = ?',
@@ -475,14 +536,7 @@ const isNowOrFuture = (timeStr) => {
   return new Date(timeStr) >= new Date()
 }
 
-// 格式化时间
-const formatTime = (timeStr) => {
-  if (!timeStr) return ''
-  const date = new Date(timeStr)
-  return date.toLocaleTimeString(locale.value === 'zh-CN' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' })
-}
-
-// 格式化日程时间（完整年月日时分秒）
+// 格式化日程时间
 const formatEventTime = (timeStr) => {
   if (!timeStr) return ''
   const date = new Date(timeStr)
@@ -491,8 +545,7 @@ const formatEventTime = (timeStr) => {
   const d = String(date.getDate()).padStart(2, '0')
   const h = String(date.getHours()).padStart(2, '0')
   const m = String(date.getMinutes()).padStart(2, '0')
-  const s = String(date.getSeconds()).padStart(2, '0')
-  return `${y}-${M}-${d} ${h}:${m}:${s}`
+  return `${M}-${d} ${h}:${m}`
 }
 
 // 格式化日期
@@ -516,7 +569,12 @@ const navigateTo = (path) => {
 
 // 打开笔记
 const openNote = (note) => {
-  router.push(`/notes?note=${encodeURIComponent(note.name)}`)
+  // 优先用绝对 path 跳转,NoteView 拿 path 直接打开;退化用 name 兼容旧路径。
+  if (note?.path) {
+    router.push({ path: '/notes', query: { path: note.path } })
+  } else {
+    router.push({ path: '/notes', query: { note: note.name } })
+  }
 }
 
 // 打开书签（使用系统默认浏览器）
@@ -528,12 +586,12 @@ const openBookmark = async (bookmark) => {
   }
 
   // 更新访问次数（不阻塞）
-  Database.load('sqlite:productivity.db').then(db =>
-    db.execute(
+  getDatabase()
+    .then(db => db.execute(
       'UPDATE bookmarks SET access_count = access_count + 1, last_accessed_at = ? WHERE id = ?',
       [new Date().toISOString(), bookmark.id]
-    )
-  ).catch(() => {})
+    ))
+    .catch(() => {})
 }
 
 // 复制文本到剪贴板
@@ -754,7 +812,7 @@ onUnmounted(() => {
   opacity: 0.92;
 }
 
-.todo-dot  { background: #3b82f6; }
+.todo-dot  { background: var(--accent-blue); }
 .event-dot { background: #f59e0b; }
 .note-dot  { background: #10b981; }
 .bm-dot    { background: #8b5cf6; }
@@ -1221,7 +1279,7 @@ onUnmounted(() => {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #60a5fa, #2563eb);
+  background: linear-gradient(90deg, #fb923c, #c2410c);
 }
 
 .todo-progress-text,

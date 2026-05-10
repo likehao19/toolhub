@@ -1,0 +1,2241 @@
+/**
+ * editorial-flat.css — 编辑式分割线布局覆盖层
+ *
+ * 把全站从"卡片式"切换到"分割线式"——参考 website/index.html 的视觉节奏：
+ * 暖奶油底色、细发丝边、章节用 border-top 分隔、列表用 border-bottom 分隔。
+ *
+ * 加载顺序（main.js）：
+ *   common → design-refresh → toolbox-unified → theme-refresh → editorial-flat (本层)
+ *
+ * 作用域：仅 .app-content 内的内容区。Element Plus 的 Dialog/Drawer/Popper/Dropdown/
+ * Tooltip 通过 teleport 渲染到 body 根，自然在本层作用域之外，因此浮层 UI 保留圆角与阴影。
+ *
+ * 设计原则：
+ *   - 视觉拍平（圆角、阴影、表面色、渐变）覆盖到所有"卡片"类
+ *   - 节奏（padding + border-top）只加给"抽象章节"类（.section / .panel-surface / 等），
+ *     不加给 .el-card 这种内部已带 body padding 的容器，否则会双重内边距
+ *   - 输入框边框交回 Element Plus 默认（divider token 太浅，做不出可读边框）
+ */
+
+/* ============================================================
+   1. 视觉拍平：所有卡片/面板/章节去掉圆角、阴影、表面色
+   ============================================================ */
+
+.app-content :is(
+  .content-card,
+  .el-card,
+  .panel,
+  .panel-surface,
+  .panel-block,
+  .section,
+  .section-block,
+  .tool-panel,
+  .list-panel,
+  .settings-section,
+  .action-card,
+  .todo-card,
+  .stat-card,
+  .event-card,
+  .note-card,
+  .bookmark-card,
+  .password-card,
+  .audit-detail-card,
+  .about-app-card,
+  .help-support-card,
+  .history-card,
+  .info-card,
+  .summary-card,
+  .feature-card,
+  .group-card,
+  .toolbar,
+  .filter-bar,
+  .action-bar,
+  .search-bar,
+  .page-header,
+  .card-header,
+  .section-head,
+  .header-actions
+),
+/* 兜底：覆盖所有未枚举的 *-card / *-panel 类（排除 Element Plus 内部、Resizer 之类） */
+.app-content [class*="-card"]:not([class*="el-message-box"]):not([class*="el-card__"]):not(.card-actions):not(.card-row):not([class*="card-header"]):not([class*="card-title"]):not([class*="card-info"]):not([class*="card-row"]):not(.card-actions),
+.app-content [class*="-panel"]:not(.panel-resizer):not(.panel-divider):not(.panel-splitter):not([class*="panel-actions"]):not([class*="panel-header"]):not([class*="panel-title"]) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  backdrop-filter: none !important;
+}
+
+/* ============================================================
+   2. 章节节奏：抽象章节类用 hairline border-top + 上下 padding
+   （不应用到 .el-card / .content-card 等已自带 body padding 的容器）
+   ============================================================ */
+
+.app-content :is(
+  .panel,
+  .panel-surface,
+  .panel-block,
+  .section,
+  .section-block,
+  .settings-section
+) {
+  border-top: 1px solid var(--divider) !important;
+  padding-top: clamp(20px, 2.4vw, 32px) !important;
+  padding-bottom: clamp(20px, 2.4vw, 32px) !important;
+  margin-top: 0 !important;
+}
+
+.app-content :is(
+  .panel,
+  .panel-surface,
+  .panel-block,
+  .section,
+  .section-block,
+  .settings-section
+):first-child {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* el-card / content-card / *-card 容器：仅画一根 hairline，padding 让内部 body 控制 */
+.app-content :is(
+  .el-card,
+  .content-card,
+  .tool-panel,
+  .list-panel,
+  .action-card,
+  .todo-card,
+  .event-card,
+  .note-card,
+  .bookmark-card,
+  .password-card,
+  .info-card,
+  .summary-card,
+  .feature-card
+) {
+  border-top: 1px solid var(--divider) !important;
+}
+
+.app-content :is(
+  .el-card,
+  .content-card,
+  .tool-panel,
+  .list-panel,
+  .action-card,
+  .todo-card,
+  .event-card,
+  .note-card,
+  .bookmark-card,
+  .password-card,
+  .info-card,
+  .summary-card,
+  .feature-card
+):first-child {
+  border-top: 0 !important;
+}
+
+/* el-card 的 header / body：保留 Element 默认的 padding（不动），仅去掉自身的边框/背景，
+   并把 header 的下分隔线换成 divider 色 */
+.app-content .el-card .el-card__header,
+.app-content .el-card .el-card__body {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.app-content .el-card .el-card__header {
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+/* ============================================================
+   3. 顶部条 / 工具条：底部 hairline 收口，去掉浮岛感
+   ============================================================ */
+
+.app-content :is(
+  .toolbar,
+  .filter-bar,
+  .action-bar,
+  .search-bar,
+  .page-header,
+  .card-header,
+  .section-head,
+  .header-actions
+) {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border-top: 0 !important;
+  border-bottom: 1px solid var(--divider) !important;
+  padding: 12px 0 !important;
+  margin-bottom: 16px !important;
+}
+
+.app-content :is(.page-header, .toolbar, .filter-bar, .card-header):first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* ============================================================
+   4. 数值 / 统计块：纯文字节奏，多列用 border-left 分隔
+   ============================================================ */
+
+.app-content :is(.stat, .stat-card, .stat-item, .metric-card),
+.app-content .stat-row > *,
+.app-content .stats-row > * {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 14px 18px 14px 0 !important;
+}
+
+.app-content :is(.stat-row, .stats-row) { gap: 0 !important; }
+
+.app-content .stat-row > * + *,
+.app-content .stats-row > * + * {
+  border-left: 1px solid var(--divider) !important;
+  padding-left: 18px !important;
+}
+
+/* ============================================================
+   5. 列表行：hairline 分隔，去掉气泡背景
+   注意：仅枚举具体的 *-row / *-item 类，不用通用 .row（会误伤 row-meta 等布局类）
+   ============================================================ */
+
+.app-content :is(
+  .list-row,
+  .list-item,
+  .ti-row,
+  .todo-item,
+  .bookmark-row,
+  .bookmark-item,
+  .password-row,
+  .password-item,
+  .note-row,
+  .note-item,
+  .history-item,
+  .file-row,
+  .item-row,
+  .data-row,
+  .record-row,
+  .day-event-item,
+  .subtask-item,
+  .ai-provider-item,
+  .info-item,
+  .error-item
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content :is(
+  .list-row,
+  .list-item,
+  .ti-row,
+  .todo-item,
+  .bookmark-row,
+  .bookmark-item,
+  .password-row,
+  .password-item,
+  .note-row,
+  .note-item,
+  .history-item,
+  .file-row,
+  .item-row,
+  .data-row,
+  .record-row,
+  .day-event-item,
+  .subtask-item,
+  .ai-provider-item,
+  .info-item,
+  .error-item
+):last-child {
+  border-bottom: 0 !important;
+}
+
+.app-content :is(
+  .list-row,
+  .list-item,
+  .todo-item,
+  .bookmark-row,
+  .bookmark-item,
+  .password-row,
+  .password-item,
+  .note-row,
+  .note-item
+):hover {
+  background: color-mix(in srgb, var(--accent-warm) 4%, transparent 96%) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   6. 工具箱：tool-card 变成 hairline 网格
+   ============================================================ */
+
+.app-content :is(.tool-card, .tool-grid-item, .tool-tile) {
+  background: transparent !important;
+  background-image: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-right: 1px solid var(--divider) !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+.app-content :is(.tool-card, .tool-grid-item, .tool-tile):hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 网格容器：上+左封口，配合每个 tile 的右+下 hairline 拼成完整网格 */
+.app-content :is(
+  .tool-grid,
+  .tools-grid,
+  .tool-list-grid,
+  .product-grid,
+  .bookmark-cards,
+  .password-cards
+) {
+  gap: 0 !important;
+  border-top: 1px solid var(--divider) !important;
+  border-left: 1px solid var(--divider) !important;
+}
+
+/* ============================================================
+   7. 侧栏 / 导航栏：去渐变背景，仅留外侧 hairline
+   ============================================================ */
+
+.app-content :is(
+  .sidebar,
+  .sidebar-left,
+  .sidebar-right,
+  .nav-rail,
+  .left-rail,
+  .right-rail,
+  .toolbox-sidebar,
+  .productivity-sidebar
+) {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+}
+
+.app-content :is(.sidebar, .sidebar-left, .nav-rail, .left-rail, .toolbox-sidebar, .productivity-sidebar) {
+  border-right: 1px solid var(--divider) !important;
+}
+
+.app-content :is(.sidebar-right, .right-rail) {
+  border-left: 1px solid var(--divider) !important;
+}
+
+/* 侧栏分组项：选中态保留色块（功能性），但去圆角和阴影 */
+.app-content :is(.sidebar, .sidebar-left, .sidebar-right) :is(.menu-item, .nav-item, .category-item, .side-i) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   8. 输入框 / 按钮：仅去阴影、调焦点色；边框交回 Element 默认
+   （--divider 仅 10% 透明度，自己画输入框边框会几乎不可见）
+   ============================================================ */
+
+.app-content .el-input__wrapper.is-focus,
+.app-content .el-textarea__inner:focus {
+  box-shadow: 0 0 0 1px var(--accent-warm) inset !important;
+}
+
+.app-content .el-button {
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   8b. 纯图标按钮（is-text + title 无文字）—— 统一为正方形小按钮
+   匹配：<el-button text :title="t('xxx')"><el-icon>X</el-icon></el-button>
+   不影响：
+     · dialog footer 取消/确认（无 is-text 无 title）
+     · 图标+文字按钮（无 title）
+     · circle 圆形图标按钮（Bookmarks/Home/NoteView/Passwords 等头部，
+       那是另一种语义，已自带圆形）
+   尺寸对齐项目现有约定（CodeFormatter / HexConverter / ImageFormatConverter
+   等 scoped .toolbar-icon-btn 都用 28×28）
+   不加 flex-shrink:0，避免破坏 ApiDocs / ApiDebug 里
+   .toolbar-btn { flex: 1 } 的"两个图标按钮平铺一行"布局
+   ============================================================ */
+
+.app-content .el-button.is-text[title] {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 !important;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-content .el-button.is-text[title].el-button--small {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+}
+
+.app-content .el-button.is-text[title].el-button--large {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+}
+
+.app-content .el-button.is-text[title] > .el-icon {
+  margin: 0 !important;
+  font-size: 15px;
+}
+
+.app-content .el-button.is-text[title].el-button--large > .el-icon {
+  font-size: 18px;
+}
+
+/* 同行相邻图标按钮：紧凑 4px 间距（覆盖 Element 默认 12px 留白） */
+.app-content .el-button.is-text[title] + .el-button.is-text[title] {
+  margin-left: 4px;
+}
+
+/* ============================================================
+   9. 空状态：用衬线斜体（呼应 website 的 <em>）
+   ============================================================ */
+
+.app-content :is(.empty-state, .empty, .no-data, .el-empty) {
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.app-content :is(.empty-state, .empty, .no-data) :is(.empty-text, .description, p) {
+  font-family: var(--font-serif) !important;
+  font-style: italic !important;
+  color: var(--text-tertiary) !important;
+}
+
+/* ============================================================
+   10. Element Plus 表格 / 描述列表：边框瘦身
+   ============================================================ */
+
+.app-content .el-table {
+  background: transparent !important;
+}
+
+.app-content .el-table::before,
+.app-content .el-table::after {
+  display: none !important;
+}
+
+.app-content .el-table th.el-table__cell,
+.app-content .el-table td.el-table__cell {
+  background: transparent !important;
+  border-bottom-color: var(--divider) !important;
+}
+
+.app-content .el-table tr:hover > td.el-table__cell {
+  background: color-mix(in srgb, var(--accent-warm) 4%, transparent 96%) !important;
+}
+
+.app-content .el-descriptions,
+.app-content .el-descriptions__body {
+  background: transparent !important;
+}
+
+/* ============================================================
+   11. Tabs：去圆角背景，仅保留底部 active-bar
+   ============================================================ */
+
+.app-content :is(.el-tabs__header, .el-tabs__nav-wrap, .el-tabs__nav) {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content .el-tabs__nav-wrap::after {
+  background-color: var(--divider) !important;
+  height: 1px !important;
+}
+
+.app-content .el-tabs__item {
+  border-radius: 0 !important;
+}
+
+/* ============================================================
+   12. 浮层例外（保险栓）—— 即使将来某些 popper 没 teleport，也保住浮层视觉
+   ============================================================ */
+
+:is(
+  .el-dialog,
+  .el-drawer,
+  .el-popper,
+  .el-popover,
+  .el-dropdown-menu,
+  .el-message-box,
+  .el-tooltip__popper,
+  .el-select__popper,
+  .el-message
+) {
+  border-radius: var(--radius-md) !important;
+}
+
+:is(.el-dialog, .el-drawer, .el-message-box) {
+  box-shadow: var(--shadow-popover, 0 12px 36px rgba(60, 40, 20, 0.18)) !important;
+}
+
+/* dialog 内部的卡片仍允许保留圆角，避免对话框里出现"撕开式"分割线 */
+:is(.el-dialog, .el-drawer) :is(.content-card, .el-card, .panel, .section) {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--divider) !important;
+  background: var(--surface-panel) !important;
+}
+
+/* ============================================================
+   13. 工具箱子页（.toolbox-unified-shell）—— 把冷蓝调换成暖奶油 + hairline
+   ----------------------------------------------------------------
+   背景：toolbox-unified.css 给 30+ 个工具页（CryptoTool / RegexTester /
+   HexConverter / RedisClient …）建了一套独立的"冷蓝"主题（--tb-bg: #f4f8fc,
+   --tb-primary: #2f6fe4, 蓝色 radial-gradient 背景）。这一节把它整套换成
+   暖奶油 + 暖橙 + divider hairline，让所有工具子页和资源收藏页风格一致。
+   ============================================================ */
+
+/* 1) Token 重映射：所有用了 --tb-* 的规则自动跟着变 */
+.app-content.toolbox-unified-shell {
+  /* 颜色 token */
+  --tb-bg: var(--bg-primary) !important;
+  --tb-bg-soft: var(--bg-primary) !important;
+  --tb-surface: var(--bg-primary) !important;
+  --tb-surface-muted: var(--bg-secondary) !important;
+  --tb-line: var(--divider) !important;
+  --tb-line-strong: var(--divider) !important;
+  --tb-text: var(--text-primary) !important;
+  --tb-muted: var(--text-tertiary) !important;
+  --tb-muted-2: var(--text-quaternary) !important;
+  --tb-primary: var(--accent-warm) !important;
+  --tb-hover: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+  --tb-control-focus: color-mix(in srgb, var(--accent-warm) 16%, transparent 84%) !important;
+  --tb-row-hover: color-mix(in srgb, var(--accent-warm) 6%, transparent 94%) !important;
+  /* 边线 / 面板 token（toolbox-unified.css 在多处定义重复，统一覆盖） */
+  --tb-divider: 1px solid var(--divider) !important;
+  --tb-divider-strong: 1px solid var(--divider) !important;
+  --tb-panel-bg: transparent !important;
+  --tb-panel-bg-strong: transparent !important;
+  --tb-panel-line: var(--divider) !important;
+  --tb-panel-shadow: none !important;
+  --tb-control-bg: var(--bg-primary) !important;
+}
+
+/* 2) 工具子页 wrapper：去蓝色 radial-gradient，改纯暖奶油 */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
+) {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 3) 顶部 header 条：去掉冷白半透明，对齐资源收藏页的暖白 + 暖底线 */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  border-bottom: 1px solid var(--divider) !important;
+  border-color: var(--divider) !important;
+}
+
+/* 4) 工具子页里所有 panel / bar / card 类用 hairline，不要冷蓝色 */
+.app-content.toolbox-unified-shell :is(
+  [class$="-panel"],
+  [class$="-bar"],
+  [class$="-card"],
+  [class$="-area"],
+  [class$="-box"],
+  .info-panel,
+  .io-panel,
+  .config-panel,
+  .result-panel,
+  .request-panel,
+  .response-panel,
+  .left-panel,
+  .right-panel,
+  .center-panel,
+  .input-panel,
+  .output-panel,
+  .text-panel,
+  .main-panel,
+  .panel-header,
+  .panel-actions,
+  .panel-box,
+  .verify-header,
+  .verify-result,
+  .hash-extras,
+  .hash-verify,
+  .rainbow-result,
+  .rainbow-found,
+  .rainbow-notfound,
+  .quick-actions,
+  .repo-actions,
+  .empty-actions,
+  .response-toolbar,
+  .response-body,
+  .sidebar-tabs,
+  .sidebar-toolbar,
+  .sidebar-list,
+  .summary-strip,
+  .hint-row,
+  .stat-card,
+  .log-item,
+  .log-list,
+  .config-row,
+  .info-props,
+  .info-prop,
+  .verify-row,
+  .verify-input,
+  .params-bar,
+  .algo-bar,
+  .error-bar,
+  .repo-bar,
+  .url-bar,
+  .control-bar,
+  .status-bar,
+  .bottom-bar,
+  .filter-bar,
+  .toolbar
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: var(--divider) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+/* 工具子页表面色统一为暖奶油（broad pattern：所有 *-area 内容容器） */
+.app-content.toolbox-unified-shell :is(
+  .content-area,
+  .main-area,
+  .work-area,
+  .main-body,
+  .main-container,
+  .workspace-shell,
+  .editor-area,
+  .table-area,
+  .debug-layout
+),
+.app-content.toolbox-unified-shell [class$="-area"]:not([class*="el-"]) {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+}
+
+/* 5) 类侧栏导航（category-nav / sidebar / left-sidebar / sidebar-area）：
+      暖奶油 + 右侧 hairline，对齐资源收藏页 */
+.app-content.toolbox-unified-shell :is(
+  .category-nav,
+  .sidebar,
+  .sidebar-left,
+  .left-sidebar,
+  .sidebar-area,
+  .nav-rail
+) {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-right: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 类侧栏分组项：选中态用暖橙浅底，不再用冷蓝 */
+.app-content.toolbox-unified-shell :is(.category-nav, .sidebar, .sidebar-left, .left-sidebar) :is(
+  .category-item,
+  .menu-item,
+  .nav-item,
+  .cat-item
+) {
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.category-nav, .sidebar, .sidebar-left, .left-sidebar) :is(
+  .category-item,
+  .menu-item,
+  .nav-item,
+  .cat-item
+):hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.category-nav, .sidebar, .sidebar-left, .left-sidebar) :is(
+  .category-item.active,
+  .menu-item.active,
+  .nav-item.active,
+  .cat-item.active,
+  .category-item.is-active,
+  .menu-item.is-active
+) {
+  background: color-mix(in srgb, var(--accent-warm) 10%, transparent 90%) !important;
+  color: var(--accent-warm) !important;
+  box-shadow: inset 2px 0 0 var(--accent-warm) !important;
+}
+
+/* 6) 输入框：把蓝色边框 / 焦点光替换成暖色 */
+.app-content.toolbox-unified-shell :is(
+  .el-input__wrapper,
+  .el-textarea__inner,
+  .el-select__wrapper,
+  .el-date-editor.el-input__wrapper
+) {
+  background: var(--bg-primary) !important;
+  box-shadow: 0 0 0 1px var(--divider) inset !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .el-input__wrapper:hover,
+  .el-textarea__inner:hover,
+  .el-select__wrapper:hover,
+  .el-date-editor.el-input__wrapper:hover
+) {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) inset !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .el-input__wrapper.is-focus,
+  .el-select__wrapper.is-focused,
+  .el-date-editor.el-input__wrapper.is-focus,
+  .el-textarea__inner:focus
+) {
+  box-shadow:
+    0 0 0 1px var(--accent-warm) inset,
+    0 0 0 3px color-mix(in srgb, var(--accent-warm) 14%, transparent 86%) !important;
+}
+
+/* 7) 按钮：覆盖 toolbox-unified.css 里写死的蓝色（#2f6fe4 渐变与阴影） */
+.app-content.toolbox-unified-shell .el-button--primary,
+.app-content.toolbox-unified-shell .el-button--primary:hover {
+  background: var(--accent-warm) !important;
+  background-image: none !important;
+  border-color: var(--accent-warm) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--primary:hover {
+  background: var(--accent-warm-hover, var(--accent-warm)) !important;
+  border-color: var(--accent-warm-hover, var(--accent-warm)) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button {
+  box-shadow: none !important;
+}
+
+/* 8) 链接、active 文本：覆盖写死的 #2f6fe4 文本色 */
+.app-content.toolbox-unified-shell :is(.breadcrumb-link, .el-link, .el-link--primary) {
+  color: var(--accent-warm) !important;
+}
+
+/* 9) Tab 选中条：暖橙 */
+.app-content.toolbox-unified-shell .el-tabs__active-bar {
+  background-color: var(--accent-warm) !important;
+}
+
+.app-content.toolbox-unified-shell .el-tabs__item.is-active {
+  color: var(--accent-warm) !important;
+}
+
+/* 10) 行 hover：暖橙浅底 */
+.app-content.toolbox-unified-shell :is(
+  .history-item,
+  .collection-tree-row,
+  .res-header-row,
+  .log-item,
+  .stat-card,
+  .list-row,
+  .file-row
+):hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+}
+
+/* 11) 覆盖 toolbox-unified.css 里写死的冷蓝/冷灰文本 & 边框
+       （这些值绕过了 --tb-* token，所以 token 重映射追不上，需要点对点盖掉） */
+
+/* 表单标签 / 输入文本 / placeholder */
+.app-content.toolbox-unified-shell .el-form-item__label {
+  color: var(--text-secondary) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__inner, .el-textarea__inner) {
+  color: var(--text-primary) !important;
+}
+
+.app-content.toolbox-unified-shell :is(.el-input__inner, .el-textarea__inner)::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* 默认按钮文本 / 边框（写死 #334155 / #475569 / #d8e2ef / #d5e0ec / #b9c9de / #c1d0e2） */
+.app-content.toolbox-unified-shell .el-button--default {
+  color: var(--text-secondary) !important;
+  border-color: var(--divider) !important;
+  background: var(--bg-primary) !important;
+}
+
+.app-content.toolbox-unified-shell .el-button--default:hover {
+  color: var(--text-primary) !important;
+  border-color: color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) !important;
+  background: color-mix(in srgb, var(--accent-warm) 5%, var(--bg-primary) 95%) !important;
+}
+
+/* 输入框默认边框 / hover（覆盖写死的冷灰边） */
+.app-content.toolbox-unified-shell :is(
+  .el-input__wrapper,
+  .el-textarea__inner,
+  .el-select__wrapper,
+  .el-input-number,
+  .el-date-editor.el-input__wrapper
+) {
+  border-color: var(--divider) !important;
+}
+
+/* 主按钮聚焦阴影（蓝光 → 暖光） */
+.app-content.toolbox-unified-shell .el-button--primary:focus-visible,
+.app-content.toolbox-unified-shell .el-button--primary.is-active {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-warm) 28%, transparent 72%) !important;
+}
+
+/* 12) 状态条 / 摘要条 / 网络工具的 summary-strip 等用写死的 rgba(248,251,255) 作半透明冷白底
+       —— 全部清成透明，让暖奶油底色透出来 */
+.app-content.toolbox-unified-shell :is(
+  .summary-strip,
+  .status-bar,
+  .bottom-bar,
+  .response-toolbar,
+  .panel-resizer,
+  .regex-input-area
+) {
+  background: transparent !important;
+  background-image: none !important;
+  border-color: var(--divider) !important;
+}
+
+/* ============================================================
+   14. 单页深修：日程 / 智能对话 / 接口调试 左侧栏
+   ----------------------------------------------------------------
+   这些页用了独有类名（.toolbar-btn / .content-container / .calendar-container /
+   .conversation-sidebar / .sidebar-tab / .create-action-btn …）+ 一些写死的冷
+   蓝/冷灰，前面的 §1 / §13 抓不到，单独点对点处理。
+   ============================================================ */
+
+/* —— 日程页 (Calendar.vue) —— */
+
+/* 顶部工具栏按钮：去渐变 / 去阴影 / 去 1px 冷白边 */
+.app-content .calendar-wrapper .toolbar-btn {
+  background: transparent !important;
+  background-image: none !important;
+  border: 1px solid var(--divider) !important;
+  box-shadow: none !important;
+}
+
+.app-content .calendar-wrapper .toolbar-btn:hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+  border-color: color-mix(in srgb, var(--accent-warm) 30%, var(--divider) 70%) !important;
+}
+
+/* 外层 18px 圆角大卡片 → 拍平，仅靠 padding 留白 */
+.app-content .calendar-wrapper :is(.content-container, .calendar-container) {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 顶部 header 与下面工作区之间，用一根 hairline 收口 */
+.app-content .calendar-wrapper > .header {
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+/* 日历格 / 周列 / 列表行：去圆角与卡片背景 */
+.app-content .calendar-wrapper :is(.calendar-day, .week-column, .week-day, .day-view, .list-view, .event-list-view) {
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* —— 智能对话页 (AIConversation.vue / AIChat.vue) —— */
+
+/* breadcrumb 胶囊 → 纯文字 */
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .breadcrumb {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  color: var(--text-primary) !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .breadcrumb i {
+  color: var(--accent-warm) !important;
+}
+
+/* 顶部 header 冷灰底线 → divider */
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) > .header {
+  background: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+/* 对话侧栏 #f9fafb 冷白 → 暖奶油，#e5e7eb 冷灰边 → divider */
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .conversation-sidebar {
+  background: var(--bg-primary) !important;
+  border-right: 1px solid var(--divider) !important;
+}
+
+/* 侧栏新建 / 折叠按钮、列表项：圆角统一收一档，hover/active 走暖橙 */
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) :is(
+  .sidebar-new-btn,
+  .sidebar-collapse-btn,
+  .sidebar-expand-btn
+) {
+  border-radius: 0 !important;
+  border: 1px solid var(--divider) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text-secondary) !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) :is(
+  .sidebar-new-btn,
+  .sidebar-collapse-btn,
+  .sidebar-expand-btn
+):hover {
+  background: color-mix(in srgb, var(--accent-warm) 6%, transparent 94%) !important;
+  border-color: color-mix(in srgb, var(--accent-warm) 30%, var(--divider) 70%) !important;
+  color: var(--accent-warm) !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .sidebar-item {
+  border-radius: 0 !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .sidebar-item:hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .sidebar-item.active {
+  background: color-mix(in srgb, var(--accent-warm) 10%, transparent 90%) !important;
+  color: var(--accent-warm) !important;
+  box-shadow: inset 2px 0 0 var(--accent-warm) !important;
+}
+
+/* 消息气泡：保留圆角（聊天气泡是合理的圆角，不算"卡片"）但去掉 box-shadow */
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .message-bubble {
+  box-shadow: none !important;
+}
+
+/* 输入区：去掉冷灰边和圆角胶囊感 */
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .input-area {
+  background: transparent !important;
+  border-top: 1px solid var(--divider) !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .input-wrapper {
+  border-radius: 8px !important;
+  border: 1px solid var(--divider) !important;
+  background: var(--bg-primary) !important;
+  box-shadow: none !important;
+}
+
+.app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .input-wrapper:focus-within {
+  border-color: var(--accent-warm) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-warm) 12%, transparent 88%) !important;
+}
+
+/* —— 接口调试 (ApiDebug.vue) 左侧栏：拍平 + 重排 —— */
+
+/* 左侧栏底色：覆盖蓝白渐变 */
+.app-content.toolbox-unified-shell .api-debug-wrapper .left-sidebar {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+  border-right: 1px solid var(--divider) !important;
+}
+
+/* 折叠按钮：去冷灰边 + 圆角，改 hairline 暖色 */
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-toggle {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--divider) !important;
+  border-left: 0 !important;
+  border-radius: 0 4px 4px 0 !important;
+  box-shadow: none !important;
+  color: var(--text-tertiary) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-toggle:hover {
+  color: var(--accent-warm) !important;
+  border-color: color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) !important;
+}
+
+/* Tabs 行：从"圆角胶囊 + 渐变 + 阴影"改成"纯文字 + 底部 active 横线" */
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tabs {
+  display: flex !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tab {
+  flex: 1 !important;
+  padding: 12px 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border-bottom: 2px solid transparent !important;
+  color: var(--text-tertiary) !important;
+  font-weight: 500 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.04em !important;
+  transition: color 0.15s, border-color 0.15s !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tab:hover {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-tab.active {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-bottom: 2px solid var(--accent-warm) !important;
+  box-shadow: none !important;
+  color: var(--accent-warm) !important;
+  font-weight: 600 !important;
+}
+
+/* 工具栏：合并视觉，去掉两层 padding 的视觉重叠 */
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.sidebar-toolbar, .sidebar-toolbar-create) {
+  padding: 10px 12px !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-toolbar + .sidebar-toolbar-create {
+  padding-top: 0 !important;
+}
+
+/* 创建按钮：写死的蓝色 (#245fca + rgba(74,120,217,0.1)) → 暖橙 hairline 风格 */
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-actions-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  border: 1px solid var(--divider) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-action-btn {
+  height: 34px !important;
+  padding: 0 10px !important;
+  margin: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--text-secondary) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-action-btn + .create-action-btn {
+  border-left: 1px solid var(--divider) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .create-action-btn:hover {
+  background: color-mix(in srgb, var(--accent-warm) 8%, transparent 92%) !important;
+  color: var(--accent-warm) !important;
+  border-color: var(--divider) !important;
+}
+
+/* 列表 / 集合树 / 历史项：去圆角，仅 hairline 分隔 */
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.collection-tree-row, .history-item) {
+  border-radius: 0 !important;
+  background: transparent !important;
+  padding: 8px 12px !important;
+  margin: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper :is(.collection-tree-row, .history-item):hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .history-group-label {
+  padding: 12px 12px 4px !important;
+  font-size: 10px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  color: var(--text-quaternary) !important;
+  font-weight: 600 !important;
+}
+
+/* —— 全站：广义 sidebar 匹配兜底（覆盖 .conversation-sidebar / .left-sidebar /
+       .docs-sidebar / .filter-sidebar 等所有 *-sidebar 后缀） —— */
+.app-content [class$="-sidebar"]:not([class*="el-"]) {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-right: 1px solid var(--divider) !important;
+}
+
+/* ============================================================
+   15. 工具箱管理页（Toolbox.vue 索引页）—— 编辑式重排
+   ----------------------------------------------------------------
+   原结构是三层嵌套圆角白卡（content-area → tool-category × N → tool-card 网格），
+   重排后：纯暖奶油底 → 章节标题（中文友好的清淡字号，无 letter-spacing） →
+   工具网格用透明 tile + gap 间距 + hover 暖橙浅底（不画发丝边网格也不画卡片）。
+   ============================================================ */
+
+/* 1) 外层 wrapper：去 radial-gradient，纯暖奶油底 */
+.app-content.toolbox-unified-shell .toolbox-wrapper {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+}
+
+/* 2) content-area 大卡片：拍平成纯滚动容器 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .content-area {
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 3) workspace 紧凑内边距 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .toolbox-workspace {
+  padding: 6px 0 16px !important;
+}
+
+/* 4) 工具分类：列表式，章节间只画一根 hairline（不再上下双线收口） */
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-category {
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent-warm) 14%, var(--divider) 86%) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-category:last-child {
+  border-bottom: 0 !important;
+}
+
+/* 5) 分类标题：纯文字小标，无底色无下分隔线 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .category-header {
+  height: auto !important;
+  margin: 0 !important;
+  padding: 14px 18px 6px !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--text-tertiary) !important;
+}
+
+/* 数量计数：隐藏（用户要求移除） */
+.app-content.toolbox-unified-shell .toolbox-wrapper .category-count {
+  display: none !important;
+}
+
+/* 6) 工具网格：列宽 200，紧凑行，下方留白让分类底线和内容隔开 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  gap: 0 !important;
+  margin: 0 !important;
+  padding: 2px 8px 12px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+/* 7) 工具行：横向 grid（图标 | 名字 | 收藏星），列表风 hover */
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: 28px minmax(0, 1fr) 22px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 40px !important;
+  padding: 0 10px !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  box-shadow: none !important;
+  transform: none !important;
+  cursor: pointer !important;
+  transition: background 0.12s ease !important;
+  flex-direction: unset !important;
+  justify-content: unset !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover {
+  background: color-mix(in srgb, var(--accent-warm) 7%, transparent 93%) !important;
+  border: 0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .tool-icon {
+  transform: none !important;
+  filter: saturate(1.05) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:active {
+  background: color-mix(in srgb, var(--accent-warm) 14%, transparent 86%) !important;
+  transform: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent-warm) 50%, transparent 50%) !important;
+  outline-offset: -2px !important;
+}
+
+/* 8) 图标：保留 emoji 默认彩色！强制覆盖 toolbox-unified 的 grayscale 滤镜 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-icon,
+.app-content.toolbox-unified-shell .tool-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 18px !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  /* 关键：去掉 toolbox-unified.css 第 2358 行的灰度滤镜 */
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 1 !important;
+  transition: filter 0.12s ease !important;
+}
+
+/* 工具名：左对齐、单行省略 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-name {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--text-primary) !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .tool-name {
+  color: var(--text-primary) !important;
+}
+
+/* 9) 收藏星：第 3 列 grid 里，position: static 让它跟随行的右侧
+       未收藏淡显（始终可见），已收藏满显暖橙 */
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  width: 22px !important;
+  height: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  opacity: 0.3 !important;
+  color: var(--text-quaternary) !important;
+  transition: opacity 0.12s, color 0.12s, background 0.12s !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn .el-icon {
+  font-size: 12px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .favorite-btn {
+  opacity: 0.7 !important;
+  background: transparent !important;
+}
+
+/* 已收藏：始终满显暖橙（不被父级 hover 规则盖掉） */
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn.starred {
+  opacity: 1 !important;
+  color: #d97706 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .favorite-btn.starred {
+  opacity: 1 !important;
+  color: #d97706 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn:hover {
+  opacity: 1 !important;
+  color: #d97706 !important;
+  background: color-mix(in srgb, #d97706 14%, transparent 86%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn .el-icon {
+  font-size: 11px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .favorite-btn {
+  opacity: 0.7 !important;
+  background: transparent !important;
+}
+
+/* 已收藏：始终满显暖橙（不被 hover 行为遮蔽） */
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn.starred {
+  opacity: 1 !important;
+  color: #d97706 !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .favorite-btn.starred {
+  opacity: 1 !important;
+  color: #d97706 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn:hover {
+  opacity: 1 !important;
+  color: #d97706 !important;
+  background: color-mix(in srgb, #d97706 14%, transparent 86%) !important;
+}
+
+/* 10) 顶部条（header）：暖白渐变 + divider 底线，去 button glow */
+.app-content.toolbox-unified-shell .toolbox-wrapper .header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .fav-hint {
+  color: var(--text-tertiary) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .fav-hint .el-icon {
+  color: #d97706 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .header-actions .el-button {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-wrapper .breadcrumb .el-icon {
+  color: var(--accent-warm) !important;
+}
+
+/* ============================================================
+   16. 便签管理页（ToolboxStickyNotes.vue）—— 拉直 + 暖系化
+   ----------------------------------------------------------------
+   原页问题：
+   1. wrapper 用了 #eef2f6 → #e7ecf3 冷蓝灰渐变（与暖奶油主调脱节）
+   2. .overview-card 是 18px 圆角白卡 + 阴影 + 1px 冷灰边（4 张并排重）
+   3. .settings-section 也是 18px 圆角边框（卡中卡 → 嵌套）
+   4. .keycap 写死 "PingFang SC" → 全局 --font-family 没生效
+   5. 大量冷色：#303133 / #a8abb2 / #c0c4cc / #dcdfe6 / #909399 / #409eff
+   ============================================================ */
+
+/* 1) wrapper：去冷蓝灰渐变 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+}
+
+/* 2) header：去半透明冷白渐变 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper > .header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .breadcrumb .el-icon {
+  color: var(--accent-warm) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .breadcrumb-link {
+  color: var(--accent-warm) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .breadcrumb-sep {
+  color: var(--text-quaternary) !important;
+}
+
+/* 3) 概览：4 张白卡 → 一条横向键值条，hairline 分列 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .overview-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  margin: 0 0 18px !important;
+  padding: 14px 0 !important;
+  border-top: 1px solid var(--divider) !important;
+  border-bottom: 1px solid var(--divider) !important;
+  background: transparent !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .overview-card {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 4px 18px !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .overview-card + .overview-card {
+  border-left: 1px solid var(--divider) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .overview-label {
+  font-size: 11px !important;
+  color: var(--text-tertiary) !important;
+  font-weight: 500 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .overview-value {
+  font-size: 13px !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+/* 4) settings-section：去掉 18px 边框圆角，改成纯章节（章节间 hairline） */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-section {
+  margin: 0 !important;
+  padding: 16px 0 4px !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-top: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-section:first-of-type {
+  border-top: 0 !important;
+  padding-top: 4px !important;
+}
+
+/* section-header：编辑式小标 + 暖橙左竖线 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .section-header {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--text-secondary) !important;
+  padding: 0 0 10px 10px !important;
+  border-bottom: 0 !important;
+  border-left: 3px solid var(--accent-warm) !important;
+  margin-bottom: 4px !important;
+  line-height: 1.2 !important;
+}
+
+/* 5) setting-row：紧凑 + 清淡的行式分隔（保留横向 padding，避免文字贴边） */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row {
+  border-bottom: 1px solid var(--divider) !important;
+  padding: 10px 14px !important;
+  min-height: 48px !important;
+  border-radius: 0 !important;
+  gap: 24px !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row:last-child {
+  border-bottom: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row:hover {
+  background: color-mix(in srgb, var(--accent-warm) 4%, transparent 96%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .label-text {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .label-desc {
+  color: var(--text-tertiary) !important;
+}
+
+/* content-area 内边距收紧（横向给得稍大避免顶到滚动条） */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .content-area {
+  padding: 10px 24px 20px !important;
+}
+
+/* settings-group 内部留白（让 setting-row 不直接顶到 section 边缘） */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .settings-group {
+  padding: 0 4px !important;
+}
+
+/* 6) el-input-number：暖系替换冷蓝灰
+       toolbox-unified.css:4979 在外层 .el-input-number 写了
+         · border: 1px solid rgba(100,116,139,0.16) 冷灰
+         · background: linear-gradient(...) 冷白渐变
+         · :hover / :focus-within 也是冷蓝色
+       toolbox-unified.css:5010 在内层 .el-input__wrapper 写了 border:0
+       关键约束：边框只能在外层加，内层必须保持 border:0，否则出现双层边框
+       原版本 §6 错误地把暖色边加到了内层 → 双框 bug，本次改回外层 */
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--divider) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number:hover {
+  border-color: color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) !important;
+  background: var(--bg-primary) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number:focus-within {
+  border-color: var(--accent-warm) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-warm) 14%, transparent 86%) !important;
+}
+
+/* 内层 wrapper 强制透明、零边框 —— 拦截任何把 border 加回内层的规则 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number .el-input,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number .el-input__wrapper,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number .el-input.is-focus .el-input__wrapper,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number .el-input__wrapper.is-focus {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number .el-input__inner {
+  color: var(--text-primary) !important;
+}
+
+/* 加减按钮：暖系底 + 暖系边 + 暖系文字 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number__decrease,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number__increase {
+  background: transparent !important;
+  border-color: var(--divider) !important;
+  color: var(--text-secondary) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number__decrease:hover,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number__increase:hover {
+  background: color-mix(in srgb, var(--accent-warm) 8%, transparent 92%) !important;
+  color: var(--accent-warm) !important;
+  border-color: color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number__decrease.is-disabled,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .el-input-number__increase.is-disabled {
+  color: var(--text-quaternary) !important;
+  background: transparent !important;
+  cursor: not-allowed !important;
+}
+
+/* 6) shortcut-input：去冷灰边 + 冷蓝聚焦光 → 暖色 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-input {
+  background: var(--bg-primary) !important;
+  border-color: var(--divider) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-input:hover {
+  border-color: color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-input.recording {
+  border-color: var(--accent-warm) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-warm) 14%, transparent 86%) !important;
+}
+
+/* 7) keycap：用全局字体 + 暖系键帽（覆盖写死的 PingFang SC + 冷蓝 active） */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .keycap {
+  font-family: var(--font-family-mono, var(--font-family)) !important;
+  color: var(--text-primary) !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-primary) 90%, var(--bg-secondary) 10%) 0%,
+    var(--bg-secondary) 100%) !important;
+  border: 1px solid var(--divider) !important;
+  border-bottom-width: 2px !important;
+  border-bottom-color: color-mix(in srgb, var(--text-tertiary) 30%, var(--divider) 70%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .keycap.active {
+  color: var(--accent-warm) !important;
+  border-color: color-mix(in srgb, var(--accent-warm) 35%, var(--divider) 65%) !important;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--accent-warm) 8%, var(--bg-primary) 92%) 0%,
+    color-mix(in srgb, var(--accent-warm) 12%, var(--bg-primary) 88%) 100%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .keycap-sep {
+  color: var(--text-quaternary) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-clear {
+  color: var(--text-quaternary) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-clear:hover {
+  color: var(--accent-warm) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .shortcut-placeholder,
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .recording-hint {
+  color: var(--text-tertiary) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .recording-dot {
+  background: var(--accent-warm) !important;
+}
+
+/* 8) 滚动条颜色：从冷灰换成暖灰 */
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .content-area::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-quaternary) 60%, transparent 40%) !important;
+}
+
+.app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .content-area::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-tertiary) 70%, transparent 30%) !important;
+}
+
+/* ============================================================
+   17. 工作台首页（Dashboard.vue）—— 头部卡 → 分割线
+   ----------------------------------------------------------------
+   原结构：dash-topbar 是带 box-shadow / border-radius / backdrop-blur 的"卡片"，
+   里面 4 个 stat-item 是 pill 胶囊样式。
+   重排：dash-topbar 拍平成 hairline 条，stat-item 用左侧 hairline 分列、
+   去胶囊化、文字与数字编辑式排版。
+   ============================================================ */
+
+/* 1) 顶部条：从卡片 → hairline 收口的横条 */
+.app-content .dashboard-wrapper .dash-topbar {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  padding: 14px 18px !important;
+}
+
+/* 2) 右侧统计区：从 wrap pill 列表 → hairline 分列的并排数据条 */
+.app-content .dashboard-wrapper .topbar-stats {
+  gap: 0 !important;
+}
+
+.app-content .dashboard-wrapper .stat-item {
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 4px 16px !important;
+  transform: none !important;
+  transition: background 0.15s !important;
+}
+
+.app-content .dashboard-wrapper .stat-item + .stat-item {
+  border-left: 1px solid var(--divider) !important;
+}
+
+.app-content .dashboard-wrapper .stat-item:hover {
+  background: color-mix(in srgb, var(--accent-warm) 5%, transparent 95%) !important;
+  transform: none !important;
+}
+
+/* 3) topbar 操作按钮：去 lift + 阴影 */
+.app-content .dashboard-wrapper .topbar-actions {
+  margin-left: 16px !important;
+  padding-left: 16px !important;
+  border-left: 1px solid var(--divider) !important;
+}
+
+.app-content .dashboard-wrapper .icon-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+.app-content .dashboard-wrapper .icon-btn:hover {
+  background: color-mix(in srgb, var(--accent-warm) 8%, transparent 92%) !important;
+  border-color: var(--divider) !important;
+  transform: none !important;
+  box-shadow: none !important;
+  color: var(--accent-warm) !important;
+}
+
+/* 4) 快捷条 quick-strip：始终显示（v-if 已在 .vue 中改成 v-show 之外的占位形式），
+       面板拍平 + 暖色 hairline */
+.app-content .dashboard-wrapper .quick-strip {
+  gap: 0 !important;
+}
+
+/* 改成横向布局：head 在左固定宽（两面板自然对齐），list 在右占满
+   单行高度，整体比原来矮一半 */
+.app-content .dashboard-wrapper .quick-panel {
+  background: transparent !important;
+  background-image: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 6px 14px !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 38px !important;
+}
+
+.app-content .dashboard-wrapper .quick-panel + .quick-panel {
+  border-left: 1px solid var(--divider) !important;
+}
+
+/* head 固定宽，让两个面板的 head 在同一垂直线上对齐 */
+.app-content .dashboard-wrapper .quick-panel .quick-panel-head {
+  flex: 0 0 auto !important;
+  min-width: 96px !important;
+  margin: 0 !important;
+}
+
+/* list 占满剩余宽度，单行横向滚动 */
+.app-content .dashboard-wrapper .quick-panel :is(.qs-bookmark-list, .qs-credentials-list) {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* 空数据占位：列表区显示一个"暂无"的暖灰提示 */
+.app-content .dashboard-wrapper .qs-bookmark-list:empty::after,
+.app-content .dashboard-wrapper .qs-credentials-list:empty::after {
+  content: "暂无数据";
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 24px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+/* ============================================================
+   18. 文档/笔记 左侧文件树节点（NoteView.vue + NoteEditor.vue）
+   ----------------------------------------------------------------
+   原页问题：.tree-item-wrapper hover 给整行画了一个半透明白盒子（rgba(255,255,255,0.58)）；
+   active 又是一块"白渐变 + 1px 暖橙边 + 阴影"的浮起卡片（NoteView）或冷蓝
+   #e1f0fa 底色（NoteEditor）。两边都"白方框"，跟编辑式风格不搭。
+   重排：hover 暖橙浅底无边、active 暖橙浅底 + 左侧暖橙竖线（无圆角无阴影）。
+   ============================================================ */
+
+.app-content :is(.notes-page-wrapper, .notes2-page) .tree-item-wrapper {
+  border: 0 !important;
+  border-left: 3px solid transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  margin: 0 !important;
+  padding: 6px 10px !important;
+}
+
+.app-content :is(.notes-page-wrapper, .notes2-page) .tree-item-wrapper:hover {
+  background: color-mix(in srgb, var(--accent-warm) 6%, transparent 94%) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 3px solid transparent !important;
+  box-shadow: none !important;
+}
+
+.app-content :is(.notes-page-wrapper, .notes2-page) .tree-item-wrapper.active {
+  background: color-mix(in srgb, var(--accent-warm) 11%, transparent 89%) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-left: 3px solid var(--accent-warm) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: var(--accent-warm) !important;
+  font-weight: 600 !important;
+}
+
+/* arrow 展开箭头颜色统一 */
+.app-content :is(.notes-page-wrapper, .notes2-page) .tree-item-wrapper .arrow {
+  color: var(--text-quaternary) !important;
+}
+
+.app-content :is(.notes-page-wrapper, .notes2-page) .tree-item-wrapper:hover .arrow,
+.app-content :is(.notes-page-wrapper, .notes2-page) .tree-item-wrapper.active .arrow {
+  color: var(--accent-warm) !important;
+}
+
+/* ============================================================
+   18b. SDK 版本管理（SdkManager.vue）左侧菜单 —— 对齐其它页的"左竖线 + 暖橙浅底"
+   ----------------------------------------------------------------
+   原页问题：
+   - .sidebar-left 用 linear-gradient(rgba(249,252,255,0.58), rgba(239,246,252,0.34)) 冷蓝渐变
+   - .menu-item:hover 用 rgba(255,255,255,0.42) 半透明白底（不显著）
+   - .menu-item.active 用 linear-gradient(rgba(58,117,216,0.12), rgba(255,255,255,0.26)) 冷蓝渐变 +
+     box-shadow inset rgba(58,117,216,0.76) 冷蓝左竖线
+   现在统一为：暖奶油底 + 右侧 hairline + hover 暖橙 6% + active 暖橙 11% +
+   3px 暖橙左竖线 + 暖橙文字（和 NoteView/AIConversation/ApiDebug 一致）
+   ============================================================ */
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left {
+  background: var(--bg-primary) !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-right: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item {
+  border-radius: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--text-secondary) !important;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item + .menu-item {
+  border-top: 1px solid var(--divider) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item:hover {
+  background: color-mix(in srgb, var(--accent-warm) 6%, transparent 94%) !important;
+  background-image: none !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item.active {
+  background: color-mix(in srgb, var(--accent-warm) 11%, transparent 89%) !important;
+  background-image: none !important;
+  color: var(--accent-warm) !important;
+  font-weight: 600 !important;
+  box-shadow: inset 3px 0 0 var(--accent-warm) !important;
+}
+
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item.active:hover {
+  background: color-mix(in srgb, var(--accent-warm) 14%, transparent 86%) !important;
+  color: var(--accent-warm) !important;
+  box-shadow: inset 3px 0 0 var(--accent-warm) !important;
+}
+
+/* menu-list 容器留白调整 */
+.app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-list {
+  padding: 6px 0 !important;
+}
+
+/* ============================================================
+   19. 全站头部统一压缩 + 隐藏英文 eyebrow（"Knowledge Vault" /
+       "Security Tools" / "Desktop Assets" 等）
+   ----------------------------------------------------------------
+   原页头部：page-eyebrow 英文小标 + breadcrumb 中文标题，竖向叠加 + min-height 58px。
+   英文 eyebrow 在中文界面里显得多余。隐藏后头部高度降到 ~42px。
+   ============================================================ */
+
+/* 1) 隐藏所有页面的 page-eyebrow 英文小标 */
+.app-content .page-eyebrow {
+  display: none !important;
+}
+
+/* 2) 头部高度统一压缩 */
+.app-content :is(
+  .notes-page-wrapper,
+  .bookmarks-page-wrapper,
+  .passwords-page-wrapper,
+  .credential-manager,
+  .calendar-wrapper,
+  .todos-page-wrapper,
+  .settings-page-wrapper,
+  .ai-conversation-wrapper,
+  .ai-chat-wrapper,
+  .agent-team-wrapper,
+  .chat-wrapper,
+  .home-page,
+  .about-page,
+  .statistics-page
+) > .header {
+  min-height: 44px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 3) 工具箱所有子页头部也跟着压（toolbox-unified-shell 下的 .header） */
+.app-content.toolbox-unified-shell .toolbox-wrapper > .header,
+.app-content.toolbox-unified-shell [class$="-wrapper"] > .header,
+.app-content.toolbox-unified-shell [class$="-page"] > .header,
+.app-content.toolbox-unified-shell [class$="-mgr"] > .header,
+.app-content.toolbox-unified-shell .ebook-shelf > .header,
+.app-content.toolbox-unified-shell .ebook-reader > .header,
+.app-content.toolbox-unified-shell .redis-client > .header,
+.app-content.toolbox-unified-shell .sqlite-mgr > .header {
+  min-height: 44px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 4) page-title-block：去掉 eyebrow 后，breadcrumb 直接居中（不需要 column 间距） */
+.app-content .page-title-block {
+  gap: 0 !important;
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+/* 5) breadcrumb 字号略调（之前是配 eyebrow 的层级，现在独立要再小一点） */
+.app-content :is(
+  .notes-page-wrapper,
+  .bookmarks-page-wrapper,
+  .passwords-page-wrapper,
+  .credential-manager,
+  .calendar-wrapper,
+  .todos-page-wrapper,
+  .ai-conversation-wrapper,
+  .ai-chat-wrapper,
+  .toolbox-wrapper,
+  .toolbox-sticky-notes-wrapper
+) .breadcrumb {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+/* ============================================================
+   20. 工具箱所有页面（索引页 + 30+ 子页）头部统一高度与样式
+   ----------------------------------------------------------------
+   原 toolbox-unified.css:3155 给所有工具箱头部设了 min-height: 58px。这里
+   用相同的选择器列表，靠源顺序（editorial-flat 在 toolbox-unified 之后加载）
+   覆盖成 44px + 暖白渐变 + divider 收口，让索引页和所有子页头部完全一致。
+   ============================================================ */
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .toolbox-sticky-notes-wrapper,
+  .multi-print-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding: 0 18px !important;
+  margin: 0 !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(18px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* 头部内的 breadcrumb 字号统一（14px / 600） */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .toolbox-sticky-notes-wrapper,
+  .multi-print-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) .breadcrumb {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+/* breadcrumb-link / sep / 图标颜色 */
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .toolbox-sticky-notes-wrapper,
+  .multi-print-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) :is(.breadcrumb .el-icon, .breadcrumb i) {
+  font-size: 15px !important;
+  color: var(--accent-warm) !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .toolbox-sticky-notes-wrapper,
+  .multi-print-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) .breadcrumb-link {
+  color: var(--accent-warm) !important;
+  cursor: pointer !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .toolbox-wrapper,
+  .sdk-manager-wrapper,
+  .port-manager-wrapper,
+  .network-tool-page,
+  .code-fmt-wrapper,
+  .git-manager-wrapper,
+  .git-report-wrapper,
+  .file-diff-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .mock-service-wrapper,
+  .perf-test-wrapper,
+  .auto-test-wrapper,
+  .ebook-shelf,
+  .ebook-reader,
+  .screenshot-mgr-wrapper,
+  .redis-client,
+  .img-b64-wrapper,
+  .hex-converter-wrapper,
+  .img-cvt-wrapper,
+  .regex-wrapper,
+  .crypto-wrapper,
+  .sqlite-mgr,
+  .maven-wrapper,
+  .wallpaper-wrapper,
+  .log-analyzer-wrapper,
+  .hardware-info-page,
+  .download-manager-wrapper,
+  .ssh-terminal-wrapper,
+  .toolbox-sticky-notes-wrapper,
+  .multi-print-wrapper
+) > :is(.header, .page-header, .wp-header, .reader-header) .breadcrumb-sep {
+  color: var(--text-quaternary) !important;
+  font-weight: 400 !important;
+}
+
+/* ============================================================
+   25. 主面板分割线（恢复被 §1 [class*="-panel"] 通用规则清掉的边线）
+   ----------------------------------------------------------------
+   §1 第 60 行那条 `.app-content [class*="-panel"] { border: 0 !important; }`
+   把所有 -panel 元素的 border 都清零了，导致 toolbox-unified.css 第 5759 行
+   给主面板加的 border-left 失效。这里用更高特异性 + 显式选择器恢复，
+   仅作用于工具页主体的 grid 直接子元素，不影响内部其他 panel。
+   ============================================================ */
+
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .content-area,
+  .api-debug-wrapper .debug-layout,
+  .api-docs-wrapper .docs-edit,
+  .mock-service-wrapper .mock-layout,
+  .perf-test-wrapper .bench-layout,
+  .auto-test-wrapper .auto-layout,
+  .git-manager-wrapper .main-content,
+  .git-report-wrapper .main-content,
+  .maven-wrapper .main-area,
+  .img-cvt-wrapper .main-area,
+  .img-b64-wrapper .main-area,
+  .redis-client .main-body,
+  .sqlite-mgr .main-body,
+  .ssh-terminal-wrapper .main-body,
+  .sdk-manager-wrapper .main-container,
+  .log-analyzer-wrapper .content-area,
+  .log-analyzer-wrapper .workspace,
+  .crypto-wrapper .main-body,
+  .regex-wrapper .main-area
+) > *:not(:first-child):not(.panel-resizer):not(.panel-divider):not(.panel-splitter) {
+  border-left: 1px solid rgba(60, 40, 20, 0.18) !important;
+}
+
+/* SshTerminal 深色面板：用更亮的分割线 */
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .main-body > *:not(:first-child):not(.panel-resizer) {
+  border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+}

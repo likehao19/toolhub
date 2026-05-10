@@ -232,11 +232,14 @@ const fetchIcon = async (form) => {
 
 // ── 生成首字母 SVG fallback ──
 const letterIcon = (name) => {
-  const letter = name.charAt(0).toUpperCase()
+  // Array.from 处理 surrogate pair / emoji,charAt(0) 在 emoji 下会切到一半。
+  const letter = (Array.from(String(name || ''))[0] || '?').toUpperCase()
   const colors = ['#6366f1','#8b5cf6','#ec4899','#f97316','#22c55e','#06b6d4','#3b82f6','#ef4444']
-  const bg = colors[name.charCodeAt(0) % colors.length]
+  const bg = colors[(name?.charCodeAt(0) || 0) % colors.length]
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${bg}"/><text x="32" y="44" text-anchor="middle" font-family="system-ui,sans-serif" font-size="32" font-weight="600" fill="white">${letter}</text></svg>`
-  return 'data:image/svg+xml;base64,' + btoa(svg)
+  // 旧:btoa(svg) —— 名字含中文/emoji 时 SVG 里有非 latin-1 字符,btoa 抛 InvalidCharacterError,
+  // 整个 fallback 流程崩,UI 显示破图。改用 utf8 内联 data URL,无需 base64,绕过 btoa 限制。
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg)
 }
 
 const onIconError = (e, site) => {

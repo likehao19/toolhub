@@ -182,7 +182,7 @@
               <template v-else>
                 <!-- 对方头像（左） -->
                 <div v-if="msg.username !== username" class="avatar">
-                  {{ msg.username.charAt(0).toUpperCase() }}
+                  {{ firstGlyph(msg.username) }}
                 </div>
 
                 <div class="bubble-wrap">
@@ -273,7 +273,7 @@
 
                 <!-- 自己头像（右） -->
                 <div v-if="msg.username === username" class="avatar avatar-self">
-                  {{ username.charAt(0).toUpperCase() }}
+                  {{ firstGlyph(username) }}
                 </div>
               </template>
             </div>
@@ -288,10 +288,12 @@
             <span class="user-count">{{ onlineUsers.length }}</span>
           </div>
           <div class="user-list">
-            <div v-for="u in onlineUsers" :key="u"
+            <!-- 后端允许多设备同名(每条连接占一个 slot),用 username 当 key 会触发 Vue 重复警告
+                 + DOM 复用错位。加 index 后缀让 key 在重名时仍唯一。 -->
+            <div v-for="(u, i) in onlineUsers" :key="u + '#' + i"
                  class="user-item" :class="{ 'is-me': u === username }">
               <div class="user-avatar" :class="{ 'user-avatar-me': u === username }">
-                {{ u.charAt(0).toUpperCase() }}
+                {{ firstGlyph(u) }}
               </div>
               <span class="user-name">{{ u }}</span>
               <span v-if="u === username" class="me-badge">{{ t('chat.me') }}</span>
@@ -417,11 +419,65 @@ const msgId = () => `msg-${Date.now()}-${++_msgSeq}`
 
 const objectUrls = []
 const selfSentFileIds = new Set()
-// fileId → { chunks, received, total, filename, mime, size, username, time }
+// fileId → { chunks, received, total, filename, mime, size, username, time, msgIdx }
 const receivingChunks = new Map()
+
+// ---- 接收超时 ----
+// 服务端 broadcast 容量 512,对端高速发送时若本端处理跟不上会触发 RecvError::Lagged 跳过若干 chunk,
+// 没有超时机制的话 receivingChunks 里的状态(最多 1GB) + UI 进度卡片会永远残留,到 disconnect 才释放。
+const RECEIVE_TIMEOUT_MS = 30_000
+const receiveTimers = new Map()  // fileId → timeoutId
+
+const clearReceiveTimer = (fileId) => {
+  const id = receiveTimers.get(fileId)
+  if (id) { clearTimeout(id); receiveTimers.delete(fileId) }
+}
+
+const armReceiveTimer = (fileId) => {
+  clearReceiveTimer(fileId)
+  receiveTimers.set(fileId, setTimeout(() => abortReceive(fileId), RECEIVE_TIMEOUT_MS))
+}
+
+const abortReceive = (fileId) => {
+  const state = receivingChunks.get(fileId)
+  if (!state) return
+  receivingChunks.delete(fileId)
+  clearReceiveTimer(fileId)
+  const idx = messages.value.findIndex(m => m.type === 'file_receiving' && m.fileId === fileId)
+  if (idx !== -1) messages.value.splice(idx, 1)
+  ElMessage.error(`${state.filename}：接收超时,部分数据丢失`)
+}
+
+// ---- 进度更新节流（rAF 合帧）----
+// 1MB chunk + PIPELINE=4 时每秒可达数十次响应式更新,findIndex+对象 spread 让主线程被卡。
+// 同一帧内同 fileId 的多次更新只在 rAF 里写一次。
+//
+// 关键:用 fileId 而不是 msgIdx 来定位消息。
+// 旧实现记录 msgIdx 想跳过 findIndex,但当任一并发文件因超时被 splice 删除时,
+// 它后面所有文件的 msgIdx 全部错位 1,完成路径会改写到错误的消息条目(甚至别人的文本气泡)。
+// findIndex 在几百条消息的列表里也只是几十微秒,远比 splice 错位安全。
+const pendingProgress = new Map() // fileId → { key, value }
+let progressFlushScheduled = false
+
+const queueProgress = (fileId, key, value) => {
+  pendingProgress.set(fileId, { key, value })
+  if (progressFlushScheduled) return
+  progressFlushScheduled = true
+  requestAnimationFrame(() => {
+    progressFlushScheduled = false
+    for (const [fid, { key, value }] of pendingProgress) {
+      const idx = messages.value.findIndex(m => m.fileId === fid && (m.type === 'file_sending' || m.type === 'file_receiving'))
+      if (idx === -1) continue
+      const m = messages.value[idx]
+      messages.value[idx] = { ...m, [key]: value }
+    }
+    pendingProgress.clear()
+  })
+}
 
 const LAN_PORT = 18765
 let ws = null
+let connectTimer = null   // 模块级,re-entry 时能 clear 掉旧的
 
 // ---- 工具 ----
 const ft = () => {
@@ -434,7 +490,18 @@ const scrollBottom = async () => {
   if (messageAreaRef.value) messageAreaRef.value.scrollTop = messageAreaRef.value.scrollHeight
 }
 
-const saveUsername = () => { if (username.value) localStorage.setItem('chat-username', username.value) }
+const saveUsername = () => {
+  // 旧:setItem(username.value),没 trim,下次启动会读出带空白的名字。
+  const v = username.value.trim()
+  if (v) localStorage.setItem('chat-username', v)
+}
+
+// emoji/中文等 surrogate-pair 安全的首字符;空名兜底成 ?
+const firstGlyph = (name) => {
+  if (!name) return '?'
+  const ch = Array.from(String(name))[0]
+  return ch ? ch.toUpperCase() : '?'
+}
 
 const formatFileSize = (bytes) => {
   if (!bytes) return ''
@@ -456,7 +523,8 @@ const scanLan = async () => {
     discoveredRooms.value = await invoke('discover_lan_chat')
     lanState.value = 'found'
   } catch (e) {
-    connectError.value = t('chat.scanFailed') + e
+    // 旧:t(...) + e 把 Error 对象拼成 [object Object]。统一走 String() 拿到可读消息。
+    connectError.value = t('chat.scanFailed') + String(e?.message ?? e)
     lanState.value = 'idle'
   }
 }
@@ -481,7 +549,7 @@ const createRoom = async () => {
     wsUrl.value = `${localIp}:${LAN_PORT}`
     connectWs()
   } catch (e) {
-    connectError.value = t('chat.createFailed') + e
+    connectError.value = t('chat.createFailed') + String(e?.message ?? e)
     lanState.value = 'found'
   } finally {
     creating.value = false
@@ -503,21 +571,37 @@ const connectWs = () => {
   const room = roomId.value.trim() || 'default'
   const url = `ws://${serverHost.value.trim()}:${serverPort.value}/chat/${room}`
   if (!wsUrl.value) wsUrl.value = `${serverHost.value.trim()}:${serverPort.value}`
+
+  // 防重入:用户快速点 join,或在 lanState='connecting' 期间又触发,会让旧 ws 漏关。
+  // 老 socket 的 onmessage 仍会往 messages 推数据,把上个房间的消息混进新房间 / 头像状态串味。
+  if (ws) {
+    try {
+      ws.onopen = ws.onmessage = ws.onerror = ws.onclose = null
+      ws.close()
+    } catch {}
+    ws = null
+  }
+  // 清掉上一次的 8s 连接超时 timer,否则它会在新 ws 还在连接中时把它误关
+  if (connectTimer) { clearTimeout(connectTimer); connectTimer = null }
+
   ws = new WebSocket(url)
   // 接收二进制帧为 ArrayBuffer，而不是 Blob，便于直接操作字节
   ws.binaryType = 'arraybuffer'
 
-  const connectTimer = setTimeout(() => {
+  // 用本次连接的 boundWs 引用,避免 timer 闭包里的 ws? 在中途被 reset 成 null 时跨连接误关
+  const boundWs = ws
+  connectTimer = setTimeout(() => {
     if (!connected.value && (connecting.value || lanState.value === 'connecting')) {
-      ws?.close()
+      try { boundWs.close() } catch {}
       connecting.value = false
       connectError.value = t('chat.connectTimeout')
       lanState.value = 'found'
     }
+    connectTimer = null
   }, 8000)
 
   ws.onopen = () => {
-    clearTimeout(connectTimer)
+    if (connectTimer) { clearTimeout(connectTimer); connectTimer = null }
     connecting.value = false
     connected.value = true
     lanState.value = 'idle'
@@ -580,18 +664,22 @@ const handleBinaryChunk = (buffer) => {
   const chunkData = new Uint8Array(buffer, 4 + headerLen)
 
   if (!receivingChunks.has(fileId)) {
-    receivingChunks.set(fileId, {
-      filename, mime, size, username: d.username,
-      chunks: new Array(totalChunks).fill(null),
-      received: 0, total: totalChunks, time: d.time || ft()
-    })
+    // push 一条 file_receiving 消息(带 fileId),后续按 fileId 查找,
+    // 不再依赖 msgIdx —— 任何并发文件的 splice 都不会让本条目错位。
     messages.value.push({
       _id: msgId(), type: 'file_receiving', fileId,
       username: d.username, filename, size,
-      received: 0, total: totalChunks, time: d.time || ft()
+      received: 0, total: totalChunks, time: ft()
+    })
+    receivingChunks.set(fileId, {
+      filename, mime, size, username: d.username,
+      chunks: new Array(totalChunks).fill(null),
+      received: 0, total: totalChunks, time: ft(),
     })
     scrollBottom()
   }
+  // 收到任何块都重置超时计时器
+  armReceiveTimer(fileId)
 
   const state = receivingChunks.get(fileId)
   if (state.chunks[chunkIndex] === null) {
@@ -600,17 +688,27 @@ const handleBinaryChunk = (buffer) => {
     state.received++
   }
 
-  // 更新接收进度
-  const idx = messages.value.findIndex(m => m.type === 'file_receiving' && m.fileId === fileId)
-  if (idx !== -1) messages.value[idx] = { ...messages.value[idx], received: state.received }
+  // 节流更新接收进度(rAF 合帧),按 fileId 定位条目
+  queueProgress(fileId, 'received', state.received)
 
   if (state.received === state.total) {
+    clearReceiveTimer(fileId)
+    // 完成时强制按 fileId 同步刷新进度,避免最终展示卡在 99%
+    const idx = messages.value.findIndex(m => m.fileId === fileId && m.type === 'file_receiving')
+    if (idx !== -1) {
+      messages.value[idx] = { ...messages.value[idx], received: state.total }
+    }
+    pendingProgress.delete(fileId)
     try {
       const blob = new Blob(state.chunks, { type: state.mime })
       const blobUrl = URL.createObjectURL(blob)
       objectUrls.push(blobUrl)
-      if (idx !== -1) {
-        messages.value.splice(idx, 1, {
+      const finalIdx = messages.value.findIndex(m => m.fileId === fileId && m.type === 'file_receiving')
+      if (finalIdx !== -1) {
+        // 保留原 _id，避免 v-for :key 冲突导致多文件 DOM 复用串味
+        messages.value.splice(finalIdx, 1, {
+          _id: messages.value[finalIdx]._id,
+          fileId,
           type: 'file', username: state.username, filename: state.filename,
           mime: state.mime, dataUrl: blobUrl, blob,
           size: state.size, time: state.time,
@@ -619,7 +717,8 @@ const handleBinaryChunk = (buffer) => {
         })
       }
     } catch {
-      if (idx !== -1) messages.value.splice(idx, 1)
+      const errIdx = messages.value.findIndex(m => m.fileId === fileId && m.type === 'file_receiving')
+      if (errIdx !== -1) messages.value.splice(errIdx, 1)
       ElMessage.error(`${state.filename} ${t('chat.receiveFailed')}`)
     }
     receivingChunks.delete(fileId)
@@ -700,11 +799,19 @@ const buildBinaryChunk = (fileId, chunkIndex, totalChunks, size, filename, mime,
 
 const sendFileChunked = async (pending) => {
   const { file, name, mime, size } = pending
-  const fileId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+  // 旧:`${Date.now()}-${Math.random().toString(36).slice(2)}` —— Math.random toString(36)
+  // 长度不固定(rare 情况返回 "0" 时 slice(2) 是空串),同毫秒多调用碰撞率非零。
+  // crypto.randomUUID 一行搞定,Tauri 内嵌 webview 都支持。
+  const fileId = (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`
   const totalChunks = Math.max(1, Math.ceil(size / CHUNK_SIZE))
 
   selfSentFileIds.add(fileId)
 
+  // push 一条 file_sending 消息(带 fileId),后续按 fileId 查找。
+  // 不再用 msgIdx 索引 —— 多文件并发时另一个文件超时被 splice 会让 msgIdx 错位 1,
+  // 完成路径会改写到错误条目。
   messages.value.push({
     _id: msgId(), type: 'file_sending', fileId,
     username: username.value, filename: name, size,
@@ -712,10 +819,18 @@ const sendFileChunked = async (pending) => {
   })
   scrollBottom()
 
+  const findSendingIdx = () => messages.value.findIndex(m => m.fileId === fileId && m.type === 'file_sending')
+
+  const abort = () => {
+    pendingProgress.delete(fileId)
+    const idx = findSendingIdx()
+    if (idx !== -1) messages.value.splice(idx, 1)
+  }
+
   try {
     // 并发读取 PIPELINE 块，流水线发送
     for (let i = 0; i < totalChunks; i += PIPELINE) {
-      if (!ws || ws.readyState !== WebSocket.OPEN) break
+      if (!ws || ws.readyState !== WebSocket.OPEN) { abort(); return }
       const end = Math.min(i + PIPELINE, totalChunks)
 
       // 并发读取本批次所有切片
@@ -727,28 +842,31 @@ const sendFileChunked = async (pending) => {
 
       // 顺序发送（WebSocket 保证顺序，接收方按 chunkIndex 拼接）
       for (let k = 0; k < buffers.length; k++) {
-        if (!ws || ws.readyState !== WebSocket.OPEN) return
+        if (!ws || ws.readyState !== WebSocket.OPEN) { abort(); return }
         ws.send(buildBinaryChunk(fileId, i + k, totalChunks, size, name, mime, buffers[k]))
-        const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
-        if (idx !== -1) messages.value[idx] = { ...messages.value[idx], sent: i + k + 1 }
+        // 节流更新发送进度,避免高速 chunk 把 UI 卡住
+        queueProgress(fileId, 'sent', i + k + 1)
       }
     }
 
-    // 全部发完 → 本地直接从 File 创建 Blob URL 展示
-    const blob = new Blob([file], { type: mime })
-    const blobUrl = URL.createObjectURL(blob)
-    objectUrls.push(blobUrl)
-    const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
-    if (idx !== -1) {
-      messages.value.splice(idx, 1, {
+    // 全部发完,强制刷一次最终进度,然后替换为完成卡片
+    pendingProgress.delete(fileId)
+    const finalIdx = findSendingIdx()
+    if (finalIdx !== -1) {
+      const blob = new Blob([file], { type: mime })
+      const blobUrl = URL.createObjectURL(blob)
+      objectUrls.push(blobUrl)
+      // 保留原 _id,避免 v-for :key 冲突
+      messages.value.splice(finalIdx, 1, {
+        _id: messages.value[finalIdx]._id,
+        fileId,
         type: 'file', username: username.value, filename: name,
         mime, dataUrl: blobUrl, blob, size, time: ft(),
         isImage: mime.startsWith('image/'), isVideo: mime.startsWith('video/')
       })
     }
   } catch {
-    const idx = messages.value.findIndex(m => m.type === 'file_sending' && m.fileId === fileId)
-    if (idx !== -1) messages.value.splice(idx, 1)
+    abort()
     ElMessage.error(`${name} 发送失败`)
   }
   scrollBottom()
@@ -770,11 +888,18 @@ const sendMessage = () => {
   filesToSend.forEach(f => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl) })
   pendingFiles.value = []
   if (filesToSend.length > 0) {
-    ;(async () => { for (const f of filesToSend) await sendFileChunked(f) })()
+    // 多文件并行发送(WebSocket 帧顺序仍由协议保证,接收端按 fileId+chunkIndex 拼接,不会串味)。
+    // catch 必须挂在外层,避免 unhandledrejection。
+    Promise.all(filesToSend.map(f => sendFileChunked(f))).catch(err => {
+      console.warn('[chat] file batch send error:', err)
+    })
   }
 }
 
-const onKeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage() } }
+const onKeydown = (e) => {
+  // isComposing:输入法选词阶段按 Enter 不应该发送(否则中文输入法用户每次选词都会触发)。
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage() }
+}
 
 const autoResize = () => {
   const el = textareaRef.value
@@ -789,6 +914,13 @@ const disconnect = async () => {
   connected.value = false; messages.value = []; onlineUsers.value = []; wsUrl.value = ''
   pendingFiles.value.forEach(f => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl) })
   pendingFiles.value = []
+  // 清掉文件传输的中间状态,避免重连后旧 fileId 残留导致内存泄漏 / 拼包错乱
+  receivingChunks.clear()
+  selfSentFileIds.clear()
+  // 清接收超时定时器和节流队列,避免重连后乱触发
+  for (const id of receiveTimers.values()) clearTimeout(id)
+  receiveTimers.clear()
+  pendingProgress.clear()
   if (isHost.value) { await invoke('stop_lan_server').catch(() => {}); isHost.value = false }
 }
 
@@ -796,6 +928,10 @@ const copyAddr = () => navigator.clipboard.writeText(wsUrl.value).then(() => ElM
 
 onUnmounted(async () => {
   ws?.close()
+  // 清接收超时定时器,组件卸载后不再触发 ElMessage
+  for (const id of receiveTimers.values()) clearTimeout(id)
+  receiveTimers.clear()
+  pendingProgress.clear()
   if (isHost.value) await invoke('stop_lan_server').catch(() => {})
   objectUrls.forEach(u => URL.revokeObjectURL(u))
 })

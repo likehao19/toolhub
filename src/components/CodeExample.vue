@@ -73,7 +73,7 @@ const copyCode = async () => {
   border: 1px solid #e4e7ed;
   border-radius: 12px;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--bg-primary);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
@@ -99,7 +99,7 @@ const copyCode = async () => {
 
 .example-demo {
   padding: 28px;
-  background: #ffffff;
+  background: var(--bg-primary);
 }
 
 .example-code {

@@ -220,7 +220,7 @@ onUnmounted(() => {
 
 .input:focus {
   outline: none;
-  border-color: rgba(59, 130, 246, 0.5);
+  border-color: rgba(194, 65, 12, 0.5);
   background: rgba(255, 255, 255, 0.9);
 }
 
@@ -272,9 +272,9 @@ onUnmounted(() => {
 }
 
 .add-btn:hover {
-  border-color: rgba(59, 130, 246, 0.5);
-  color: #3b82f6;
-  background: rgba(59, 130, 246, 0.05);
+  border-color: rgba(194, 65, 12, 0.5);
+  color: var(--accent-blue, #c2410c);
+  background: rgba(194, 65, 12, 0.05);
 }
 
 .bar {

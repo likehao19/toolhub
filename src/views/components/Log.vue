@@ -72,7 +72,7 @@
               <div v-if="logHistory.length > 0">
                 <h4 style="margin: 0 0 12px 0; color: #303133;">日志历史</h4>
                 <div style="max-height: 300px; overflow-y: auto; padding: 12px; background: #f5f7fa; border-radius: 4px;">
-                  <div v-for="(log, index) in logHistory" :key="index" style="margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px;">
+                  <div v-for="(log, index) in logHistory" :key="index" style="margin-bottom: 8px; padding: 8px; background: var(--bg-primary); border-radius: 4px;">
                     <el-tag :type="getLogTagType(log.level)" size="small" style="margin-right: 8px;">
                       {{ log.level.toUpperCase() }}
                     </el-tag>

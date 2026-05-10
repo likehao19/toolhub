@@ -1,7 +1,13 @@
 //! 书签相关命令
 
 use base64::Engine;
+use futures_util::StreamExt;
 use serde::Serialize;
+
+/// HTML 抓取大小上限 5 MB。
+/// 旧实现 response.text() 把整个响应读进 String,用户输入 SSRF/恶意 URL 指向大文件接口时
+/// 直接被拖到 OOM。绝大多数网站首页 HTML 远小于 1 MB,5 MB 已经是非常宽裕的上限。
+const MAX_HTML_BYTES: usize = 5 * 1024 * 1024;
 
 #[derive(Debug, Serialize)]
 pub struct WebsiteInfo {
@@ -27,7 +33,31 @@ pub async fn fetch_website_info(url: String) -> Result<WebsiteInfo, String> {
         .await
         .map_err(|e| format!("请求失败: {}", e))?;
 
-    let html = response.text().await.map_err(|e| format!("读取响应失败: {}", e))?;
+    // 流式累计字节,超过 MAX_HTML_BYTES 立刻中断,避免把任意大响应整体读进 String。
+    // 同时尊重 Content-Length 提前拒绝(若服务端如实声明)。
+    if let Some(len) = response.content_length() {
+        if len as usize > MAX_HTML_BYTES {
+            return Err(format!(
+                "页面过大({}字节),超过 {} MB 上限",
+                len, MAX_HTML_BYTES / 1024 / 1024
+            ));
+        }
+    }
+    let mut buf: Vec<u8> = Vec::new();
+    let mut stream = response.bytes_stream();
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk.map_err(|e| format!("读取响应失败: {}", e))?;
+        if buf.len() + chunk.len() > MAX_HTML_BYTES {
+            return Err(format!(
+                "页面过大,超过 {} MB 上限,已中断下载",
+                MAX_HTML_BYTES / 1024 / 1024
+            ));
+        }
+        buf.extend_from_slice(&chunk);
+    }
+    // HTML 通常 UTF-8;少数页面是 GBK / Shift-JIS,这里 lossy 兜底,即使有少量乱码,
+    // 解析 title / meta description / favicon 用的都是 ASCII 标签,功能不受影响。
+    let html = String::from_utf8_lossy(&buf).to_string();
 
     // 解析标题
     let title = extract_title(&html).unwrap_or_default();
@@ -140,7 +170,9 @@ fn extract_attribute(tag: &str, attr: &str) -> Option<String> {
     for pattern in &patterns {
         if let Some(start) = lower.find(pattern.as_str()) {
             let value_start = start + pattern.len();
-            let quote = pattern.chars().last().unwrap();
+            // pattern 当前总是以 " 或 ' 结尾,理论上 last() 不可能为 None,
+            // 但靠"理论"打底 = 留 panic;给个明确的 fallback 不花钱。
+            let Some(quote) = pattern.chars().last() else { continue };
             if let Some(end) = tag[value_start..].find(quote) {
                 return Some(tag[value_start..value_start + end].to_string());
             }

@@ -1,0 +1,601 @@
+/**
+ * 主题精修层 — 把官网编辑式风格下沉到应用
+ *
+ * 加载顺序：common.css → design-refresh.css → toolbox-unified.css → theme-refresh.css
+ * 这是最后加载的覆盖层，负责把暖色 token 下的细节体验对齐官网。
+ */
+
+/* ===== 官网编辑感：标题节奏 ===== */
+
+.app-content .page-eyebrow,
+.app-content .sec-eyebrow,
+.bookmarks-page-wrapper .sidebar-title,
+.credential-manager .sidebar-title,
+.todos-page-wrapper .sidebar-title,
+.notes-page-wrapper .sidebar-title,
+.passwords-page-wrapper .sidebar-title {
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--text-tertiary) !important;
+}
+
+/* 工具栏图标颜色不再扎眼 */
+.app-content .breadcrumb .el-icon {
+  color: var(--text-secondary);
+}
+
+/* ===== 衬线斜体点睛（克制使用，仅在空状态/about 等处） ===== */
+
+.app-content .empty-state .empty-text,
+.app-content .empty .empty-text,
+.app-content .no-data,
+.app-content .el-empty__description {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-tertiary);
+}
+
+/* About 页面 */
+.about-page h1,
+.about-page h2,
+.statistics-page h2 {
+  letter-spacing: -0.02em;
+}
+
+/* ===== Element Plus primary 按钮：暖橙下保证可读 ===== */
+
+.app-content .el-button--primary {
+  --el-button-bg-color: var(--accent-blue);
+  --el-button-border-color: var(--accent-blue);
+  --el-button-hover-bg-color: var(--accent-blue-hover);
+  --el-button-hover-border-color: var(--accent-blue-hover);
+  --el-button-active-bg-color: var(--accent-blue-active);
+  --el-button-active-border-color: var(--accent-blue-active);
+  color: #ffffff !important;
+}
+
+.app-content .el-button--primary:hover {
+  color: #ffffff !important;
+}
+
+/* link 按钮（"跳转到设置"等）保持 token 色 */
+.app-content .el-button.is-link,
+.app-content .el-link.el-link--primary {
+  --el-link-text-color: var(--accent-blue);
+  --el-link-hover-text-color: var(--accent-blue-hover);
+}
+
+/* ===== Switch / Tag / Progress 暖色化 ===== */
+
+.app-content .el-switch.is-checked .el-switch__core {
+  background-color: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+.app-content .el-tag--primary,
+.app-content .el-tag.el-tag--default {
+  background-color: var(--accent-blue-bg);
+  border-color: color-mix(in srgb, var(--accent-blue) 22%, transparent 78%);
+  color: var(--accent-blue);
+}
+
+.app-content .el-progress-bar__inner {
+  background-color: var(--accent-blue);
+}
+
+/* ===== Tabs 选中态 ===== */
+
+.app-content .el-tabs__active-bar {
+  background-color: var(--accent-blue);
+}
+
+.app-content .el-tabs__item.is-active {
+  color: var(--accent-blue);
+}
+
+/* ===== 选中文本 ===== */
+
+::selection {
+  background: var(--accent-warm-soft);
+  color: var(--accent-blue-active);
+}
+
+/* ===== 滚动条暖色化 ===== */
+
+*::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text-quaternary) 70%, transparent 30%);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--text-tertiary) 70%, transparent 30%);
+}
+
+/* ===== Dialog / Drawer 圆角与边框统一 ===== */
+
+.app-content .el-dialog,
+.el-dialog {
+  border: 1px solid var(--divider);
+  box-shadow: var(--shadow-popover);
+}
+
+.el-dialog__title {
+  letter-spacing: -0.01em;
+  font-weight: 600;
+}
+
+/* ===== Notification / Message 暖底 ===== */
+
+.el-notification {
+  background-color: var(--surface-panel) !important;
+  border: 1px solid var(--divider) !important;
+}
+
+.el-message {
+  background-color: var(--surface-panel) !important;
+  border: 1px solid var(--divider) !important;
+}
+
+/* ===== 链接默认色 ===== */
+
+.app-content a:not(.el-button):not(.brand):not(.tool-card):not(.side-i) {
+  color: var(--accent-blue);
+}
+
+.app-content a:not(.el-button):not(.brand):not(.tool-card):not(.side-i):hover {
+  color: var(--accent-blue-hover);
+}
+
+/* ===== 修补：暖色调下个别工具页 hover 残留蓝边 ===== */
+
+.app-content .tool-card:hover,
+.app-content .todo-card:hover,
+.app-content .bookmark-row:hover,
+.app-content .password-item:hover,
+.app-content .note-card:hover {
+  border-color: color-mix(in srgb, var(--accent-blue) 22%, var(--divider) 78%) !important;
+}
+
+/* ===== Empty 视觉：少一点冷感 ===== */
+
+.app-content .el-empty__image svg path {
+  fill: var(--bg-tertiary);
+}
+
+/* ===== Form label 颜色与官网风格一致 ===== */
+
+.app-content .el-form-item__label {
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* ===== 暗色模式 polish ===== */
+
+[data-theme="dark"] .app-content .el-button--primary {
+  color: #1a1714 !important;
+}
+
+[data-theme="dark"] ::selection {
+  background: rgba(251, 146, 60, 0.30);
+  color: #f5f1ea;
+}
+
+/* ============================================================ */
+/* 强制盖掉 37 个页面的硬编码冷灰渐变（侧栏 / 内容区 / 树 / 列表） */
+/* 这些 vue 文件的 scoped style 里大量使用：                    */
+/*   linear-gradient(180deg, rgba(248,250,252,*), rgba(241,245,249,*))  */
+/*   linear-gradient(180deg, rgba(252,253,255,*), rgba(245,247,250,*))  */
+/* 它们都是冷灰白，会盖住暖奶油底。这里按类名一刀切。            */
+/* ============================================================ */
+
+/* —— 侧栏（笔记树、书签分类、待办分类、密码分类等） —— */
+.app-content .sidebar-left,
+.app-content .sidebar-panel,
+.app-content .left-sidebar,
+.app-content .folder-sidebar,
+.app-content .category-sidebar,
+.app-content .notes-sidebar,
+.app-content .tree-sidebar {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-primary) 96%, var(--accent-warm-soft) 4%) 0%,
+    color-mix(in srgb, var(--bg-secondary) 92%, #fff 8%) 100%) !important;
+  border-color: var(--divider) !important;
+}
+
+/* —— 内容区 / 主容器 —— */
+.app-content .content-area,
+.app-content .main-container,
+.app-content .workspace,
+.app-content .workspace-shell,
+.app-content .right-content,
+.app-content .main-content,
+.app-content .right-pane {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-primary) 98%, var(--accent-warm-soft) 2%) 0%,
+    color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%) 100%) !important;
+  border-color: var(--divider) !important;
+}
+
+/* —— 文件树 / 列表容器 —— */
+.app-content .file-tree,
+.app-content .tree-container,
+.app-content .list-wrapper,
+.app-content .file-list-container,
+.app-content .category-list,
+.app-content .folder-list,
+.app-content .item-list-container {
+  background: transparent !important;
+}
+
+/* —— 通用 panel / card 在暖底上的微暖白 —— */
+.app-content .panel,
+.app-content .panel-surface,
+.app-content .section,
+.app-content .section-block,
+.app-content .tool-panel,
+.app-content .list-panel,
+.app-content .settings-section,
+.app-content .editor-container,
+.app-content .preview-container {
+  background: var(--bg-primary) !important;
+  border-color: var(--divider) !important;
+}
+
+/* —— 卡片元素 —— */
+.app-content .tool-card,
+.app-content .todo-card,
+.app-content .bookmark-card,
+.app-content .note-card,
+.app-content .password-row,
+.app-content .event-card,
+.app-content .stat-card,
+.app-content .summary-card {
+  background: var(--bg-primary) !important;
+}
+
+/* —— 把硬编码冷边框 rgba(60, 40, 20,0.08) 类常见出现的位置统一矫正 —— */
+.app-content .sidebar-left,
+.app-content .content-area,
+.app-content .main-container,
+.app-content .panel,
+.app-content .tool-card,
+.app-content .todo-card,
+.app-content .bookmark-card,
+.app-content .note-card,
+.app-content .stat-card {
+  border-color: var(--divider) !important;
+}
+
+/* —— 工具箱壳层下的所有 wrapper 内层背景透明，让暖渐变透出 —— */
+.app-content.toolbox-unified-shell .toolbox-wrapper,
+.app-content.toolbox-unified-shell [class$="-wrapper"],
+.app-content.toolbox-unified-shell [class$="-page"] {
+  background: transparent !important;
+}
+
+/* —— Notes / Bookmarks / Todos / Passwords 主容器外壳暖化 —— */
+.app-content .notes-page-wrapper,
+.app-content .bookmarks-page-wrapper,
+.app-content .todos-page-wrapper,
+.app-content .passwords-page-wrapper,
+.app-content .calendar-wrapper,
+.app-content .credential-manager {
+  background: transparent !important;
+}
+
+/* —— 内层 main-container（笔记/书签/待办/密码的主体壳） —— */
+.app-content .notes-page-wrapper .main-container,
+.app-content .bookmarks-page-wrapper .main-container,
+.app-content .credential-manager .main-container,
+.app-content .todos-page-wrapper .main-container,
+.app-content .passwords-page-wrapper .main-container {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-secondary) 60%, var(--bg-primary) 40%) 0%,
+    var(--bg-secondary) 100%) !important;
+}
+
+/* —— 输入框 / select 暖色 —— */
+.app-content .el-input__wrapper,
+.app-content .el-textarea__inner,
+.app-content .el-select__wrapper {
+  background-color: var(--bg-primary) !important;
+}
+
+/* —— Empty / Drop zone 暖底 —— */
+.app-content .empty-state,
+.app-content .drop-zone,
+.app-content .upload-dropzone {
+  background: color-mix(in srgb, var(--bg-secondary) 70%, var(--bg-primary) 30%) !important;
+}
+
+/* ============================================================ */
+/* 暗色模式下，上述 !important 覆盖也得跟上                       */
+/* ============================================================ */
+[data-theme="dark"] .app-content .sidebar-left,
+[data-theme="dark"] .app-content .sidebar-panel,
+[data-theme="dark"] .app-content .left-sidebar,
+[data-theme="dark"] .app-content .folder-sidebar,
+[data-theme="dark"] .app-content .category-sidebar {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--bg-tertiary) 92%, var(--accent-warm) 8%) 0%,
+    var(--bg-tertiary) 100%) !important;
+}
+
+[data-theme="dark"] .app-content .content-area,
+[data-theme="dark"] .app-content .main-container,
+[data-theme="dark"] .app-content .workspace {
+  background: var(--bg-tertiary) !important;
+}
+
+/* ============================================================ */
+/* 分割线布局 — 剥掉卡片化装饰，改用横线分隔                    */
+/* 让统一的暖底（var(--surface-page)）从所有页面透出来          */
+/* ============================================================ */
+
+/* —— 1. 顶层容器：透明，让暖底透出 —— */
+.app-content .content-area,
+.app-content .main-container,
+.app-content .workspace,
+.app-content .workspace-shell,
+.app-content .right-content,
+.app-content .main-content,
+.app-content .right-pane,
+.app-content .toolbox-workspace,
+.app-content .calendar-workspace,
+.app-content .sdk-workspace,
+.app-content .dashboard-workspace,
+.app-content .credential-manager .main-tabs {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* —— 2. 侧栏：保留极淡的左侧分割线，去除卡片感 —— */
+.app-content .sidebar-left,
+.app-content .sidebar-panel,
+.app-content .left-sidebar,
+.app-content .folder-sidebar,
+.app-content .category-sidebar,
+.app-content .notes-sidebar,
+.app-content .tree-sidebar,
+.app-content .left-panel {
+  background: transparent !important;
+  border: none !important;
+  border-right: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* —— 3. 卡片元素：去掉卡片背景/边框/阴影/圆角，改横线分隔 —— */
+.app-content .tool-card,
+.app-content .todo-card,
+.app-content .bookmark-card,
+.app-content .bookmark-row,
+.app-content .note-card,
+.app-content .password-row,
+.app-content .password-item,
+.app-content .event-card,
+.app-content .stat-card,
+.app-content .summary-card,
+.app-content .history-item,
+.app-content .search-item,
+.app-content .recent-row,
+.app-content .download-item,
+.app-content .mock-row,
+.app-content .port-row,
+.app-content .result-row,
+.app-content .file-item,
+.app-content .endpoint-item,
+.app-content .node-card,
+.app-content .version-card,
+.app-content .server-card,
+.app-content .db-card,
+.app-content .rule-card,
+.app-content .test-card,
+.app-content .case-card,
+.app-content .log-item,
+.app-content .module-card,
+.app-content .compact-file-row,
+.app-content .task-item {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+/* —— 卡片父容器把负 margin 抵消，避免列表与父 padding 冲突 —— */
+.app-content .todo-cards,
+.app-content .bookmark-cards,
+.app-content .password-list,
+.app-content .task-list,
+.app-content .file-list,
+.app-content .item-list,
+.app-content .compact-file-list,
+.app-content .download-list,
+.app-content .port-list {
+  gap: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* —— 列表最后一项不画底线 —— */
+.app-content .tool-card:last-child,
+.app-content .todo-card:last-child,
+.app-content .bookmark-card:last-child,
+.app-content .bookmark-row:last-child,
+.app-content .note-card:last-child,
+.app-content .password-row:last-child,
+.app-content .password-item:last-child,
+.app-content .event-card:last-child,
+.app-content .stat-card:last-child,
+.app-content .history-item:last-child,
+.app-content .search-item:last-child,
+.app-content .file-item:last-child,
+.app-content .task-item:last-child,
+.app-content .module-card:last-child,
+.app-content .compact-file-row:last-child {
+  border-bottom: none !important;
+}
+
+/* —— hover：淡暖背景，不再 transform 抬升 —— */
+.app-content .tool-card:hover,
+.app-content .todo-card:hover,
+.app-content .bookmark-card:hover,
+.app-content .bookmark-row:hover,
+.app-content .note-card:hover,
+.app-content .password-row:hover,
+.app-content .password-item:hover,
+.app-content .event-card:hover,
+.app-content .file-item:hover,
+.app-content .history-item:hover,
+.app-content .task-item:hover,
+.app-content .module-card:hover,
+.app-content .compact-file-row:hover {
+  background: var(--accent-warm-soft) !important;
+  border-color: var(--divider) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* —— 4. Section / panel：剥背景，节与节之间用顶部分割线 —— */
+.app-content .panel,
+.app-content .panel-surface,
+.app-content .section,
+.app-content .section-block,
+.app-content .tool-panel,
+.app-content .list-panel,
+.app-content .settings-section,
+.app-content .editor-container,
+.app-content .preview-container,
+.app-content .tool-category,
+.app-content .stat-row,
+.app-content .filter-bar,
+.app-content .commit-group {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.app-content .settings-section + .settings-section,
+.app-content .tool-category + .tool-category,
+.app-content .commit-group + .commit-group {
+  border-top: 1px solid var(--divider) !important;
+  margin-top: 16px !important;
+  padding-top: 16px !important;
+}
+
+/* —— 5. el-card 同样剥装饰，改横线分隔 —— */
+.app-content .el-card {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--divider) !important;
+}
+
+.app-content .el-card:last-child {
+  border-bottom: none !important;
+}
+
+.app-content .el-card .el-card__header {
+  background: transparent !important;
+  border-bottom: 1px solid var(--divider) !important;
+  padding: 14px 16px !important;
+}
+
+.app-content .el-card .el-card__body {
+  background: transparent !important;
+}
+
+/* —— 6. Header / toolbar：底部 1px 分割线，不再卡片化 —— */
+.app-content .header,
+.app-content .filter-bar,
+.app-content .toolbar,
+.app-content .action-bar,
+.app-content .search-bar,
+.app-content .panel-toolbar,
+.app-content .suite-toolbar,
+.app-content .sql-toolbar,
+.app-content .tab-toolbar,
+.app-content .response-toolbar,
+.app-content .list-toolbar,
+.app-content .stats-bar {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* —— 7. Sidebar 内分类项：透明 + hover 暖底 + active 左侧 3px 暖橙条 —— */
+.app-content .category-item,
+.app-content .menu-item,
+.app-content .conn-item,
+.app-content .doc-item,
+.app-content .compact-file-row {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content .category-item:hover,
+.app-content .menu-item:hover,
+.app-content .conn-item:hover {
+  background: var(--accent-warm-soft) !important;
+}
+
+.app-content .category-item.active,
+.app-content .menu-item.active,
+.app-content .conn-item.active {
+  background: var(--accent-blue-bg) !important;
+  border-left: 3px solid var(--accent-blue) !important;
+  border-radius: 0 !important;
+}
+
+/* —— 8. status-bar 顶部分割线 —— */
+.app-content .status-bar {
+  background: transparent !important;
+  border: none !important;
+  border-top: 1px solid var(--divider) !important;
+  border-radius: 0 !important;
+}
+
+/* —— 9. 表格透明、行 hover 暖底 —— */
+.app-content .el-table,
+.app-content .el-table tr,
+.app-content .el-table th,
+.app-content .el-table td {
+  background: transparent !important;
+}
+
+.app-content .el-table--enable-row-hover .el-table__body tr:hover > td {
+  background: var(--accent-warm-soft) !important;
+}
+
+/* —— 10. el-tabs 头部分割线 —— */
+.app-content .el-tabs__header {
+  border-bottom: 1px solid var(--divider) !important;
+  background: transparent !important;
+  margin: 0 !important;
+}
+
+/* —— 11. Drop zone 仍保留虚线边框（功能提示，必要保留）—— */
+.app-content .drop-zone,
+.app-content .upload-dropzone,
+.app-content .el-upload-dragger {
+  background: transparent !important;
+  border: 1px dashed var(--border-color) !important;
+  border-radius: 12px !important;
+}
+
+.app-content .drop-zone:hover,
+.app-content .upload-dropzone:hover,
+.app-content .el-upload-dragger:hover {
+  border-color: var(--accent-blue) !important;
+  background: var(--accent-warm-soft) !important;
+}
+

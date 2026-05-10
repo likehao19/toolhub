@@ -102,9 +102,18 @@ export async function addBook({ title, author, cover, format, file_path, file_si
 
 export async function updateBook(id, fields) {
   const db = await getDatabase()
-  const keys = Object.keys(fields)
+  // 列名白名单:防止 fields 里混入未知 key 拼到 SQL,既保护代码也避免误改字段。
+  const ALLOWED = new Set([
+    'title', 'author', 'cover', 'format', 'file_path', 'file_size',
+    'total_pages', 'description'
+  ])
+  const keys = Object.keys(fields).filter(k => ALLOWED.has(k))
+  if (keys.length === 0) return
   const sets = keys.map(k => `${k} = ?`).join(', ')
-  await db.execute(`UPDATE books SET ${sets}, updated_at = datetime('now') WHERE id = ?`, [...keys.map(k => fields[k]), id])
+  await db.execute(
+    `UPDATE books SET ${sets}, updated_at = datetime('now') WHERE id = ?`,
+    [...keys.map(k => fields[k]), id]
+  )
 }
 
 export async function deleteBook(id) {
@@ -180,6 +189,7 @@ export async function updateHighlight(id, { note, color }) {
   const db = await getDatabase()
   const sets = []
   const vals = []
+  // 这里只允许 note / color 两个字段,直接写死,无需白名单
   if (note !== undefined) { sets.push('note = ?'); vals.push(note) }
   if (color !== undefined) { sets.push('color = ?'); vals.push(color) }
   if (sets.length) {

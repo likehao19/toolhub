@@ -28,9 +28,14 @@ export async function addConnection({ name, host, port, password, db_index, colo
 
 export async function updateConnection(id, fields) {
   const db = await getDatabase()
-  const keys = Object.keys(fields)
+  const ALLOWED = new Set(['name', 'host', 'port', 'password', 'db_index', 'color', 'sort_order'])
+  const keys = Object.keys(fields).filter(k => ALLOWED.has(k))
+  if (keys.length === 0) return
   const sets = keys.map(k => `${k} = ?`).join(', ')
-  await db.execute(`UPDATE redis_connections SET ${sets} WHERE id = ?`, [...keys.map(k => fields[k]), id])
+  await db.execute(
+    `UPDATE redis_connections SET ${sets} WHERE id = ?`,
+    [...keys.map(k => fields[k]), id]
+  )
 }
 
 export async function deleteConnection(id) {

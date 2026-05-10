@@ -23,7 +23,7 @@
     </div>
 
     <div class="content-area">
-      <div class="debug-layout">
+      <div class="debug-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
         <div class="sidebar-area" :class="{ collapsed: sidebarCollapsed }">
           <div class="left-sidebar" :class="{ collapsed: sidebarCollapsed }">
             <div v-if="!sidebarCollapsed" class="sidebar-content">
@@ -37,13 +37,12 @@
               </div>
 
               <div v-if="sidebarTab === 'collections'" class="sidebar-list">
-                <div class="sidebar-toolbar sidebar-toolbar-create">
-                  <div class="create-actions-grid">
-                    <el-button size="small" class="create-action-btn" type="primary" @click="onCreateCollection">
-                      <el-icon><CollectionTag /></el-icon>
-                      <span>{{ t('apiDebug.newCollection') }}</span>
-                    </el-button>
-                  </div>
+                <!-- 顶部新建栏（对齐 ApiDocs 风格） -->
+                <div class="list-toolbar">
+                  <el-button size="small" type="primary" class="toolbar-btn" @click="onCreateCollection">
+                    <el-icon><CollectionTag /></el-icon>
+                    <span>{{ t('apiDebug.newCollection') }}</span>
+                  </el-button>
                 </div>
                 <el-tree
                   v-if="collectionTree.length"
@@ -55,24 +54,42 @@
                   :expand-on-click-node="false"
                   :highlight-current="true"
                   @node-click="handleCollectionNodeClick"
+                  @node-expand="onTreeExpand"
+                  @node-collapse="onTreeCollapse"
                 >
-                  <template #default="{ data }">
-                    <div class="collection-tree-row" :class="{ active: activeTreeNodeId === data.id }">
-                      <div class="collection-tree-main">
-                        <span class="collection-tree-icon">{{ iconForNode(data) }}</span>
-                        <template v-if="data.type === 'api'">
-                          <span class="method-tag" :style="{ color: METHOD_COLORS[data.method] }">{{ data.method }}</span>
-                        </template>
+                  <template #default="{ node, data }">
+                    <div class="tree-row" :class="{ active: activeTreeNodeId === data.id, 'is-folder': data.type === 'folder' || data.type === 'collection' }">
+                      <div class="tree-row-main">
+                        <!-- 自绘展开/折叠 chevron：folder/collection 显示，api 同尺寸占位保持对齐 -->
+                        <el-icon v-if="data.type === 'folder' || data.type === 'collection'" class="row-chevron" :class="{ expanded: node.expanded }">
+                          <CaretRight />
+                        </el-icon>
+                        <span v-else class="row-chevron-spacer"></span>
+                        <el-icon v-if="data.type === 'collection'" class="row-icon collection-icon"><CollectionTag /></el-icon>
+                        <el-icon v-else-if="data.type === 'folder'" class="row-icon folder-icon">
+                          <FolderOpened v-if="node.expanded" />
+                          <Folder v-else />
+                        </el-icon>
+                        <span v-else class="method-tag" :style="{ color: METHOD_COLORS[data.method] }">{{ data.method }}</span>
                         <span class="item-name" :title="nodeTitle(data)">{{ nodeTitle(data) }}</span>
+                        <span v-if="(data.type === 'folder' || data.type === 'collection') && data.children?.length" class="folder-count">{{ data.children.length }}</span>
                       </div>
                       <el-dropdown trigger="click" size="small" @command="cmd => onTreeNodeCmd(cmd, data)">
-                        <el-icon class="collection-more"><MoreFilled /></el-icon>
+                        <el-icon class="row-more" @click.stop><MoreFilled /></el-icon>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item v-if="data.type !== 'api'" command="newFolder">{{ t('apiDebug.newFolder') }}</el-dropdown-item>
-                            <el-dropdown-item v-if="data.type !== 'api'" command="newInterface">{{ t('apiDebug.newInterface') }}</el-dropdown-item>
-                            <el-dropdown-item command="rename">{{ t('common.edit') }}</el-dropdown-item>
-                            <el-dropdown-item command="delete" divided>{{ t('common.delete') }}</el-dropdown-item>
+                            <el-dropdown-item v-if="data.type !== 'api'" command="newFolder">
+                              <el-icon><FolderAdd /></el-icon>{{ t('apiDebug.newFolder') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item v-if="data.type !== 'api'" command="newInterface">
+                              <el-icon><DocumentAdd /></el-icon>{{ t('apiDebug.newInterface') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item command="rename" :divided="data.type !== 'api'">
+                              <el-icon><Edit /></el-icon>{{ t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item command="delete" divided>
+                              <el-icon><Delete /></el-icon>{{ t('common.delete') }}
+                            </el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -84,7 +101,9 @@
 
               <div v-if="sidebarTab === 'history'" class="sidebar-list">
                 <div class="sidebar-toolbar">
-                  <el-button size="small" text type="danger" @click="onClearHistory">{{ t('apiDebug.clearHistory') }}</el-button>
+                  <el-button size="small" text type="danger" @click="onClearHistory" :title="t('apiDebug.clearHistory')">
+                    <el-icon><Delete /></el-icon>
+                  </el-button>
                 </div>
                 <div v-for="group in groupedHistory" :key="group.label" class="history-group">
                   <div class="history-group-label">{{ group.label }}</div>
@@ -99,12 +118,16 @@
               </div>
             </div>
           </div>
-          <div class="sidebar-toggle" @click="sidebarCollapsed = !sidebarCollapsed">
-            <el-icon>
-              <ArrowLeft v-if="!sidebarCollapsed" />
-              <ArrowRight v-else />
-            </el-icon>
-          </div>
+        </div>
+
+        <!-- 折叠/展开按钮：浮动在 debug-layout 内，按钮中心始终落在 panel 右边缘 -->
+        <div class="sidebar-toggle" :class="{ collapsed: sidebarCollapsed }"
+          @click="sidebarCollapsed = !sidebarCollapsed"
+          :title="sidebarCollapsed ? t('common.showSidebar') : t('common.hideSidebar')">
+          <el-icon>
+            <ArrowLeft v-if="!sidebarCollapsed" />
+            <ArrowRight v-else />
+          </el-icon>
         </div>
 
         <div class="main-panel">
@@ -117,10 +140,10 @@
             <el-input v-model="reqUrl" class="url-input" :placeholder="'https://api.example.com/users'" @keydown.ctrl.enter="doSend" clearable />
             <div class="url-actions">
               <el-button type="primary" :loading="sending" @click="doSend" :disabled="!reqUrl.trim()">
-                {{ sending ? t('apiDebug.sending') : t('apiDebug.send') }}
+                <el-icon style="margin-right: 6px;"><Promotion /></el-icon>{{ sending ? t('apiDebug.sending') : t('apiDebug.send') }}
               </el-button>
               <el-button v-if="sending" @click="doCancel" type="danger" plain>
-                {{ t('apiDebug.cancel') }}
+                <el-icon style="margin-right: 6px;"><Close /></el-icon>{{ t('apiDebug.cancel') }}
               </el-button>
               <el-dropdown trigger="click" @command="onUrlMenuCmd">
                 <el-button class="url-more-btn"><el-icon><ArrowDown /></el-icon></el-button>
@@ -172,7 +195,9 @@
                         <el-radio-button value="multipart">multipart</el-radio-button>
                         <el-radio-button value="raw">raw</el-radio-button>
                       </el-radio-group>
-                      <el-button v-if="reqBody.type === 'json'" size="small" text @click="formatBodyJson">{{ t('apiDebug.formatJson') }}</el-button>
+                      <el-button v-if="reqBody.type === 'json'" size="small" text @click="formatBodyJson">
+                        <el-icon style="margin-right: 4px;"><Brush /></el-icon>{{ t('apiDebug.formatJson') }}
+                      </el-button>
                     </div>
                     <textarea v-if="reqBody.type === 'json' || reqBody.type === 'raw'" v-model="reqBody.content" class="body-textarea" :placeholder="reqBody.type === 'json' ? '{ }' : 'raw text...'" spellcheck="false" />
                     <div v-if="reqBody.type === 'form' || reqBody.type === 'multipart'" class="kv-editor">
@@ -197,7 +222,7 @@
                       <el-option label="API Key" value="apikey" />
                     </el-select>
                     <div v-if="reqAuth.type === 'bearer'" class="auth-fields">
-                      <el-input v-model="reqAuth.token" size="small" placeholder="Token (支持 {{变量}})" />
+                      <el-input v-model="reqAuth.token" size="small" :placeholder="t('apiDebug.tokenPlaceholder')" />
                     </div>
                     <div v-if="reqAuth.type === 'basic'" class="auth-fields">
                       <el-input v-model="reqAuth.username" size="small" placeholder="Username" />
@@ -241,7 +266,9 @@
                         <el-radio-button value="pretty">Pretty</el-radio-button>
                         <el-radio-button value="raw">Raw</el-radio-button>
                       </el-radio-group>
-                      <el-button size="small" text @click="copyResponse">{{ t('apiDebug.copy') }}</el-button>
+                      <el-button size="small" text @click="copyResponse" :title="t('common.copy')">
+                        <el-icon><CopyDocument /></el-icon>
+                      </el-button>
                     </div>
                     <pre class="response-body" :class="resBodyMode">{{ resBodyMode === 'pretty' ? prettyBody : response?.body }}</pre>
                   </el-tab-pane>
@@ -310,8 +337,12 @@
           <el-select v-model="editEnvId" size="small" style="flex:1" :placeholder="t('apiDebug.selectEnv')">
             <el-option v-for="env in environments" :key="env.id" :label="env.name" :value="env.id" />
           </el-select>
-          <el-button size="small" type="primary" @click="onCreateEnv">+</el-button>
-          <el-button size="small" type="danger" :disabled="!editEnvId" @click="onDeleteEnv">{{ t('common.delete') }}</el-button>
+          <el-button size="small" type="primary" text @click="onCreateEnv" :title="t('common.add')">
+            <el-icon><Plus /></el-icon>
+          </el-button>
+          <el-button size="small" type="danger" text :disabled="!editEnvId" @click="onDeleteEnv" :title="t('common.delete')">
+            <el-icon><Delete /></el-icon>
+          </el-button>
         </div>
         <template v-if="editingEnv">
           <el-input v-model="editingEnv.name" size="small" style="margin: 12px 0" :placeholder="t('apiDebug.envName')" />
@@ -342,10 +373,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading, CollectionTag } from '@element-plus/icons-vue'
+import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading, CollectionTag, Folder, FolderOpened, FolderAdd, DocumentAdd, Edit, Delete, Document, CaretRight, CopyDocument, Plus, Promotion, Brush } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { sendRequest, cancelRequest } from '@/utils/apiWorkbench/httpEngine'
 import { formatSize, METHOD_COLORS, COMMON_HEADERS, tryFormatJson, isJson, buildUrl, buildAuthHeader } from '@/utils/apiWorkbench/shared'
@@ -557,9 +588,11 @@ onBeforeUnmount(() => {
 
 function refreshCollectionsState() {
   collections.value = loadCollections()
-  const nextExpanded = []
-  buildCollectionTree(collections.value).forEach(root => collectExpandKeys(root, nextExpanded))
-  expandedKeys.value = Array.from(new Set(nextExpanded))
+  // 不再 mutate expandedKeys ——
+  // 1) :default-expanded-keys 是 reactive 绑定，每次变化会被 EP 重新应用，
+  //    会破坏用户手动折叠的状态；
+  // 2) EP 内部 store 在数据更新时按 ID 保留 nodesMap，已展开节点的状态不会丢；
+  // 3) 新建节点时通过 expandNodeById 显式展开父节点。
 }
 
 function onCreateCollection() {
@@ -571,6 +604,8 @@ function onCreateCollection() {
       refreshCollectionsState()
       activeTreeNodeId.value = `collection:${collection.id}`
       selectedCollectionId.value = collection.id
+      // 自动展开新创建的 collection
+      expandNodeById(`collection:${collection.id}`)
       ElMessage.success(t('apiDebug.saved'))
     }
   }).catch(() => {})
@@ -592,6 +627,11 @@ function onCreateFolderAtSelection() {
         activeTreeNodeId.value = `folder:${folder.id}`
         selectedCollectionId.value = target.collectionId
         selectedFolderId.value = folder.id
+        // 自动展开父节点（folder 在 folder 下，或 folder 在 collection 下）
+        const parentTreeId = target.parentId
+          ? `folder:${target.parentId}`
+          : `collection:${target.collectionId}`
+        expandNodeById(parentTreeId)
       }
     }
   }).catch(() => {})
@@ -659,16 +699,25 @@ function onTreeNodeCmd(cmd, data) {
   }
 }
 
+/* ========= 文件夹/集合展开/折叠：no-op =========
+   注意：不要在这里 mutate expandedKeys —— :default-expanded-keys
+   是 reactive 绑定，每次变化会被 EP 重新应用，导致刚刚折叠的节点
+   被强制重新展开，子节点"折叠不住"。 */
+function onTreeExpand() { /* no-op */ }
+function onTreeCollapse() { /* no-op */ }
+
 function handleCollectionNodeClick(data) {
   activeTreeNodeId.value = data.id
   if (data.type === 'collection') {
     selectedCollectionId.value = data.rawId
     selectedFolderId.value = null
+    toggleTreeNode(data.id)
     return
   }
   selectedCollectionId.value = data.collectionId
   if (data.type === 'folder') {
     selectedFolderId.value = data.rawId
+    toggleTreeNode(data.id)
     return
   }
   activeItemId.value = data.rawId
@@ -677,6 +726,24 @@ function handleCollectionNodeClick(data) {
   if (item) {
     loadCollectionItem(item)
   }
+}
+
+/* 手动 toggle：非 lazy 模式下空 folder 被 EP 视为 leaf，
+   expand-on-click-node 不生效，所以这里主动调用 node API。 */
+function toggleTreeNode(treeNodeId) {
+  if (!collectionTreeRef.value) return
+  const treeNode = collectionTreeRef.value.getNode(treeNodeId)
+  if (!treeNode) return
+  if (treeNode.expanded) treeNode.collapse()
+  else treeNode.expand()
+}
+
+/* 工具：通过 tree 实例展开某节点（异步，等 DOM 更新） */
+async function expandNodeById(treeNodeId) {
+  await nextTick()
+  if (!collectionTreeRef.value) return
+  const treeNode = collectionTreeRef.value.getNode(treeNodeId)
+  if (treeNode) treeNode.expand()
 }
 
 function loadCollectionItem(item) {
@@ -707,6 +774,11 @@ function doSaveToCollection() {
     auth: reqAuth.value,
   }, saveParentNodeId.value)
   refreshCollectionsState()
+  // 自动展开保存目标父节点（folder 或 collection 根）
+  const parentTreeId = saveParentNodeId.value
+    ? `folder:${saveParentNodeId.value}`
+    : `collection:${saveCollectionId.value}`
+  expandNodeById(parentTreeId)
   showSaveDialog.value = false
   ElMessage.success(t('apiDebug.saved'))
 }
@@ -877,6 +949,10 @@ function shortenUrl(url) {
 
 onMounted(() => {
   refreshCollectionsState()
+  // 初始展开所有 collection / folder 节点（一次性，后续不再 mutate）
+  const initial = []
+  buildCollectionTree(collections.value).forEach(root => collectExpandKeys(root, initial))
+  expandedKeys.value = Array.from(new Set(initial))
   history.value = loadHistory()
   environments.value = loadEnvironments()
   currentEnvId.value = getCurrentEnvId()
@@ -899,7 +975,7 @@ onMounted(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -977,36 +1053,60 @@ onMounted(() => {
   min-height: 0;
   padding: 0;
   gap: 0;
+  position: relative;
+  transition: grid-template-columns 0.22s ease;
+}
+.debug-layout.sidebar-collapsed {
+  grid-template-columns: 0 minmax(0, 1fr) !important;
 }
 .sidebar-area.collapsed {
   width: 0;
+  overflow: hidden;
 }
 .sidebar-area {
   position: relative;
   display: flex;
   min-height: 0;
+  transition: width 0.22s ease;
 }
 .left-sidebar {
   width: 260px; min-width: 260px;
-  background: linear-gradient(180deg, rgba(248, 252, 255, 0.72), rgba(241, 247, 252, 0.52));
+  background: transparent;
   display: flex; flex-direction: column; position: relative;
   transition: width 0.2s, min-width 0.2s;
   border: 0;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 0;
   box-shadow: none;
+  overflow: hidden;
 }
 .left-sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; border-width: 0; }
 .sidebar-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 .sidebar-toggle {
-  position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
-  width: 20px; height: 48px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(15, 23, 42, 0.08); border-left: none;
-  border-radius: 0 8px 8px 0; z-index: 10; color: var(--text-tertiary); font-size: 11px;
-  box-shadow: none;
+  position: absolute;
+  left: 260px;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid rgba(60, 40, 20, 0.14);
+  border-radius: 11px;
+  z-index: 20;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  box-shadow: 0 2px 6px rgba(60, 40, 20, 0.06);
+  transition: left 0.22s ease, color 0.15s, background 0.15s, box-shadow 0.15s;
 }
-.sidebar-toggle:hover { color: var(--accent-blue); }
+.sidebar-toggle.collapsed { left: 0; }
+.sidebar-toggle:hover {
+  color: var(--accent-blue);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(47, 111, 228, 0.18);
+}
 .sidebar-tabs { display: flex; padding: 10px 10px 8px; gap: 6px; }
 .sidebar-tab {
   flex: 1; text-align: center; padding: 8px 0; font-size: 12px; color: var(--text-secondary);
@@ -1016,92 +1116,149 @@ onMounted(() => {
 .sidebar-tab.active {
   color: var(--accent-blue); font-weight: 600;
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  border-color: rgba(10,132,255,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  border-color: rgba(194, 65, 12,0.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
 }
-.sidebar-list { flex: 1; overflow-y: auto; padding: 4px 8px 8px; }
+.sidebar-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 4px 8px 8px; }
 .sidebar-toolbar {
   padding: 6px 4px 10px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
-.sidebar-toolbar-create {
-  display: block;
-  padding: 8px 6px 10px;
-}
-.create-actions-grid {
+/* 顶部新建栏（对齐 ApiDocs 视觉） */
+.list-toolbar {
   display: flex;
-  align-items: stretch;
-  gap: 0;
+  gap: 6px;
+  /* sidebar-list 自带 4px/8px padding —— negative margin 抵消，让 toolbar 顶到面板边缘 */
+  margin: -4px -8px 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  flex-shrink: 0;
 }
-.create-action-btn {
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 32px;
-  margin: 0;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(49, 107, 208, 0.2);
-  background: rgba(74, 120, 217, 0.1);
-  color: #245fca;
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.2;
-  box-shadow: none;
-}
-.create-action-btn :deep(.el-icon) {
-  margin-right: 4px;
-  margin-bottom: 0;
-  font-size: 14px;
-}
-.create-action-btn :deep(span) {
+.toolbar-btn {
+  flex: 1;
   display: inline-flex;
-  flex-direction: row;
   align-items: center;
   justify-content: center;
-  min-width: 0;
+  gap: 4px;
 }
-.create-action-btn:hover {
-  border-color: rgba(49, 107, 208, 0.28);
-  background: rgba(74, 120, 217, 0.15);
-  color: #245fca;
-}
-.collection-tree-row {
+.toolbar-btn :deep(.el-icon) { font-size: 13px; }
+/* el-tree 节点行 — 对齐 ApiDocs 视觉 */
+.tree-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
   width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 6px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: color 0.15s;
 }
-.collection-tree-main {
+.tree-row.active {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+.tree-row.active .item-name { color: var(--accent-blue); }
+.tree-row.active .method-tag { color: var(--accent-blue) !important; }
+
+.tree-row-main {
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 0;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
-.collection-tree-icon { flex-shrink: 0; }
-.collection-more { font-size: 14px; color: var(--text-tertiary); cursor: pointer; flex-shrink: 0; opacity: 0; transition: opacity 0.15s, color 0.15s; }
-.collection-more:hover { color: var(--text-primary); }
-.collection-tree-row:hover .collection-more,
-:deep(.el-tree-node.is-current) .collection-more {
-  opacity: 1;
+.row-icon { font-size: 14px; flex-shrink: 0; color: #d2a55a; }
+.folder-icon { color: #d2a55a; }
+.collection-icon { color: #6b7280; }
+.tree-row.active .folder-icon,
+.tree-row.active .collection-icon { color: var(--accent-blue); }
+
+.folder-count {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-quaternary);
+  padding: 1px 6px;
+  background: rgba(60, 40, 20, 0.06);
+  border-radius: 8px;
+  margin-left: 2px;
 }
+.tree-row.active .folder-count {
+  color: var(--accent-blue);
+  background: rgba(47, 111, 228, 0.12);
+}
+
+.row-more {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--text-quaternary);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.15s;
+}
+.tree-row:hover .row-more { opacity: 1; }
+.row-more:hover { background: rgba(60, 40, 20, 0.06); color: var(--text-primary); }
+
 :deep(.el-tree) {
-  --el-tree-node-hover-bg-color: rgba(255,255,255,0.56);
+  --el-tree-node-hover-bg-color: rgba(60, 40, 20, 0.04);
   background: transparent;
+  /* 防止深层缩进的节点撑出横向滚动 */
+  overflow: hidden;
+}
+:deep(.el-tree-node) {
+  /* 缩进会累加 padding-left，子节点过宽时会逼出横向滚动；这里截断 */
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* 彻底隐藏 EP 默认展开箭头，由 slot 内自绘 chevron 接管视觉 */
+:deep(.el-tree-node__expand-icon) {
+  display: none !important;
+}
+/* 自绘 chevron：folder/collection 行有箭头，api 行用 spacer 占位 */
+.row-chevron {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  font-size: 12px;
+  color: var(--text-secondary, #606266);
+  transition: transform 0.18s ease, color 0.15s;
+}
+.row-chevron.expanded { transform: rotate(90deg); }
+.tree-row:hover .row-chevron { color: var(--accent-blue); }
+.tree-row.active .row-chevron { color: var(--accent-blue); }
+.row-chevron-spacer {
+  flex-shrink: 0;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
 }
 :deep(.el-tree-node__content) {
-  height: 34px;
-  border-radius: 10px;
-  margin-bottom: 2px;
-  padding-right: 6px;
+  height: 32px;
+  padding-right: 0 !important;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: 0;
+  overflow: hidden;
+  transition: background 0.15s, border-color 0.15s;
+}
+:deep(.el-tree-node__content:hover) {
+  background: rgba(60, 40, 20, 0.04);
+}
+:deep(.el-tree-node.is-current > .el-tree-node__content) {
+  background: rgba(47, 111, 228, 0.08);
+  border-left-color: var(--accent-blue);
 }
 :deep(.el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content) {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  border: 1px solid rgba(10,132,255,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  border: 0;
+  border-left: 2px solid var(--accent-blue);
+  box-shadow: none;
 }
 .method-tag { font-size: 10px; font-weight: 700; flex-shrink: 0; width: 40px; }
 .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
@@ -1126,7 +1283,7 @@ onMounted(() => {
   color: var(--text-quaternary);
   font-size: 12px;
   padding: 24px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   background: rgba(255,255,255,0.52);
 }
@@ -1139,12 +1296,12 @@ onMounted(() => {
   overflow: hidden;
   border: 0;
   border-radius: 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.7), rgba(246,249,252,0.5));
+  background: transparent;
   box-shadow: none;
 }
 .url-bar {
-  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-  background: rgba(255,255,255,0.58); border-bottom: 1px solid rgba(100, 116, 139, 0.12); flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+  background: transparent; border-bottom: 1px solid rgba(60, 40, 20, 0.08); flex-shrink: 0;
 }
 .url-actions {
   display: flex;
@@ -1173,9 +1330,40 @@ onMounted(() => {
   box-shadow: none !important;
 }
 .method-select { width: 110px; flex-shrink: 0; }
+.method-select :deep(.el-select__wrapper) {
+  height: 32px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
+  padding: 0 10px;
+}
+.method-select :deep(.el-select__wrapper:hover) {
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.2);
+}
+.method-select :deep(.el-select__wrapper.is-focused) {
+  box-shadow: inset 0 0 0 1.5px var(--accent-blue);
+}
 .method-select :deep(.el-input__inner) { font-weight: 700; }
+
 .url-input { flex: 1; }
-.url-input :deep(.el-input__inner) { font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+.url-input :deep(.el-input__wrapper) {
+  height: 32px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
+  padding: 0 12px;
+}
+.url-input :deep(.el-input__wrapper:hover) {
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.2);
+}
+.url-input :deep(.el-input__wrapper.is-focus) {
+  box-shadow: inset 0 0 0 1.5px var(--accent-blue);
+}
+.url-input :deep(.el-input__inner) {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12.5px;
+  color: var(--text-primary);
+}
 .split-panels {
   flex: 1;
   width: 100%;
@@ -1190,33 +1378,167 @@ onMounted(() => {
   width: 100%;
   min-width: 0;
   min-height: 180px;
-  overflow-y: auto;
-  border-bottom: 1px solid rgba(100, 116, 139, 0.12); background: rgba(255,255,255,0.24);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid rgba(100, 116, 139, 0.12);
+  background: transparent;
 }
 .panel-resizer { display: none; }
 .response-panel {
   flex: 1 1 55%;
   width: 100%;
   min-width: 0;
-  overflow-y: auto;
+  overflow: hidden;
   background: transparent;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
-.compact-tabs :deep(.el-tabs__header) { margin: 0; padding: 0 12px; }
-.compact-tabs :deep(.el-tabs__item) { height: 36px; line-height: 36px; font-size: 12px; padding: 0 12px; }
-.compact-tabs :deep(.el-tabs__content) { padding: 0; }
-.compact-tabs :deep(.el-tab-pane) { padding: 0 12px 10px; }
-.kv-editor { padding: 6px 0; }
-.kv-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; min-height: 30px; }
-.kv-header-row { margin-bottom: 8px; }
-.kv-delete { flex-shrink: 0; font-size: 14px; color: var(--text-quaternary); cursor: pointer; }
-.kv-delete:hover { color: var(--el-color-danger); }
+
+/* ============ tabs：nav sticky 不滚动，content 独立滚 ============ */
+.compact-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  --el-color-primary: var(--accent-blue);
+}
+.compact-tabs :deep(.el-tabs__header) {
+  margin: 0;
+  padding: 0 12px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+}
+.compact-tabs :deep(.el-tabs__nav-wrap) {
+  padding: 0;
+}
+.compact-tabs :deep(.el-tabs__nav-wrap::after) {
+  display: none;
+}
+.compact-tabs :deep(.el-tabs__item) {
+  height: 36px;
+  line-height: 36px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 0 14px;
+  color: var(--text-tertiary);
+  transition: color 0.15s;
+  border-bottom: 2px solid transparent;
+}
+.compact-tabs :deep(.el-tabs__item):hover {
+  color: var(--text-primary);
+}
+.compact-tabs :deep(.el-tabs__item.is-active) {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+.compact-tabs :deep(.el-tabs__active-bar) {
+  height: 2px;
+  background: var(--accent-blue);
+  border-radius: 2px;
+}
+.compact-tabs :deep(.el-tabs__content) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+}
+.compact-tabs :deep(.el-tabs__content)::-webkit-scrollbar { width: 5px; }
+.compact-tabs :deep(.el-tabs__content)::-webkit-scrollbar-thumb { background: rgba(60, 40, 20, 0.18); border-radius: 3px; }
+.compact-tabs :deep(.el-tab-pane) {
+  padding: 12px 14px;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+/* KV 编辑器 — 对齐 ApiDocs 卡片风 */
+.kv-editor {
+  border: 1px solid rgba(60, 40, 20, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  padding: 0;
+}
+.kv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  min-height: 36px;
+  margin: 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+  transition: background 0.12s;
+}
+.kv-row:last-of-type { border-bottom: 0; }
+.kv-row:not(.kv-header-row):hover { background: rgba(47, 111, 228, 0.025); }
+.kv-header-row {
+  min-height: 30px;
+  background: rgba(60, 40, 20, 0.03);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  margin-bottom: 0 !important;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.kv-editor :deep(.el-input__wrapper),
+.kv-editor :deep(.el-select__wrapper),
+.kv-editor :deep(.el-autocomplete .el-input__wrapper) {
+  height: 30px;
+  background: transparent;
+  box-shadow: none;
+  padding: 0 8px;
+  border-radius: 6px;
+  transition: box-shadow 0.12s, background 0.12s;
+}
+.kv-editor :deep(.el-input__inner) {
+  font-size: 12px;
+  height: 30px;
+  line-height: 30px;
+}
+.kv-editor :deep(.el-input__wrapper:hover),
+.kv-editor :deep(.el-select__wrapper:hover),
+.kv-editor :deep(.el-autocomplete .el-input__wrapper:hover) {
+  background: rgba(60, 40, 20, 0.03);
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
+}
+.kv-editor :deep(.el-input__wrapper.is-focus),
+.kv-editor :deep(.el-select__wrapper.is-focused),
+.kv-editor :deep(.el-autocomplete .el-input__wrapper.is-focus) {
+  background: #fff !important;
+  box-shadow: inset 0 0 0 1.5px var(--accent-blue) !important;
+}
+.kv-editor > .el-button {
+  display: block;
+  width: calc(100% - 12px);
+  margin: 6px;
+  height: 28px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+  text-align: center;
+}
+.kv-editor > .el-button:hover {
+  background: rgba(47, 111, 228, 0.06) !important;
+}
+.kv-delete {
+  flex-shrink: 0;
+  font-size: 14px;
+  color: var(--text-quaternary);
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 5px;
+  transition: color 0.12s, background 0.12s, opacity 0.12s;
+}
+.kv-delete:hover { color: var(--el-color-danger); background: rgba(229, 57, 53, 0.08); }
+.kv-row:not(.kv-header-row) .kv-delete { opacity: 0; }
+.kv-row:not(.kv-header-row):hover .kv-delete { opacity: 1; }
 .body-type-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .body-textarea {
   width: 100%; min-height: 120px; max-height: 200px; padding: 10px 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 12px;
+  border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 12px;
   background: rgba(255,255,255,0.92); color: var(--text-primary);
   font-family: 'Consolas', 'Monaco', monospace; font-size: 12px;
   resize: vertical; outline: none; box-sizing: border-box;
@@ -1228,7 +1550,7 @@ onMounted(() => {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   color: var(--text-quaternary); gap: 8px;
   margin: 20px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.42);
 }
@@ -1237,7 +1559,7 @@ onMounted(() => {
 .response-loading { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-tertiary); }
 .response-status-bar {
   display: flex; align-items: center; gap: 10px; padding: 8px 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08); flex-shrink: 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08); flex-shrink: 0;
 }
 .status-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
 .status-badge.ok { color: #67C23A; background: rgba(103,194,58,0.12); }
@@ -1252,14 +1574,14 @@ onMounted(() => {
   flex: 1; overflow-y: auto;
 }
 .response-headers-table { padding: 4px 0; }
-.res-header-row { display: flex; gap: 12px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.res-header-row { display: flex; gap: 12px; padding: 6px 0; font-size: 12px; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .res-header-key { min-width: 120px; max-width: 32%; flex: 0 1 220px; font-weight: 600; color: var(--text-primary); }
 .res-header-val { flex: 1; color: var(--text-secondary); word-break: break-all; }
 .env-list-bar { display: flex; gap: 8px; }
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 16px; padding: 0 16px;
   margin: 0;
-  background: rgba(255,255,255,0.72); border: 1px solid rgba(15, 23, 42, 0.08); border-top: none;
+  background: rgba(255,255,255,0.72); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
   border-radius: 0;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
 }

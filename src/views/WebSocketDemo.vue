@@ -270,7 +270,7 @@ const goBack = () => {
   margin-bottom: 8px;
   padding: 8px;
   border-radius: 4px;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .message-item.sent {

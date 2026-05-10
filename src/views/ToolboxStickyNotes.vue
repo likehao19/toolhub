@@ -6,20 +6,20 @@
           <div class="page-eyebrow">Desktop Assets</div>
           <div class="breadcrumb">
             <el-icon><Briefcase /></el-icon>
-            <span class="breadcrumb-link" @click="router.push('/toolbox')">工具箱</span>
+            <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
             <span class="breadcrumb-sep">/</span>
-            <span>便签管理</span>
+            <span>{{ t('toolboxStickyNotes.pageTitle') }}</span>
           </div>
         </div>
       </div>
       <div class="header-actions">
-        <el-button size="small" circle title="重置为默认" @click="resetConfig">
+        <el-button size="small" text @click="resetConfig" :title="t('common.reset')">
           <el-icon><RefreshLeft /></el-icon>
         </el-button>
-        <el-button size="small" type="primary" circle title="保存配置" @click="saveConfig">
+        <el-button size="small" text @click="saveConfig" :title="t('common.save')">
           <el-icon><Check /></el-icon>
         </el-button>
-        <el-button size="small" circle title="打开便签" @click="openStickyNotes">
+        <el-button size="small" text @click="openStickyNotes" :title="t('toolboxStickyNotes.openNotes')">
           <el-icon><Promotion /></el-icon>
         </el-button>
       </div>
@@ -28,18 +28,18 @@
     <div class="content-area">
       <div class="settings-section">
         <div class="section-header">
-          <span>存储</span>
+          <span>{{ t('toolboxStickyNotes.sectionBasic') }}</span>
         </div>
         <div class="settings-group">
           <div class="setting-row">
             <div class="setting-label">
-              <span class="label-text">笔记文件夹</span>
-              <span class="label-desc">选择已有文件夹作为便签存储位置</span>
+              <span class="label-text">{{ t('toolboxStickyNotes.noteFolder') }}</span>
+              <span class="label-desc">{{ t('toolboxStickyNotes.noteFolderDesc') }}</span>
             </div>
             <div class="setting-control">
               <el-select
                 v-model="config.noteFolder"
-                placeholder="选择文件夹"
+                :placeholder="t('toolboxStickyNotes.selectFolder')"
                 style="width: 240px;"
                 :loading="foldersLoading"
               >
@@ -57,18 +57,10 @@
               </el-select>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="settings-section">
-        <div class="section-header">
-          <span>快捷键</span>
-        </div>
-        <div class="settings-group">
           <div class="setting-row">
             <div class="setting-label">
-              <span class="label-text">新建便签</span>
-              <span class="label-desc">点击右侧区域后按下组合键录入，Esc 取消</span>
+              <span class="label-text">{{ t('toolboxStickyNotes.newNote') }}</span>
+              <span class="label-desc">{{ t('toolboxStickyNotes.shortcutDesc') }}</span>
             </div>
             <div class="setting-control shortcut-control">
               <div
@@ -86,7 +78,7 @@
                     <span class="keycap-sep">+</span>
                     <span class="recording-dot"></span>
                   </template>
-                  <span v-else class="recording-hint">请按下组合键...</span>
+                  <span v-else class="recording-hint">{{ t('toolboxStickyNotes.recordingHint') }}</span>
                 </template>
                 <template v-else-if="config.shortcut">
                   <template v-for="(key, i) in config.shortcut.split('+')" :key="i">
@@ -94,12 +86,12 @@
                     <kbd class="keycap">{{ key }}</kbd>
                   </template>
                 </template>
-                <span v-else class="shortcut-placeholder">未设置</span>
+                <span v-else class="shortcut-placeholder">{{ t('toolboxStickyNotes.notSet') }}</span>
               </div>
               <span
                 v-if="config.shortcut && !isRecording"
                 class="shortcut-clear"
-                title="清除快捷键"
+                :title="t('toolboxStickyNotes.clearShortcut')"
                 @click.stop="config.shortcut = ''"
               >&times;</span>
             </div>
@@ -109,13 +101,13 @@
 
       <div class="settings-section">
         <div class="section-header">
-          <span>窗口</span>
+          <span>{{ t('toolboxStickyNotes.sectionWindow') }}</span>
         </div>
         <div class="settings-group">
           <div class="setting-row">
             <div class="setting-label">
-              <span class="label-text">最大窗口数</span>
-              <span class="label-desc">同时打开的便签窗口上限</span>
+              <span class="label-text">{{ t('toolboxStickyNotes.maxWindows') }}</span>
+              <span class="label-desc">{{ t('toolboxStickyNotes.maxWindowsDesc') }}</span>
             </div>
             <div class="setting-control">
               <el-input-number v-model="config.maxWindows" :min="1" :max="20" size="small" />
@@ -123,8 +115,8 @@
           </div>
           <div class="setting-row">
             <div class="setting-label">
-              <span class="label-text">默认置顶</span>
-              <span class="label-desc">新建便签窗口始终显示在最上层</span>
+              <span class="label-text">{{ t('toolboxStickyNotes.defaultOnTop') }}</span>
+              <span class="label-desc">{{ t('toolboxStickyNotes.defaultOnTopDesc') }}</span>
             </div>
             <div class="setting-control">
               <el-switch v-model="config.alwaysOnTop" />
@@ -132,8 +124,8 @@
           </div>
           <div class="setting-row">
             <div class="setting-label">
-              <span class="label-text">默认宽度</span>
-              <span class="label-desc">新建便签窗口的初始宽度(px)</span>
+              <span class="label-text">{{ t('toolboxStickyNotes.defaultWidth') }}</span>
+              <span class="label-desc">{{ t('toolboxStickyNotes.defaultWidthDesc') }}</span>
             </div>
             <div class="setting-control">
               <el-input-number v-model="config.defaultWidth" :min="200" :max="800" :step="10" size="small" />
@@ -141,8 +133,8 @@
           </div>
           <div class="setting-row">
             <div class="setting-label">
-              <span class="label-text">默认高度</span>
-              <span class="label-desc">新建便签窗口的初始高度(px)</span>
+              <span class="label-text">{{ t('toolboxStickyNotes.defaultHeight') }}</span>
+              <span class="label-desc">{{ t('toolboxStickyNotes.defaultHeightDesc') }}</span>
             </div>
             <div class="setting-control">
               <el-input-number v-model="config.defaultHeight" :min="200" :max="800" :step="10" size="small" />
@@ -150,12 +142,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="status-bar">
-      <span>文件夹：{{ config.noteFolder || '未设置' }}</span>
-      <span>快捷键：{{ config.shortcut || '未设置' }}</span>
-      <span>窗口上限：{{ config.maxWindows }}</span>
     </div>
   </div>
 </template>
@@ -165,13 +151,14 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { Check, Promotion, Briefcase, RefreshLeft } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { t } from '@/i18n'
 
 const router = useRouter()
 
 const STORAGE_KEY = 'sticky_notes_config'
 
 const DEFAULT_CONFIG = {
-  noteFolder: '渚跨',
+  noteFolder: '',
   shortcut: 'Ctrl+Alt+N',
   maxWindows: 10,
   alwaysOnTop: true,
@@ -234,7 +221,7 @@ const loadFolders = async () => {
   } catch {
     folderOptions.value = config.value.noteFolder
       ? [{ value: config.value.noteFolder, label: config.value.noteFolder, depth: 0 }]
-      : [{ value: '渚跨', label: '渚跨', depth: 0 }]
+      : [{ value: t('toolboxStickyNotes.defaultFolder'), label: t('toolboxStickyNotes.defaultFolder'), depth: 0 }]
   } finally {
     foldersLoading.value = false
   }
@@ -342,13 +329,13 @@ const stopRecording = () => {
 // ---- 閲嶇疆 ----
 const resetConfig = async () => {
   try {
-    await ElMessageBox.confirm('确定要将所有设置恢复为默认值吗？', '重置设置', {
-      confirmButtonText: '重置',
-      cancelButtonText: '取消',
+    await ElMessageBox.confirm(t('toolboxStickyNotes.resetConfirmMsg'), t('toolboxStickyNotes.resetConfirmTitle'), {
+      confirmButtonText: t('common.reset'),
+      cancelButtonText: t('common.cancel'),
       type: 'warning'
     })
     config.value = { ...DEFAULT_CONFIG }
-    ElMessage.info('已恢复默认设置，点击保存后生效')
+    ElMessage.info(t('toolboxStickyNotes.resetDone'))
   } catch {
     // 鐢ㄦ埛鍙栨秷
   }
@@ -394,7 +381,7 @@ const saveConfig = async () => {
     // ignore in non-Tauri env
   }
 
-  ElMessage.success('配置已保存')
+  ElMessage.success(t('toolboxStickyNotes.configSaved'))
 }
 
 const openStickyNotes = async () => {
@@ -428,7 +415,7 @@ const openStickyNotes = async () => {
     }
 
     if (!label) {
-      ElMessage.warning('宸茶揪鍒版渶澶т究绛剧獥鍙ｆ暟')
+      ElMessage.warning(t('toolboxStickyNotes.maxWindowsReached'))
       return
     }
 
@@ -446,7 +433,7 @@ const openStickyNotes = async () => {
     const stickyUrl = `${window.location.origin}/sticky-notes?id=${timestamp}`
     const stickyWindow = new WebviewWindow(label, {
       url: stickyUrl,
-      title: '渚跨',
+      title: t('toolboxStickyNotes.stickyWindowTitle'),
       x, y,
       width: config.value.defaultWidth,
       height: config.value.defaultHeight,
@@ -464,12 +451,12 @@ const openStickyNotes = async () => {
     })
 
     stickyWindow.once('tauri://error', (e) => {
-      console.error('[渚跨] 绐楀彛鍒涘缓澶辫触:', e)
-      ElMessage.error('鎵撳紑渚跨澶辫触')
+      console.error('[Sticky Notes] window create failed:', e)
+      ElMessage.error(t('toolboxStickyNotes.openFailed'))
     })
   } catch (e) {
-    console.error('[渚跨] 鎵撳紑澶辫触:', e)
-    ElMessage.error('鎵撳紑渚跨澶辫触')
+    console.error('[Sticky Notes] open failed:', e)
+    ElMessage.error(t('toolboxStickyNotes.openFailed'))
   }
 }
 </script>
@@ -491,7 +478,7 @@ const openStickyNotes = async () => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -520,7 +507,10 @@ const openStickyNotes = async () => {
 .breadcrumb-link:hover { color: var(--accent-blue); text-decoration: underline; }
 .breadcrumb-sep { color: #c0c4cc; font-weight: 400; }
 .header-actions { display: flex; gap: 8px; }
-.header-actions :deep(.el-button) { --el-button-border-radius: 10px; }
+.header-actions :deep(.el-button) {
+  --el-button-border-radius: 10px;
+  min-width: 84px;
+}
 
 .content-area {
   flex: 1;
@@ -533,18 +523,53 @@ const openStickyNotes = async () => {
 .content-area::-webkit-scrollbar-thumb { background: #dcdfe6; border-radius: 3px; }
 .content-area::-webkit-scrollbar-thumb:hover { background: #c0c4cc; }
 
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.overview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid rgba(60, 40, 20, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 8px 20px rgba(60, 40, 20, 0.04);
+}
+
+.overview-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.overview-value {
+  font-size: 13px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .settings-section {
   width: 100%;
-  margin-bottom: 0;
-  padding: 18px 0 6px;
-  border: 0;
-  border-radius: 0;
+  margin-bottom: 12px;
+  padding: 14px 16px 6px;
+  border: 1px solid rgba(60, 40, 20, 0.08);
+  border-radius: 18px;
   background: transparent;
   box-shadow: none;
   box-sizing: border-box;
 }
 .settings-section:first-child { padding-top: 0; }
-.settings-section:not(:last-child) { border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.settings-section:first-of-type { padding-top: 14px; }
 .section-header {
   display: flex;
   align-items: center;
@@ -564,11 +589,11 @@ const openStickyNotes = async () => {
   grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
   align-items: center;
   gap: 28px;
-  min-height: 58px;
+  min-height: 56px;
   padding: 12px 0;
   transition: background 0.15s;
 }
-.setting-row:not(:last-child) { border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.setting-row:not(:last-child) { border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .setting-row:hover { background: rgba(255,255,255,0.34); }
 .setting-label {
   display: flex;
@@ -604,7 +629,7 @@ const openStickyNotes = async () => {
   border-radius: 8px;
   padding: 0 12px;
   cursor: pointer;
-  background: #fff;
+  background: var(--bg-primary);
   transition: border-color 0.2s, box-shadow 0.2s;
   user-select: none;
 }
@@ -640,14 +665,14 @@ const openStickyNotes = async () => {
 .folder-indent { color: #c0c4cc; margin-right: 2px; }
 
 .status-bar {
-  height: 30px;
-  min-height: 30px;
+  min-height: 34px;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 16px;
   margin: 0 18px 18px;
   padding: 0 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: 0;
   border-radius: 0 0 18px 18px;
   background: rgba(255,255,255,0.72);
@@ -658,6 +683,10 @@ const openStickyNotes = async () => {
 }
 
 @media (max-width: 860px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .content-area {
     padding: 14px 14px 8px;
   }
@@ -672,6 +701,11 @@ const openStickyNotes = async () => {
   .setting-control {
     width: 100%;
     justify-content: flex-start;
+  }
+
+  .status-bar {
+    border-radius: 12px;
+    border-top: 1px solid rgba(60, 40, 20, 0.08);
   }
 }
 </style>

@@ -8,7 +8,7 @@
             <el-icon><Connection /></el-icon>
             <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
             <span class="breadcrumb-sep">/</span>
-            <span>WebSocket 测试</span>
+            <span>{{ t('websocketTest.title') }}</span>
           </div>
         </div>
       </div>
@@ -16,42 +16,54 @@
 
     <div class="content-area">
       <aside class="config-panel">
-        <div class="panel-title">连接配置</div>
-        <el-form label-width="72px" size="small">
-          <el-form-item label="地址">
-            <el-input v-model="url" placeholder="ws:// 或 wss://" />
-          </el-form-item>
-          <el-form-item>
-            <el-button v-if="!ws" type="primary" :loading="connecting" @click="connect">连接</el-button>
-            <el-button v-else type="danger" @click="disconnect">断开</el-button>
-          </el-form-item>
-        </el-form>
+        <div class="panel-section">
+          <div class="panel-title">{{ t('websocketTest.connectionConfig') }}</div>
+          <div class="url-row">
+            <el-input v-model="url" :placeholder="t('websocketTest.urlPlaceholder')" size="small" class="url-input" />
+            <el-button v-if="!ws" type="primary" :loading="connecting" size="small" @click="connect">
+              <el-icon style="margin-right: 6px;"><Connection /></el-icon>{{ t('websocketTest.connect') }}
+            </el-button>
+            <el-button v-else type="danger" size="small" @click="disconnect">
+              <el-icon style="margin-right: 6px;"><Close /></el-icon>{{ t('websocketTest.disconnect') }}
+            </el-button>
+          </div>
+        </div>
 
-        <div class="panel-title composer-title">发送消息</div>
-        <el-input
-          v-model="message"
-          type="textarea"
-          :rows="8"
-          class="composer-input"
-          placeholder="输入要发送的内容"
-        />
-        <div class="quick-actions">
-          <el-button type="primary" :disabled="!ws" @click="sendMessage">发送</el-button>
-          <el-button :disabled="!ws" @click="sendJsonMessage">发送 JSON</el-button>
-          <el-button :disabled="!ws" @click="sendHeartbeat">发送心跳</el-button>
+        <div class="panel-section composer-section">
+          <div class="panel-title">{{ t('websocketTest.sendMessage') }}</div>
+          <el-input
+            v-model="message"
+            type="textarea"
+            class="composer-input"
+            :placeholder="t('websocketTest.contentPlaceholder')"
+            resize="none"
+          />
+          <div class="quick-actions">
+            <el-button type="primary" size="small" :disabled="!ws" @click="sendMessage">
+              <el-icon style="margin-right: 6px;"><Promotion /></el-icon>{{ t('websocketTest.send') }}
+            </el-button>
+            <el-button size="small" :disabled="!ws" @click="sendJsonMessage">
+              <el-icon style="margin-right: 6px;"><Document /></el-icon>{{ t('websocketTest.sendJson') }}
+            </el-button>
+            <el-button size="small" :disabled="!ws" @click="sendHeartbeat">
+              <el-icon style="margin-right: 6px;"><Bell /></el-icon>{{ t('websocketTest.heartbeat') }}
+            </el-button>
+          </div>
         </div>
       </aside>
 
       <section class="result-panel">
         <div class="result-toolbar">
           <div class="status-row">
-            <el-tag :type="ws ? 'success' : 'info'">{{ ws ? '已连接' : '未连接' }}</el-tag>
-            <span class="hint">{{ url || '请先输入 WebSocket 地址' }}</span>
+            <el-tag :type="ws ? 'success' : 'info'">{{ ws ? t('websocketTest.connected') : t('websocketTest.disconnected') }}</el-tag>
+            <span class="hint">{{ url || t('websocketTest.enterUrlHint') }}</span>
           </div>
           <div class="log-meta">
             <span class="log-count">{{ messages.length }}</span>
-            <span class="log-label">条日志</span>
-            <el-button text size="small" @click="clearMessages">清空日志</el-button>
+            <span class="log-label">{{ t('websocketTest.logCount') }}</span>
+            <el-button text size="small" @click="clearMessages" :title="t('websocketTest.clearLog')">
+              <el-icon><Delete /></el-icon>
+            </el-button>
           </div>
         </div>
 
@@ -60,7 +72,7 @@
             <span class="time">{{ item.time }}</span>
             <span class="content">{{ item.content }}</span>
           </div>
-          <div v-if="messages.length === 0" class="empty-hint">暂无消息日志</div>
+          <div v-if="messages.length === 0" class="empty-hint">{{ t('websocketTest.emptyLog') }}</div>
         </div>
       </section>
     </div>
@@ -71,7 +83,7 @@
 import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Connection } from '@element-plus/icons-vue'
+import { Connection, Delete, Close, Promotion, Document, Bell } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { TauriWebSocket } from '@/utils/tauri'
 
@@ -89,7 +101,7 @@ function addMessage(type, content) {
 
 async function connect() {
   if (!url.value.trim()) {
-    ElMessage.warning('请输入 WebSocket 地址')
+    ElMessage.warning(t('websocketTest.enterUrl'))
     return
   }
 
@@ -99,24 +111,24 @@ async function connect() {
     ws.value = socket
 
     removeListener = socket.addListener((msg) => {
-      if (msg.type === 'Text') addMessage('received', `收到: ${msg.data}`)
-      else if (msg.type === 'Binary') addMessage('received', `收到二进制数据: ${msg.data.length} 字节`)
+      if (msg.type === 'Text') addMessage('received', t('websocketTest.received', { data: msg.data }))
+      else if (msg.type === 'Binary') addMessage('received', t('websocketTest.receivedBinary', { bytes: msg.data.length }))
       else if (msg.type === 'Close') {
-        addMessage('system', '连接已关闭')
+        addMessage('system', t('websocketTest.closed'))
         ws.value = null
       } else if (msg.type === 'Ping') {
-        addMessage('system', '收到 Ping')
+        addMessage('system', t('websocketTest.receivedPing'))
       } else if (msg.type === 'Pong') {
-        addMessage('system', '收到 Pong')
+        addMessage('system', t('websocketTest.receivedPong'))
       } else {
-        addMessage('system', `事件: ${msg.type}`)
+        addMessage('system', t('websocketTest.event', { type: msg.type }))
       }
     })
 
-    addMessage('system', '连接成功')
+    addMessage('system', t('websocketTest.connectSuccess'))
   } catch (error) {
     ElMessage.error(error?.message || String(error))
-    addMessage('error', `连接失败: ${error?.message || String(error)}`)
+    addMessage('error', t('websocketTest.connectFailed', { error: error?.message || String(error) }))
   } finally {
     connecting.value = false
   }
@@ -127,7 +139,7 @@ async function disconnect() {
 
   try {
     await ws.value.disconnect()
-    addMessage('system', '已断开连接')
+    addMessage('system', t('websocketTest.disconnectedNotice'))
   } catch (error) {
     ElMessage.error(error?.message || String(error))
   } finally {
@@ -141,22 +153,22 @@ async function disconnect() {
 
 async function sendPayload(payload, label = payload) {
   if (!ws.value) {
-    ElMessage.warning('请先连接 WebSocket')
+    ElMessage.warning(t('websocketTest.enterWs'))
     return false
   }
 
   if (!payload.trim()) {
-    ElMessage.warning('请输入消息内容')
+    ElMessage.warning(t('websocketTest.enterContent'))
     return false
   }
 
   try {
     await ws.value.send(payload)
-    addMessage('sent', `发送: ${label}`)
+    addMessage('sent', t('websocketTest.sent', { data: label }))
     return true
   } catch (error) {
     ElMessage.error(error?.message || String(error))
-    addMessage('error', `发送失败: ${error?.message || String(error)}`)
+    addMessage('error', t('websocketTest.sendFailed', { error: error?.message || String(error) }))
     return false
   }
 }
@@ -169,7 +181,7 @@ async function sendMessage() {
 
 async function sendJsonMessage() {
   if (!message.value.trim()) {
-    ElMessage.warning('请输入 JSON 内容')
+    ElMessage.warning(t('websocketTest.enterJson'))
     return
   }
 
@@ -178,7 +190,7 @@ async function sendJsonMessage() {
     const sent = await sendPayload(formatted, formatted)
     if (sent) message.value = formatted
   } catch {
-    ElMessage.error('JSON 格式不正确')
+    ElMessage.error(t('websocketTest.invalidJson'))
   }
 }
 
@@ -203,7 +215,7 @@ onUnmounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
 .header {
@@ -212,11 +224,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  min-height: 52px;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
 }
 
 .header-left { display: flex; align-items: center; min-width: 0; }
@@ -234,12 +245,12 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); }
@@ -248,39 +259,81 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   overflow: hidden;
 }
 
+/* 左侧配置：分段布局，区段之间用分割线 */
 .config-panel {
   min-height: 0;
-  overflow: auto;
-  padding: 16px 18px;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 0;
+  overflow: hidden;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  padding: 14px 18px;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.panel-section + .panel-section {
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
+}
+
+.composer-section {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .panel-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.composer-title { margin-top: 8px; }
-.composer-input { flex: 0 0 auto; }
+/* URL 行：输入与按钮同行 */
+.url-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.url-input { flex: 1; min-width: 0; }
+.url-row :deep(.el-button) { flex-shrink: 0; min-width: 64px; }
+
+/* Composer：textarea 撑满剩余高度 */
+.composer-input {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.composer-input :deep(.el-textarea) {
+  flex: 1;
+  display: flex;
+  height: 100%;
+}
+.composer-input :deep(.el-textarea__inner) {
+  flex: 1;
+  height: 100% !important;
+  min-height: 120px;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
 
 .quick-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
+/* 右侧结果区 */
 .result-panel {
   min-width: 0;
   min-height: 0;
@@ -293,8 +346,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  padding: 12px 18px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  padding: 8px 18px;
+  flex-shrink: 0;
 }
 
 .status-row {
@@ -305,7 +359,7 @@ onUnmounted(() => {
 }
 
 .hint {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -320,13 +374,15 @@ onUnmounted(() => {
 }
 
 .log-count {
-  min-width: 30px;
-  padding: 1px 8px;
+  min-width: 24px;
+  padding: 1px 6px;
   text-align: center;
-  border-radius: 999px;
-  font-size: 12px;
-  color: #334155;
-  background: rgba(148, 163, 184, 0.18);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: rgba(60, 40, 20, 0.06);
+  font-variant-numeric: tabular-nums;
 }
 
 .log-label {
@@ -344,26 +400,29 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 86px minmax(0, 1fr);
   gap: 10px;
-  padding: 10px 18px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  font-size: 13px;
+  padding: 8px 18px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+  font-size: 12.5px;
 }
 
-.log-item.sent { background: rgba(64, 158, 255, 0.06); }
-.log-item.received { background: rgba(103, 194, 58, 0.08); }
-.log-item.error { background: rgba(245, 108, 108, 0.08); }
-.log-item.system { background: rgba(148, 163, 184, 0.08); }
+.log-item.sent { background: rgba(64, 158, 255, 0.05); }
+.log-item.received { background: rgba(103, 194, 58, 0.06); }
+.log-item.error { background: rgba(245, 108, 108, 0.06); }
+.log-item.system { background: rgba(148, 163, 184, 0.05); }
 
 .time {
   color: var(--text-tertiary);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11.5px;
 }
 
 .content {
   color: var(--text-primary);
   word-break: break-word;
   line-height: 1.5;
+  font-family: 'Consolas', 'Monaco', monospace;
 }
 
 .empty-hint {
@@ -372,14 +431,17 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-tertiary);
+  color: var(--text-quaternary);
   font-size: 13px;
 }
 
 @media (max-width: 1100px) {
   .content-area { grid-template-columns: 1fr; }
-  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
-  .result-toolbar { padding: 10px 14px; }
-  .log-item { padding: 10px 14px; }
+  .config-panel {
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+    max-height: 320px;
+  }
+  .composer-input :deep(.el-textarea__inner) { min-height: 80px; }
 }
 </style>

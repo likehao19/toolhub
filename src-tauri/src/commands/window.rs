@@ -39,15 +39,20 @@ pub async fn create_child_window(app: AppHandle, url: String) -> Result<String, 
     let window_label = format!("{}-{}", window::CHILD_WINDOW_LABEL_PREFIX, count);
 
     // 构建子窗口
-    WebviewWindowBuilder::new(&app, &window_label, WebviewUrl::External(parsed_url))
+    let mut builder = WebviewWindowBuilder::new(&app, &window_label, WebviewUrl::External(parsed_url))
         .title(window::DEFAULT_CHILD_WINDOW_TITLE)
         .inner_size(
             window::DEFAULT_CHILD_WINDOW_WIDTH,
             window::DEFAULT_CHILD_WINDOW_HEIGHT,
         )
         .center()
-        .initialization_script(LINK_INTERCEPTION_SCRIPT)
-        .build()
+        .initialization_script(LINK_INTERCEPTION_SCRIPT);
+    // 显式继承主窗口图标:WebviewWindowBuilder 默认不会自动用 bundle.icon,
+    // 不设置的话子窗口在任务栏/标题栏会显示通用图标。
+    if let Some(icon) = app.default_window_icon().cloned() {
+        builder = builder.icon(icon).map_err(|e| format!("应用窗口图标失败: {}", e))?;
+    }
+    builder.build()
         .map_err(|e| format!("创建窗口失败: {}", e))?;
 
     Ok(window_label)
@@ -112,7 +117,8 @@ pub async fn close_splashscreen(window: Window) -> Result<(), String> {
     if let Some(main) = window.get_webview_window(window::MAIN_WINDOW_LABEL) {
         main.show().map_err(|e| e.to_string())?;
         let _ = main.set_focus();
-        std::thread::sleep(std::time::Duration::from_millis(120));
+        // 用 tokio 的非阻塞 sleep,避免 std::thread::sleep 把整个 tokio worker 钉住 120ms
+        tokio::time::sleep(std::time::Duration::from_millis(120)).await;
     }
 
     if let Some(splashscreen) = window.get_webview_window(window::SPLASH_WINDOW_LABEL) {
@@ -185,12 +191,15 @@ pub async fn create_custom_titlebar_window(app: AppHandle) -> Result<String, Str
 
     // 使用 public 目录中的 HTML 文件，并传递窗口标签作为 URL 参数
     let url = format!("custom-titlebar-window.html?label={}", window_label);
-    WebviewWindowBuilder::new(&app, &window_label, WebviewUrl::App(url.into()))
+    let mut builder = WebviewWindowBuilder::new(&app, &window_label, WebviewUrl::App(url.into()))
         .title("自定义标题栏窗口")
         .inner_size(800.0, 600.0)
         .decorations(false) // 禁用系统标题栏
-        .center()
-        .build()
+        .center();
+    if let Some(icon) = app.default_window_icon().cloned() {
+        builder = builder.icon(icon).map_err(|e| format!("应用窗口图标失败: {}", e))?;
+    }
+    builder.build()
         .map_err(|e| format!("创建窗口失败: {}", e))?;
 
     Ok(window_label)
@@ -374,7 +383,7 @@ pub async fn create_custom_notification_window(
     // 构建自定义通知窗口
     // position() 设置的是窗口的 outer_position（窗口左上角的位置）
     // 对于没有装饰的窗口，outer_position 就是窗口的位置
-    let notification_window = WebviewWindowBuilder::new(&app, &window_label, WebviewUrl::App(url.into()))
+    let mut notif_builder = WebviewWindowBuilder::new(&app, &window_label, WebviewUrl::App(url.into()))
         .title("通知")
         .inner_size(notif_width, notif_height)
         .position(x, y)
@@ -383,15 +392,18 @@ pub async fn create_custom_notification_window(
         .always_on_top(true) // 始终置顶
         .skip_taskbar(true) // 不在任务栏显示
         .resizable(false) // 不可调整大小
-        .shadow(false) // 禁用窗口阴影（Windows）
-        .build()
+        .shadow(false); // 禁用窗口阴影（Windows）
+    if let Some(icon) = app.default_window_icon().cloned() {
+        notif_builder = notif_builder.icon(icon).map_err(|e| format!("应用窗口图标失败: {}", e))?;
+    }
+    let notification_window = notif_builder.build()
         .map_err(|e| format!("创建通知窗口失败: {}", e))?;
     
     // 显示窗口
     notification_window.show().map_err(|e| format!("显示窗口失败: {}", e))?;
     
-    // 等待一小段时间确保窗口已创建
-    std::thread::sleep(std::time::Duration::from_millis(50));
+    // 等待一小段时间确保窗口已创建(用 tokio sleep,避免阻塞 tokio worker)
+    tokio::time::sleep(std::time::Duration::from_millis(50)).await;
     
     // 再次设置位置，确保位置正确
     // 使用 PhysicalPosition，因为显示器坐标是物理坐标

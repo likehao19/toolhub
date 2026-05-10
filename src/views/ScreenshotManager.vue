@@ -14,8 +14,8 @@
         </div>
       </div>
       <div class="header-actions">
-        <el-button size="small" @click="showSettings = !showSettings">
-          <el-icon><Setting /></el-icon> {{ t('screenshot.settings') }}
+        <el-button size="small" text @click="showSettings = !showSettings" :title="t('screenshot.settings')">
+          <el-icon><Setting /></el-icon>
         </el-button>
       </div>
     </div>
@@ -52,8 +52,8 @@
       <div class="section">
         <div class="section-title">
           {{ t('screenshot.history') }} ({{ history.length }})
-          <el-button v-if="history.length" size="small" text type="danger" @click="onClearHistory">
-            {{ t('screenshot.clearHistory') }}
+          <el-button v-if="history.length" size="small" text type="danger" @click="onClearHistory" :title="t('screenshot.clearHistory')">
+            <el-icon><Delete /></el-icon>
           </el-button>
         </div>
         <div v-if="history.length" class="history-grid">
@@ -64,8 +64,12 @@
               <span>{{ formatTime(item.timestamp) }}</span>
             </div>
             <div class="history-actions">
-              <el-button size="small" text @click="pinFromHistory(item)">📌</el-button>
-              <el-button size="small" text type="danger" @click="onDeleteHistory(item.id)">✕</el-button>
+              <el-button size="small" text @click="pinFromHistory(item)" :title="t('common.pin')">
+                <el-icon><Position /></el-icon>
+              </el-button>
+              <el-button size="small" text type="danger" @click="onDeleteHistory(item.id)" :title="t('common.delete')">
+                <el-icon><Close /></el-icon>
+              </el-button>
             </div>
           </div>
         </div>
@@ -110,7 +114,9 @@
             <el-switch v-model="settings.showMagnifier" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="doSaveSettings">{{ t('common.save') }}</el-button>
+            <el-button type="primary" size="small" @click="doSaveSettings">
+              <el-icon style="margin-right: 6px;"><Check /></el-icon>{{ t('common.save') }}
+            </el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -128,7 +134,7 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Briefcase, Setting } from '@element-plus/icons-vue'
+import { Briefcase, Setting, Delete, Position, Close, Check } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { loadSettings, saveSettings, loadHistory, clearHistory, deleteHistoryItem, loadColors } from '@/utils/screenshotManager'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
@@ -184,11 +190,14 @@ async function startScreenshot(mode) {
 
 async function startFullscreen() {
   try {
-    const { invoke } = await import('@tauri-apps/api/core')
+    const { invoke, convertFileSrc } = await import('@tauri-apps/api/core')
     const screens = await invoke('capture_all_screens')
     if (!screens.length) return
     const s = screens[0]
-    const blob = await fetch(`data:image/png;base64,${s.data}`).then(r => r.blob())
+    // 后端现在返回 PNG 文件路径(避免 base64 base64 经 IPC 多屏暴增内存),
+    // 前端通过 asset:// URL 拿 Blob,再走 clipboard / Image 加载。
+    const assetUrl = convertFileSrc(s.path)
+    const blob = await fetch(assetUrl).then(r => r.blob())
     await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
     ElMessage.success(t('screenshot.copiedFull'))
     const { addToHistory, uuid } = await import('@/utils/screenshotManager')
@@ -203,7 +212,11 @@ async function startFullscreen() {
       let fullImage = ''
       const MAX_FULL = 1200
       if (img.width <= MAX_FULL && img.height <= MAX_FULL) {
-        fullImage = `data:image/png;base64,${s.data}`
+        // 小图用 canvas 转 dataURL 持久化(asset:// URL 关掉就失效,localStorage 历史不能存)
+        const fc2 = document.createElement('canvas')
+        fc2.width = img.width; fc2.height = img.height
+        fc2.getContext('2d').drawImage(img, 0, 0)
+        fullImage = fc2.toDataURL('image/png')
       } else {
         const fc = document.createElement('canvas')
         const ratio = Math.min(MAX_FULL / img.width, MAX_FULL / img.height)
@@ -217,8 +230,11 @@ async function startFullscreen() {
         fullImage,
       })
       history.value = loadHistory()
+      // 截图已经吃进 Blob/canvas,临时文件可以删了。失败不影响主流程,
+      // 后端 capture_screen_fast 也会定期清理 >2 分钟的旧文件。
+      invoke('delete_temp_file', { path: s.path }).catch(() => {})
     }
-    img.src = `data:image/png;base64,${s.data}`
+    img.src = assetUrl
   } catch (e) {
     ElMessage.error(String(e))
   }
@@ -284,7 +300,9 @@ async function copyColor(hex) {
 // ===== Settings =====
 function doSaveSettings() {
   saveSettings(settings.value)
-  ElMessage.success(t('apiWorkbench.saved'))
+  // 旧:t('apiWorkbench.saved') —— 这是复制粘贴导致的 namespace 错误,
+  // apiWorkbench 在 i18n 里根本没有 saved 子键,toast 显示原始 key 字符串。
+  ElMessage.success(t('common.saveSuccess'))
 }
 
 // ===== Helpers =====
@@ -310,7 +328,7 @@ function formatTime(ts) {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   flex-shrink: 0;
   backdrop-filter: blur(18px);
@@ -339,10 +357,10 @@ function formatTime(ts) {
 .section {
   margin-bottom: 18px;
   padding: 16px 18px 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.72);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(60, 40, 20,0.04);
 }
 .section-title {
   font-size: 14px; font-weight: 600; color: var(--text-primary);
@@ -351,7 +369,7 @@ function formatTime(ts) {
 .action-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .action-card {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 20px 12px; border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 16px;
+  padding: 20px 12px; border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 16px;
   cursor: pointer; background: rgba(255,255,255,0.68); transition: all 0.15s;
 }
 .action-card:hover { border-color: var(--accent-blue); background: rgba(64,158,255,0.04); transform: translateY(-2px); }
@@ -360,12 +378,12 @@ function formatTime(ts) {
 .action-hint { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
 .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 .history-card {
-  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 12px;
+  border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 12px;
   overflow: hidden; background: rgba(255,255,255,0.78); cursor: pointer;
   transition: border-color 0.15s; position: relative;
 }
 .history-card:hover { border-color: var(--accent-blue); }
-.history-thumb { width: 100%; height: 80px; object-fit: cover; display: block; background: rgba(248,250,252,0.9); }
+.history-thumb { width: 100%; height: 80px; object-fit: cover; display: block; background: rgba(248, 244, 232,0.9); }
 .history-info {
   padding: 6px 8px; font-size: 10px; color: var(--text-tertiary);
   display: flex; justify-content: space-between;
@@ -375,7 +393,7 @@ function formatTime(ts) {
 .color-grid { display: flex; flex-wrap: wrap; gap: 8px; }
 .color-card {
   display: flex; align-items: center; gap: 6px; padding: 6px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 10px;
+  border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 10px;
   cursor: pointer; font-size: 11px; font-family: monospace;
   background: rgba(255,255,255,0.78);
 }
@@ -383,7 +401,7 @@ function formatTime(ts) {
 .color-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
 .color-hex { color: var(--text-secondary); }
 .settings-section {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   padding: 16px;
   background: rgba(255,255,255,0.78);
@@ -393,14 +411,14 @@ function formatTime(ts) {
   color: var(--text-quaternary);
   font-size: 12px;
   padding: 24px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   background: rgba(255,255,255,0.5);
 }
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 16px; padding: 0 16px;
   margin: 0 18px 18px;
-  background: rgba(255,255,255,0.72); border: 1px solid rgba(15, 23, 42, 0.08); border-top: none;
+  background: rgba(255,255,255,0.72); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
   border-radius: 0 0 18px 18px;
 }

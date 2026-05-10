@@ -20,50 +20,55 @@
       <div class="bench-layout">
         <!-- Config -->
         <div class="bench-config">
-          <div style="font-weight:600;font-size:13px;margin-bottom:12px">{{ t('perfTest.benchConfig') }}</div>
-          <el-form size="small" label-width="80px">
+          <div class="config-title">{{ t('perfTest.benchConfig') }}</div>
+          <el-form size="small" label-position="top" class="config-form">
             <el-form-item label="URL">
               <el-input v-model="benchUrl" placeholder="https://api.example.com/users" />
             </el-form-item>
-            <el-form-item :label="t('perfTest.method')">
-              <el-select v-model="benchMethod" style="width:110px">
-                <el-option v-for="m in methods" :key="m" :label="m" :value="m" />
-              </el-select>
-            </el-form-item>
+            <div class="form-row">
+              <el-form-item :label="t('perfTest.method')" class="row-method">
+                <el-select v-model="benchMethod">
+                  <el-option v-for="m in methods" :key="m" :label="m" :value="m" />
+                </el-select>
+              </el-form-item>
+              <el-form-item :label="t('perfTest.benchMode')" class="row-mode">
+                <el-radio-group v-model="benchMode" size="small" class="mode-group">
+                  <el-radio-button value="fixed">{{ t('perfTest.fixedMode') }}</el-radio-button>
+                  <el-radio-button value="ramp">{{ t('perfTest.rampMode') }}</el-radio-button>
+                </el-radio-group>
+              </el-form-item>
+            </div>
             <el-form-item label="Headers">
-              <el-input v-model="benchHeaders" type="textarea" :rows="3"
+              <el-input v-model="benchHeaders" type="textarea" :rows="5"
                 placeholder="Content-Type: application/json&#10;Authorization: Bearer xxx"
-                style="font-family:monospace;font-size:12px" />
+                resize="none"
+                class="mono-input" />
             </el-form-item>
             <el-form-item v-if="benchMethod !== 'GET' && benchMethod !== 'HEAD'" label="Body">
-              <el-input v-model="benchBody" type="textarea" :rows="3"
+              <el-input v-model="benchBody" type="textarea" :rows="5"
                 placeholder='{"key": "value"}'
-                style="font-family:monospace;font-size:12px" />
+                resize="none"
+                class="mono-input" />
             </el-form-item>
-            <el-form-item :label="t('perfTest.benchMode')">
-              <el-radio-group v-model="benchMode" size="small">
-                <el-radio-button value="fixed">{{ t('perfTest.fixedMode') }}</el-radio-button>
-                <el-radio-button value="ramp">{{ t('perfTest.rampMode') }}</el-radio-button>
-              </el-radio-group>
-            </el-form-item>
-            <el-form-item :label="t('perfTest.concurrency')">
-              <el-input-number v-model="benchConcurrency" :min="1" :max="200" style="width:120px" />
-            </el-form-item>
-            <el-form-item :label="t('perfTest.duration')">
-              <el-input-number v-model="benchDuration" :min="1" :max="300" style="width:120px" />
-              <span style="margin-left:4px;font-size:11px;color:var(--text-tertiary)">s</span>
-            </el-form-item>
-            <template v-if="benchMode === 'ramp'">
-              <el-form-item :label="t('perfTest.rampEnd')">
-                <el-input-number v-model="benchRampEnd" :min="benchConcurrency" :max="1000" style="width:120px" />
+            <div class="form-row">
+              <el-form-item :label="t('perfTest.concurrency')">
+                <el-input-number v-model="benchConcurrency" :min="1" :max="200" controls-position="right" class="num-input" />
               </el-form-item>
-            </template>
+              <el-form-item :label="t('perfTest.duration')">
+                <el-input-number v-model="benchDuration" :min="1" :max="300" controls-position="right" class="num-input" />
+              </el-form-item>
+            </div>
+            <el-form-item v-if="benchMode === 'ramp'" :label="t('perfTest.rampEnd')">
+              <el-input-number v-model="benchRampEnd" :min="benchConcurrency" :max="1000" controls-position="right" class="num-input full" />
+            </el-form-item>
           </el-form>
-          <div style="display:flex;gap:8px;margin-top:8px">
+          <div class="config-actions">
             <el-button type="primary" size="small" :loading="benchRunning" :disabled="!benchUrl.trim()" @click="doStartBench">
-              {{ benchRunning ? t('perfTest.benchRunning') : t('perfTest.startBench') }}
+              <el-icon style="margin-right: 6px;"><VideoPlay /></el-icon>{{ benchRunning ? t('perfTest.benchRunning') : t('perfTest.startBench') }}
             </el-button>
-            <el-button v-if="benchRunning" type="danger" size="small" @click="doStopBench">{{ t('perfTest.stopBench') }}</el-button>
+            <el-button v-if="benchRunning" type="danger" size="small" @click="doStopBench">
+              <el-icon style="margin-right: 6px;"><VideoPause /></el-icon>{{ t('perfTest.stopBench') }}
+            </el-button>
           </div>
         </div>
         <!-- Results -->
@@ -83,7 +88,7 @@
               <div class="bench-stat-card" :class="benchStats.errorRate > 5 ? 'err' : ''"><div class="stat-val">{{ benchStats.errorRate }}%</div><div class="stat-label">{{ t('perfTest.errorRate') }}</div></div>
             </div>
             <div v-if="benchSnapshots.length > 1" class="bench-chart-area">
-              <div style="font-size:12px;font-weight:600;margin-bottom:8px">{{ t('perfTest.timeline') }}</div>
+              <div class="chart-title">{{ t('perfTest.timeline') }}</div>
               <div class="bench-chart-row" v-for="(snap, si) in benchSnapshots.slice(-20)" :key="si">
                 <span class="chart-time">{{ snap.elapsed.toFixed(0) }}s</span>
                 <span class="chart-bar-wrap">
@@ -94,7 +99,7 @@
               </div>
             </div>
           </template>
-          <div v-else class="empty-hint" style="display:flex;align-items:center;justify-content:center;height:100%">
+          <div v-else class="empty-hint">
             {{ t('perfTest.benchHint') }}
           </div>
         </div>
@@ -107,7 +112,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Odometer } from '@element-plus/icons-vue'
+import { Odometer, VideoPlay, VideoPause } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { METHOD_COLORS } from '@/utils/apiWorkbench/shared'
 import { runBenchmark } from '@/utils/apiWorkbench/benchEngine'
@@ -192,7 +197,7 @@ function doStopBench() {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 .header {
   display: flex;
@@ -200,12 +205,11 @@ function doStopBench() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  min-height: 52px;
   box-sizing: border-box;
   flex-shrink: 0;
-  backdrop-filter: blur(18px);
 }
 .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
 .page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -219,73 +223,238 @@ function doStopBench() {
 }
 .breadcrumb {
   display: flex; align-items: center; gap: 6px;
-  font-size: 15px; font-weight: 600;
+  font-size: 14px; font-weight: 600;
   color: var(--text-primary); white-space: nowrap;
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); }
 
-.content-area { flex: 1; overflow: hidden; padding: 14px 18px 0; min-height: 0; }
+.content-area { flex: 1; overflow: hidden; min-height: 0; }
 .bench-layout { flex: 1; display: flex; height: 100%; overflow: hidden; min-height: 0; }
+
+/* 左侧配置：去除卡片，分割线由统一 CSS 提供 */
 .bench-config {
-  width: 360px;
-  min-width: 320px;
-  padding: 16px;
-  overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  width: 260px;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
+
+.config-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+}
+
+.config-form {
+  padding: 12px 16px 4px;
+}
+.config-form :deep(.el-form-item) {
+  margin-bottom: 12px;
+}
+/* label-position=top 时，标签在输入框上方 */
+.config-form :deep(.el-form-item__label) {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0 0 4px;
+  line-height: 1.2;
+  height: auto;
+}
+/* 输入框和下拉默认占满当前栏位 */
+.config-form :deep(.el-input),
+.config-form :deep(.el-textarea),
+.config-form :deep(.el-select),
+.config-form :deep(.el-input-number) {
+  width: 100%;
+}
+.config-form :deep(.el-textarea__inner) {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 双栏行：method + mode / concurrency + duration */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.form-row :deep(.el-form-item) {
+  margin-bottom: 12px;
+}
+.row-method { min-width: 0; }
+.row-mode { min-width: 0; }
+.mode-group { display: flex; width: 100%; }
+.mode-group :deep(.el-radio-button) { flex: 1; }
+.mode-group :deep(.el-radio-button__inner) { width: 100%; padding-left: 0; padding-right: 0; }
+
+.num-input { width: 100%; }
+.num-input.full { width: 100%; }
+
+.mono-input :deep(.el-textarea__inner) {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.config-actions {
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px 14px;
+  border-top: 1px solid rgba(60, 40, 20, 0.06);
+  margin-top: 4px;
+}
+.config-actions :deep(.el-button) { flex: 1; }
+
+/* 右侧结果：去除卡片 */
 .bench-results {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 18px 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  padding: 14px 18px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
-.bench-progress-bar { margin-bottom: 16px; padding: 12px; border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 14px; background: rgba(255,255,255,0.72); }
-.bench-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+
+/* 进度条：去除卡片 */
+.bench-progress-bar {
+  margin-bottom: 14px;
+  padding: 0 0 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  border-radius: 0;
+  background: transparent;
+}
+
+/* 统计网格：去除单卡片，仅用底部细线分隔 */
+.bench-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-bottom: 16px;
+  border: 1px solid rgba(60, 40, 20, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.5);
+}
 .bench-stat-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  padding: 10px;
+  border: 0;
+  border-right: 1px solid rgba(60, 40, 20, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  border-radius: 0;
+  padding: 12px 10px;
   text-align: center;
-  background: rgba(255,255,255,0.72);
+  background: transparent;
 }
-.bench-stat-card.ok { border-color: rgba(103,194,58,0.3); }
-.bench-stat-card.err { border-color: rgba(245,108,108,0.3); }
-.stat-val { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+/* 4 列：每行第 4 个无右边框 */
+.bench-stat-card:nth-child(4n) { border-right: 0; }
+/* 最后一行无下边框（8 项时第 5-8 个） */
+.bench-stat-card:nth-last-child(-n+4) { border-bottom: 0; }
 .bench-stat-card.ok .stat-val { color: #67C23A; }
 .bench-stat-card.err .stat-val { color: #F56C6C; }
-.stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
-.bench-chart-area { border-top: 1px solid rgba(15, 23, 42, 0.08); padding-top: 12px; }
-.bench-chart-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
-.chart-time { width: 30px; color: var(--text-tertiary); text-align: right; flex-shrink: 0; }
-.chart-bar-wrap { flex: 1; height: 12px; background: rgba(226,232,240,0.9); border-radius: 999px; overflow: hidden; }
-.chart-bar { height: 100%; border-radius: 999px; transition: width 0.3s; }
+.stat-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+}
+
+/* 时间序列：去除外层装饰 */
+.bench-chart-area {
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
+  padding-top: 12px;
+}
+.chart-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.bench-chart-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 11px;
+}
+.chart-time {
+  width: 30px;
+  color: var(--text-tertiary);
+  text-align: right;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.chart-bar-wrap {
+  flex: 1;
+  height: 10px;
+  background: rgba(60, 40, 20, 0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.chart-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s;
+}
 .qps-bar { background: linear-gradient(90deg, #409EFF, #67C23A); }
-.chart-val { width: 70px; color: var(--text-secondary); flex-shrink: 0; text-align: right; }
+.chart-val {
+  width: 70px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .empty-hint {
-  text-align: center; color: var(--text-quaternary); font-size: 12px; padding: 24px;
-  border: 1px dashed rgba(15, 23, 42, 0.08); border-radius: 14px; background: rgba(255,255,255,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 220px;
+  text-align: center;
+  color: var(--text-quaternary);
+  font-size: 13px;
+  padding: 24px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
 
 @media (max-width: 960px) {
-  .content-area { padding: 14px 14px 0; }
   .bench-layout { flex-direction: column; }
   .bench-config {
     width: 100%;
     min-width: 0;
-    border-right: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px 18px 0 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+    max-height: 320px;
   }
-  .bench-results { border-radius: 0 0 18px 18px; }
   .bench-stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .bench-stat-card:nth-child(2n) { border-right: 0; }
+  .bench-stat-card:nth-child(4n) { border-right: 1px solid rgba(60, 40, 20, 0.08); }
+  .bench-stat-card:nth-last-child(-n+4) { border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
+  .bench-stat-card:nth-last-child(-n+2) { border-bottom: 0; }
 }
 </style>

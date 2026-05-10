@@ -49,6 +49,14 @@
         >
           <template v-if="previewSrc">
             <img :src="previewSrc" class="preview-img" />
+            <button
+              type="button"
+              class="preview-clear-btn"
+              :title="t('common.delete')"
+              @click.stop="doClear"
+            >
+              <el-icon><Close /></el-icon>
+            </button>
           </template>
           <template v-else>
             <el-icon class="drop-icon"><UploadFilled /></el-icon>
@@ -74,7 +82,7 @@
             @keyup.enter="convertUrl"
           />
           <el-button size="small" type="primary" @click="convertUrl" :loading="urlLoading" :disabled="!imageUrl.trim()">
-            {{ t('imageToBase64.convert') }}
+            <el-icon style="margin-right: 6px;"><MagicStick /></el-icon>{{ t('imageToBase64.convert') }}
           </el-button>
         </div>
 
@@ -129,7 +137,7 @@
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Picture, CopyDocument, Delete, UploadFilled } from '@element-plus/icons-vue'
+import { Picture, CopyDocument, Delete, UploadFilled, Close, MagicStick } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
 
@@ -305,20 +313,20 @@ statusText.value = t('imageToBase64.ready')
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
+/* ============ Header（对齐 ImageFormatConverter） ============ */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  min-height: 52px;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
+  flex-shrink: 0;
 }
 .header-left { display: flex; align-items: center; min-width: 0; }
 .page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -330,233 +338,291 @@ statusText.value = t('imageToBase64.ready')
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-.breadcrumb {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 15px; font-weight: 600; color: var(--text-primary);
-}
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
-.breadcrumb-link { cursor: pointer; color: var(--accent-blue); transition: opacity 0.15s; }
-.breadcrumb-link:hover { text-decoration: underline; opacity: 0.85; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
+.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
+.breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-quaternary); margin: 0 2px; }
 
+/* ============ Toolbar：扫平风（去卡片） ============ */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 14px 18px 0;
-  padding: 10px 12px;
+  padding: 8px 18px;
   flex-wrap: wrap;
-  min-height: 52px;
+  min-height: 44px;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.58);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 22px rgba(15,23,42,0.03);
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  flex-shrink: 0;
 }
 .toolbar-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
 .toolbar-spacer { flex: 1; }
 .format-select { width: 130px; }
-.toolbar :deep(.el-button),
-.toolbar :deep(.el-select) { --el-border-radius-base: 10px; }
-.toolbar :deep(.el-select__wrapper),
-.url-row :deep(.el-input__wrapper) {
-  background: rgba(248,250,252,0.92);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
-}
-.toolbar :deep(.el-select__wrapper.is-focused),
-.url-row :deep(.el-input__wrapper.is-focus) {
-  box-shadow: inset 0 0 0 1px rgba(64, 158, 255, 0.7);
-}
+.toolbar :deep(.el-button) { --el-border-radius-base: 8px; }
 .toolbar-icon-btn {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border-radius: 10px;
+  border-radius: 6px;
   color: var(--text-secondary);
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: transparent;
+  border: 1px solid transparent;
 }
 .toolbar-icon-btn:hover:not(.is-disabled) {
   color: var(--text-primary);
-  background: rgba(255,255,255,0.96);
-  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(60, 40, 20, 0.05);
+  border-color: rgba(60, 40, 20, 0.1);
 }
 
+/* ============ 主体：左右 panel 扫平拼接 ============ */
 .main-area {
   flex: 1;
   display: flex;
   overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
   gap: 0;
 }
 .input-panel {
-  width: 380px;
-  min-width: 320px;
+  flex: 0 0 280px;
+  min-width: 260px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 14px;
+  padding: 14px 18px;
   overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  background: transparent;
+  border-right: 1px solid rgba(60, 40, 20, 0.08);
 }
 .output-panel {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: transparent;
 }
 .output-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255,255,255,0.64);
+  padding: 10px 18px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  flex-shrink: 0;
 }
 .output-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .output-meta {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 0 10px;
-  border-radius: 999px;
   font-size: 11px;
-  font-weight: 600;
   color: var(--text-tertiary);
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  font-variant-numeric: tabular-nums;
 }
 .output-body {
   flex: 1;
   min-height: 0;
-  padding: 14px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.36), rgba(248,250,252,0.22));
-}
-.output-body.is-empty {
+  padding: 14px 18px;
   display: flex;
 }
 
+/* ============ Drop Zone：扫平、文字防溢出 ============ */
 .drop-zone {
-  border: 1px dashed rgba(15, 23, 42, 0.14);
-  border-radius: 18px;
-  padding: 28px 16px;
+  position: relative;
+  border: 1px dashed rgba(60, 40, 20, 0.18);
+  border-radius: 10px;
+  padding: 22px 14px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all var(--transition-normal);
-  min-height: 160px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248,250,252,0.92));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  transition: padding 0.2s ease, min-height 0.2s ease,
+              background 0.2s ease, border-color 0.15s ease;
+  min-height: 140px;
+  background: rgba(255, 255, 255, 0.5);
+  /* 关键：防止内部文字撑破容器 */
+  min-width: 0;
+  overflow: hidden;
+  text-align: center;
 }
 .drop-zone:hover,
 .drop-zone.dragging {
-  border-color: rgba(64, 158, 255, 0.45);
-  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(238,246,255,0.96));
+  border-color: var(--accent-blue);
+  background: rgba(238, 246, 255, 0.7);
 }
 .drop-zone.has-preview {
-  padding: 10px;
-  min-height: auto;
+  border-style: solid;
+  border-color: rgba(60, 40, 20, 0.12);
+  padding: 12px;
+  min-height: 140px;
+  background: rgba(255, 255, 255, 0.6);
 }
-.drop-icon { font-size: 40px; color: var(--text-quaternary); margin-bottom: 8px; }
-.drop-text { font-size: var(--font-size-body); color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; }
+.drop-icon {
+  font-size: 36px;
+  color: var(--text-quaternary);
+  margin-bottom: 8px;
+}
+.drop-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0 0 4px;
+  font-weight: 600;
+  /* 中文长串无空格也能在窄面板内换行 */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+  max-width: 100%;
+}
 .drop-formats {
-  font-size: var(--font-size-caption);
+  font-size: 11px;
   color: var(--text-quaternary);
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.5;
+  /* 长格式列表也能换行 */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
 .preview-img {
   max-width: 100%;
-  max-height: 240px;
+  max-height: 200px;
   object-fit: contain;
-  border-radius: 14px;
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 8px;
+  background: rgba(248, 244, 232, 0.6);
+  border: 1px solid rgba(60, 40, 20, 0.06);
+}
+/* 浮层清除按钮 */
+.preview-clear-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(60, 40, 20, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 6px rgba(60, 40, 20, 0.08);
+  opacity: 0;
+  transform: translateY(-2px);
+  transition: opacity 0.15s, transform 0.15s, color 0.15s, background 0.15s;
+}
+.drop-zone:hover .preview-clear-btn,
+.preview-clear-btn:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.preview-clear-btn:hover {
+  color: var(--el-color-danger);
+  background: #fff;
+  border-color: rgba(245, 108, 108, 0.4);
 }
 .hidden-input { display: none; }
-.url-row { display: flex; gap: 8px; }
+
+/* ============ URL Row ============ */
+.url-row { display: flex; gap: 8px; min-width: 0; }
+.url-row :deep(.el-input) { min-width: 0; }
+.url-row :deep(.el-input__wrapper) {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
+}
+.url-row :deep(.el-input__wrapper.is-focus) {
+  box-shadow: inset 0 0 0 1px var(--accent-blue);
+}
+
+/* ============ File Info：扫平分行 ============ */
 .file-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
-  border-radius: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  padding: 4px 0;
 }
 .info-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
-  font-size: var(--font-size-caption);
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+  min-width: 0;
 }
-.info-row:last-child { border-bottom: none; padding-bottom: 0; }
-.info-label { color: var(--text-tertiary); font-weight: 600; }
+.info-row:last-child { border-bottom: none; }
+.info-label {
+  color: var(--text-tertiary);
+  font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
 .info-value {
   color: var(--text-primary);
   font-family: var(--font-mono, 'Consolas', monospace);
   word-break: break-all;
+  overflow-wrap: anywhere;
   text-align: right;
-  max-width: 220px;
+  flex: 1;
+  min-width: 0;
+  font-size: 11.5px;
 }
+
+/* ============ Base64 输出 textarea ============ */
 .b64-output {
   flex: 1;
   width: 100%;
-  min-height: 100%;
-  padding: 14px 16px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 12px 14px;
+  border: 1px solid rgba(60, 40, 20, 0.1);
   outline: none;
   resize: none;
   font-size: 12px;
   font-family: var(--font-mono, 'Consolas', monospace);
   line-height: 1.65;
   color: var(--text-primary);
-  background: rgba(248,250,252,0.94);
-  border-radius: 14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
   word-break: break-all;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.b64-output:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.08);
 }
 .b64-output::placeholder { color: var(--text-quaternary); }
 
+/* ============ 状态栏：扫平 ============ */
 .status-bar {
   display: flex;
   align-items: center;
-  padding: 0 16px;
-  height: 32px;
-  margin: 0 18px 18px;
-  font-size: var(--font-size-caption);
+  gap: 10px;
+  padding: 0 18px;
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
+  font-size: 11.5px;
   color: var(--text-tertiary);
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(247,249,252,0.9));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-top: none;
-  border-radius: 0 0 18px 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  height: 30px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 .status-spacer { flex: 1; }
 
+/* ============ Scrollbar ============ */
 .input-panel::-webkit-scrollbar,
-.b64-output::-webkit-scrollbar { width: 6px; }
+.b64-output::-webkit-scrollbar { width: 5px; }
 .input-panel::-webkit-scrollbar-track,
 .b64-output::-webkit-scrollbar-track { background: transparent; }
 .input-panel::-webkit-scrollbar-thumb,
@@ -564,23 +630,17 @@ statusText.value = t('imageToBase64.ready')
 .input-panel::-webkit-scrollbar-thumb:hover,
 .b64-output::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 
+/* ============ 响应式 ============ */
 @media (max-width: 980px) {
   .main-area {
     flex-direction: column;
-    gap: 12px;
   }
-
-  .input-panel,
-  .output-panel {
+  .input-panel {
+    flex: 0 0 auto;
     width: 100%;
     min-width: 0;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
-  }
-
-  .status-bar {
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   }
 }
 </style>

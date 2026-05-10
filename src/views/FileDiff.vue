@@ -18,13 +18,11 @@
     <!-- 工具栏 -->
     <div class="toolbar">
       <div class="toolbar-group">
-        <el-button size="small" @click="openFile('left')">
+        <el-button size="small" text @click="openFile('left')" :title="t('fileDiff.openLeft')">
           <el-icon><FolderOpened /></el-icon>
-          {{ t('fileDiff.openLeft') }}
         </el-button>
-        <el-button size="small" @click="openFile('right')">
+        <el-button size="small" text @click="openFile('right')" :title="t('fileDiff.openRight')">
           <el-icon><FolderOpened /></el-icon>
-          {{ t('fileDiff.openRight') }}
         </el-button>
       </div>
 
@@ -49,10 +47,10 @@
         </el-button>
         <div class="toolbar-sep-sm"></div>
         <el-button size="small" text class="merge-tb-btn" @click="doMerge(currentDiffIndex, 'left-to-right')" :title="t('fileDiff.mergeToRight')">
-          →
+          <el-icon><Right /></el-icon>
         </el-button>
         <el-button size="small" text class="merge-tb-btn" @click="doMerge(currentDiffIndex, 'right-to-left')" :title="t('fileDiff.mergeToLeft')">
-          ←
+          <el-icon><Back /></el-icon>
         </el-button>
       </div>
 
@@ -60,13 +58,13 @@
 
       <div class="toolbar-group">
         <el-button size="small" text @click="saveFile('left')" :disabled="!leftText" :title="t('fileDiff.saveLeft')">
-          <el-icon><Download /></el-icon> L
+          <el-icon><Download /></el-icon>
         </el-button>
         <el-button size="small" text @click="saveFile('right')" :disabled="!rightText" :title="t('fileDiff.saveRight')">
-          <el-icon><Download /></el-icon> R
+          <el-icon><Download /></el-icon>
         </el-button>
         <el-button size="small" text @click="doExportDiff" :disabled="!diffBlocks.length" :title="t('fileDiff.exportDiff')">
-          <el-icon><Document /></el-icon> .diff
+          <el-icon><Document /></el-icon>
         </el-button>
       </div>
     </div>
@@ -130,7 +128,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, shallowRef, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { Document, FolderOpened, ArrowUp, ArrowDown, Download, Sort } from '@element-plus/icons-vue'
+import { Document, FolderOpened, ArrowUp, ArrowDown, Download, Sort, Right, Back } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
 
@@ -725,7 +723,7 @@ function getFileName(path) {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
 /* ---- Header ---- */
@@ -734,11 +732,10 @@ function getFileName(path) {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  min-height: 52px;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
 }
 .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
 .page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -754,11 +751,11 @@ function getFileName(path) {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 .breadcrumb-link {
   cursor: pointer;
   color: var(--accent-blue);
@@ -767,17 +764,14 @@ function getFileName(path) {
 .breadcrumb-link:hover { text-decoration: underline; opacity: 0.85; }
 .breadcrumb-sep { color: var(--text-tertiary); margin: 0 1px; }
 
-/* ---- Toolbar ---- */
+/* ---- Toolbar：去除卡片，仅留底部分割线 ---- */
 .toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 18px 18px 0;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  padding: 8px 18px;
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .toolbar-group {
   display: flex;
@@ -785,18 +779,18 @@ function getFileName(path) {
   gap: 6px;
 }
 .toolbar :deep(.el-button) {
-  --el-button-border-radius: 10px;
+  --el-button-border-radius: 8px;
 }
 .toolbar-sep {
   width: 1px;
   height: 20px;
-  background: rgba(15, 23, 42, 0.08);
+  background: rgba(60, 40, 20, 0.12);
   margin: 0 4px;
 }
 .toolbar-sep-sm {
   width: 1px;
   height: 16px;
-  background: rgba(15, 23, 42, 0.08);
+  background: rgba(60, 40, 20, 0.12);
   margin: 0 2px;
 }
 .toolbar-spacer { flex: 1; }
@@ -811,9 +805,9 @@ function getFileName(path) {
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
-  padding: 0 6px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(60, 40, 20, 0.06);
 }
 
 .merge-tb-btn {
@@ -823,47 +817,44 @@ function getFileName(path) {
   min-width: 28px;
 }
 
-/* ---- Workspace shell ---- */
+/* ---- Workspace shell：去除外层卡片 ---- */
 .workspace-shell {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin: 14px 18px 18px;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  background: transparent;
 }
-/* ---- File name bar ---- */
+
+/* ---- File name bar：去除卡片，仅留底部分割线 ---- */
 .file-name-bar {
   display: flex;
-  margin: 0 20px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px 16px 0 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  border-radius: 0;
 }
 .file-name {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
+  padding: 7px 18px;
   font-size: var(--font-size-caption);
   color: var(--text-secondary);
   cursor: pointer;
   transition: background var(--transition-fast);
   user-select: none;
 }
-.file-name:hover { background: rgba(239, 246, 255, 0.72); }
-.file-name.left { border-right: 1px solid rgba(15, 23, 42, 0.08); }
+.file-name:hover { background: rgba(60, 40, 20, 0.03); }
+.file-name.left { border-right: 1px solid rgba(60, 40, 20, 0.1); }
 
 .file-tag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
+  padding: 2px 6px;
+  border-radius: 4px;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -898,24 +889,21 @@ function getFileName(path) {
   flex-shrink: 0;
 }
 
-/* ---- Editor container ---- */
+/* ---- Editor container：去除外框，保留中间合并栏的左右分割线 ---- */
 .editor-container {
   flex: 1;
   display: flex;
   overflow: hidden;
   min-height: 0;
-  margin: 0 20px;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
-  border-left: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  background: transparent;
 }
 .editor-pane {
   flex: 1;
   overflow: hidden;
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.5);
 }
-.left-pane { border-right: 1px solid rgba(15, 23, 42, 0.08); }
-.right-pane { border-left: 1px solid rgba(15, 23, 42, 0.08); }
+.left-pane { border-right: 1px solid rgba(60, 40, 20, 0.1); }
+.right-pane { border-left: 1px solid rgba(60, 40, 20, 0.1); }
 
 .editor-mount {
   height: 100%;
@@ -952,10 +940,8 @@ function getFileName(path) {
   position: relative;
   width: 36px;
   min-width: 36px;
-  background: rgba(248, 250, 252, 0.94);
+  background: rgba(60, 40, 20, 0.03);
   overflow: hidden;
-  border-left: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .merge-btn-pair {
@@ -977,9 +963,9 @@ function getFileName(path) {
   justify-content: center;
   width: 22px;
   height: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 6px;
-  background: rgba(255,255,255,0.94);
+  border: 1px solid rgba(60, 40, 20, 0.12);
+  border-radius: 4px;
+  background: rgba(255,255,255,0.9);
   color: var(--text-tertiary);
   font-size: 13px;
   font-weight: 700;
@@ -1014,34 +1000,31 @@ function getFileName(path) {
   color: var(--accent-blue);
 }
 
-/* ---- Status bar ---- */
+/* ---- Status bar：去除卡片，仅留顶部分割线 ---- */
 .status-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 16px;
-  margin: 0 20px 20px;
-  background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-top: none;
-  border-radius: 0 0 16px 16px;
+  gap: 10px;
+  padding: 0 18px;
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
   font-size: 11.5px;
   color: var(--text-tertiary);
-  height: 34px;
+  height: 30px;
   box-sizing: border-box;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
+  padding: 2px 6px;
+  border-radius: 4px;
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
 .badge-total {
-  background: rgba(15, 23, 42, 0.06);
+  background: rgba(60, 40, 20, 0.06);
   color: var(--text-primary);
 }
 .badge-added {
@@ -1062,17 +1045,10 @@ function getFileName(path) {
   font-weight: 500;
 }
 .status-spacer { flex: 1; }
-@media (max-width: 1100px) {
-  .toolbar,
-  .file-name-bar,
-  .editor-container,
-  .status-bar { margin-left: 14px; margin-right: 14px; }
-}
 
 @media (max-width: 860px) {
   .header { padding: 0 14px; }
-  .breadcrumb { font-size: 14px; }
-  .toolbar { margin-top: 14px; padding: 10px 12px; }
+  .breadcrumb { font-size: 13px; }
   .merge-gutter { width: 30px; min-width: 30px; }
 }
 </style>

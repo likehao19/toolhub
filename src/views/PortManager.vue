@@ -14,9 +14,8 @@
         </div>
       </div>
       <div class="header-actions">
-        <el-button size="small" @click="refreshPorts" :loading="loading">
+        <el-button size="small" text @click="refreshPorts" :loading="loading" :title="t('common.refresh')">
           <el-icon><Refresh /></el-icon>
-          {{ t('portManager.refresh') }}
         </el-button>
       </div>
     </div>
@@ -113,9 +112,13 @@
       <span v-if="portStats.listening" class="stat-chip listening">LISTENING {{ portStats.listening }}</span>
       <span v-if="portStats.established" class="stat-chip established">ESTABLISHED {{ portStats.established }}</span>
       <span class="page-info" v-if="totalPages > 1">
-        <el-button size="small" text :disabled="currentPage <= 1" @click="currentPage--">‹</el-button>
+        <el-button size="small" text :disabled="currentPage <= 1" @click="currentPage--" :title="t('common.prev')">
+          <el-icon><ArrowLeft /></el-icon>
+        </el-button>
         {{ currentPage }} / {{ totalPages }}
-        <el-button size="small" text :disabled="currentPage >= totalPages" @click="currentPage++">›</el-button>
+        <el-button size="small" text :disabled="currentPage >= totalPages" @click="currentPage++" :title="t('common.next')">
+          <el-icon><ArrowRight /></el-icon>
+        </el-button>
       </span>
     </div>
   </div>
@@ -124,7 +127,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { Refresh, Search, Monitor } from '@element-plus/icons-vue'
+import { Refresh, Search, Monitor, ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { t } from '@/i18n'
 import { getAllPorts, killProcess } from '@/utils/portManager.js'
@@ -285,7 +288,7 @@ onMounted(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -336,20 +339,20 @@ onMounted(() => {
   padding: 14px 18px 0;
 }
 .table-area :deep(.el-table) {
-  --el-table-border-color: rgba(15, 23, 42, 0.08);
-  --el-table-header-bg-color: rgba(248,250,252,0.94);
-  --el-table-bg-color: rgba(252,253,255,0.99);
-  --el-table-tr-bg-color: rgba(252,253,255,0.99);
+  --el-table-border-color: rgba(60, 40, 20, 0.08);
+  --el-table-header-bg-color: rgba(248, 244, 232,0.94);
+  --el-table-bg-color: rgba(253, 251, 246,0.99);
+  --el-table-tr-bg-color: rgba(253, 251, 246,0.99);
   --el-table-row-hover-bg-color: rgba(64, 158, 255, 0.06);
   --el-table-header-text-color: var(--text-secondary);
   --el-table-text-color: var(--text-primary);
-  --el-fill-color-lighter: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  --el-fill-color-lighter: rgba(248, 244, 232,0.9);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-bottom: none;
   border-radius: 18px 18px 0 0;
   font-size: 12px;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
 }
 .table-area :deep(.el-table th) {
   font-weight: 600;
@@ -371,7 +374,7 @@ onMounted(() => {
 .state-badge.established { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue); }
 .state-badge.time-wait { background: rgba(230, 162, 60, 0.12); color: #e6a23c; }
 .state-badge.close-wait { background: rgba(245, 108, 108, 0.12); color: #f56c6c; }
-.state-badge.other { background: rgba(248,250,252,0.9); color: var(--text-tertiary); }
+.state-badge.other { background: rgba(248, 244, 232,0.9); color: var(--text-tertiary); }
 .system-tag { font-size: 11px; color: var(--text-quaternary); }
 
 .status-bar {
@@ -381,7 +384,7 @@ onMounted(() => {
   padding: 0 16px;
   margin: 0 18px 18px;
   background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px;
   color: var(--text-tertiary);

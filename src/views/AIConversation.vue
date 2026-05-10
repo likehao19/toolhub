@@ -505,7 +505,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { fetch } from '@tauri-apps/plugin-http'
 import { Plus, Setting, Delete, Connection, Edit } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -544,8 +544,10 @@ async function getDb() {
 }
 
 // Markdown 渲染器配置
+// 安全:html=false 让 markdown-it 转义嵌入的原生 HTML。
+// AI 流式输出/用户输入若含 <script>... 会被当文本展示而非执行。
 const md = new MarkdownIt({
-  html: true,
+  html: false,
   linkify: true,
   typographer: true,
   breaks: true,
@@ -560,6 +562,12 @@ const md = new MarkdownIt({
 })
 
 // 全局复制代码函数
+// 注:挂到 window 是为了让通过 v-html 渲染出来的 onclick="copyCode(this)" 能找到它。
+// 旧实现没有清理,组件多次挂卸/打开多个 AI 对话时:
+//   1) 全局命名空间被污染
+//   2) 后挂载的实例覆盖前一个,所有按钮都点到最后那个实例
+// onBeforeUnmount 里 delete 掉,且只在没人占用时才设置(同时打开多窗口时第一个 mount 即 own)。
+const __prevCopyCode = window.copyCode
 window.copyCode = function(button) {
   const codeBlock = button.closest('.hljs-code-block')
   const code = codeBlock.querySelector('code').textContent
@@ -570,6 +578,16 @@ window.copyCode = function(button) {
     }, 2000)
   })
 }
+onBeforeUnmount(() => {
+  // 卸载时中断 in-flight 的 AI 请求,避免占用配额并防止响应继续写入已 dispose 的 ref。
+  abortAIRequest()
+  // 还原成上一个挂载者的实现(若有),否则 delete 掉
+  if (__prevCopyCode) {
+    window.copyCode = __prevCopyCode
+  } else {
+    try { delete window.copyCode } catch { window.copyCode = undefined }
+  }
+})
 
 // 状态管理
 const messages = ref([])
@@ -577,6 +595,18 @@ const userInput = ref('')
 const isLoading = ref(false)
 const isStreaming = ref(false)
 const streamingContent = ref('')
+
+// AI 会话请求中止控制
+// 旧实现:fetch 没有 signal,用户切到别的页面/换模型/重新提问后,旧的流式请求会继续读完整个响应,
+// 浪费 token + 网络带宽,新旧响应交错写入 streamingContent 还会导致 UI 错乱。
+// 同一时刻只允许一个进行中的对话请求 —— 发新请求 / 切对话 / 卸载组件前都先 abort 旧的。
+let aiAbortController = null
+const abortAIRequest = () => {
+  if (aiAbortController) {
+    try { aiAbortController.abort() } catch {}
+    aiAbortController = null
+  }
+}
 const selectedModel = ref('')
 const showSettingsDialog = ref(false)
 const showCustomApiDialog = ref(false)
@@ -760,6 +790,8 @@ const formatTime = (isoStr) => {
 // 切换对话
 const switchConversation = async (conversationId) => {
   if (conversationId === currentConversationId.value) return
+  // 同 newConversation:切对话前中断上一个对话还在跑的流式请求
+  abortAIRequest()
   currentConversationId.value = conversationId
   await loadMessages(conversationId)
   scrollToBottom()
@@ -1134,6 +1166,8 @@ const onModelChange = () => {
 
 // 新建对话
 const newConversation = async () => {
+  // 切对话前 abort 旧的 in-flight 请求,避免上一对话的流式响应继续写入 streamingContent
+  abortAIRequest()
   // 直接创建新对话
   const id = await createConversation(t('aiConv.newConversation'), selectedModel.value)
   if (id) {
@@ -1217,6 +1251,11 @@ const sendMessage = async () => {
   })
   scrollToBottom()
 
+  // 发起新请求前先 abort 上一个 in-flight 请求(用户连点发送 / 用上一个还没回完就再发),
+  // 避免新旧响应交错写入 streamingContent。
+  abortAIRequest()
+  aiAbortController = new AbortController()
+
   // 获取当前模型的流式设置
   const modelId = selectedModel.value
   let useStream = false
@@ -1249,6 +1288,10 @@ const sendMessage = async () => {
       await loadConversationList()
       scrollToBottom()
     } catch (error) {
+      // AbortError 用户主动取消,不视为失败,也不入库
+      if (error?.name === 'AbortError') {
+        return
+      }
       const errTimestamp = new Date().toLocaleTimeString()
       const errContent = `抱歉，我遇到了一些问题：${error.message}`
       ElMessage.error('AI 回复失败: ' + error.message)
@@ -1283,6 +1326,11 @@ const sendMessageStream = async (content) => {
     await saveMessage(currentConversationId.value, 'assistant', streamingContent.value, assistantTimestamp)
     await loadConversationList()
   } catch (error) {
+    // AbortError 是用户主动取消(切换对话/卸载/重发),不应当作"AI 回复失败"
+    // 也不写入数据库 —— 否则每次切对话都会留下一条假错误消息。
+    if (error?.name === 'AbortError') {
+      return
+    }
     const errTimestamp = new Date().toLocaleTimeString()
     const errContent = `抱歉，我遇到了一些问题：${error.message}`
     ElMessage.error('AI 回复失败: ' + error.message)
@@ -1357,7 +1405,8 @@ const callOpenAI = async (content, stream = false) => {
         { role: 'user', content }
       ],
       stream
-    })
+    }),
+    signal: aiAbortController?.signal,
   })
 
   if (!response.ok) {
@@ -1430,7 +1479,8 @@ const callClaude = async (content, stream = false) => {
       max_tokens: 4096,
       messages: conversationHistory,
       ...(stream ? { stream: true } : {})
-    })
+    }),
+    signal: aiAbortController?.signal,
   })
 
   if (!response.ok) {
@@ -1559,7 +1609,8 @@ const callCustomAPI = async (apiId, content, stream = false) => {
         { role: 'user', content }
       ],
       stream
-    })
+    }),
+    signal: aiAbortController?.signal,
   })
 
   if (!response.ok) {
@@ -1648,7 +1699,7 @@ onMounted(async () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--bg-secondary, #f9fafb);
 }
 
 .header {
@@ -1656,8 +1707,8 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e4e7ed;
+  background-color: var(--bg-primary, #ffffff);
+  border-bottom: 1px solid var(--border-color, #e4e7ed);
   height: 50px;
   box-sizing: border-box;
 }
@@ -1699,14 +1750,14 @@ onMounted(async () => {
   position: relative;
 }
 
-/* 侧边栏 — 白色主题 */
+/* 侧边栏 — 与团队讨论一致 */
 .conversation-sidebar {
   width: 260px;
   min-width: 260px;
   display: flex;
   flex-direction: column;
-  background: #f9fafb;
-  border-right: 1px solid #e5e7eb;
+  background: var(--bg-tertiary, #f9fafb);
+  border-right: 1px solid var(--border-color, #e5e7eb);
   transition: width 0.25s ease, min-width 0.25s ease;
   overflow: hidden;
 }
@@ -1739,7 +1790,7 @@ onMounted(async () => {
   transition: background 0.15s, border-color 0.15s;
   user-select: none;
   white-space: nowrap;
-  background: #ffffff;
+  background: var(--bg-primary);
 }
 
 .sidebar-new-btn:hover {
@@ -1897,7 +1948,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #ffffff;
+  background: var(--bg-secondary, #f9fafb);
 }
 
 .messages-container {
@@ -1906,7 +1957,7 @@ onMounted(async () => {
   padding: 40px 20px;
   scrollbar-width: thin;
   scrollbar-color: #d1d5db transparent;
-  background: linear-gradient(to bottom, #ffffff 0%, #f9fafb 100%);
+  background: var(--bg-secondary, #f9fafb);
 }
 
 .messages-container::-webkit-scrollbar {
@@ -2032,10 +2083,10 @@ onMounted(async () => {
 }
 
 .assistant-message {
-  background: #ffffff;
+  background: var(--bg-primary, #ffffff);
   color: #1f2937;
   border-radius: 18px 18px 18px 4px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color, #e5e7eb);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -2076,7 +2127,7 @@ onMounted(async () => {
   display: flex;
   gap: 6px;
   padding: 16px 20px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-radius: 18px 18px 18px 4px;
   border: 1px solid #e5e7eb;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -2111,16 +2162,16 @@ onMounted(async () => {
 
 .input-area {
   padding: 20px;
-  background: #ffffff;
-  border-top: 1px solid #e4e7ed;
+  background: var(--bg-primary, #ffffff);
+  border-top: 1px solid var(--border-color, #e4e7ed);
 }
 
 .input-wrapper {
   position: relative;
   max-width: 800px;
   margin: 0 auto;
-  background: #ffffff;
-  border: 1.5px solid #d1d5db;
+  background: var(--bg-primary, #ffffff);
+  border: 1.5px solid var(--border-color, #d1d5db);
   border-radius: 24px;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -2360,7 +2411,7 @@ onMounted(async () => {
 }
 
 .message-text :deep(td) {
-  background: #ffffff;
+  background: var(--bg-primary);
 }
 
 .message-text :deep(a) {

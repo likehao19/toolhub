@@ -444,7 +444,7 @@ onMounted(async () => {
 .log-item {
   margin-bottom: 8px;
   padding: 8px;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 4px;
 }
 

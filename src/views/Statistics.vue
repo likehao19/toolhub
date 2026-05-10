@@ -485,7 +485,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 24px;
   padding: 16px 24px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
@@ -510,7 +510,7 @@ onMounted(() => {
 }
 
 .stat-card {
-  background: #ffffff;
+  background: var(--bg-primary);
   border-radius: 8px;
 }
 

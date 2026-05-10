@@ -321,7 +321,10 @@ fn find_sdk_in_path_sync(sdk_type: &str) -> Result<SdkInPathInfo, String> {
 
     let output = command_output(find_cmd, &[exe_name])?;
 
-    let stdout = String::from_utf8_lossy(&output.stdout).to_string();
+    // Windows 中文系统 where 的输出编码通常是 GBK,from_utf8_lossy 会让中文路径出乱码,
+    // 接下来的 process_found_exe 用乱码路径去拼 sdk_path / 跑 version 命令必然失败。
+    // decode_process_output 在 Windows 下走 GBK→UTF-8 兜底,行为和 shell.rs / port.rs 一致。
+    let stdout = decode_process_output(&output.stdout);
     let first_line = stdout.lines().next().unwrap_or("").trim();
 
     if first_line.is_empty() || !output.status.success() {
@@ -329,7 +332,7 @@ fn find_sdk_in_path_sync(sdk_type: &str) -> Result<SdkInPathInfo, String> {
         #[cfg(target_os = "windows")]
         if sdk_type == "maven" {
             let output2 = command_output("where", &["mvn.bat"])?;
-            let stdout2 = String::from_utf8_lossy(&output2.stdout).to_string();
+            let stdout2 = decode_process_output(&output2.stdout);
             let line2 = stdout2.lines().next().unwrap_or("").trim();
             if !line2.is_empty() && output2.status.success() {
                 return process_found_exe(sdk_type, line2);
@@ -665,11 +668,16 @@ fn setup_system_privilege_sync() -> Result<(), String> {
     let username = std::env::var("USERNAME")
         .map_err(|_| "Cannot get USERNAME".to_string())?;
     let userdomain = std::env::var("USERDOMAIN").unwrap_or_default();
-    let full_user = if userdomain.is_empty() {
+    let raw_user = if userdomain.is_empty() {
         username
     } else {
         format!(r"{}\{}", userdomain, username)
     };
+    // PowerShell 单引号字符串里只有 `'` 需要转义为 `''`,其他字符(包括反斜杠、$、")都按字面量处理。
+    // 旧实现直接把 raw_user 拼进 ps_content 的单引号字符串,理论上 USERNAME 受 OS 控制,
+    // 但若进程继承自被污染的环境(启动器构造的环境变量含 `'`),会以管理员权限注入 PS 命令。
+    // 这里转义后嵌入,即使 raw_user 含 `'` 也只能作为字符串常量。
+    let full_user = raw_user.replace('\'', "''");
 
     let temp_dir = std::env::temp_dir();
 
@@ -700,8 +708,11 @@ try {{
 }}
 "#,
         user = full_user,
-        ok = ok_file.to_string_lossy().replace('\\', "\\"),
-        err = err_file.to_string_lossy().replace('\\', "\\"),
+        // PowerShell 单引号字符串里 ' 必须 → '' 转义。
+        // TEMP 目录路径理论上不会含 ',但若用户 USERPROFILE 被改成奇怪路径,
+        // 不转义会让 Out-File 的目标路径提前闭合,有可能注入 PS 命令。
+        ok = ok_file.to_string_lossy().replace('\'', "''"),
+        err = err_file.to_string_lossy().replace('\'', "''"),
     );
 
     let mut f = std::fs::File::create(&ps_file)
@@ -714,7 +725,7 @@ try {{
     //    -Wait 确保同步等到脚本执行完毕
     let inner_args = format!(
         "'-NoProfile','-ExecutionPolicy','Bypass','-WindowStyle','Hidden','-File','{}'",
-        ps_file.to_string_lossy()
+        ps_file.to_string_lossy().replace('\'', "''")
     );
     let cmd = format!(
         "Start-Process -FilePath powershell.exe -ArgumentList @({}) -Verb RunAs -Wait",

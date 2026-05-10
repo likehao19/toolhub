@@ -15,8 +15,7 @@
       </div>
       <div class="header-actions">
         <el-button type="primary" size="small" @click="showConnDialog = true">
-          <el-icon><Plus /></el-icon>
-          {{ t('redisClient.newConnection') }}
+          <el-icon style="margin-right: 6px;"><Plus /></el-icon>{{ t('redisClient.newConnection') }}
         </el-button>
       </div>
     </div>
@@ -123,7 +122,7 @@
               <div class="key-list-footer">
                 {{ t('redisClient.totalKeys') }}: {{ allKeys.length }}
                 <el-button v-if="selectedKeys.length" size="small" type="danger" text @click="batchDelete">
-                  {{ t('redisClient.deleteKey') }} ({{ selectedKeys.length }})
+                  <el-icon style="margin-right: 4px;"><Delete /></el-icon>{{ t('redisClient.deleteKey') }} ({{ selectedKeys.length }})
                 </el-button>
               </div>
             </div>
@@ -162,7 +161,9 @@
                     <el-radio-button value="text">Text</el-radio-button>
                     <el-radio-button value="json">JSON</el-radio-button>
                   </el-radio-group>
-                  <el-button size="small" type="primary" @click="saveStringValue">{{ t('redisClient.save') }}</el-button>
+                  <el-button size="small" type="primary" @click="saveStringValue">
+                    <el-icon style="margin-right: 6px;"><Check /></el-icon>{{ t('redisClient.save') }}
+                  </el-button>
                 </div>
                 <el-input
                   v-model="editStringValue"
@@ -175,7 +176,9 @@
               <!-- Hash 类型 -->
               <div v-else-if="currentKeyDetail.key_type === 'hash'" class="detail-body">
                 <div class="detail-toolbar">
-                  <el-button size="small" type="primary" @click="addHashField">{{ t('redisClient.addField') }}</el-button>
+                  <el-button size="small" type="primary" @click="addHashField">
+                    <el-icon style="margin-right: 6px;"><Plus /></el-icon>{{ t('redisClient.addField') }}
+                  </el-button>
                 </div>
                 <el-table :data="hashTableData" size="small" max-height="500">
                   <el-table-column prop="field" label="Field" min-width="150">
@@ -192,9 +195,9 @@
                   </el-table-column>
                   <el-table-column width="100" align="right">
                     <template #default="{ row, $index }">
-                      <el-button v-if="row.editing" size="small" type="primary" text @click="saveHashRow(row)">✓</el-button>
-                      <el-button v-else size="small" text @click="row.editing = true"><el-icon><EditPen /></el-icon></el-button>
-                      <el-button size="small" text type="danger" @click="deleteHashField($index)"><el-icon><Delete /></el-icon></el-button>
+                      <el-button v-if="row.editing" size="small" type="primary" text @click="saveHashRow(row)" :title="t('common.save')"><el-icon><Check /></el-icon></el-button>
+                      <el-button v-else size="small" text @click="row.editing = true" :title="t('common.edit')"><el-icon><EditPen /></el-icon></el-button>
+                      <el-button size="small" text type="danger" @click="deleteHashField($index)" :title="t('common.delete')"><el-icon><Delete /></el-icon></el-button>
                     </template>
                   </el-table-column>
                 </el-table>
@@ -204,8 +207,12 @@
               <div v-else-if="currentKeyDetail.key_type === 'list'" class="detail-body">
                 <div class="detail-toolbar">
                   <el-input v-model="newListItem" size="small" :placeholder="t('redisClient.newValue')" style="width: 300px" @keyup.enter="pushListItem" />
-                  <el-button size="small" @click="pushListItem">RPUSH</el-button>
-                  <el-button size="small" @click="lpushListItem">LPUSH</el-button>
+                  <el-button size="small" @click="pushListItem">
+                    <el-icon style="margin-right: 4px;"><DArrowRight /></el-icon>RPUSH
+                  </el-button>
+                  <el-button size="small" @click="lpushListItem">
+                    <el-icon style="margin-right: 4px;"><DArrowLeft /></el-icon>LPUSH
+                  </el-button>
                 </div>
                 <el-table :data="listTableData" size="small" max-height="500">
                   <el-table-column label="Index" width="70" type="index" />
@@ -222,7 +229,9 @@
               <div v-else-if="currentKeyDetail.key_type === 'set'" class="detail-body">
                 <div class="detail-toolbar">
                   <el-input v-model="newSetMember" size="small" :placeholder="t('redisClient.newValue')" style="width: 300px" @keyup.enter="addSetMember" />
-                  <el-button size="small" type="primary" @click="addSetMember">SADD</el-button>
+                  <el-button size="small" type="primary" @click="addSetMember">
+                    <el-icon style="margin-right: 4px;"><Plus /></el-icon>SADD
+                  </el-button>
                 </div>
                 <el-table :data="setTableData" size="small" max-height="500">
                   <el-table-column prop="value" label="Member" />
@@ -239,7 +248,9 @@
                 <div class="detail-toolbar">
                   <el-input v-model="newZsetMember" size="small" placeholder="Member" style="width: 200px" />
                   <el-input v-model="newZsetScore" size="small" placeholder="Score" style="width: 100px" />
-                  <el-button size="small" type="primary" @click="addZsetMember">ZADD</el-button>
+                  <el-button size="small" type="primary" @click="addZsetMember">
+                    <el-icon style="margin-right: 4px;"><Plus /></el-icon>ZADD
+                  </el-button>
                 </div>
                 <el-table :data="zsetTableData" size="small" max-height="500">
                   <el-table-column prop="member" label="Member" min-width="200" />
@@ -353,7 +364,9 @@
       <div class="right-area empty-right" v-else>
         <el-icon :size="64" color="var(--text-quaternary)"><Connection /></el-icon>
         <p>{{ t('redisClient.connectFirst') }}</p>
-        <el-button type="primary" @click="showConnDialog = true">{{ t('redisClient.newConnection') }}</el-button>
+        <el-button type="primary" @click="showConnDialog = true">
+          <el-icon style="margin-right: 6px;"><Plus /></el-icon>{{ t('redisClient.newConnection') }}
+        </el-button>
       </div>
     </div>
 
@@ -385,7 +398,7 @@
           </el-form-item>
         </div>
         <el-form-item :label="t('redisClient.password')">
-          <el-input v-model="connForm.password" type="password" show-password placeholder="可选" />
+          <el-input v-model="connForm.password" type="password" show-password :placeholder="t('redisClient.passwordOptional')" />
         </el-form-item>
         <div style="display:flex;gap:12px">
           <el-form-item :label="t('redisClient.database')" style="width:100px">
@@ -397,7 +410,9 @@
         </div>
       </el-form>
       <template #footer>
-        <el-button size="small" @click="testConn" :loading="testingConn">{{ t('redisClient.testConnection') }}</el-button>
+        <el-button size="small" @click="testConn" :loading="testingConn">
+          <el-icon style="margin-right: 6px;"><Connection /></el-icon>{{ t('redisClient.testConnection') }}
+        </el-button>
         <el-button size="small" @click="showConnDialog = false">{{ t('common.cancel') }}</el-button>
         <el-button size="small" type="primary" @click="saveConn">{{ t('common.confirm') }}</el-button>
       </template>
@@ -406,8 +421,8 @@
     <!-- TTL 对话框 -->
     <el-dialog v-model="showTtlDialog" :title="t('redisClient.setTtl')" width="360px" append-to-body>
       <el-form label-position="top" size="small">
-        <el-form-item label="TTL (秒)">
-          <el-input v-model.number="ttlInput" placeholder="-1 = 永不过期" />
+        <el-form-item :label="t('redisClient.ttlSecondsLabel')">
+          <el-input v-model.number="ttlInput" :placeholder="t('redisClient.ttlNeverExpire')" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -442,7 +457,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   Connection, Plus, Search, Refresh, List, Monitor, DataAnalysis,
-  Timer, EditPen, Delete, Loading, Key
+  Timer, EditPen, Delete, Loading, Key, Check, DArrowLeft, DArrowRight
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { t } from '@/i18n'
@@ -970,7 +985,7 @@ watch(showRenameDialog, (v) => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
 /* Header */
@@ -980,12 +995,11 @@ watch(showRenameDialog, (v) => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  height: 52px;
   flex-shrink: 0;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
 }
 .header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
 .header-actions { display: flex; align-items: center; gap: 8px; }
@@ -998,28 +1012,28 @@ watch(showRenameDialog, (v) => {
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: var(--text-primary); min-width: 0; }
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-primary); min-width: 0; }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-quaternary); margin: 0 1px; }
-.header-actions :deep(.el-button) { --el-button-border-radius: 10px; }
+.header-actions :deep(.el-button) { --el-button-border-radius: 8px; }
 
 /* Main body */
-.main-body { flex: 1; display: flex; overflow: hidden; padding: 18px 18px 0; gap: 0; min-height: 0; }
+.main-body { flex: 1; display: flex; overflow: hidden; gap: 0; min-height: 0; }
 
-/* Left panel */
+/* Left panel：统一 260px 宽度，仅用右侧分割线 */
 .left-panel {
-  width: 236px;
+  width: 260px;
+  min-width: 260px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  box-shadow: none;
 }
 .panel-title {
   padding: 12px 14px 6px;
@@ -1029,7 +1043,7 @@ watch(showRenameDialog, (v) => {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
-.db-title { border-top: 1px solid rgba(15, 23, 42, 0.08); margin-top: 6px; padding-top: 10px; }
+.db-title { border-top: 1px solid rgba(60, 40, 20, 0.08); margin-top: 6px; padding-top: 10px; }
 .conn-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
 .conn-item {
   display: grid;
@@ -1037,18 +1051,17 @@ watch(showRenameDialog, (v) => {
   align-items: center;
   column-gap: 8px;
   row-gap: 2px;
-  padding: 9px 10px;
-  border-radius: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
   transition: all var(--transition-fast);
   border: 1px solid transparent;
 }
-.conn-item:hover { background: rgba(255, 255, 255, 0.58); }
+.conn-item:hover { background: rgba(60, 40, 20, 0.04); }
 .conn-item.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  border-color: rgba(10,132,255,0.14);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  background: rgba(47, 111, 228, 0.08);
+  border-color: rgba(47, 111, 228, 0.18);
 }
 .conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-quaternary); grid-row: span 2; align-self: start; margin-top: 4px; }
 .conn-dot.connected { background: var(--color-green, #67c23a); box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
@@ -1059,7 +1072,7 @@ watch(showRenameDialog, (v) => {
   padding: 24px 12px;
   font-size: 12px;
   color: var(--text-quaternary);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   background: rgba(255,255,255,0.52);
 }
@@ -1072,10 +1085,10 @@ watch(showRenameDialog, (v) => {
   cursor: pointer;
   color: var(--text-secondary);
   transition: all var(--transition-fast);
-  background: rgba(15, 23, 42, 0.04);
+  background: rgba(60, 40, 20, 0.04);
 }
-.db-item:hover { background: rgba(15, 23, 42, 0.08); color: var(--text-primary); }
-.db-item.active { background: var(--accent-blue); color: #fff; box-shadow: 0 6px 16px rgba(10,132,255,0.2); }
+.db-item:hover { background: rgba(60, 40, 20, 0.08); color: var(--text-primary); }
+.db-item.active { background: var(--accent-blue); color: #fff; box-shadow: 0 6px 16px rgba(194, 65, 12,0.2); }
 
 /* Right area */
 .right-area {
@@ -1084,10 +1097,10 @@ watch(showRenameDialog, (v) => {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 .empty-right {
   align-items: center;
@@ -1106,8 +1119,8 @@ watch(showRenameDialog, (v) => {
 .tab-bar {
   display: flex;
   gap: 0;
-  background: rgba(255,255,255,0.66);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
   padding: 0 14px;
 }
@@ -1131,12 +1144,12 @@ watch(showRenameDialog, (v) => {
 .key-browser { flex: 1; display: flex; overflow: hidden; min-height: 0; }
 
 .key-list-panel {
-  width: 308px;
+  width: 260px;
   flex-shrink: 0;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  border-right: 1px solid rgba(60, 40, 20, 0.1);
   display: flex;
   flex-direction: column;
-  background: rgba(248, 250, 252, 0.72);
+  background: transparent;
 }
 .key-search { display: flex; gap: 8px; padding: 12px; }
 .key-search :deep(.el-button) { --el-button-border-radius: 10px; }
@@ -1158,7 +1171,7 @@ watch(showRenameDialog, (v) => {
   justify-content: center;
   gap: 8px;
   padding: 20px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   background: rgba(255,255,255,0.56);
 }
@@ -1167,7 +1180,7 @@ watch(showRenameDialog, (v) => {
   padding: 8px 12px;
   font-size: 11px;
   color: var(--text-tertiary);
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1183,12 +1196,12 @@ watch(showRenameDialog, (v) => {
   background: transparent;
   min-height: 0;
 }
-.key-detail-empty { align-items: center; justify-content: center; gap: 12px; color: var(--text-quaternary); margin: 18px; border: 1px dashed rgba(15, 23, 42, 0.08); border-radius: 18px; background: rgba(255,255,255,0.48); }
+.key-detail-empty { align-items: center; justify-content: center; gap: 12px; color: var(--text-quaternary); margin: 18px; border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 18px; background: rgba(255,255,255,0.48); }
 .key-detail-empty p { margin: 0; }
 
 .detail-header {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
   background: rgba(255,255,255,0.62);
 }
@@ -1240,8 +1253,8 @@ watch(showRenameDialog, (v) => {
   margin: 0;
   padding: 14px;
   border-radius: 14px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(60, 40, 20, 0.04);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   font-family: 'Cascadia Code', Consolas, monospace;
   font-size: 12px;
   white-space: pre-wrap;
@@ -1282,8 +1295,8 @@ watch(showRenameDialog, (v) => {
   padding: 16px;
   border-radius: 16px;
   background: rgba(255,255,255,0.7);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 8px 24px rgba(15,23,42,0.04);
+  border: 1px solid rgba(60, 40, 20, 0.08);
+  box-shadow: 0 8px 24px rgba(60, 40, 20,0.04);
 }
 .info-card-title { font-size: 11px; color: var(--text-tertiary); font-weight: 600; text-transform: uppercase; }
 .info-card-value { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-top: 6px; font-variant-numeric: tabular-nums; }
@@ -1299,7 +1312,7 @@ watch(showRenameDialog, (v) => {
   color: var(--text-quaternary);
   font-size: 14px;
   margin: 12px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 16px;
   background: rgba(255,255,255,0.56);
 }
@@ -1312,7 +1325,7 @@ watch(showRenameDialog, (v) => {
   padding: 0 16px;
   margin: 0 18px 18px 254px;
   background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px;
   color: var(--text-tertiary);
@@ -1329,15 +1342,15 @@ watch(showRenameDialog, (v) => {
   position: fixed;
   z-index: 9999;
   background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 12px;
-  box-shadow: 0 10px 28px rgba(15,23,42,0.14);
+  box-shadow: 0 10px 28px rgba(60, 40, 20,0.14);
   padding: 4px 0;
   min-width: 150px;
   backdrop-filter: blur(16px);
 }
 .ctx-item { padding: 7px 16px; font-size: 13px; color: var(--text-primary); cursor: pointer; }
-.ctx-item:hover { background: rgba(15, 23, 42, 0.05); }
+.ctx-item:hover { background: rgba(60, 40, 20, 0.05); }
 .ctx-danger { color: var(--color-red, #f56c6c); }
 
 .conn-list::-webkit-scrollbar,
@@ -1352,7 +1365,7 @@ watch(showRenameDialog, (v) => {
 .cli-output::-webkit-scrollbar-thumb { background: var(--text-quaternary); border-radius: 3px; }
 
 @media (max-width: 1180px) {
-  .main-body { padding: 14px 14px 0; }
+  .main-body { padding: 0; }
   .left-panel { width: 220px; }
   .key-list-panel { width: 260px; }
   .status-bar { margin: 0 14px 14px 234px; }
@@ -1362,7 +1375,7 @@ watch(showRenameDialog, (v) => {
   .main-body { flex-direction: column; gap: 14px; padding-bottom: 14px; }
   .left-panel {
     width: 100%;
-    border-right: 1px solid rgba(15, 23, 42, 0.08);
+    border-right: 1px solid rgba(60, 40, 20, 0.08);
     border-radius: 18px;
     max-height: 240px;
   }
@@ -1373,10 +1386,10 @@ watch(showRenameDialog, (v) => {
   .key-list-panel {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+    border-bottom: 1px solid rgba(60, 40, 20, 0.08);
     max-height: 280px;
   }
-  .status-bar { margin: 0 14px 14px; border-top: 1px solid rgba(15, 23, 42, 0.08); border-radius: 18px; }
+  .status-bar { margin: 0 14px 14px; border-top: 1px solid rgba(60, 40, 20, 0.08); border-radius: 18px; }
 }
 
 @media (max-width: 720px) {

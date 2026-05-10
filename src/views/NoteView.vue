@@ -423,7 +423,7 @@
 
 <script setup>
 import {ref, computed, onMounted, onBeforeUnmount, nextTick, watch, defineAsyncComponent} from 'vue'
-import { onBeforeRouteLeave } from 'vue-router'
+import { onBeforeRouteLeave, useRoute } from 'vue-router'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import { t } from '@/i18n'
 import {Check, Edit, Close, Clock, Delete, ArrowLeft, ArrowRight, RefreshLeft, View, Loading, DocumentAdd, Upload, Document, Tickets, Plus, Folder} from '@element-plus/icons-vue'
@@ -510,8 +510,7 @@ const onUploadImg = async (files, callback) => {
     const urls = []
 
     // 确保 images 文件夹存在
-    const appDir = await appDataDir()
-    const notesDir = await join(appDir, 'notes')
+    const notesDir = await getConfiguredNotesDir()
     const imagesDir = await join(notesDir, 'images')
 
     // 创建 images 文件夹（如果不存在）
@@ -617,6 +616,9 @@ onMounted(async () => {
   await loadNotesTree()
   await loadRecentFiles()
 
+  // 来自工作台等位置的深链:?path=<abs> 直接打开,?note=<name> 走兼容查找
+  await openFromRouteQuery()
+
   // 监听页面关闭事件，自动保存
   window.addEventListener('beforeunload', handleBeforeUnload)
 
@@ -668,6 +670,11 @@ onBeforeUnmount(async () => {
   window.removeEventListener('notes-path-changed', handleNotesPathChanged)
   document.removeEventListener('mousemove', doResize)
   document.removeEventListener('mouseup', stopResize)
+
+  // 清理 Tauri 拖拽监听器(每次 setupFileDrop 注册 3 个,反复进入这个视图会累积导致一次拖拽触发多套逻辑)
+  while (fileDropUnlisteners.length) {
+    try { fileDropUnlisteners.pop()?.() } catch {}
+  }
 
   if (selectedFile.value && isEditing.value) {
     await autoSaveCurrentFile()
@@ -876,12 +883,75 @@ const getSubFolders = (folder) => {
   return notesTree.value.folders.filter(f => f.parent === folderKey)
 }
 
+const getConfiguredNotesDir = async () => {
+  const { getNotesDir } = await import('@/utils/notes')
+  return await getNotesDir()
+}
+
+const route = useRoute()
+
+// 工作台等地方深链跳转过来:?path=<abs> 直接打开;?note=<name> 兜底按文件名找。
+// 必须在 loadNotesTree() 之后调用,因为 expandToFile 依赖文件夹树已建好。
+const openFromRouteQuery = async () => {
+  const path = route.query.path
+  const note = route.query.note
+  if (!path && !note) return
+
+  try {
+    let targetFile = null
+
+    if (path) {
+      const sep = path.includes('\\') ? '\\' : '/'
+      const baseName = path.split(sep).pop() || ''
+      const dot = baseName.lastIndexOf('.')
+      const noteName = dot > 0 ? baseName.slice(0, dot) : baseName
+      const ext = dot > 0 ? baseName.slice(dot + 1).toLowerCase() : 'md'
+      const folder = path.substring(0, path.lastIndexOf(sep))
+      const folderName = folder.split(sep).pop() || ''
+      targetFile = {
+        name: noteName,
+        path,
+        extension: ext,
+        type: 'file',
+        folder: folderName,
+      }
+    } else if (note) {
+      // 在所有已加载文件夹缓存里按名找;找不到再递归遍历 rootFolders
+      const flatten = []
+      for (const f of notesTree.value.folders) {
+        const files = folderFilesCache.value.get(getFolderKey(f)) || []
+        flatten.push(...files)
+      }
+      targetFile = flatten.find(f => f.name === note || `${f.name}.${f.extension}` === note)
+      if (!targetFile) {
+        for (const f of rootFolders.value) {
+          await loadFolderFiles(f)
+          const files = folderFilesCache.value.get(getFolderKey(f)) || []
+          targetFile = files.find(file => file.name === note)
+          if (targetFile) break
+        }
+      }
+    }
+
+    if (targetFile?.path) {
+      await openFile(targetFile, false)
+    }
+  } catch { /* ignore */ }
+}
+
+const getNoteVersionKey = async (file = selectedFile.value) => {
+  if (!file?.path) return file?.name || ''
+  const notesDir = (await getConfiguredNotesDir()).replace(/\\/g, '/')
+  const filePath = file.path.replace(/\\/g, '/')
+  const prefix = notesDir.endsWith('/') ? notesDir : `${notesDir}/`
+  return filePath.startsWith(prefix) ? filePath.slice(prefix.length) : getFileNameWithExt(file)
+}
+
 // 加载笔记树
 const loadNotesTree = async () => {
   try {
     // 使用 getNotesDir() 获取配置的笔记路径
-    const { getNotesDir } = await import('@/utils/notes')
-    const notesDir = await getNotesDir()
+    const notesDir = await getConfiguredNotesDir()
 
     if (!(await exists(notesDir))) {
       await mkdir(notesDir, {recursive: true})
@@ -893,7 +963,8 @@ const loadNotesTree = async () => {
     if (result.directories && Array.isArray(result.directories)) {
       for (const dir of result.directories) {
         // 过滤掉 images 文件夹（系统文件夹）
-        if (dir.name === 'images' || dir.name.startsWith('_')) {
+        // 过滤掉 images / ebooks 等系统目录(ebooks 由 ebookManager 写到 notes/ebooks 下,不属于文档中心)
+        if (dir.name === 'images' || dir.name === 'ebooks' || dir.name.startsWith('_')) {
           continue
         }
         folders.push({
@@ -928,7 +999,8 @@ const loadFolderFiles = async (folder) => {
       const parentKey = getFolderKey(folder)
       for (const dir of result.directories) {
         // 过滤掉 images 文件夹（系统文件夹）
-        if (dir.name === 'images' || dir.name.startsWith('_')) {
+        // 过滤掉 images / ebooks 等系统目录(ebooks 由 ebookManager 写到 notes/ebooks 下,不属于文档中心)
+        if (dir.name === 'images' || dir.name === 'ebooks' || dir.name.startsWith('_')) {
           continue
         }
         const subFolderPath = dir.path || await join(folder.path, dir.name)
@@ -1086,8 +1158,7 @@ const confirmCreateFolder = async () => {
   }
 
   try {
-    const appDir = await appDataDir()
-    const notesDir = await join(appDir, 'notes')
+    const notesDir = await getConfiguredNotesDir()
 
     let parentPath = notesDir
     let parentKey = null
@@ -1298,6 +1369,14 @@ const confirmRenameFolder = async (folder) => {
     // 执行重命名
     await rename(oldPath, newPath)
 
+    // 同步迁移该文件夹下所有版本 key
+    try {
+      const notesRoot = (await getConfiguredNotesDir()).replace(/\\/g, '/')
+      const oldPrefix = oldPath.replace(/\\/g, '/').replace(`${notesRoot}/`, '')
+      const newPrefix = newPath.replace(/\\/g, '/').replace(`${notesRoot}/`, '')
+      await versionAPI.renameNoteVersionPrefix(oldPrefix, newPrefix)
+    } catch { /* ignore */ }
+
     // 更新文件夹对象
     folder.name = renamingFolderName.value.trim()
     folder.path = newPath
@@ -1357,6 +1436,17 @@ const deleteFolder = async (folder) => {
     })
 
     await remove(folder.path, {recursive: true})
+
+    // 文件夹连同里面的笔记一起没了,清理这些笔记的版本历史(按相对路径前缀匹配)
+    try {
+      const notesRoot = (await getConfiguredNotesDir()).replace(/\\/g, '/')
+      const prefix = folder.path.replace(/\\/g, '/').replace(`${notesRoot}/`, '')
+      const db = await (await import('@tauri-apps/plugin-sql')).default.load('sqlite:productivity.db')
+      await db.execute(
+        `DELETE FROM note_versions WHERE note_name LIKE ? || '%'`,
+        [prefix + '/']
+      )
+    } catch { /* ignore */ }
 
     notesTree.value.folders = notesTree.value.folders.filter(f => f.path !== folder.path)
 
@@ -1654,12 +1744,21 @@ const confirmEditFileName = async () => {
       return
     }
 
+    // 重命名前先记下旧版本 key,改完路径后立即迁移版本历史
+    const oldVersionKey = await getNoteVersionKey(selectedFile.value)
+
     // 重命名文件
     await rename(oldPath, newPath)
 
     // 更新文件对象
     selectedFile.value.name = newName
     selectedFile.value.path = newPath
+
+    // 同步迁移版本历史 key,避免改名后版本"断掉"
+    try {
+      const newVersionKey = await getNoteVersionKey(selectedFile.value)
+      await versionAPI.renameNoteVersionKey(oldVersionKey, newVersionKey)
+    } catch { /* ignore */ }
 
     // 找到文件所在的文件夹并重新加载
     const folder = notesTree.value.folders.find(f => f.path === folderPath)
@@ -1698,7 +1797,10 @@ const deleteCurrentNote = async () => {
     })
 
     const filePath = selectedFile.value.path
+    const versionKeyToDrop = await getNoteVersionKey(selectedFile.value)
     await remove(filePath)
+    // 文件没了,版本历史一并清理
+    try { await versionAPI.deleteNoteVersionsByKey(versionKeyToDrop) } catch { /* ignore */ }
 
     // 从文件路径中找到所属的文件夹
     const separator = filePath.includes('\\') ? '\\' : '/'
@@ -1769,7 +1871,8 @@ const saveNote = async () => {
 
       // 保存版本历史（MD 和 TXT 文件）
       try {
-        await versionAPI.saveNoteVersion(selectedFile.value.name, contentToSave, t('notes.manualSave'))
+        const versionKey = await getNoteVersionKey()
+        await versionAPI.saveNoteVersion(versionKey, contentToSave, t('notes.manualSave'))
       } catch (e) { /* ignore */ }
     } else if (ext === 'xlsx') {
       // 保存Excel文件
@@ -1976,8 +2079,9 @@ const saveWordFile = async () => {
     // 获取编辑器内容
     const htmlContent = wordEditorRef.value.getContent()
 
-    // 将 HTML 转换为 docx 段落
-    const paragraphs = htmlToDocxParagraphs(htmlContent)
+    // 将 HTML 转换为 docx 段落(原先用 require('docx') 在 Vite/webview 里没有 require,
+    // 直接 ReferenceError;现在把 docx 类作参数传进去,跟外层动态 import 共用一份)
+    const paragraphs = htmlToDocxParagraphs(htmlContent, { Paragraph, TextRun, HeadingLevel })
 
     // 创建文档
     const doc = new Document({
@@ -2001,8 +2105,8 @@ const saveWordFile = async () => {
 }
 
 // 将 HTML 转换为 docx 段落（简化版）
-const htmlToDocxParagraphs = (html) => {
-  const { Paragraph, TextRun, HeadingLevel } = require('docx')
+// docx 类由调用方注入,避免 require('docx') 在 ESM 环境里直接 ReferenceError。
+const htmlToDocxParagraphs = (html, { Paragraph, TextRun, HeadingLevel }) => {
   const paragraphs = []
 
   // 移除 HTML 标签并按行分割
@@ -2056,7 +2160,8 @@ const showVersionHistory = async () => {
   }
 
   try {
-    noteVersions.value = await versionAPI.getNoteVersions(selectedFile.value.name)
+    const versionKey = await getNoteVersionKey()
+    noteVersions.value = await versionAPI.getNoteVersions(versionKey)
     showVersionDialog.value = true
   } catch (error) {
 
@@ -2074,7 +2179,8 @@ const restoreVersion = async (version) => {
     )
 
     // 获取版本内容
-    const content = await versionAPI.getVersionContent(selectedFile.value.name, version.version_number)
+    const versionKey = await getNoteVersionKey()
+    const content = await versionAPI.getVersionContent(versionKey, version.version_number)
 
     // 直接替换当前编辑器的内容
     noteContent.value = content
@@ -2084,7 +2190,7 @@ const restoreVersion = async (version) => {
 
     // 保存为新版本（作为恢复记录）
     await versionAPI.saveNoteVersion(
-      selectedFile.value.name,
+      versionKey,
       content,
       `恢复到版本 ${version.version_number}`
     )
@@ -2369,6 +2475,10 @@ const confirmFolderSelect = async () => {
 }
 
 // 设置文件拖拽监听
+// 收集 listen() 返回的 unlisten,组件卸载时清理。
+// 否则每次进入这个视图都会向当前窗口堆叠 3 个 drag-over/leave/drop 监听,
+// 多次切回 NoteView 后,一次拖拽会触发多套处理逻辑(用闭包里的过期 state)。
+const fileDropUnlisteners = []
 const setupFileDrop = async () => {
   try {
     const { listen } = await import('@tauri-apps/api/event')
@@ -2382,7 +2492,7 @@ const setupFileDrop = async () => {
     let currentHighlightElement = null // 缓存当前高亮的元素
 
     // 监听 Tauri 拖拽悬浮事件
-    await listen('tauri://drag-over', async (event) => {
+    fileDropUnlisteners.push(await listen('tauri://drag-over', async (event) => {
       isDragging = true
       const position = event.payload?.position
       if (!position) return
@@ -2463,10 +2573,10 @@ const setupFileDrop = async () => {
           hoverTimer = null
         }
       }
-    })
+    }))
 
     // 监听拖拽离开
-    await listen('tauri://drag-leave', async () => {
+    fileDropUnlisteners.push(await listen('tauri://drag-leave', async () => {
       isDragging = false
       dropTargetFolder = null
       lastHoverFolder = null
@@ -2479,10 +2589,10 @@ const setupFileDrop = async () => {
         currentHighlightElement.classList.remove('drop-target')
         currentHighlightElement = null
       }
-    })
+    }))
 
     // 监听文件拖拽释放事件
-    await listen('tauri://drag-drop', async (event) => {
+    fileDropUnlisteners.push(await listen('tauri://drag-drop', async (event) => {
       isDragging = false
 
       // 清除计时器
@@ -2535,7 +2645,7 @@ const setupFileDrop = async () => {
 
       // 显示文件夹选择对话框
       showFolderSelectDialog.value = true
-    })
+    }))
   } catch (e) { /* ignore */ }
 }
 
@@ -2656,6 +2766,14 @@ const moveFolder = async (sourceFolder, targetFolder) => {
     // 执行移动（重命名）
     await rename(sourcePath, newPath)
 
+    // 同步迁移该文件夹下所有版本 key
+    try {
+      const notesRoot = (await getConfiguredNotesDir()).replace(/\\/g, '/')
+      const oldPrefix = sourcePath.replace(/\\/g, '/').replace(`${notesRoot}/`, '')
+      const newPrefix = newPath.replace(/\\/g, '/').replace(`${notesRoot}/`, '')
+      await versionAPI.renameNoteVersionPrefix(oldPrefix, newPrefix)
+    } catch { /* ignore */ }
+
     // 更新文件夹对象
     const oldFolderKey = getFolderKey(sourceFolder)
     const oldParent = sourceFolder.parent
@@ -2730,8 +2848,18 @@ const moveFile = async (sourceFile, targetFolder) => {
       return
     }
 
+    // 移动前先记下旧版本 key
+    const oldVersionKey = await getNoteVersionKey(sourceFile)
+
     // 执行移动
     await rename(sourcePath, newPath)
+
+    // 同步迁移版本历史 key
+    try {
+      const movedFile = { ...sourceFile, path: newPath }
+      const newVersionKey = await getNoteVersionKey(movedFile)
+      await versionAPI.renameNoteVersionKey(oldVersionKey, newVersionKey)
+    } catch { /* ignore */ }
 
     // 找到源文件所在的文件夹
     const separator = sourcePath.includes('\\') ? '\\' : '/'
@@ -2885,7 +3013,8 @@ const handleImportFile = async (event) => {
 // 对比版本
 const compareWithVersion = async (version) => {
   try {
-    const content = await versionAPI.getVersionContent(selectedFile.value.name, version.version_number)
+    const versionKey = await getNoteVersionKey()
+    const content = await versionAPI.getVersionContent(versionKey, version.version_number)
     compareVersion.value = version
     compareContent.value = content
     showCompareDialog.value = true
@@ -2916,8 +3045,9 @@ const restoreCompareVersion = async () => {
     await writeTextFile(selectedFile.value.path, content)
 
     // 保存为新版本（作为恢复记录）
+    const versionKey = await getNoteVersionKey()
     await versionAPI.saveNoteVersion(
-      selectedFile.value.name,
+      versionKey,
       content,
       `恢复到版本 ${compareVersion.value.version_number}`
     )
@@ -2944,8 +3074,9 @@ const autoSaveCurrentFile = async () => {
 
       // 保存到版本历史
       try {
+        const versionKey = await getNoteVersionKey()
         await versionAPI.saveNoteVersion(
-          selectedFile.value.name,
+          versionKey,
           noteContent.value,
           '自动保存'
         )
@@ -3119,7 +3250,7 @@ const formatFileTime = (time) => {
 .header {
   min-height: 58px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3140,7 +3271,7 @@ const formatFileTime = (time) => {
 }
 
 .sidebar-toggle-btn {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(242,246,251,0.92));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
 }
@@ -3186,7 +3317,7 @@ const formatFileTime = (time) => {
   gap: 8px;
   padding: 6px 12px;
   background: rgba(255,255,255,0.74);
-  border: 1px solid rgba(15,23,42,0.06);
+  border: 1px solid rgba(60, 40, 20,0.06);
   border-radius: 999px;
   margin-right: 12px;
 }
@@ -3201,7 +3332,7 @@ const formatFileTime = (time) => {
   padding: 6px 12px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
-  background: white;
+  background: var(--bg-primary);
   cursor: pointer;
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -3248,8 +3379,8 @@ const formatFileTime = (time) => {
   min-width: 260px;
   max-width: 600px;
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(248,250,252,0.94), rgba(241,245,249,0.98));
-  border: 1px solid rgba(15,23,42,0.08);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 96%, var(--accent-warm-soft) 4%), var(--bg-secondary));
+  border: 1px solid var(--divider);
   border-right: none;
   display: flex;
   flex-direction: column;
@@ -3272,16 +3403,16 @@ const formatFileTime = (time) => {
 }
 
 .resize-handle:hover {
-  background-color: #60a5fa;
+  background-color: var(--accent-blue);
 }
 
 .resize-handle.resizing {
-  background-color: #3b82f6;
+  background-color: var(--accent-blue-hover);
 }
 
 .sidebar-toolbar {
   padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(15,23,42,0.06);
+  border-bottom: 1px solid rgba(60, 40, 20,0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -3343,8 +3474,8 @@ const formatFileTime = (time) => {
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
   color: var(--accent-color);
   font-weight: 600;
-  border-color: rgba(10,132,255,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  border-color: rgba(194, 65, 12,0.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
 .tree-info {
@@ -3450,7 +3581,7 @@ const formatFileTime = (time) => {
   border-radius: 4px;
   font-size: 0.85rem;
   outline: none;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .new-folder-input:focus {
@@ -3466,7 +3597,7 @@ const formatFileTime = (time) => {
   border-radius: 3px;
   font-size: 0.85rem;
   outline: none;
-  background: white;
+  background: var(--bg-primary);
   min-width: 80px;
 }
 
@@ -3483,7 +3614,7 @@ const formatFileTime = (time) => {
   border-radius: 3px;
   font-size: 0.85rem;
   outline: none;
-  background: white;
+  background: var(--bg-primary);
   min-width: 100px;
 }
 
@@ -3503,14 +3634,14 @@ const formatFileTime = (time) => {
 /* ignore */
 .content-area {
   flex: 1;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
   min-width: 0;
   z-index: 0;
-  border: 1px solid rgba(15,23,42,0.08);
+  border: 1px solid var(--divider);
   border-radius: 0 18px 18px 0;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
@@ -3568,7 +3699,7 @@ const formatFileTime = (time) => {
   align-items: center;
   padding: 0 20px;
   gap: 15px;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 .toolbar-group {
@@ -3664,7 +3795,7 @@ const formatFileTime = (time) => {
   overflow-y: auto;
   overflow-x: auto;
   padding: 40px 60px;
-  background: #fff;
+  background: var(--bg-primary);
   min-height: 0;
 }
 
@@ -3719,7 +3850,7 @@ const formatFileTime = (time) => {
   flex: 1;
   overflow: auto;
   padding: 40px 60px;
-  background: #fff;
+  background: var(--bg-primary);
   min-height: 0;
 }
 
@@ -3739,7 +3870,7 @@ const formatFileTime = (time) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 /* ignore */
@@ -3749,7 +3880,7 @@ const formatFileTime = (time) => {
   align-items: center;
   justify-content: center;
   padding: 60px 40px;
-  background: #ffffff;
+  background: var(--bg-primary);
   overflow-y: auto;
 }
 
@@ -3989,7 +4120,7 @@ const formatFileTime = (time) => {
   flex: 1;
   overflow: auto;
   padding: 16px;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 .compare-content pre {

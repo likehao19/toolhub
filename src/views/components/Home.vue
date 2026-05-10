@@ -197,7 +197,7 @@ const scrollToCategory = (categoryName) => {
 <style scoped>
 .home-page {
   min-height: 100%;
-  background: #ffffff;
+  background: var(--surface-page);
   padding: 0;
 }
 

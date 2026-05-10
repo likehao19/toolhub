@@ -52,6 +52,28 @@
               {{ algo.label }}
             </el-radio-button>
           </el-radio-group>
+
+          <!-- 算法说明:点击感叹号弹出气泡(原右侧 info-panel 被合并到这里) -->
+          <el-popover
+            placement="bottom-end"
+            :width="320"
+            trigger="click"
+            popper-class="crypto-info-popover"
+          >
+            <template #reference>
+              <button class="info-trigger" type="button" :title="currentAlgoInfo.label">!</button>
+            </template>
+            <div class="info-pop">
+              <div class="info-pop-title">{{ currentAlgoInfo.label }}</div>
+              <div v-if="currentAlgoInfo.desc" class="info-pop-desc">{{ currentAlgoInfo.desc }}</div>
+              <div v-if="currentAlgoInfo.props && currentAlgoInfo.props.length" class="info-pop-props">
+                <div v-for="p in currentAlgoInfo.props" :key="p.label" class="info-pop-prop">
+                  <span class="prop-label">{{ p.label }}:</span>
+                  <span class="prop-value">{{ p.value }}</span>
+                </div>
+              </div>
+            </div>
+          </el-popover>
         </div>
 
         <!-- 参数栏（部分算法需要key/iv等） -->
@@ -118,7 +140,7 @@
             class="rsa-key-input"
           />
           <el-button size="small" type="primary" @click="generateRSAKeyPair">
-            {{ t('cryptoTool.generateKeyPair') }}
+            <el-icon style="margin-right: 6px;"><Key /></el-icon>{{ t('cryptoTool.generateKeyPair') }}
           </el-button>
         </div>
 
@@ -149,14 +171,14 @@
               @click="doEncrypt"
               :disabled="!inputText.trim()"
             >
-              {{ encryptLabel }} ↓
+              <el-icon style="margin-right: 6px;"><Lock /></el-icon>{{ encryptLabel }}
             </el-button>
             <el-button
               v-if="canDecrypt"
               @click="doDecrypt"
               :disabled="!inputText.trim()"
             >
-              {{ decryptLabel }} ↓
+              <el-icon style="margin-right: 6px;"><Unlock /></el-icon>{{ decryptLabel }}
             </el-button>
             <el-button
               v-if="isHashOnly"
@@ -164,7 +186,7 @@
               @click="doEncrypt"
               :disabled="!inputText.trim()"
             >
-              {{ t('cryptoTool.calculate') }} ↓
+              <el-icon style="margin-right: 6px;"><MagicStick /></el-icon>{{ t('cryptoTool.calculate') }}
             </el-button>
           </div>
 
@@ -201,7 +223,7 @@
                 class="verify-input"
               />
               <el-button size="small" type="primary" @click="doVerifyHash" :disabled="!outputText || !verifyHash.trim()">
-                {{ t('cryptoTool.verify') }}
+                <el-icon style="margin-right: 6px;"><Check /></el-icon>{{ t('cryptoTool.verify') }}
               </el-button>
             </div>
             <div v-if="verifyResult !== null" class="verify-result" :class="verifyResult ? 'match' : 'mismatch'">
@@ -222,12 +244,12 @@
                 class="verify-input"
               />
               <el-button size="small" type="warning" @click="doRainbowLookup" :loading="rainbowLoading" :disabled="!rainbowInput.trim()">
-                {{ t('cryptoTool.lookup') }}
+                <el-icon style="margin-right: 6px;"><Search /></el-icon>{{ t('cryptoTool.lookup') }}
               </el-button>
             </div>
             <div v-if="rainbowResult !== null" class="rainbow-result">
               <template v-if="rainbowResult">
-                <span class="rainbow-found">{{ t('cryptoTool.plaintext') }}：<code>{{ rainbowResult }}</code></span>
+                <span class="rainbow-found">{{ t('cryptoTool.plaintext') }}: <code>{{ rainbowResult }}</code></span>
               </template>
               <template v-else>
                 <span class="rainbow-notfound">{{ t('cryptoTool.notFound') }}</span>
@@ -242,18 +264,6 @@
           <el-alert :title="errorMsg" type="error" show-icon :closable="false" />
         </div>
       </div>
-
-      <!-- 右侧说明 -->
-      <div class="info-panel">
-        <div class="info-title">{{ currentAlgoInfo.label }}</div>
-        <div class="info-desc">{{ currentAlgoInfo.desc }}</div>
-        <div class="info-props" v-if="currentAlgoInfo.props">
-          <div v-for="(v, k) in currentAlgoInfo.props" :key="k" class="info-prop">
-            <span class="prop-label">{{ k }}:</span>
-            <span class="prop-value">{{ v }}</span>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -261,7 +271,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Lock, Delete, Sort, DocumentCopy, CopyDocument, CircleCheckFilled, CircleCloseFilled } from '@element-plus/icons-vue'
+import { Lock, Unlock, Delete, Sort, DocumentCopy, CopyDocument, CircleCheckFilled, CircleCloseFilled, Key, MagicStick, Check, Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
 import CryptoJS from 'crypto-js'
@@ -280,46 +290,46 @@ const categories = [
 
 const algoMap = {
   hash: [
-    { key: 'md5', label: 'MD5', hashOnly: true, desc: 'MD5 消息摘要算法，输出 128 位哈希值。已不推荐用于安全场景，但常用于文件校验。', props: { '输出长度': '128 bit / 32 hex', '类型': '哈希（不可逆）', '安全性': '已被攻破，仅用于校验' } },
-    { key: 'sha1', label: 'SHA-1', hashOnly: true, desc: 'SHA-1 安全哈希算法，输出 160 位哈希值。已被证明不安全。', props: { '输出长度': '160 bit / 40 hex', '类型': '哈希（不可逆）', '安全性': '已不推荐' } },
-    { key: 'sha224', label: 'SHA-224', hashOnly: true, desc: 'SHA-2 家族成员，输出 224 位。', props: { '输出长度': '224 bit / 56 hex', '类型': '哈希（不可逆）' } },
-    { key: 'sha256', label: 'SHA-256', hashOnly: true, desc: 'SHA-2 家族中最常用的算法，广泛用于区块链、TLS 等。', props: { '输出长度': '256 bit / 64 hex', '类型': '哈希（不可逆）', '安全性': '安全' } },
-    { key: 'sha384', label: 'SHA-384', hashOnly: true, desc: 'SHA-2 家族成员，输出 384 位。', props: { '输出长度': '384 bit / 96 hex', '类型': '哈希（不可逆）' } },
-    { key: 'sha512', label: 'SHA-512', hashOnly: true, desc: 'SHA-2 家族最强版本，输出 512 位。', props: { '输出长度': '512 bit / 128 hex', '类型': '哈希（不可逆）', '安全性': '非常安全' } },
-    { key: 'sha3_256', label: 'SHA3-256', hashOnly: true, desc: 'SHA-3（Keccak）标准，第三代安全哈希。', props: { '输出长度': '256 bit', '类型': '哈希（不可逆）', '安全性': '最新标准' } },
-    { key: 'sha3_512', label: 'SHA3-512', hashOnly: true, desc: 'SHA-3 512 位版本。', props: { '输出长度': '512 bit', '类型': '哈希（不可逆）' } },
-    { key: 'ripemd160', label: 'RIPEMD-160', hashOnly: true, desc: 'RACE Integrity Primitives 哈希，比特币地址生成中使用。', props: { '输出长度': '160 bit / 40 hex', '类型': '哈希（不可逆）' } },
-    { key: 'hmac_md5', label: 'HMAC-MD5', hashOnly: true, needsKey: true, desc: '带密钥的 MD5 消息认证码。', props: { '类型': 'HMAC（需要密钥）', '输出': '128 bit' } },
-    { key: 'hmac_sha256', label: 'HMAC-SHA256', hashOnly: true, needsKey: true, desc: '带密钥的 SHA-256 消息认证码，常用于 API 签名。', props: { '类型': 'HMAC（需要密钥）', '输出': '256 bit', '安全性': '安全' } },
-    { key: 'hmac_sha512', label: 'HMAC-SHA512', hashOnly: true, needsKey: true, desc: '带密钥的 SHA-512 消息认证码。', props: { '类型': 'HMAC（需要密钥）', '输出': '512 bit' } },
+    { key: 'md5', label: 'MD5', hashOnly: true },
+    { key: 'sha1', label: 'SHA-1', hashOnly: true },
+    { key: 'sha224', label: 'SHA-224', hashOnly: true },
+    { key: 'sha256', label: 'SHA-256', hashOnly: true },
+    { key: 'sha384', label: 'SHA-384', hashOnly: true },
+    { key: 'sha512', label: 'SHA-512', hashOnly: true },
+    { key: 'sha3_256', label: 'SHA3-256', hashOnly: true },
+    { key: 'sha3_512', label: 'SHA3-512', hashOnly: true },
+    { key: 'ripemd160', label: 'RIPEMD-160', hashOnly: true },
+    { key: 'hmac_md5', label: 'HMAC-MD5', hashOnly: true, needsKey: true },
+    { key: 'hmac_sha256', label: 'HMAC-SHA256', hashOnly: true, needsKey: true },
+    { key: 'hmac_sha512', label: 'HMAC-SHA512', hashOnly: true, needsKey: true },
   ],
   symmetric: [
-    { key: 'aes', label: 'AES', needsKey: true, needsIV: true, showMode: true, showPadding: true, showKeySize: true, showOutputEncoding: true, desc: 'AES 高级加密标准，当今最广泛使用的对称加密算法。', props: { '密钥长度': '128/192/256 bit', '分组大小': '128 bit', '模式': 'CBC/ECB/CFB/OFB/CTR', '安全性': '非常安全' } },
-    { key: 'des', label: 'DES', needsKey: true, needsIV: true, showMode: true, showOutputEncoding: true, desc: 'DES 数据加密标准，已过时，密钥太短。', props: { '密钥长度': '56 bit', '分组大小': '64 bit', '安全性': '已不安全，仅作学习' } },
-    { key: 'tripledes', label: '3DES', needsKey: true, needsIV: true, showMode: true, showOutputEncoding: true, desc: 'Triple DES，三重 DES 加密，DES 的增强版。', props: { '密钥长度': '168 bit', '分组大小': '64 bit', '安全性': '较安全但慢' } },
-    { key: 'rabbit', label: 'Rabbit', needsKey: true, showOutputEncoding: true, desc: 'Rabbit 流密码，高性能流加密算法。', props: { '类型': '流密码', '密钥长度': '128 bit', '速度': '非常快' } },
-    { key: 'rc4', label: 'RC4', needsKey: true, showOutputEncoding: true, desc: 'RC4 流密码，曾广泛用于 SSL/TLS 和 WEP，已被弃用。', props: { '类型': '流密码', '密钥长度': '可变', '安全性': '已不安全' } },
+    { key: 'aes', label: 'AES', needsKey: true, needsIV: true, showMode: true, showPadding: true, showKeySize: true, showOutputEncoding: true },
+    { key: 'des', label: 'DES', needsKey: true, needsIV: true, showMode: true, showOutputEncoding: true },
+    { key: 'tripledes', label: '3DES', needsKey: true, needsIV: true, showMode: true, showOutputEncoding: true },
+    { key: 'rabbit', label: 'Rabbit', needsKey: true, showOutputEncoding: true },
+    { key: 'rc4', label: 'RC4', needsKey: true, showOutputEncoding: true },
   ],
   asymmetric: [
-    { key: 'rsa', label: 'RSA', isRSA: true, desc: 'RSA 公钥密码算法，用于加密和数字签名。', props: { '密钥长度': '1024/2048/4096 bit', '类型': '非对称加密', '用途': '加密/签名/密钥交换', '安全性': '推荐 2048+ bit' } },
+    { key: 'rsa', label: 'RSA', isRSA: true },
   ],
   encoding: [
-    { key: 'base64', label: 'Base64', desc: 'Base64 编码，将二进制数据转换为 ASCII 字符串。', props: { '类型': '编码（非加密）', '用途': '数据传输/嵌入', '膨胀率': '约 33%' } },
-    { key: 'base32', label: 'Base32', desc: 'Base32 编码，使用 A-Z 和 2-7，不区分大小写。', props: { '类型': '编码', '字符集': 'A-Z, 2-7', '膨胀率': '约 60%' } },
-    { key: 'hex', label: 'Hex', desc: '十六进制编码，每个字节用两个十六进制字符表示。', props: { '类型': '编码', '字符集': '0-9, a-f', '膨胀率': '100%' } },
-    { key: 'url', label: 'URL Encode', desc: 'URL 编码（百分号编码），将特殊字符转换为 %XX 格式。', props: { '类型': '编码', '标准': 'RFC 3986', '用途': 'URL 参数' } },
-    { key: 'html', label: 'HTML Encode', desc: 'HTML 实体编码，防止 XSS 攻击和特殊字符显示问题。', props: { '类型': '编码', '用途': 'Web 安全', '示例': '< → &lt;' } },
-    { key: 'unicode', label: 'Unicode', desc: 'Unicode 转义编码，将字符转为 \\uXXXX 格式。', props: { '类型': '编码', '格式': '\\uXXXX', '用途': '国际化' } },
-    { key: 'utf8', label: 'UTF-8 Hex', desc: 'UTF-8 十六进制编码，显示字符的 UTF-8 字节序列。', props: { '类型': '编码', '用途': '查看字节' } },
-    { key: 'ascii', label: 'ASCII', desc: 'ASCII 码转换，字符与 ASCII 码值互转。', props: { '类型': '编码', '范围': '0-127' } },
-    { key: 'binary', label: 'Binary', desc: '二进制编码，将文本转为 0/1 二进制表示。', props: { '类型': '编码', '格式': '8位每字符' } },
-    { key: 'octal', label: 'Octal', desc: '八进制编码，将字符转为八进制表示。', props: { '类型': '编码', '格式': '\\NNN' } },
-    { key: 'morse', label: 'Morse', desc: '摩尔斯电码，经典的电报编码方式。', props: { '类型': '编码', '支持': 'A-Z, 0-9', '分隔': '空格/斜杠' } },
+    { key: 'base64', label: 'Base64' },
+    { key: 'base32', label: 'Base32' },
+    { key: 'hex', label: 'Hex' },
+    { key: 'url', label: 'URL Encode' },
+    { key: 'html', label: 'HTML Encode' },
+    { key: 'unicode', label: 'Unicode' },
+    { key: 'utf8', label: 'UTF-8 Hex' },
+    { key: 'ascii', label: 'ASCII' },
+    { key: 'binary', label: 'Binary' },
+    { key: 'octal', label: 'Octal' },
+    { key: 'morse', label: 'Morse' },
   ],
   other: [
-    { key: 'jwt', label: 'JWT Decode', hashOnly: true, desc: 'JWT (JSON Web Token) 解码器，解析 Header 和 Payload。', props: { '类型': '解码（不验证签名）', '格式': 'header.payload.signature', '标准': 'RFC 7519' } },
-    { key: 'bcrypt_gen', label: 'Bcrypt Gen', hashOnly: true, desc: '生成 Bcrypt 哈希，用于密码存储。（使用 JS 模拟的简化版）', props: { '类型': '密码哈希', '用途': '密码存储', '特点': '自带盐值' } },
-    { key: 'crc32', label: 'CRC32', hashOnly: true, desc: 'CRC32 循环冗余校验，常用于文件完整性检查。', props: { '输出': '32 bit', '类型': '校验和', '用途': '数据校验' } },
+    { key: 'jwt', label: 'JWT Decode', hashOnly: true },
+    { key: 'bcrypt_gen', label: 'Bcrypt Gen', hashOnly: true },
+    { key: 'crc32', label: 'CRC32', hashOnly: true },
   ],
 }
 
@@ -360,11 +370,17 @@ watch(activeCategory, (cat) => {
 
 const currentAlgos = computed(() => algoMap[activeCategory.value] || [])
 const currentAlgoConfig = computed(() => currentAlgos.value.find(a => a.key === activeAlgo.value) || {})
-const currentAlgoInfo = computed(() => ({
-  label: currentAlgoConfig.value.label || '',
-  desc: currentAlgoConfig.value.desc || '',
-  props: currentAlgoConfig.value.props || null,
-}))
+const currentAlgoInfo = computed(() => {
+  const algoKey = activeAlgo.value
+  const descValue = t(`cryptoTool.algos.${algoKey}.desc`)
+  const propsValue = t(`cryptoTool.algos.${algoKey}.props`)
+  return {
+    label: currentAlgoConfig.value.label || '',
+    // t() 没找到 key 时会返回 key 本身（字符串），这里 fallback 成空
+    desc: typeof descValue === 'string' && descValue.startsWith('cryptoTool.algos.') ? '' : descValue,
+    props: Array.isArray(propsValue) ? propsValue : null,
+  }
+})
 
 const needsKey = computed(() => currentAlgoConfig.value.needsKey)
 const needsIV = computed(() => currentAlgoConfig.value.needsIV)
@@ -461,7 +477,7 @@ function doEncrypt() {
       const encrypt = new JSEncrypt()
       encrypt.setPublicKey(rsaPublicKey.value)
       const result = encrypt.encrypt(text)
-      if (!result) throw new Error('RSA 加密失败，请检查公钥格式')
+      if (!result) throw new Error(t('cryptoTool.rsaEncryptFailed'))
       outputText.value = result
       return
     }
@@ -541,7 +557,7 @@ function doDecrypt() {
       const decrypt = new JSEncrypt()
       decrypt.setPrivateKey(rsaPrivateKey.value)
       const result = decrypt.decrypt(text)
-      if (!result) throw new Error('RSA 解密失败，请检查私钥格式')
+      if (!result) throw new Error(t('cryptoTool.rsaDecryptFailed'))
       outputText.value = result
       return
     }
@@ -755,7 +771,7 @@ function copyOutput() {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
 .header {
@@ -764,24 +780,14 @@ function copyOutput() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  height: 52px;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  flex: 1;
-}
-
-.header-right {
-  display: flex;
-  gap: 6px;
-}
+.header-left { display: flex; align-items: center; min-width: 0; flex: 1; }
+.header-right { display: flex; gap: 4px; }
 
 .page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .page-eyebrow {
@@ -792,155 +798,186 @@ function copyOutput() {
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-
 .breadcrumb {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
 }
+.breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
+.breadcrumb-link:hover { text-decoration: underline; }
+.breadcrumb-sep { color: var(--text-tertiary); margin: 0 2px; }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 
-.breadcrumb-link {
-  cursor: pointer;
-  color: var(--accent-blue);
-}
-
-.breadcrumb-link:hover {
-  text-decoration: underline;
-}
-
-.breadcrumb-sep {
-  color: var(--text-tertiary);
-  margin: 0 2px;
-}
-
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
-.header-right :deep(.el-button) { --el-button-border-radius: 10px; }
-
+/* main-body 改成 grid:260px 给左侧分类导航 + 1fr 给中间内容区。
+   原先 flex+flex:1 在某些条件下 content-area 没真正拉满,
+   grid 是确定性两栏,不会受子元素 min-content 影响。 */
 .main-body {
   flex: 1;
-  display: flex;
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
   overflow: hidden;
-  padding: 14px 18px 0;
 }
 
-/* 左侧分类导航 */
+/* 左侧分类导航：扁平列表，无卡片
+   不再设 width / min-width:grid 第一栏已经固定 260px,这里设宽度反而会和 grid 冲突。 */
 .category-nav {
-  width: 156px;
-  min-width: 156px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  overflow-y: auto;
-  padding: 8px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  overflow: hidden;
+  padding: 8px 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .category-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 10px;
+  padding: 8px 14px;
   cursor: pointer;
   font-size: 13px;
   color: var(--text-secondary);
-  transition: all var(--transition-fast);
-  border: 1px solid transparent;
-  border-radius: 12px;
-  margin-bottom: 4px;
+  transition: color 0.15s, background 0.15s;
+  border-left: 2px solid transparent;
 }
 
 .category-item:hover {
-  background: rgba(255,255,255,0.58);
   color: var(--text-primary);
+  background: rgba(60, 40, 20, 0.03);
 }
 
 .category-item.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
   color: var(--accent-blue);
-  border-color: rgba(10,132,255,0.14);
   font-weight: var(--font-weight-semibold);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  background: rgba(47, 111, 228, 0.06);
+  border-left-color: var(--accent-blue);
 }
 
-.cat-icon {
-  font-size: 16px;
-}
+.cat-icon { font-size: 15px; flex-shrink: 0; }
+.cat-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* 中间内容区 */
+/* 中间内容区:按分割线区分段落
+   grid 子项默认 stretch,自然占满 1fr 宽度。min-width:0 让内部 textarea 不会撑开列。 */
 .content-area {
-  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px 18px 18px;
-  gap: 14px;
   overflow-y: auto;
-  min-width: 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: transparent;
 }
 
 .algo-bar {
   flex-shrink: 0;
-  padding: 12px 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.74);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
-.algo-bar :deep(.el-radio-group) {
-  flex-wrap: wrap;
+.algo-bar :deep(.el-radio-group) { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+
+/* 感叹号触发按钮:替代了原来右侧常驻的 info-panel
+   margin-left:auto 把按钮推到 algo-bar 最右边,与原 info-panel 位置一致,
+   不再让算法栏右半部分留白。 */
+.info-trigger {
+  flex-shrink: 0;
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--text-tertiary);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
+.info-trigger:hover {
+  color: var(--accent-blue);
+  border-color: var(--accent-blue);
+  background: rgba(47, 111, 228, 0.08);
+}
+.info-trigger:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* 弹出气泡内容 */
+.info-pop { display: flex; flex-direction: column; gap: 10px; }
+.info-pop-title {
+  font-size: 14px;
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+}
+.info-pop-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+.info-pop-props { display: flex; flex-direction: column; }
+.info-pop-prop {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+}
+.info-pop-prop:last-child { border-bottom: 0; }
+.info-pop-prop .prop-label { color: var(--text-tertiary); white-space: nowrap; min-width: 60px; }
+.info-pop-prop .prop-value { color: var(--text-primary); word-break: break-all; }
 
 .params-bar {
   display: flex;
-  gap: var(--space-sm);
-  align-items: flex-start;
+  gap: 10px;
+  align-items: center;
   flex-wrap: wrap;
   flex-shrink: 0;
-  padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.68);
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
-.params-bar :deep(.el-input-group__prepend) { background: rgba(15, 23, 42, 0.04); }
+.params-bar :deep(.el-input-group__prepend) {
+  background: rgba(60, 40, 20, 0.03);
+  font-size: 12px;
+}
 .params-bar :deep(.el-button),
-.content-area :deep(.el-button) { --el-button-border-radius: 10px; }
+.content-area :deep(.el-button) { --el-button-border-radius: 8px; }
 
-.param-input {
-  width: 260px;
-}
+.param-input { width: 240px; }
+.param-select { width: 120px; }
+.rsa-key-input { width: 100%; max-width: 360px; }
 
-.param-select {
-  width: 120px;
-}
-
-.rsa-key-input {
-  width: 300px;
-}
-
+/* 输入输出区：去除卡片，保留文本框 */
 .io-area {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 14px;
+  gap: 12px;
   min-height: 0;
+  padding: 14px 18px;
 }
 
 .io-panel {
   display: flex;
   flex-direction: column;
-  min-height: 280px;
-  padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  background: rgba(255,255,255,0.76);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+  min-height: 240px;
+  min-width: 0;
 }
 
 .panel-header {
@@ -949,44 +986,43 @@ function copyOutput() {
   align-items: center;
   font-size: 12px;
   font-weight: var(--font-weight-semibold);
-  color: var(--text-secondary);
-  margin-bottom: 8px;
+  color: var(--text-tertiary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.panel-actions {
-  display: flex;
-  gap: 2px;
-}
+.panel-actions { display: flex; gap: 2px; }
 
 .io-textarea {
   flex: 1;
   width: 100%;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  padding: 14px;
+  border: 1px solid rgba(60, 40, 20, 0.12);
+  border-radius: 8px;
+  padding: 12px;
   font-family: 'Cascadia Code', 'Fira Code', monospace;
   font-size: 13px;
   line-height: 1.5;
-  background: rgba(255,255,255,0.9);
+  background: rgba(255, 255, 255, 0.7);
   color: var(--text-primary);
   resize: none;
   outline: none;
   box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .io-textarea:focus {
-  border-color: rgba(10,132,255,0.25);
-  box-shadow: 0 0 0 3px rgba(10,132,255,0.08);
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.1);
+  background: #fff;
 }
 
-.io-textarea[readonly] {
-  background: rgba(15, 23, 42, 0.04);
-}
+.io-textarea[readonly] { background: rgba(60, 40, 20, 0.025); }
 
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
   flex-shrink: 0;
   padding: 4px 0;
@@ -994,88 +1030,35 @@ function copyOutput() {
 
 .error-bar {
   flex-shrink: 0;
+  padding: 0 18px 12px;
 }
 
-/* 右侧说明面板 */
-.info-panel {
-  width: 250px;
-  min-width: 250px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-left: none;
-  border-radius: 0 18px 18px 0;
-  padding: 16px;
-  overflow-y: auto;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
-}
-
-.info-title {
-  font-size: 16px;
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  margin-bottom: var(--space-md);
-}
-
-.info-desc {
-  font-size: 12px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: var(--space-lg);
-}
-
-.info-prop {
-  display: flex;
-  gap: 8px;
-  font-size: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
-}
-
-.prop-label {
-  color: var(--text-tertiary);
-  white-space: nowrap;
-  min-width: 60px;
-}
-
-.prop-value {
-  color: var(--text-primary);
-  word-break: break-all;
-}
-
-/* 哈希增强 */
+/* 哈希增强：用分割线分两栏，无卡片 */
 .hash-extras {
   flex-shrink: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  padding-top: 2px;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .hash-verify, .rainbow-lookup {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: rgba(255,255,255,0.68);
+  padding: 12px 18px;
 }
+.hash-verify { border-right: 1px solid rgba(60, 40, 20, 0.08); }
 
 .verify-header {
   font-size: 12px;
   font-weight: var(--font-weight-semibold);
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.verify-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.verify-input {
-  flex: 1;
-}
+.verify-row { display: flex; gap: 8px; align-items: center; }
+.verify-input { flex: 1; }
 
 .verify-result {
   display: flex;
@@ -1083,25 +1066,15 @@ function copyOutput() {
   gap: 6px;
   font-size: 13px;
   font-weight: var(--font-weight-semibold);
-  padding: 8px 12px;
-  border-radius: 12px;
+  padding: 6px 0;
 }
 
-.verify-result.match {
-  color: #67c23a;
-  background: rgba(103, 194, 58, 0.1);
-}
-
-.verify-result.mismatch {
-  color: #f56c6c;
-  background: rgba(245, 108, 108, 0.1);
-}
+.verify-result.match { color: #67c23a; }
+.verify-result.mismatch { color: #f56c6c; }
 
 .rainbow-result {
   font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.04);
+  padding: 4px 0;
 }
 
 .rainbow-found code {
@@ -1109,12 +1082,10 @@ function copyOutput() {
   color: #e6a23c;
   background: rgba(230, 162, 60, 0.1);
   padding: 2px 6px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
-.rainbow-notfound {
-  color: var(--text-tertiary);
-}
+.rainbow-notfound { color: var(--text-tertiary); }
 
 .rainbow-hint {
   font-size: 11px;
@@ -1123,57 +1094,45 @@ function copyOutput() {
 }
 
 .content-area::-webkit-scrollbar,
-.category-nav::-webkit-scrollbar,
-.info-panel::-webkit-scrollbar {
-  width: 5px;
-}
+.category-nav::-webkit-scrollbar { width: 5px; }
 .content-area::-webkit-scrollbar-thumb,
-.category-nav::-webkit-scrollbar-thumb,
-.info-panel::-webkit-scrollbar-thumb {
+.category-nav::-webkit-scrollbar-thumb {
   background: var(--text-quaternary);
   border-radius: 3px;
 }
 
 @media (max-width: 1180px) {
-  .main-body { padding: 14px; }
-  .category-nav { width: 142px; min-width: 142px; }
-  .info-panel { width: 220px; min-width: 220px; }
+  .main-body { grid-template-columns: 220px minmax(0, 1fr); }
 }
 
 @media (max-width: 960px) {
-  .main-body { flex-direction: column; }
+  .main-body { grid-template-columns: minmax(0, 1fr); }
   .category-nav {
-    width: 100%;
-    min-width: 0;
-    border-right: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px 18px 0 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 0;
-  }
-  .content-area {
-    border-left: 1px solid rgba(15, 23, 42, 0.08);
-  }
-  .info-panel {
-    width: 100%;
-    min-width: 0;
-    border-left: 1px solid rgba(15, 23, 42, 0.08);
-    border-top: none;
-    border-radius: 0 0 18px 18px;
-  }
-  .io-area {
-    grid-template-columns: 1fr;
-  }
-  .action-buttons {
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+    padding: 6px 8px;
     flex-direction: row;
-    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 2px;
   }
+  .category-item {
+    padding: 6px 10px;
+    border-left: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 6px;
+  }
+  .category-item.active {
+    border-left: 0;
+    border-bottom-color: var(--accent-blue);
+  }
+  .io-area { grid-template-columns: 1fr; }
+  .action-buttons { flex-direction: row; justify-content: center; }
 }
 
 @media (max-width: 720px) {
   .header {
     height: auto;
-    min-height: 58px;
+    min-height: 52px;
     padding: 10px 14px;
     align-items: flex-start;
     flex-direction: column;
@@ -1181,6 +1140,7 @@ function copyOutput() {
   .header-left,
   .header-right { width: 100%; }
   .hash-extras { grid-template-columns: 1fr; }
+  .hash-verify { border-right: 0; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
   .verify-row { flex-direction: column; align-items: stretch; }
 }
 </style>

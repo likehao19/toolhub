@@ -30,16 +30,14 @@
             </div>
           </el-option>
         </el-select>
-        <el-button size="small" @click="selectRepo">
+        <el-button size="small" text @click="selectRepo" :title="t('gitManager.browseRepo')">
           <el-icon><FolderOpened /></el-icon>
-          {{ t('gitManager.browseRepo') }}
         </el-button>
-        <el-button size="small" @click="scanRepos" :loading="scanning" :title="t('gitManager.rescan')">
+        <el-button size="small" text @click="scanRepos" :loading="scanning" :title="t('gitManager.rescan')">
           <el-icon><Search /></el-icon>
         </el-button>
-        <el-button size="small" @click="refresh" :loading="loading">
+        <el-button size="small" text @click="refresh" :loading="loading" :title="t('common.refresh')">
           <el-icon><Refresh /></el-icon>
-          {{ t('gitManager.refresh') }}
         </el-button>
       </div>
     </div>
@@ -71,8 +69,12 @@
       <div class="empty-icon">📂</div>
       <div class="empty-text">{{ t('gitManager.noRepo') }}</div>
       <div class="empty-actions">
-        <el-button type="primary" @click="scanRepos" :loading="scanning">{{ t('gitManager.autoDetect') }}</el-button>
-        <el-button @click="selectRepo">{{ t('gitManager.browseRepo') }}</el-button>
+        <el-button type="primary" @click="scanRepos" :loading="scanning">
+          <el-icon style="margin-right: 6px;"><Search /></el-icon>{{ t('gitManager.autoDetect') }}
+        </el-button>
+        <el-button @click="selectRepo">
+          <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('gitManager.browseRepo') }}
+        </el-button>
       </div>
     </div>
 
@@ -224,7 +226,7 @@
           @keyup.enter.ctrl="doCommit"
         />
         <el-button size="small" type="primary" @click="doCommit" :disabled="!commitMessage.trim() || !hasStaged" :loading="committing">
-          {{ t('gitManager.commit') }}
+          <el-icon style="margin-right: 6px;"><Check /></el-icon>{{ t('gitManager.commit') }}
         </el-button>
       </div>
       <div class="action-buttons">
@@ -244,8 +246,8 @@
           Pop
         </el-button>
         <el-divider direction="vertical" />
-        <el-button size="small" @click="showLogDialog = true">
-          {{ t('gitManager.log') }}
+        <el-button size="small" text @click="showLogDialog = true" :title="t('gitManager.log')">
+          <el-icon><Tickets /></el-icon>
         </el-button>
       </div>
       </div>
@@ -272,7 +274,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Monitor, Refresh, FolderOpened, Connection, Download, Upload, Search } from '@element-plus/icons-vue'
+import { Monitor, Refresh, FolderOpened, Connection, Download, Upload, Search, Tickets, Check } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { t } from '@/i18n'
 import * as git from '@/utils/gitManager.js'
@@ -438,7 +440,7 @@ async function selectRepo() {
   try {
     dialogOpen = (await dialogMod).open
   } catch {
-    ElMessage.warning('Dialog API 不可用')
+    ElMessage.warning(t('gitManager.dialogApiUnavailable'))
     return
   }
   const dir = await dialogOpen({ directory: true, title: t('gitManager.selectRepo') })
@@ -668,7 +670,7 @@ onMounted(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -718,7 +720,7 @@ onMounted(() => {
   align-items: center;
   padding: 10px 18px;
   background: rgba(255,255,255,0.42);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
 }
 
@@ -784,8 +786,8 @@ onMounted(() => {
   flex-direction: column;
   overflow: hidden;
   margin: 14px 18px 0;
-  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px 18px 0 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
@@ -794,34 +796,34 @@ onMounted(() => {
 .main-content {
   flex: 1;
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   overflow: hidden;
   min-height: 0;
-  padding: 20px;
-  gap: 18px;
+  padding: 0;
+  gap: 0;
 }
 
-/* ---- 文件面板 ---- */
+/* ---- 文件面板：去除卡片，分割线由统一 CSS 提供 ---- */
 .file-panel {
   width: auto;
-  min-width: 260px;
-  border: 1px solid rgba(15,23,42,0.08);
-  border-radius: 18px;
-  background: rgba(255,255,255,0.92);
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(15,23,42,0.05);
+  box-shadow: none;
 }
 
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(15,23,42,0.06);
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
-  background: rgba(247,249,252,0.68);
+  background: transparent;
 }
 
 .panel-title {
@@ -837,7 +839,7 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   padding: 8px 10px;
-  border-bottom: 1px solid rgba(15,23,42,0.06);
+  border-bottom: 1px solid rgba(60, 40, 20,0.06);
   flex-shrink: 0;
 }
 
@@ -963,8 +965,8 @@ onMounted(() => {
 .file-item:hover { background: rgba(255,255,255,0.58); }
 .file-item.active {
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  border-color: rgba(10,132,255,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  border-color: rgba(194, 65, 12,0.15);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
 .dir-item {
@@ -1041,10 +1043,10 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(255,255,255,0.92);
-  border: 1px solid rgba(15,23,42,0.08);
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15,23,42,0.05);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .diff-content {
@@ -1107,7 +1109,7 @@ onMounted(() => {
   padding: 28px 24px;
   border: 1px dashed rgba(148, 163, 184, 0.34);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.88), rgba(241, 245, 249, 0.76));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 88%, var(--accent-warm-soft) 12%), color-mix(in srgb, var(--bg-secondary) 76%, transparent 24%));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
@@ -1118,7 +1120,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background: rgba(59, 130, 246, 0.1);
+  background: var(--accent-blue-bg);
   color: var(--accent-blue);
   font-size: 20px;
   font-weight: 700;
@@ -1150,7 +1152,7 @@ onMounted(() => {
   align-items: center;
   padding: 10px 18px;
   background: rgba(255,255,255,0.42);
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
   gap: 12px;
   flex-shrink: 0;
 }

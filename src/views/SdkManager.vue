@@ -203,7 +203,7 @@ onMounted(() => { refreshAll() })
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -236,7 +236,7 @@ onMounted(() => { refreshAll() })
 
 .main-container {
   display: grid;
-  grid-template-columns: 148px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   flex: 1;
   width: 100%;
   min-width: 0;
@@ -247,31 +247,32 @@ onMounted(() => { refreshAll() })
 
 /* 左侧菜单 */
 .sidebar-left {
-  width: 148px;
-  min-width: 148px;
-  max-width: 148px;
-  background: linear-gradient(180deg, rgba(249, 252, 255, 0.58), rgba(239, 246, 252, 0.34));
+  width: 260px;
+  min-width: 260px;
+  max-width: 260px;
+  background: transparent;
   border: 0;
-  border-right: 1px solid rgba(112, 128, 150, 0.16);
   border-radius: 0;
   display: flex; flex-direction: column;
   box-shadow: none;
+  overflow: hidden;
 }
-.menu-list { padding: 8px 6px; flex: 1; overflow-y: auto; }
+.menu-list { padding: 6px 0; flex: 1; overflow-y: auto; }
 
 .menu-item {
   display: flex; align-items: center; gap: 8px;
-  padding: 8px 9px; border-radius: 9px;
+  padding: 9px 14px; border-radius: 0;
   cursor: pointer; transition: all var(--transition-fast);
   color: var(--text-secondary); font-size: 13px; margin-bottom: 0;
   border: 0;
+  border-left: 2px solid transparent;
 }
-.menu-item + .menu-item { border-top: 1px solid rgba(100, 116, 139, 0.08); }
-.menu-item:hover { background-color: rgba(255,255,255,0.42); color: var(--text-primary); }
+.menu-item:hover { background-color: rgba(60, 40, 20, 0.04); color: var(--text-primary); }
 .menu-item.active {
-  background: linear-gradient(90deg, rgba(58, 117, 216, 0.12), rgba(255,255,255,0.26));
+  background: rgba(47, 111, 228, 0.08);
   color: var(--accent-blue); font-weight: var(--font-weight-semibold);
-  box-shadow: inset 3px 0 0 rgba(58, 117, 216, 0.76);
+  border-left-color: var(--accent-blue);
+  box-shadow: none;
 }
 
 .menu-badge {
@@ -297,7 +298,7 @@ onMounted(() => { refreshAll() })
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(252,253,255,0.56), rgba(244,248,252,0.36));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 60%, transparent 40%), color-mix(in srgb, var(--bg-secondary) 40%, transparent 60%));
   border: 0;
   border-radius: 0;
   box-shadow: none;

@@ -222,7 +222,7 @@ const goBack = () => {
 .log-item {
   margin-bottom: 8px;
   padding: 8px;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 4px;
   display: flex;
   align-items: center;

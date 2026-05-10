@@ -22,10 +22,10 @@
       </div>
       <div class="toolbar-spacer"></div>
       <div class="toolbar-group">
-        <el-button size="small" text class="toolbar-secondary-btn" @click="addFilesViaDialog">
-          <el-icon><FolderAdd /></el-icon> {{ t('imageConverter.addFiles') }}
+        <el-button size="small" text class="toolbar-secondary-btn" @click="addFilesViaDialog" :title="t('imageConverter.addFiles')">
+          <el-icon><FolderAdd /></el-icon>
         </el-button>
-        <el-button size="small" text class="toolbar-icon-btn" @click="doClear" :disabled="sourceFiles.length === 0">
+        <el-button size="small" text class="toolbar-icon-btn" @click="doClear" :disabled="sourceFiles.length === 0" :title="t('common.clear')">
           <el-icon><Delete /></el-icon>
         </el-button>
       </div>
@@ -88,8 +88,8 @@
             <el-input-number v-model="resizeWidth" :min="1" :max="9999" size="small" :placeholder="t('imageConverter.width')"
               controls-position="right" class="dim-input" @change="onWidthChange" />
             <el-button :type="aspectLocked ? 'primary' : 'default'" size="small" text class="lock-btn"
-              @click="aspectLocked = !aspectLocked">
-              {{ aspectLocked ? '🔗' : '🔓' }}
+              @click="aspectLocked = !aspectLocked" :title="aspectLocked ? t('common.unlock') : t('common.lock')">
+              <el-icon><Lock v-if="aspectLocked" /><Unlock v-else /></el-icon>
             </el-button>
             <el-input-number v-model="resizeHeight" :min="1" :max="9999" size="small" :placeholder="t('imageConverter.height')"
               controls-position="right" class="dim-input" @change="onHeightChange" />
@@ -121,13 +121,13 @@
         <!-- 操作 -->
         <div class="actions">
           <el-button type="primary" @click="doConvert" :loading="converting" :disabled="sourceFiles.length === 0" size="default">
-            {{ batchMode ? t('imageConverter.convertAll') : t('imageConverter.convert') }}
+            <el-icon style="margin-right: 6px;"><MagicStick /></el-icon>{{ batchMode ? t('imageConverter.convertAll') : t('imageConverter.convert') }}
           </el-button>
           <el-button v-if="convertedResult && !batchMode" @click="doSaveAs" size="default">
-            {{ t('imageConverter.saveAs') }}
+            <el-icon style="margin-right: 6px;"><Download /></el-icon>{{ t('imageConverter.saveAs') }}
           </el-button>
           <el-button v-if="batchMode && batchResults.length > 0" @click="doBatchSave" size="default">
-            {{ t('imageConverter.batchSave') }}
+            <el-icon style="margin-right: 6px;"><Files /></el-icon>{{ t('imageConverter.batchSave') }}
           </el-button>
         </div>
       </div>
@@ -219,7 +219,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Picture, Upload, Delete, FolderAdd, Close, Files, PictureFilled, CopyDocument } from '@element-plus/icons-vue'
+import { Picture, Upload, Delete, FolderAdd, Close, Files, PictureFilled, CopyDocument, Lock, Unlock, MagicStick, Download } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWindow } from '@tauri-apps/api/window'
@@ -518,7 +518,7 @@ function formatBytes(bytes) {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: var(--bg-primary);
 }
 
 .header {
@@ -526,11 +526,10 @@ function formatBytes(bytes) {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  min-height: 58px;
+  background: rgba(255, 255, 255, 0.86);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
+  min-height: 52px;
   box-sizing: border-box;
-  backdrop-filter: blur(18px);
 }
 .header-left { display: flex; align-items: center; min-width: 0; }
 .page-title-block { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -542,8 +541,8 @@ function formatBytes(bytes) {
   text-transform: uppercase;
   color: var(--text-tertiary);
 }
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 600; color: var(--text-primary); }
-.breadcrumb .el-icon { font-size: 15px; color: var(--accent-blue); }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.breadcrumb .el-icon { font-size: 14px; color: var(--accent-blue); }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); }
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-quaternary); margin: 0 2px; }
@@ -552,81 +551,62 @@ function formatBytes(bytes) {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 14px 18px 0;
-  padding: 10px 12px;
+  padding: 8px 18px;
   flex-wrap: wrap;
-  min-height: 52px;
+  min-height: 44px;
   box-sizing: border-box;
-  background: rgba(255,255,255,0.58);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 22px rgba(15,23,42,0.03);
+  background: transparent;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .toolbar-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
 .toolbar-spacer { flex: 1; }
 .toolbar-secondary-btn:not(.is-disabled) {
-  background: rgba(248,250,252,0.9);
-  border-color: rgba(15, 23, 42, 0.08);
   color: var(--text-primary);
 }
 .toolbar-icon-btn {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   padding: 0;
-  border-radius: 10px;
+  border-radius: 6px;
   color: var(--text-secondary);
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: transparent;
+  border: 1px solid transparent;
 }
 .toolbar-icon-btn:hover:not(.is-disabled) {
   color: var(--text-primary);
-  background: rgba(255,255,255,0.96);
-  border-color: rgba(15, 23, 42, 0.1);
+  background: rgba(60, 40, 20, 0.05);
+  border-color: rgba(60, 40, 20, 0.1);
 }
-.toolbar :deep(.el-button),
-.toolbar :deep(.el-switch) {
-  --el-border-radius-base: 10px;
-}
-.toolbar :deep(.el-switch) {
-  padding: 4px 8px;
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 999px;
-}
+.toolbar :deep(.el-button) { --el-border-radius-base: 8px; }
 
 .main-area {
   flex: 1;
   display: flex;
   overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
   gap: 0;
 }
 .left-panel {
-  width: 380px;
-  min-width: 380px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  width: 260px;
+  min-width: 260px;
+  background: transparent;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  padding: 16px;
-  gap: 12px;
+  overflow: hidden;
+  padding: 14px 18px;
+  gap: 14px;
 }
 .right-panel {
   flex: 1;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: transparent;
   overflow-y: auto;
-  padding: 16px;
+  padding: 14px 18px;
 }
 
+/* 拖拽区保留虚线作为上传交互提示 */
 .drop-zone {
-  border: 1px dashed rgba(15, 23, 42, 0.14);
-  border-radius: 18px;
+  border: 1px dashed rgba(60, 40, 20, 0.18);
+  border-radius: 10px;
   padding: 24px 16px;
   text-align: center;
   cursor: pointer;
@@ -636,16 +616,15 @@ function formatBytes(bytes) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248,250,252,0.92));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.74);
+  background: rgba(255, 255, 255, 0.5);
 }
 .drop-zone:hover,
-.drop-zone.drop-active { border-color: rgba(64, 158, 255, 0.45); background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(238,246,255,0.96)); }
-.drop-zone.has-file { border-style: solid; border-color: rgba(15, 23, 42, 0.08); }
+.drop-zone.drop-active { border-color: var(--accent-blue); background: rgba(238, 246, 255, 0.7); }
+.drop-zone.has-file { border-style: solid; border-color: rgba(60, 40, 20, 0.12); }
 .drop-icon { font-size: 36px; color: var(--text-quaternary); margin-bottom: 8px; }
 .drop-text { font-size: 13px; color: var(--text-secondary); margin: 0; font-weight: 600; }
 .drop-sub { font-size: 11px; color: var(--text-quaternary); margin: 4px 0 0; }
-.preview-thumb { max-width: 200px; max-height: 100px; border-radius: 12px; margin-bottom: 8px; object-fit: contain; border: 1px solid rgba(15, 23, 42, 0.06); background: rgba(248,250,252,0.9); }
+.preview-thumb { max-width: 200px; max-height: 100px; border-radius: 8px; margin-bottom: 8px; object-fit: contain; border: 1px solid rgba(60, 40, 20, 0.08); background: rgba(248, 244, 232, 0.5); }
 .file-name {
   font-size: 13px;
   color: var(--text-primary);
@@ -657,16 +636,17 @@ function formatBytes(bytes) {
   max-width: 100%;
 }
 .file-meta { font-size: 11px; color: var(--text-tertiary); margin: 4px 0 0; }
+
+/* 文件列表：分割线分隔条目，无外框 */
 .file-list {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248,250,252,0.9));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .file-item {
   display: flex; align-items: center; gap: 8px;
-  padding: 9px 10px; font-size: 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 9px 0; font-size: 12px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
 }
 .file-item:last-child { border-bottom: none; }
 .file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500; }
@@ -674,17 +654,18 @@ function formatBytes(bytes) {
 .file-item-remove { cursor: pointer; color: var(--text-quaternary); flex-shrink: 0; }
 .file-item-remove:hover { color: var(--accent-red, #f56c6c); }
 
+/* 设置区：分行无卡片 */
 .settings {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(248,250,252,0.9));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
 }
-.setting-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.setting-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+}
+.setting-row:last-child { border-bottom: 0; }
 .setting-label { font-size: 12px; color: var(--text-secondary); white-space: nowrap; min-width: 70px; font-weight: 600; }
 .fmt-select { width: 120px; }
 .quality-slider { flex: 1; }
@@ -696,14 +677,14 @@ function formatBytes(bytes) {
 .settings :deep(.el-input__wrapper),
 .settings :deep(.el-select__wrapper),
 .settings :deep(.el-input-number__wrapper) {
-  border-radius: 10px;
-  background: rgba(248,250,252,0.92);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
 }
 .settings :deep(.el-input__wrapper.is-focus),
 .settings :deep(.el-select__wrapper.is-focused),
 .settings :deep(.el-input-number__wrapper:focus-within) {
-  box-shadow: inset 0 0 0 1px rgba(64, 158, 255, 0.7);
+  box-shadow: inset 0 0 0 1px var(--accent-blue);
 }
 .settings :deep(.el-checkbox__label) {
   color: var(--text-secondary);
@@ -715,27 +696,23 @@ function formatBytes(bytes) {
   flex-wrap: wrap;
 }
 
+/* 段落小标题：去除药丸样式 */
 .section-card-title {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 0 10px;
+  display: block;
+  padding: 8px 0 6px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--text-secondary);
-  letter-spacing: 0.02em;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  border-radius: 999px;
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  margin-bottom: 8px;
 }
+
+/* EXIF 区：去除卡片，分行展示 */
 .exif-section {
   font-size: 12px;
-  padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(248,250,252,0.9));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
 }
 .exif-collapse :deep(.el-collapse) {
   border-top: none;
@@ -744,112 +721,103 @@ function formatBytes(bytes) {
 }
 .exif-collapse :deep(.el-collapse-item__header) {
   height: auto;
-  min-height: 34px;
-  padding: 4px 0 10px;
+  min-height: 32px;
+  padding: 4px 0;
   font-size: 12px;
   font-weight: 600;
   color: var(--text-primary);
   background: transparent;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
 }
 .exif-collapse :deep(.el-collapse-item__wrap) {
   background: transparent;
   border-bottom: none;
 }
 .exif-collapse :deep(.el-collapse-item__content) {
-  padding: 10px 0 0;
+  padding: 8px 0 0;
 }
 .exif-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 .exif-row {
   display: flex;
   gap: 10px;
-  padding: 8px 10px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 12px;
-  background: rgba(255,255,255,0.62);
+  padding: 7px 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+  background: transparent;
 }
+.exif-row:last-child { border-bottom: 0; }
 .exif-tag { font-weight: 600; color: var(--text-secondary); min-width: 140px; }
 .exif-val { color: var(--text-tertiary); word-break: break-all; }
-.actions { display: flex; gap: 8px; padding-top: 4px; flex-wrap: wrap; }
-.actions :deep(.el-button) { --el-border-radius-base: 10px; }
+.actions { display: flex; gap: 8px; padding-top: 8px; flex-wrap: wrap; }
+.actions :deep(.el-button) { --el-border-radius-base: 8px; }
 
+/* 空状态：保留虚线提示 */
 .empty-preview {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  height: 100%; color: var(--text-tertiary);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(248,250,252,0.9));
+  height: 100%; min-height: 240px;
+  color: var(--text-tertiary);
+  border: 1px dashed rgba(60, 40, 20, 0.14);
+  border-radius: 10px;
+  background: transparent;
   padding: 24px;
   gap: 10px;
 }
 .empty-icon { font-size: 60px; margin-bottom: 4px; }
 .empty-preview p {
   margin: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  font-size: 13px;
+  color: var(--text-tertiary);
 }
+
+/* 预览区：去除每个卡片，左右两列用分割线 */
 .preview-area { display: flex; flex-direction: column; gap: 16px; }
-.preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
 .preview-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  padding: 14px;
+  padding: 14px 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   min-height: 200px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
+}
+.preview-card:first-child {
+  border-right: 1px solid rgba(60, 40, 20, 0.08);
 }
 .preview-label {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 0 10px;
-  border-radius: 999px;
+  display: block;
+  padding-bottom: 6px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--text-secondary);
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  color: var(--text-tertiary);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
+  width: 100%;
+  text-align: center;
 }
-.preview-img { max-width: 100%; max-height: 240px; object-fit: contain; border-radius: 12px; border: 1px solid rgba(15, 23, 42, 0.06); background: rgba(255,255,255,0.72); }
+.preview-img { max-width: 100%; max-height: 240px; object-fit: contain; border-radius: 8px; border: 1px solid rgba(60, 40, 20, 0.08); background: rgba(255,255,255,0.5); }
 .preview-meta { font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
 .preview-placeholder {
   color: var(--text-quaternary);
   font-size: 13px;
   margin: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
 }
+
+/* 体积对比：去除卡片，仅留进度条与文字 */
 .size-compare {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  padding: 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248,250,252,0.9));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  padding: 12px 0;
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
 }
-.size-bar-wrap { display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(248,250,252,0.9); margin-bottom: 8px; }
+.size-bar-wrap { display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(60, 40, 20, 0.06); margin-bottom: 8px; }
 .size-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
 .before-bar { background: var(--accent-blue); }
 .after-bar { background: #67c23a; }
@@ -863,61 +831,52 @@ function formatBytes(bytes) {
 }
 .size-down { color: #67c23a; font-weight: 600; }
 .size-up { color: #f56c6c; font-weight: 600; }
+
+/* 批量表格：去除外框卡片，让 el-table 自身样式生效 */
 .batch-table {
   width: 100%;
-  padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.76), rgba(248,250,252,0.9));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  background: transparent;
 }
 .batch-table :deep(.el-table) {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
+  border: 1px solid rgba(60, 40, 20, 0.1);
+  border-radius: 8px;
   overflow: hidden;
-  background: rgba(255,255,255,0.78);
+  background: rgba(255, 255, 255, 0.6);
 }
 .batch-table :deep(.el-table th.el-table__cell) {
-  background: rgba(248,250,252,0.94);
+  background: rgba(60, 40, 20, 0.04);
   color: var(--text-secondary);
   font-weight: 700;
 }
 
 .status-bar {
   display: flex; align-items: center; gap: 10px;
-  padding: 0 16px;
-  margin: 0 18px 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(247,249,252,0.9));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-top: none;
+  padding: 0 18px;
+  background: transparent;
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
   font-size: 11.5px; color: var(--text-tertiary);
-  height: 32px; box-sizing: border-box;
-  border-radius: 0 0 18px 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  height: 30px; box-sizing: border-box;
 }
 .status-spacer { flex: 1; }
 
 @media (max-width: 1100px) {
   .main-area {
     flex-direction: column;
-    gap: 12px;
   }
 
-  .left-panel,
-  .right-panel {
+  .left-panel {
     width: 100%;
     min-width: 0;
-    border: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   }
 
   .preview-grid {
     grid-template-columns: 1fr;
   }
-
-  .status-bar {
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
+  .preview-card:first-child {
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   }
 }
 </style>

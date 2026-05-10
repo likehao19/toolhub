@@ -76,6 +76,7 @@ import { listen } from '@tauri-apps/api/event'
 import { invoke } from '@tauri-apps/api/core'
 import { ElMessage } from 'element-plus'
 import { useAppStore } from '@/store'
+import { initEncryption } from '@/utils/encryption'
 import CloseConfirmDialog from '@/components/CloseConfirmDialog.vue'
 import HeaderBar from '@/components/HeaderBar.vue'
 import ProductivitySidebar from '@/components/ProductivitySidebar.vue'
@@ -702,6 +703,10 @@ const registerMainWindowShortcuts = async () => {
 onMounted(async () => {
   registerGlobalDomListeners()
   cleanupAppearanceSync = syncSystemThemePreference()
+  // 在所有用到密码 / 凭据解密的页面挂载之前先把主密钥拉到内存,
+  // 避免 Passwords / Dashboard 加载时因为密钥未就绪而看到空密码。
+  // initEncryption 内部已 try/catch,失败也不会阻塞启动。
+  await initEncryption()
   try {
     await registerMainWindowShortcuts()
   } catch (error) {
@@ -978,30 +983,35 @@ const handleCloseConfirm = async ({ action, remember }) => {
 <style>
 /* ===== 全局设计令牌 (Design Tokens) ===== */
 :root {
-  /* —— 背景层级 —— */
-  --bg-primary:        #ffffff;
-  --bg-secondary:      #f3f6fb;
-  --bg-tertiary:       #e9edf5;
-  --bg-grouped:        #f0f4fa;
-  --surface-page:      radial-gradient(circle at 0% 0%, #eef6ff 0%, #f8fbff 36%, #f3f6fb 100%);
+  /* —— 背景层级（暖奶油基调，与官网一致） —— */
+  --bg-primary:        #fdfbf6;
+  --bg-secondary:      #f5f1e8;
+  --bg-tertiary:       #ebe7dc;
+  --bg-grouped:        #f0ede4;
+  --surface-page:      #fbfaf6;
   --surface-panel:     rgba(255,255,255,0.92);
   --surface-panel-soft:rgba(255,255,255,0.72);
   --surface-hover:     rgba(255,255,255,0.96);
   --surface-muted:     rgba(255,255,255,0.62);
-  --surface-accent:    rgba(13,110,253,0.10);
-  --surface-divider:   rgba(15,23,42,0.08);
+  --surface-accent:    rgba(194,65,12,0.08);
+  --surface-divider:   rgba(60,40,20,0.10);
 
   /* —— 文字层级 —— */
-  --text-primary:      #0f172a;
-  --text-secondary:    #475569;
-  --text-tertiary:     #64748b;
-  --text-quaternary:   #94a3b8;
+  --text-primary:      #1a1a1a;
+  --text-secondary:    #3f3f46;
+  --text-tertiary:     #71717a;
+  --text-quaternary:   #a1a1aa;
 
-  /* —— 系统强调色 —— */
-  --accent-blue:       #0d6efd;
-  --accent-blue-hover: #0b5ed7;
-  --accent-blue-active:#0a58ca;
-  --accent-blue-bg:    rgba(13,110,253,0.12);
+  /* —— 系统强调色（暖橙；变量名保留以兼容 100+ 处引用） —— */
+  --accent-blue:       #c2410c;
+  --accent-blue-hover: #9a3412;
+  --accent-blue-active:#7c2d12;
+  --accent-blue-bg:    rgba(194,65,12,0.10);
+
+  /* —— 暖色语义别名（推荐新代码使用） —— */
+  --accent-warm:       #c2410c;
+  --accent-warm-hover: #9a3412;
+  --accent-warm-soft:  #fff1e6;
 
   /* —— 语义色（低饱和） —— */
   --color-red:         #ff3b30;
@@ -1011,18 +1021,18 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --color-teal:        #5ac8fa;
   --color-purple:      #af52de;
 
-  /* —— 分割与边框 —— */
-  --border-color:      rgba(15,23,42,0.10);
-  --border-color-strong:rgba(15,23,42,0.16);
-  --divider:           rgba(15,23,42,0.07);
+  /* —— 分割与边框（暖调） —— */
+  --border-color:      rgba(60,40,20,0.14);
+  --border-color-strong:rgba(60,40,20,0.20);
+  --divider:           rgba(60,40,20,0.10);
 
   /* —— 阴影层级 —— */
-  --shadow-sm:         0 1px 2px rgba(15,23,42,0.05);
-  --shadow-md:         0 6px 18px rgba(15,23,42,0.08);
-  --shadow-lg:         0 16px 40px rgba(15,23,42,0.12);
-  --shadow-popover:    0 14px 38px rgba(15,23,42,0.14), 0 1px 2px rgba(15,23,42,0.08);
-  --shadow-card:       0 1px 2px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.05);
-  --shadow-card-hover: 0 2px 6px rgba(15,23,42,0.08), 0 16px 28px rgba(15,23,42,0.10);
+  --shadow-sm:         0 1px 2px rgba(60, 40, 20,0.05);
+  --shadow-md:         0 6px 18px rgba(60, 40, 20,0.08);
+  --shadow-lg:         0 16px 40px rgba(60, 40, 20,0.12);
+  --shadow-popover:    0 14px 38px rgba(60, 40, 20,0.14), 0 1px 2px rgba(60, 40, 20,0.08);
+  --shadow-card:       0 1px 2px rgba(60, 40, 20,0.06), 0 8px 24px rgba(60, 40, 20,0.05);
+  --shadow-card-hover: 0 2px 6px rgba(60, 40, 20,0.08), 0 16px 28px rgba(60, 40, 20,0.10);
 
   /* —— 圆角 —— */
   --radius-xs:         6px;
@@ -1043,6 +1053,7 @@ const handleCloseConfirm = async ({ action, remember }) => {
   /* —— 字体 —— */
   --font-family:       "Segoe UI Variable Display", "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
   --font-family-mono:  "Cascadia Mono", "JetBrains Mono", "Consolas", monospace;
+  --font-serif:        "Iowan Old Style", "Source Serif Pro", "Noto Serif SC", "Songti SC", Georgia, serif;
 
   /* —— 字号层级 —— */
   --font-size-caption2: 11px;
@@ -1071,7 +1082,7 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --header-height:     44px;
   --sidebar-width:     236px;
   --sidebar-collapsed: 56px;
-  --focus-ring:        0 0 0 3px rgba(13,110,253,0.20);
+  --focus-ring:        0 0 0 3px rgba(194,65,12,0.22);
   --interactive-lift:  translateY(-1px);
 
   /* —— Element Plus 覆盖 —— */
@@ -1128,22 +1139,22 @@ const handleCloseConfirm = async ({ action, remember }) => {
     --bg-secondary:      #000000;
     --bg-tertiary:       #2c2c2e;
     --bg-grouped:        #1c1c1e;
-    --surface-page:      linear-gradient(180deg, #101114 0%, #17191d 100%);
-    --surface-panel:     rgba(32,34,39,0.9);
-    --surface-panel-soft:rgba(40,42,48,0.72);
-    --surface-hover:     rgba(58,62,70,0.82);
-    --surface-muted:     rgba(52,55,61,0.58);
-    --surface-accent:    rgba(10,132,255,0.14);
-    --surface-divider:   rgba(255,255,255,0.08);
+    --surface-page:      linear-gradient(180deg, #14110d 0%, #1a1612 100%);
+    --surface-panel:     rgba(34,30,26,0.9);
+    --surface-panel-soft:rgba(42,38,33,0.72);
+    --surface-hover:     rgba(60,52,44,0.82);
+    --surface-muted:     rgba(54,48,42,0.58);
+    --surface-accent:    rgba(251,146,60,0.14);
+    --surface-divider:   rgba(255,235,210,0.08);
 
-    --text-primary:      #f5f5f7;
-    --text-secondary:    #98989d;
-    --text-tertiary:     #636366;
-    --text-quaternary:   #48484a;
+    --text-primary:      #f5f1ea;
+    --text-secondary:    #b8aea0;
+    --text-tertiary:     #8a8175;
+    --text-quaternary:   #5a534a;
 
-    --accent-blue:       #0a84ff;
-    --accent-blue-hover: #409cff;
-    --accent-blue-bg:    rgba(10,132,255,0.12);
+    --accent-blue:       #fb923c;
+    --accent-blue-hover: #fdba74;
+    --accent-blue-bg:    rgba(251,146,60,0.14);
 
     --color-red:         #ff453a;
     --color-orange:      #ff9f0a;
@@ -1152,9 +1163,9 @@ const handleCloseConfirm = async ({ action, remember }) => {
     --color-teal:        #64d2ff;
     --color-purple:      #bf5af2;
 
-    --border-color:      rgba(255,255,255,0.08);
-    --border-color-strong:rgba(255,255,255,0.12);
-    --divider:           rgba(255,255,255,0.06);
+    --border-color:      rgba(255,235,210,0.10);
+    --border-color-strong:rgba(255,235,210,0.16);
+    --divider:           rgba(255,235,210,0.07);
 
     --shadow-sm:         0 0.5px 1px rgba(0,0,0,0.3);
     --shadow-md:         0 2px 8px rgba(0,0,0,0.4);
@@ -1240,7 +1251,7 @@ body {
   margin: 0 auto var(--space-lg);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 14px 34px rgba(59, 130, 246, 0.12);
+  box-shadow: 0 14px 34px rgba(194, 65, 12, 0.12);
   animation: splash-pulse 1.8s ease-in-out infinite;
 }
 
@@ -1336,7 +1347,7 @@ body {
 @keyframes splash-pulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 14px 34px rgba(59, 130, 246, 0.12);
+    box-shadow: 0 14px 34px rgba(194, 65, 12, 0.12);
   }
   50% {
     transform: scale(1.04);
@@ -1382,9 +1393,9 @@ body {
 
 .app-content.toolbox-unified-shell {
   background:
-    radial-gradient(circle at 12% 0%, rgba(219, 234, 254, 0.58) 0%, transparent 34%),
-    radial-gradient(circle at 88% 8%, rgba(220, 252, 231, 0.42) 0%, transparent 30%),
-    linear-gradient(135deg, #f3f8ff 0%, #fbfdff 48%, #f3faf7 100%) !important;
+    radial-gradient(circle at 12% 0%, var(--accent-warm-soft) 0%, transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(254, 215, 170, 0.32) 0%, transparent 30%),
+    linear-gradient(135deg, #fdfbf6 0%, #fbfaf6 48%, #f5f1e8 100%) !important;
 }
 
 /* ===== 页面切换动画 ===== */
@@ -1441,31 +1452,31 @@ body {
 
 /* ===== Design Refresh Overrides ===== */
 :root {
-  --bg-secondary: #f3f6fb;
-  --bg-tertiary: #e9edf5;
-  --bg-grouped: #f0f4fa;
-  --surface-page: radial-gradient(circle at 0% 0%, #eef6ff 0%, #f8fbff 36%, #f3f6fb 100%);
+  --bg-secondary: #f5f1e8;
+  --bg-tertiary: #ebe7dc;
+  --bg-grouped: #f0ede4;
+  --surface-page: #fbfaf6;
   --surface-panel-soft: rgba(255,255,255,0.76);
   --surface-hover: rgba(255,255,255,0.96);
-  --surface-accent: rgba(13,110,253,0.10);
-  --surface-divider: rgba(15,23,42,0.08);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --text-quaternary: #94a3b8;
-  --accent-blue: #0d6efd;
-  --accent-blue-hover: #0b5ed7;
-  --accent-blue-active: #0a58ca;
-  --accent-blue-bg: rgba(13,110,253,0.12);
-  --border-color: rgba(15,23,42,0.10);
-  --border-color-strong: rgba(15,23,42,0.16);
-  --divider: rgba(15,23,42,0.07);
-  --shadow-sm: 0 1px 2px rgba(15,23,42,0.05);
-  --shadow-md: 0 6px 18px rgba(15,23,42,0.08);
-  --shadow-lg: 0 16px 40px rgba(15,23,42,0.12);
-  --shadow-popover: 0 14px 38px rgba(15,23,42,0.14), 0 1px 2px rgba(15,23,42,0.08);
-  --shadow-card: 0 1px 2px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.05);
-  --shadow-card-hover: 0 2px 6px rgba(15,23,42,0.08), 0 16px 28px rgba(15,23,42,0.10);
+  --surface-accent: rgba(194,65,12,0.08);
+  --surface-divider: rgba(60,40,20,0.10);
+  --text-primary: #1a1a1a;
+  --text-secondary: #3f3f46;
+  --text-tertiary: #71717a;
+  --text-quaternary: #a1a1aa;
+  --accent-blue: #c2410c;
+  --accent-blue-hover: #9a3412;
+  --accent-blue-active: #7c2d12;
+  --accent-blue-bg: rgba(194,65,12,0.10);
+  --border-color: rgba(60,40,20,0.14);
+  --border-color-strong: rgba(60,40,20,0.20);
+  --divider: rgba(60,40,20,0.10);
+  --shadow-sm: 0 1px 2px rgba(60,40,20,0.05);
+  --shadow-md: 0 6px 18px rgba(60,40,20,0.08);
+  --shadow-lg: 0 16px 40px rgba(60,40,20,0.12);
+  --shadow-popover: 0 14px 38px rgba(60,40,20,0.14), 0 1px 2px rgba(60,40,20,0.08);
+  --shadow-card: 0 1px 2px rgba(60,40,20,0.06), 0 8px 24px rgba(60,40,20,0.05);
+  --shadow-card-hover: 0 2px 6px rgba(60,40,20,0.08), 0 16px 28px rgba(60,40,20,0.10);
   --radius-xs: 6px;
   --radius-sm: 10px;
   --radius-md: 14px;
@@ -1473,37 +1484,41 @@ body {
   --radius-xl: 24px;
   --font-family: "Segoe UI Variable Display", "PingFang SC", "Microsoft YaHei UI", "Noto Sans SC", sans-serif;
   --font-family-mono: "Cascadia Mono", "JetBrains Mono", "Consolas", monospace;
+  --font-serif: "Iowan Old Style", "Source Serif Pro", "Noto Serif SC", "Songti SC", Georgia, serif;
   --transition-fast: 120ms cubic-bezier(0.2, 0, 0, 1);
   --transition-normal: 200ms cubic-bezier(0.2, 0, 0, 1);
   --transition-smooth: 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
   --header-height: 44px;
   --sidebar-width: 236px;
-  --focus-ring: 0 0 0 3px rgba(13,110,253,0.20);
+  --focus-ring: 0 0 0 3px rgba(194,65,12,0.22);
   --interactive-lift: translateY(-1px);
+  --accent-warm: #c2410c;
+  --accent-warm-hover: #9a3412;
+  --accent-warm-soft: #fff1e6;
 }
 
 [data-theme="dark"] {
-  --bg-primary: #111827;
-  --bg-secondary: #030712;
-  --bg-tertiary: #1f2937;
-  --bg-grouped: #111827;
-  --surface-page: radial-gradient(circle at 0% 0%, #0f1b34 0%, #0b1120 34%, #020617 100%);
-  --surface-panel: rgba(17,24,39,0.92);
-  --surface-panel-soft: rgba(17,24,39,0.76);
-  --surface-hover: rgba(30,41,59,0.92);
-  --surface-muted: rgba(51,65,85,0.62);
-  --surface-accent: rgba(59,130,246,0.18);
-  --surface-divider: rgba(148,163,184,0.18);
-  --text-primary: #e5e7eb;
-  --text-secondary: #94a3b8;
-  --text-tertiary: #64748b;
-  --text-quaternary: #475569;
-  --accent-blue: #3b82f6;
-  --accent-blue-hover: #60a5fa;
-  --accent-blue-bg: rgba(59,130,246,0.18);
-  --border-color: rgba(148,163,184,0.20);
-  --border-color-strong: rgba(148,163,184,0.28);
-  --divider: rgba(148,163,184,0.14);
+  --bg-primary: #1a1714;
+  --bg-secondary: #0e0c0a;
+  --bg-tertiary: #2a2520;
+  --bg-grouped: #1a1714;
+  --surface-page: linear-gradient(180deg, #14110d 0%, #1a1612 100%);
+  --surface-panel: rgba(36,32,28,0.92);
+  --surface-panel-soft: rgba(36,32,28,0.76);
+  --surface-hover: rgba(54,46,38,0.92);
+  --surface-muted: rgba(80,68,56,0.62);
+  --surface-accent: rgba(251,146,60,0.18);
+  --surface-divider: rgba(255,235,210,0.18);
+  --text-primary: #f5f1ea;
+  --text-secondary: #b8aea0;
+  --text-tertiary: #8a8175;
+  --text-quaternary: #5a534a;
+  --accent-blue: #fb923c;
+  --accent-blue-hover: #fdba74;
+  --accent-blue-bg: rgba(251,146,60,0.18);
+  --border-color: rgba(255,235,210,0.18);
+  --border-color-strong: rgba(255,235,210,0.26);
+  --divider: rgba(255,235,210,0.12);
 }
 
 body {
@@ -1536,11 +1551,11 @@ select {
 }
 
 .el-button--primary {
-  box-shadow: 0 10px 16px rgba(13, 110, 253, 0.22);
+  box-shadow: 0 10px 16px rgba(194, 65, 12, 0.22);
 }
 
 .el-button--primary:hover {
-  box-shadow: 0 12px 20px rgba(13, 110, 253, 0.30);
+  box-shadow: 0 12px 20px rgba(194, 65, 12, 0.30);
 }
 
 .el-button--default {

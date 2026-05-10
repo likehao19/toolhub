@@ -29,8 +29,7 @@
           <el-option :label="t('ebookShelf.sortAuthor')" value="author" />
         </el-select>
         <el-button type="primary" size="small" @click="importBooks">
-          <el-icon><FolderAdd /></el-icon>
-          {{ t('ebookShelf.import') }}
+          <el-icon style="margin-right: 6px;"><FolderAdd /></el-icon>{{ t('ebookShelf.import') }}
         </el-button>
         <el-button size="small" text @click="showSettings = true" :title="t('ebookShelf.storageSettings')">
           <el-icon><Setting /></el-icon>
@@ -85,8 +84,7 @@
       <div class="empty-title">{{ t('ebookShelf.noBooks') }}</div>
       <div class="empty-hint">{{ t('ebookShelf.noBooksHint') }}</div>
       <el-button type="primary" @click="importBooks" style="margin-top: 16px">
-        <el-icon><FolderAdd /></el-icon>
-        {{ t('ebookShelf.import') }}
+        <el-icon style="margin-right: 6px;"><FolderAdd /></el-icon>{{ t('ebookShelf.import') }}
       </el-button>
       <div class="drop-hint">{{ t('ebookShelf.dropHint') }}</div>
     </div>
@@ -118,7 +116,9 @@
         <el-form-item :label="t('ebookShelf.storagePath')">
           <div style="display:flex;gap:8px;width:100%">
             <el-input v-model="storagePath" readonly style="flex:1" />
-            <el-button @click="selectStoragePath">{{ t('ebookShelf.selectFolder') }}</el-button>
+            <el-button @click="selectStoragePath">
+              <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('ebookShelf.selectFolder') }}
+            </el-button>
           </div>
           <div class="setting-hint">{{ t('ebookShelf.storageHint') }}</div>
         </el-form-item>
@@ -142,7 +142,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Reading, FolderAdd, Setting, Loading, Search } from '@element-plus/icons-vue'
+import { Reading, FolderAdd, Setting, Loading, Search, FolderOpened } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { t } from '@/i18n'
 import * as ebook from '@/utils/ebookManager'
@@ -380,7 +380,7 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -424,13 +424,13 @@ onBeforeUnmount(() => {
   cursor: pointer;
   border-radius: 18px;
   background: rgba(255,255,255,0.78);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   user-select: none;
   padding: 12px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
-.book-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(15,23,42,0.08); border-color: rgba(64,158,255,0.28); }
+.book-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(60, 40, 20,0.08); border-color: rgba(64,158,255,0.28); }
 
 .book-cover {
   position: relative;
@@ -438,7 +438,7 @@ onBeforeUnmount(() => {
   aspect-ratio: 3/4;
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(15,23,42,0.12), 0 1px 4px rgba(15,23,42,0.08);
+  box-shadow: 0 8px 24px rgba(60, 40, 20,0.12), 0 1px 4px rgba(60, 40, 20,0.08);
 }
 .book-cover img {
   width: 100%;
@@ -535,7 +535,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px dashed rgba(15, 23, 42, 0.12);
+  border: 2px dashed rgba(60, 40, 20, 0.12);
   border-radius: 18px;
   min-height: 240px;
   transition: border-color 0.2s, background 0.2s;
@@ -557,7 +557,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   gap: 8px;
   margin: 14px 18px 0;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.5);
 }
@@ -572,7 +572,7 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 0 18px;
   background: rgba(255,255,255,0.82);
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  border-top: 1px solid rgba(60, 40, 20, 0.08);
   font-size: 11px;
   color: var(--text-tertiary);
   min-height: 30px;
@@ -585,9 +585,9 @@ onBeforeUnmount(() => {
   position: fixed;
   z-index: 9999;
   background: rgba(255,255,255,0.96);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  box-shadow: 0 16px 32px rgba(15,23,42,0.14);
+  box-shadow: 0 16px 32px rgba(60, 40, 20,0.14);
   padding: 6px 0;
   min-width: 150px;
   backdrop-filter: blur(20px);
@@ -598,9 +598,9 @@ onBeforeUnmount(() => {
   color: var(--text-primary);
   cursor: pointer;
 }
-.ctx-item:hover { background: rgba(241,245,249,0.9); }
+.ctx-item:hover { background: rgba(240, 233, 220,0.9); }
 .ctx-danger { color: #f56c6c; }
-.ctx-sep { height: 1px; background: rgba(15, 23, 42, 0.08); margin: 4px 0; }
+.ctx-sep { height: 1px; background: rgba(60, 40, 20, 0.08); margin: 4px 0; }
 
 .setting-hint { font-size: 12px; color: var(--text-quaternary); margin-top: 6px; }
 .book-detail { display: flex; flex-direction: column; gap: 12px; }

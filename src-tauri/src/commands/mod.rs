@@ -24,3 +24,4 @@ pub mod network;
 pub mod dev_server;
 pub mod downloader;
 pub mod ssh;
+pub mod crypto;

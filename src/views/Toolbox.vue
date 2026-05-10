@@ -104,6 +104,7 @@ const toolPathMap = {
   'hardware-info': '/toolbox/hardware-info',
   'download-manager': '/toolbox/download-manager',
   'ssh-terminal': '/toolbox/ssh-terminal',
+  'multi-print': '/toolbox/multi-print',
 }
 
 const allCategories = computed(() => [
@@ -114,6 +115,7 @@ const allCategories = computed(() => [
       { id: 'sticky-notes', name: t('toolbox.tools.stickyNotes'), icon: '📌' },
       { id: 'ebook-shelf', name: t('toolbox.tools.ebookShelf'), icon: '📚' },
       { id: 'screenshot', name: t('toolbox.tools.screenshot'), icon: '📸' },
+      { id: 'multi-print', name: t('toolbox.tools.multiPrint'), icon: '🖨️' },
     ]
   },
   {
@@ -214,9 +216,9 @@ const goToSettings = () => {
   width: 100%;
   overflow: hidden;
   background:
-    radial-gradient(circle at 18% 0%, #f3f7ff 0%, transparent 38%),
-    radial-gradient(circle at 85% 8%, #f8fafc 0%, transparent 34%),
-    #ffffff;
+    radial-gradient(circle at 18% 0%, var(--accent-warm-soft) 0%, transparent 38%),
+    radial-gradient(circle at 85% 8%, var(--bg-secondary) 0%, transparent 34%),
+    var(--surface-page);
 }
 
 .header {
@@ -226,7 +228,7 @@ const goToSettings = () => {
   gap: 16px;
   padding: 0 18px;
   background: rgba(255, 255, 255, 0.92);
-  border-bottom: 1px solid #e8edf4;
+  border-bottom: 1px solid var(--divider);
   min-height: 62px;
   box-sizing: border-box;
   backdrop-filter: blur(12px);
@@ -252,7 +254,7 @@ const goToSettings = () => {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: var(--text-quaternary);
 }
 
 .breadcrumb {
@@ -261,12 +263,12 @@ const goToSettings = () => {
   gap: 8px;
   font-size: 18px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-primary);
 }
 
 .breadcrumb .el-icon {
   font-size: 18px;
-  color: #2563eb;
+  color: var(--accent-blue);
 }
 
 .header-actions {
@@ -290,10 +292,10 @@ const goToSettings = () => {
   flex-direction: column;
   overflow: hidden;
   margin: 14px 16px 16px;
-  background: #f8fafd;
+  background: var(--bg-secondary);
   border: 1px solid #e6ecf3;
   border-radius: 18px;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8px 22px rgba(60, 40, 20, 0.05);
 }
 
 .toolbox-workspace {
@@ -326,9 +328,9 @@ const goToSettings = () => {
   margin-bottom: 12px;
   padding: 14px 14px 16px;
   border-radius: 14px;
-  border: 1px solid #e7edf4;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+  border: 1px solid var(--divider);
+  background: var(--bg-primary);
+  box-shadow: 0 2px 8px rgba(60, 40, 20, 0.03);
 }
 
 .tool-category:last-child {
@@ -346,7 +348,7 @@ const goToSettings = () => {
   color: #334155;
   user-select: none;
   margin-bottom: 10px;
-  border-bottom: 1px dashed #e8edf4;
+  border-bottom: 1px dashed var(--divider);
 }
 
 .category-count {
@@ -359,9 +361,9 @@ const goToSettings = () => {
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
-  color: #475569;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--divider);
   font-variant-numeric: tabular-nums;
 }
 
@@ -379,20 +381,20 @@ const goToSettings = () => {
   justify-content: center;
   min-height: 98px;
   padding: 16px 10px 14px;
-  background: #ffffff;
-  border: 1px solid #e7edf4;
+  background: var(--bg-primary);
+  border: 1px solid var(--divider);
   border-radius: 12px;
   cursor: pointer;
   transition: transform var(--transition-normal), border-color var(--transition-normal), background var(--transition-normal), box-shadow var(--transition-normal);
   user-select: none;
-  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 7px rgba(60, 40, 20, 0.04);
 }
 
 .tool-card:hover {
   transform: translateY(-2px);
-  background: #fbfdff;
-  border-color: #d7e3f6;
-  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.1);
+  background: var(--accent-warm-soft);
+  border-color: color-mix(in srgb, var(--accent-blue) 28%, var(--divider) 72%);
+  box-shadow: 0 10px 18px rgba(194, 65, 12, 0.10);
 }
 
 .tool-icon {
@@ -408,7 +410,7 @@ const goToSettings = () => {
 
 .tool-name {
   font-size: 12px;
-  color: #475569;
+  color: var(--text-secondary);
   text-align: center;
   font-weight: 600;
   line-height: 1.3;
@@ -416,7 +418,7 @@ const goToSettings = () => {
 }
 
 .tool-card:hover .tool-name {
-  color: #0f172a;
+  color: var(--text-primary);
 }
 
 .tool-card::after {
@@ -475,7 +477,7 @@ const goToSettings = () => {
 }
 
 .tool-card:focus-visible {
-  outline: 2px solid rgba(37, 99, 235, 0.32);
+  outline: 2px solid rgba(194, 65, 12, 0.32);
   outline-offset: 2px;
 }
 
@@ -509,13 +511,13 @@ const goToSettings = () => {
   cursor: pointer;
   opacity: 0.22;
   transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
-  color: #94a3b8;
+  color: var(--text-quaternary);
   z-index: 1;
 }
 
 .tool-card:hover .favorite-btn {
   opacity: 0.78;
-  background: #f8fafc;
+  background: var(--bg-secondary);
 }
 
 .favorite-btn.starred {
@@ -537,6 +539,6 @@ const goToSettings = () => {
 :deep(.header-actions .el-button) {
   border-radius: 10px;
   font-weight: 600;
-  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.16);
+  box-shadow: 0 6px 12px rgba(194, 65, 12, 0.16);
 }
 </style>

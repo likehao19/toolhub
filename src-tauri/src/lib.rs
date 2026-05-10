@@ -138,6 +138,7 @@ pub fn run() {
             commands::mock_server::start_mock_server,
             commands::mock_server::stop_mock_server,
             commands::mock_server::update_mock_rules,
+            commands::mock_server::get_mock_server_status,
             commands::screenshot::capture_all_screens,
             commands::screenshot::capture_screen_fast,
             commands::screenshot::list_visible_windows,
@@ -202,6 +203,7 @@ pub fn run() {
             commands::ssh::ssh_host_key_response,
             commands::ssh::encrypt_credential,
             commands::ssh::decrypt_credential,
+            commands::crypto::crypto_get_master_key,
             commands::ssh::sftp_list,
             commands::ssh::sftp_download,
             commands::ssh::sftp_upload,
@@ -209,8 +211,21 @@ pub fn run() {
             commands::ssh::sftp_remove,
             commands::ssh::sftp_rename,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app_handle, event| {
+            // 应用进程真正退出前,显式 kill 掉 aria2c 子进程。
+            // std::process::Child 在 Aria2State drop 时不会自动杀子进程(Rust 文档明确说明),
+            // 不处理的话每次关软件 aria2c.exe 都会变孤儿进程留在 services.exe 下继续占带宽。
+            // ExitRequested 在窗口关闭准备退出时触发,Exit 在真正退出前触发——
+            // 都监听是为了多渠道兜底(比如用户从托盘菜单选 quit 走的可能是 Exit 直达)。
+            match event {
+                tauri::RunEvent::ExitRequested { .. } | tauri::RunEvent::Exit => {
+                    app_handle.state::<Aria2State>().shutdown();
+                }
+                _ => {}
+            }
+        });
 }
 
 /// 配置单实例插件

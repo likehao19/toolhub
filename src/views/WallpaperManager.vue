@@ -38,17 +38,17 @@
       </div>
       <div class="toolbar-actions">
         <el-button v-if="activeSource === 'local'" size="small" @click="selectFolder">
-          <el-icon><FolderOpened /></el-icon>
-          {{ t('wallpaper.selectFolder') }}
+          <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('wallpaper.selectFolder') }}
         </el-button>
         <el-button
           v-if="activeSource !== 'local' && activeSource !== 'downloaded'"
           size="small"
+          text
           @click="refreshCurrentSource"
           :loading="loading"
+          :title="t('common.refresh')"
         >
           <el-icon><Refresh /></el-icon>
-          {{ t('wallpaper.refresh') }}
         </el-button>
       </div>
     </div>
@@ -164,8 +164,7 @@
           @click="downloadImage(previewImg)"
           :loading="downloadProgress[previewImg?.id] != null"
         >
-          <el-icon><Download /></el-icon>
-          {{ t('wallpaper.downloadOnly') }}
+          <el-icon style="margin-right: 6px;"><Download /></el-icon>{{ t('wallpaper.downloadOnly') }}
         </el-button>
         <el-button
           type="primary"
@@ -625,7 +624,7 @@ watch(loading, async (val) => {
   padding: 0 18px;
   min-height: 58px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -664,7 +663,7 @@ watch(loading, async (val) => {
   gap: 6px;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(10,132,255,0.1);
+  background: rgba(194, 65, 12,0.1);
   font-size: 12px;
   color: var(--accent-blue);
   font-weight: 500;
@@ -699,7 +698,7 @@ watch(loading, async (val) => {
   gap: 6px;
   padding: 6px;
   background: rgba(255,255,255,0.7);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
 }
@@ -728,7 +727,7 @@ watch(loading, async (val) => {
 .source-tab.active {
   color: var(--accent-blue);
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
 .source-count {
@@ -755,7 +754,7 @@ watch(loading, async (val) => {
   justify-content: center;
   height: 240px;
   color: var(--text-tertiary);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.54);
 }
@@ -768,7 +767,7 @@ watch(loading, async (val) => {
   height: 320px;
   color: var(--text-quaternary);
   gap: 12px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.6);
 }
@@ -789,19 +788,19 @@ watch(loading, async (val) => {
   cursor: pointer;
   aspect-ratio: 16/10;
   background: rgba(255,255,255,0.78);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 8px 24px rgba(60, 40, 20, 0.05);
 }
 
 .wp-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 12px 28px rgba(60, 40, 20, 0.12);
 }
 
 .wp-card.is-current {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 3px rgba(10,132,255,0.12), 0 12px 28px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 0 0 3px rgba(194, 65, 12,0.12), 0 12px 28px rgba(60, 40, 20, 0.1);
 }
 
 .wp-card-img {

@@ -64,7 +64,7 @@ defineExpose({
 }
 
 .word-editor-content {
-  background: white;
+  background: var(--bg-primary);
   min-height: 100%;
   padding: 40px 60px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

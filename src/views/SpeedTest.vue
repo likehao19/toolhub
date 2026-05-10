@@ -8,7 +8,7 @@
             <el-icon><Odometer /></el-icon>
             <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
             <span class="breadcrumb-sep">/</span>
-            <span>网络测速</span>
+            <span>{{ t('speedTest.title') }}</span>
           </div>
         </div>
       </div>
@@ -16,30 +16,34 @@
 
     <div class="content-area">
       <aside class="config-panel">
-        <div class="panel-title">测试配置</div>
-        <div class="hint">默认使用公共测速节点测试当前设备网络延迟、下载和上传速度。</div>
+        <div class="panel-title">{{ t('speedTest.testConfig') }}</div>
+        <div class="hint">{{ t('speedTest.hint') }}</div>
 
         <el-form label-width="76px" size="small" class="bench-form">
-          <el-form-item label="延迟次数">
+          <el-form-item :label="t('speedTest.latencyCount')">
             <el-input-number v-model="latencyCount" :min="1" :max="20" style="width: 100%" />
           </el-form-item>
-          <el-form-item label="上传大小">
+          <el-form-item :label="t('speedTest.uploadSize')">
             <el-input-number v-model="uploadSizeMb" :min="1" :max="100" style="width: 100%" />
           </el-form-item>
           <el-form-item>
             <div class="action-row">
               <el-button type="primary" :loading="latencyLoading" :disabled="latencyLoading" @click="startLatency">
-                {{ latencyLoading ? '测试中...' : '开始延迟测试' }}
+                <el-icon style="margin-right: 6px;"><Timer /></el-icon>{{ latencyLoading ? t('speedTest.testing') : t('speedTest.startLatency') }}
               </el-button>
-              <el-button v-if="latencyLoading" type="danger" @click="cancelLatency">取消</el-button>
+              <el-button v-if="latencyLoading" type="danger" @click="cancelLatency">
+                <el-icon style="margin-right: 6px;"><Close /></el-icon>{{ t('speedTest.cancel') }}
+              </el-button>
             </div>
           </el-form-item>
           <el-form-item>
             <div class="action-row">
               <el-button type="primary" :loading="bandwidthLoading" :disabled="bandwidthLoading" @click="startBandwidth">
-                {{ bandwidthLoading ? '测试中...' : '开始下载/上传测试' }}
+                <el-icon style="margin-right: 6px;"><Download /></el-icon>{{ bandwidthLoading ? t('speedTest.testing') : t('speedTest.startBandwidth') }}
               </el-button>
-              <el-button v-if="bandwidthLoading" type="danger" @click="cancelBandwidth">取消</el-button>
+              <el-button v-if="bandwidthLoading" type="danger" @click="cancelBandwidth">
+                <el-icon style="margin-right: 6px;"><Close /></el-icon>{{ t('speedTest.cancel') }}
+              </el-button>
             </div>
           </el-form-item>
         </el-form>
@@ -48,39 +52,39 @@
       <section class="result-panel">
         <div class="result-toolbar">
           <div class="meta-row">
-            <el-tag size="small" :type="latencyLoading ? 'warning' : 'info'">{{ latencyLoading ? '延迟测试中' : '延迟空闲' }}</el-tag>
-            <el-tag size="small" :type="bandwidthLoading ? 'warning' : 'success'">{{ bandwidthLoading ? '带宽测试中' : '带宽空闲' }}</el-tag>
+            <el-tag size="small" :type="latencyLoading ? 'warning' : 'info'">{{ latencyLoading ? t('speedTest.latencyBusy') : t('speedTest.latencyIdle') }}</el-tag>
+            <el-tag size="small" :type="bandwidthLoading ? 'warning' : 'success'">{{ bandwidthLoading ? t('speedTest.bandwidthBusy') : t('speedTest.bandwidthIdle') }}</el-tag>
           </div>
-          <span class="hint">{{ progressText || '等待测速任务' }}</span>
+          <span class="hint">{{ progressText || t('speedTest.waiting') }}</span>
         </div>
 
         <div class="result-block">
-          <div class="result-title">延迟测试结果</div>
+          <div class="result-title">{{ t('speedTest.latencyResult') }}</div>
           <template v-if="latencyResult">
             <div class="stat-grid">
-              <div class="stat-card"><div class="stat-val">{{ latencyResult.min }} ms</div><div class="stat-label">最小</div></div>
-              <div class="stat-card"><div class="stat-val">{{ latencyResult.avg }} ms</div><div class="stat-label">平均</div></div>
-              <div class="stat-card"><div class="stat-val">{{ latencyResult.max }} ms</div><div class="stat-label">最大</div></div>
-              <div class="stat-card"><div class="stat-val">{{ latencyResult.samples.length }}</div><div class="stat-label">采样次数</div></div>
+              <div class="stat-card"><div class="stat-val">{{ latencyResult.min }} ms</div><div class="stat-label">{{ t('speedTest.min') }}</div></div>
+              <div class="stat-card"><div class="stat-val">{{ latencyResult.avg }} ms</div><div class="stat-label">{{ t('speedTest.avg') }}</div></div>
+              <div class="stat-card"><div class="stat-val">{{ latencyResult.max }} ms</div><div class="stat-label">{{ t('speedTest.max') }}</div></div>
+              <div class="stat-card"><div class="stat-val">{{ latencyResult.samples.length }}</div><div class="stat-label">{{ t('speedTest.samples') }}</div></div>
             </div>
             <div class="sample-list">
               <el-tag v-for="(item, index) in latencyResult.samples" :key="index" class="sample-tag">#{{ index + 1 }} {{ item }}ms</el-tag>
             </div>
           </template>
-          <div v-else class="empty-hint">尚未执行延迟测试</div>
+          <div v-else class="empty-hint">{{ t('speedTest.emptyLatency') }}</div>
         </div>
 
         <div class="result-block">
-          <div class="result-title">下载/上传测试结果</div>
+          <div class="result-title">{{ t('speedTest.bandwidthResult') }}</div>
           <template v-if="bandwidthResult">
             <div class="stat-grid two-col">
-              <div class="stat-card"><div class="stat-val">{{ bandwidthResult.downloadMbps ?? '-' }}</div><div class="stat-label">下载 Mbps</div></div>
-              <div class="stat-card"><div class="stat-val">{{ bandwidthResult.uploadMbps ?? '-' }}</div><div class="stat-label">上传 Mbps</div></div>
-              <div class="stat-card"><div class="stat-val">{{ formatBytes(bandwidthResult.downloadBytes) }}</div><div class="stat-label">下载大小</div></div>
-              <div class="stat-card"><div class="stat-val">{{ formatBytes(bandwidthResult.uploadBytes) }}</div><div class="stat-label">上传大小</div></div>
+              <div class="stat-card"><div class="stat-val">{{ bandwidthResult.downloadMbps ?? '-' }}</div><div class="stat-label">{{ t('speedTest.downloadMbps') }}</div></div>
+              <div class="stat-card"><div class="stat-val">{{ bandwidthResult.uploadMbps ?? '-' }}</div><div class="stat-label">{{ t('speedTest.uploadMbps') }}</div></div>
+              <div class="stat-card"><div class="stat-val">{{ formatBytes(bandwidthResult.downloadBytes) }}</div><div class="stat-label">{{ t('speedTest.downloadBytes') }}</div></div>
+              <div class="stat-card"><div class="stat-val">{{ formatBytes(bandwidthResult.uploadBytes) }}</div><div class="stat-label">{{ t('speedTest.uploadBytes') }}</div></div>
             </div>
           </template>
-          <div v-else class="empty-hint">尚未执行下载/上传测试</div>
+          <div v-else class="empty-hint">{{ t('speedTest.emptyBandwidth') }}</div>
         </div>
       </section>
     </div>
@@ -91,7 +95,7 @@
 import { ref, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Odometer } from '@element-plus/icons-vue'
+import { Odometer, Timer, Close, Download } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { runBandwidthTest, runLatencyTest } from '@/utils/networkTools'
 
@@ -134,17 +138,20 @@ async function startBandwidth() {
   if (bandwidthLoading.value) return
 
   bandwidthLoading.value = true
-  progressText.value = '测速中...'
+  progressText.value = t('speedTest.testingBandwidth')
   bandwidthAbort = new AbortController()
   try {
     bandwidthResult.value = await runBandwidthTest({
       uploadSizeMb: uploadSizeMb.value,
       signal: bandwidthAbort.signal,
       onProgress: ({ phase, bytes }) => {
-        progressText.value = `${phase === 'download' ? '下载' : '上传'}已处理 ${formatBytes(bytes)}`
+        progressText.value = t('speedTest.bytesProcessed', {
+          phase: phase === 'download' ? t('speedTest.download') : t('speedTest.upload'),
+          bytes: formatBytes(bytes),
+        })
       }
     })
-    progressText.value = '测速完成'
+    progressText.value = t('speedTest.done')
   } catch (error) {
     if (error?.name === 'AbortError') {
       progressText.value = ''
@@ -188,15 +195,17 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   overflow: hidden;
 }
 
 .config-panel {
   min-height: 0;
-  overflow: auto;
-  padding: 16px 18px;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  padding: 14px 18px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-title,
@@ -205,7 +214,7 @@ onUnmounted(() => {
   font-weight: 600;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
 }
 
 .bench-form {
@@ -237,7 +246,7 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .meta-row {
@@ -249,7 +258,7 @@ onUnmounted(() => {
 
 .result-block {
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .stat-grid {
@@ -264,7 +273,7 @@ onUnmounted(() => {
 
 .stat-card {
   padding: 12px 10px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .stat-val {
@@ -297,7 +306,7 @@ onUnmounted(() => {
 
 @media (max-width: 1100px) {
   .content-area { grid-template-columns: 1fr; }
-  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+  .config-panel { border-right: 0; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
   .result-toolbar { flex-wrap: wrap; }
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

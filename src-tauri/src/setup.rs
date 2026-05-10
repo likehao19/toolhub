@@ -190,8 +190,14 @@ fn setup_tray(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     let menu = Menu::with_items(app, &[&show_item, &hide_item, &quit_item])?;
 
     // 创建系统托盘
+    // 旧代码:default_window_icon().unwrap() —— 打包配置缺图标资源时直接 panic,应用启动失败。
+    // 现在改为:没图标就跳过托盘构建(主窗口仍可正常用),并在控制台留一条警告。
+    let Some(icon) = app.default_window_icon().cloned() else {
+        eprintln!("[setup] no default window icon, skipping tray icon");
+        return Ok(());
+    };
     TrayIconBuilder::new()
-        .icon(app.default_window_icon().unwrap().clone())
+        .icon(icon)
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(handle_tray_menu_event)

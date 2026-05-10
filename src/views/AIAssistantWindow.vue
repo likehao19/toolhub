@@ -359,7 +359,7 @@ onMounted(() => {
 }
 
 .command-item {
-  background: white;
+  background: var(--bg-primary);
   border: 1px solid #e4e7ed;
   border-radius: 8px;
   padding: 12px;
@@ -425,7 +425,7 @@ onMounted(() => {
 }
 
 .message-text {
-  background: white;
+  background: var(--bg-primary);
   padding: 10px 14px;
   border-radius: 12px;
   color: #303133;
@@ -472,7 +472,7 @@ onMounted(() => {
   display: flex;
   gap: 6px;
   padding: 10px 14px;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px 12px 12px 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -505,7 +505,7 @@ onMounted(() => {
 /* ignore */
 .input-area {
   padding: 12px;
-  background: white;
+  background: var(--bg-primary);
   border-top: 1px solid #e4e7ed;
   display: flex;
   flex-direction: column;

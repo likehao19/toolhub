@@ -122,8 +122,35 @@ export const callAI = async (messages, options = {}) => {
  * @param {Array} messages - 对话消息数组
  * @param {Function} onChunk - 接收到数据块的回调
  * @param {Object} options - 额外选项
+ *   - signal: AbortSignal,用于取消请求(切换会话/卸载组件时调用 controller.abort())
+ *   - idleTimeoutMs: 空闲超时(ms),从最近一次收到 chunk 算起,超时未收到新数据自动 abort。
+ *     默认 60_000;传 0 关闭超时。流式 AI 没有"总时长"的概念,但服务端挂掉时不会主动断流,
+ *     需要客户端兜底,否则 await 永远不返回、上层 try/finally 不执行,UI 卡死。
  */
 export const callAIStream = async (messages, onChunk, options = {}) => {
+  const externalSignal = options.signal
+  const idleTimeoutMs = options.idleTimeoutMs ?? 60_000
+
+  // 内部 controller:既响应外部 signal,也驱动空闲超时。
+  const controller = new AbortController()
+  const onExternalAbort = () => controller.abort(externalSignal?.reason)
+  if (externalSignal) {
+    if (externalSignal.aborted) controller.abort(externalSignal.reason)
+    else externalSignal.addEventListener('abort', onExternalAbort, { once: true })
+  }
+
+  let idleTimer = null
+  const armIdleTimer = () => {
+    if (!idleTimeoutMs) return
+    if (idleTimer) clearTimeout(idleTimer)
+    idleTimer = setTimeout(() => {
+      controller.abort(new DOMException(`AI 流式响应空闲超时(${idleTimeoutMs}ms)`, 'TimeoutError'))
+    }, idleTimeoutMs)
+  }
+  const clearIdleTimer = () => {
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = null }
+  }
+
   try {
     const aiConfig = await getAIConfig()
     const isClaude = aiConfig.provider === 'claude' || /anthropic\.com/i.test(aiConfig.baseURL || '')
@@ -131,9 +158,11 @@ export const callAIStream = async (messages, onChunk, options = {}) => {
     if (isClaude) {
       const systemMessage = messages.find(item => item.role === 'system')?.content || ''
       const userMessages = messages.filter(item => item.role !== 'system')
+      armIdleTimer()
       const response = await tauriFetch(`${aiConfig.baseURL.replace(/\/$/, '')}/messages`, {
         method: 'POST',
         responseType: 3,
+        signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
           'x-api-key': aiConfig.apiKey,
@@ -162,6 +191,7 @@ export const callAIStream = async (messages, onChunk, options = {}) => {
       let fullContent = ''
 
       for (const eventBlock of events) {
+        if (controller.signal.aborted) throw controller.signal.reason || new DOMException('Aborted', 'AbortError')
         const lines = eventBlock.split('\n')
         for (const line of lines) {
           if (!line.startsWith('data: ')) continue
@@ -176,6 +206,7 @@ export const callAIStream = async (messages, onChunk, options = {}) => {
           if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
             const chunk = parsed.delta.text
             fullContent += chunk
+            armIdleTimer()
             onChunk(chunk, fullContent)
           }
         }
@@ -185,27 +216,33 @@ export const callAIStream = async (messages, onChunk, options = {}) => {
     }
 
     const { client, aiConfig: clientConfig } = await initClient()
+    armIdleTimer()
+    // 排除非 OpenAI body 字段(signal/idleTimeoutMs/maxTokens 不应进 body)
+    const { signal: _s, idleTimeoutMs: _t, maxTokens: _m, temperature: _temp, ...rest } = options
     const stream = await client.chat.completions.create({
       model: clientConfig.model || 'gpt-3.5-turbo',
       messages,
       temperature: options.temperature || 0.7,
       max_tokens: options.maxTokens || 2000,
       stream: true,
-      ...options
-    })
+      ...rest
+    }, { signal: controller.signal })
 
     let fullContent = ''
     for await (const chunk of stream) {
+      if (controller.signal.aborted) throw controller.signal.reason || new DOMException('Aborted', 'AbortError')
       const content = chunk.choices[0]?.delta?.content || ''
       if (content) {
         fullContent += content
+        armIdleTimer()
         onChunk(content, fullContent)
       }
     }
 
     return fullContent
-  } catch (error) {
-    throw error
+  } finally {
+    clearIdleTimer()
+    if (externalSignal) externalSignal.removeEventListener('abort', onExternalAbort)
   }
 }
 

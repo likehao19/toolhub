@@ -102,7 +102,10 @@ export function buildAuthHeader(auth) {
     return { key: 'Authorization', value: `Bearer ${auth.token}` }
   }
   if (auth.type === 'basic' && auth.username) {
-    const encoded = btoa(`${auth.username}:${auth.password || ''}`)
+    // btoa 不支持非 latin-1,用户名/密码含中文/emoji 会抛 InvalidCharacterError,
+    // 整个请求直接失败。先 utf-8 编码再 base64。
+    const raw = `${auth.username}:${auth.password || ''}`
+    const encoded = btoa(unescape(encodeURIComponent(raw)))
     return { key: 'Authorization', value: `Basic ${encoded}` }
   }
   if (auth.type === 'apikey' && auth.key && auth.value) {

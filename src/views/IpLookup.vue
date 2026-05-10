@@ -8,37 +8,43 @@
             <el-icon><Location /></el-icon>
             <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
             <span class="breadcrumb-sep">/</span>
-            <span>IP 查询</span>
+            <span>{{ t('ipLookup.title') }}</span>
           </div>
         </div>
       </div>
       <div class="header-actions">
-        <el-button size="small" @click="lookupCurrent" :loading="loading">查询我的公网 IP</el-button>
+        <el-button size="small" @click="lookupCurrent" :loading="loading">
+          <el-icon style="margin-right: 6px;"><Position /></el-icon>{{ t('ipLookup.lookupMyIp') }}
+        </el-button>
       </div>
     </div>
 
     <div class="content-area">
       <aside class="config-panel">
-        <div class="panel-title">查询配置</div>
+        <div class="panel-title">{{ t('ipLookup.queryConfig') }}</div>
         <el-form label-width="72px" size="small">
-          <el-form-item label="IP/域名">
-            <el-input v-model="target" placeholder="例如：8.8.8.8 / example.com" clearable @keyup.enter="submit" />
+          <el-form-item :label="t('ipLookup.ipOrDomain')">
+            <el-input v-model="target" :placeholder="t('ipLookup.ipPlaceholder')" clearable @keyup.enter="submit" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" :loading="loading" @click="submit">开始查询</el-button>
-            <el-button @click="reset">重置</el-button>
+            <el-button type="primary" :loading="loading" @click="submit">
+              <el-icon style="margin-right: 6px;"><Search /></el-icon>{{ t('ipLookup.startQuery') }}
+            </el-button>
+            <el-button @click="reset">
+              <el-icon style="margin-right: 6px;"><RefreshLeft /></el-icon>{{ t('ipLookup.reset') }}
+            </el-button>
           </el-form-item>
         </el-form>
-        <div class="hint">支持直接查询 IP，或输入域名后先解析 A 记录再查询。</div>
+        <div class="hint">{{ t('ipLookup.hint') }}</div>
 
         <div class="history-card">
-          <div class="sub-title">最近查询</div>
+          <div class="sub-title">{{ t('ipLookup.recentQueries') }}</div>
           <div v-if="historyList.length" class="history-list">
             <div v-for="item in historyList" :key="item" class="history-item" @click="selectHistory(item)">
               <span class="history-text">{{ item }}</span>
             </div>
           </div>
-          <div v-else class="hint">暂无查询历史</div>
+          <div v-else class="hint">{{ t('ipLookup.noHistory') }}</div>
         </div>
       </aside>
 
@@ -55,32 +61,32 @@
           <div class="stat-grid">
             <div class="stat-card">
               <div class="stat-val">{{ result.ip || '-' }}</div>
-              <div class="stat-label-row"><span class="stat-label">IP</span><el-button text size="small" @click="copyField(result.ip, 'IP')">复制</el-button></div>
+              <div class="stat-label-row"><span class="stat-label">IP</span><el-button text size="small" @click="copyField(result.ip, 'IP')" :title="t('common.copy')"><el-icon><CopyDocument /></el-icon></el-button></div>
             </div>
-            <div class="stat-card"><div class="stat-val">{{ result.country || '-' }}</div><div class="stat-label">国家</div></div>
+            <div class="stat-card"><div class="stat-val">{{ result.country || '-' }}</div><div class="stat-label">{{ t('ipLookup.country') }}</div></div>
             <div class="stat-card">
               <div class="stat-val">{{ result.region || '-' }}</div>
-              <div class="stat-label-row"><span class="stat-label">地区</span><el-button text size="small" @click="copyField(result.region, '地区')">复制</el-button></div>
+              <div class="stat-label-row"><span class="stat-label">{{ t('ipLookup.region') }}</span><el-button text size="small" @click="copyField(result.region, t('ipLookup.region'))" :title="t('common.copy')"><el-icon><CopyDocument /></el-icon></el-button></div>
             </div>
-            <div class="stat-card"><div class="stat-val">{{ result.city || '-' }}</div><div class="stat-label">城市</div></div>
+            <div class="stat-card"><div class="stat-val">{{ result.city || '-' }}</div><div class="stat-label">{{ t('ipLookup.city') }}</div></div>
           </div>
 
           <el-descriptions :column="2" border size="small">
-            <el-descriptions-item label="查询目标">{{ result.query || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="域名">{{ result.domain || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="IP 类型">{{ result.type || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="洲">{{ result.continent || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="ISP">
-              <div class="desc-cell"><span>{{ result.isp || '-' }}</span><el-button text size="small" @click="copyField(result.isp, 'ISP')">复制</el-button></div>
+            <el-descriptions-item :label="t('ipLookup.target')">{{ result.query || '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="t('ipLookup.domain')">{{ result.domain || '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="t('ipLookup.ipType')">{{ result.type || '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="t('ipLookup.continent')">{{ result.continent || '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="t('ipLookup.isp')">
+              <div class="desc-cell"><span>{{ result.isp || '-' }}</span><el-button text size="small" @click="copyField(result.isp, 'ISP')" :title="t('common.copy')"><el-icon><CopyDocument /></el-icon></el-button></div>
             </el-descriptions-item>
-            <el-descriptions-item label="ASN">{{ result.asn || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="时区">
-              <div class="desc-cell"><span>{{ result.timezone || '-' }}</span><el-button text size="small" @click="copyField(result.timezone, '时区')">复制</el-button></div>
+            <el-descriptions-item :label="t('ipLookup.asn')">{{ result.asn || '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="t('ipLookup.timezone')">
+              <div class="desc-cell"><span>{{ result.timezone || '-' }}</span><el-button text size="small" @click="copyField(result.timezone, t('ipLookup.timezone'))" :title="t('common.copy')"><el-icon><CopyDocument /></el-icon></el-button></div>
             </el-descriptions-item>
-            <el-descriptions-item label="坐标">{{ result.latitude && result.longitude ? `${result.latitude}, ${result.longitude}` : '-' }}</el-descriptions-item>
+            <el-descriptions-item :label="t('ipLookup.coordinates')">{{ result.latitude && result.longitude ? `${result.latitude}, ${result.longitude}` : '-' }}</el-descriptions-item>
           </el-descriptions>
         </template>
-        <div v-else class="empty-hint">输入 IP 或域名后开始查询</div>
+        <div v-else class="empty-hint">{{ t('ipLookup.emptyHint') }}</div>
       </section>
     </div>
   </div>
@@ -90,7 +96,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Location } from '@element-plus/icons-vue'
+import { Location, CopyDocument, Position, Search, RefreshLeft } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { lookupIp } from '@/utils/networkTools'
 import { writeText } from '@/utils/tauri/clipboard'
@@ -122,12 +128,12 @@ function saveHistory(value) {
 
 async function copyField(value, label) {
   if (!value) {
-    ElMessage.warning(`暂无${label}`)
+    ElMessage.warning(t('ipLookup.noField', { label }))
     return
   }
   try {
     await writeText(String(value))
-    ElMessage.success(`${label}已复制`)
+    ElMessage.success(t('ipLookup.fieldCopied', { label }))
   } catch {}
 }
 
@@ -164,7 +170,7 @@ function reset() {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -176,9 +182,11 @@ function reset() {
 
 .config-panel {
   min-height: 0;
-  overflow: auto;
-  padding: 16px 18px;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  padding: 14px 18px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-title,
@@ -187,7 +195,7 @@ function reset() {
   font-weight: 600;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
 }
 
 .hint {
@@ -207,7 +215,7 @@ function reset() {
 
 .history-item {
   padding: 10px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   cursor: pointer;
 }
 
@@ -228,7 +236,7 @@ function reset() {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .meta-row {
@@ -246,7 +254,7 @@ function reset() {
 
 .stat-card {
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .stat-val {
@@ -289,7 +297,7 @@ function reset() {
 
 @media (max-width: 1100px) {
   .content-area { grid-template-columns: 1fr; }
-  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+  .config-panel { border-right: 0; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style>

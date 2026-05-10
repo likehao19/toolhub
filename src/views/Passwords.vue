@@ -1004,7 +1004,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { 
   Plus, Search, Edit, Delete, DocumentCopy, Upload, Download, 
   View, Folder, Star, Monitor, Key, CreditCard, ArrowLeft, 
@@ -1019,7 +1019,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import Database from '@tauri-apps/plugin-sql'
 import { writeText } from '@tauri-apps/plugin-clipboard-manager'
 import { t } from '@/i18n'
-import { encryptPassword, decryptPassword } from '@/utils/encryption'
+import { encryptPassword, decryptPassword, isEncryptedV1 } from '@/utils/encryption'
 import { analyzePasswordStrength, generatePassword as generateRandomPassword } from '@/utils/passwordStrength'
 import { importPasswordFile, validatePasswords, exportToEncryptedJSON } from '@/utils/passwordImport'
 import { open as openDialog, save as saveDialog } from '@tauri-apps/plugin-dialog'
@@ -1371,16 +1371,39 @@ const loadPasswords = async () => {
     loading.value = true
     const db = await getDatabase()
     const result = await db.select(`
-      SELECT p.*, c.icon as category_icon 
-      FROM passwords p 
-      LEFT JOIN password_categories c ON p.category_id = c.id 
+      SELECT p.*, c.icon as category_icon
+      FROM passwords p
+      LEFT JOIN password_categories c ON p.category_id = c.id
       ORDER BY p.updated_at DESC
     `)
     passwords.value = result || []
+    // 后台一次性升级旧 base64 密文到 AES,不阻塞 UI 渲染。
+    // 失败时静默,旧数据仍可读(decryptPassword 会走 legacy 兜底)。
+    migrateLegacyPasswords(db).catch(() => {})
   } catch (error) {
     ElMessage.error(t('passwords.loadPasswordsFailed'))
   } finally {
     loading.value = false
+  }
+}
+
+// 把旧 base64 密文升级为 AES-256-CBC。
+// 只在密钥已就绪时运行;每条记录单独 try,损坏的不影响其他记录。
+async function migrateLegacyPasswords(db) {
+  const legacy = passwords.value.filter(p => p.password && !isEncryptedV1(p.password))
+  if (legacy.length === 0) return
+  for (const p of legacy) {
+    try {
+      const plain = decryptPassword(p.password)
+      if (!plain) continue
+      const upgraded = encryptPassword(plain)
+      if (!isEncryptedV1(upgraded)) continue  // 密钥还没就绪,留待下次
+      await db.execute(
+        'UPDATE passwords SET password = ? WHERE id = ?',
+        [upgraded, p.id]
+      )
+      p.password = upgraded
+    } catch { /* skip this row */ }
   }
 }
 
@@ -1611,14 +1634,19 @@ const viewPassword = (password) => {
 }
 
 // 复制到剪贴板
+// clipboardTimer 必须在组件卸载时清掉:用户复制密码后 30 秒会自动清空剪贴板,
+// 如果用户在期间切到别的页面/复制了别的内容,旧 timer 还在,会无差别地把当前剪贴板抹掉。
 let clipboardTimer = null
+const clearClipboardTimer = () => {
+  if (clipboardTimer) { clearTimeout(clipboardTimer); clipboardTimer = null }
+}
 const copyToClipboard = async (text, label) => {
   try {
     await writeText(text)
     ElMessage.success(`${label}${t('passwords.copied')}`)
     // 复制密码后 30 秒自动清除剪贴板
     if (label === t('passwords.passwordLabel')) {
-      if (clipboardTimer) clearTimeout(clipboardTimer)
+      clearClipboardTimer()
       clipboardTimer = setTimeout(async () => {
         try { await writeText('') } catch {}
         clipboardTimer = null
@@ -1628,6 +1656,7 @@ const copyToClipboard = async (text, label) => {
     ElMessage.error(t('passwords.copyFailed'))
   }
 }
+onBeforeUnmount(clearClipboardTimer)
 
 // 更新密码强度
 const updatePasswordStrength = () => {
@@ -2689,7 +2718,7 @@ onMounted(async () => {
 .header {
   min-height: 58px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2710,7 +2739,7 @@ onMounted(async () => {
 }
 
 .sidebar-toggle-btn {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(242, 246, 251, 0.92));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
@@ -2773,7 +2802,7 @@ onMounted(async () => {
 /* ========== Layout ========== */
 .main-container {
   display: grid;
-  grid-template-columns: 272px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   flex: 1;
   overflow: hidden;
   min-height: 0;
@@ -2789,8 +2818,8 @@ onMounted(async () => {
 .sidebar-left {
   min-width: 0;
   flex-shrink: 0;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 96%, var(--accent-warm-soft) 4%), var(--bg-secondary));
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-right: none;
   border-radius: 18px 0 0 18px;
   display: flex;
@@ -2805,7 +2834,7 @@ onMounted(async () => {
 
 .sidebar-toolbar {
   padding: 14px 14px 10px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2862,8 +2891,8 @@ onMounted(async () => {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
   color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
-  border-color: rgba(10, 132, 255, 0.15);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(15, 23, 42, 0.05);
+  border-color: rgba(194, 65, 12, 0.15);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(60, 40, 20, 0.05);
 }
 
 .category-icon {
@@ -2955,7 +2984,7 @@ onMounted(async () => {
 /* ========== Content Area ========== */
 .content-area {
   flex: 1;
-  background: linear-gradient(180deg, rgba(252, 253, 255, 0.99), rgba(245, 247, 250, 0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
   display: flex;
   flex-direction: column;
   position: relative;
@@ -2963,7 +2992,7 @@ onMounted(async () => {
   min-width: 0;
   min-height: 0;
   z-index: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 18px 0;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
@@ -2982,9 +3011,9 @@ onMounted(async () => {
 
 .password-list :deep(.el-empty) {
   min-height: 320px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248, 244, 232,0.92));
 }
 
 .password-list::-webkit-scrollbar {
@@ -3009,9 +3038,9 @@ onMounted(async () => {
   flex-direction: column;
   background: rgba(255, 255, 255, 0.92);
   border-radius: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
 }
 
 /* 紧凑单行 */
@@ -3026,7 +3055,7 @@ onMounted(async () => {
 }
 
 .password-row:not(:last-child) {
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
 }
 
 .password-row:hover {
@@ -3350,12 +3379,40 @@ onMounted(async () => {
 }
 
 .lock-form {
-  width: 300px;
+  width: 320px;
+  max-width: 90vw;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.lock-form :deep(.el-form-item) {
+  margin-bottom: 0;
+  width: 100%;
+}
+.lock-form :deep(.el-form-item__content) {
+  width: 100%;
+  justify-content: center;
+}
+.lock-form :deep(.el-input) {
+  width: 100% !important;
+}
+.lock-form :deep(.el-input__wrapper) {
+  padding: 2px 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.lock-form :deep(.el-input--large .el-input__inner) {
+  height: 36px;
+  font-size: 14px;
 }
 
 .lock-btn {
   width: 100%;
+  height: 36px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
 }
 
 /* ========== Master Password Dialog ========== */

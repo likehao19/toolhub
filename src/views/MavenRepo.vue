@@ -20,17 +20,19 @@
       <div class="toolbar-group">
         <span class="repo-label">{{ t('mavenRepo.repoPath') }}:</span>
         <span class="repo-path" :title="displayRepoPath">{{ displayRepoPath }}</span>
-        <el-button size="small" text class="toolbar-secondary-btn" @click="changeRepoPath">{{ t('mavenRepo.changePath') }}</el-button>
+        <el-button size="small" text @click="changeRepoPath" :title="t('mavenRepo.changePath')">
+          <el-icon><FolderOpened /></el-icon>
+        </el-button>
       </div>
       <div class="toolbar-spacer"></div>
       <div class="toolbar-group">
         <el-button size="small" type="primary" class="toolbar-primary-btn" @click="selectProjectDir" plain>
-          {{ t('mavenRepo.selectProjectDir') }}
+          <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('mavenRepo.selectProjectDir') }}
         </el-button>
         <el-button size="small" class="toolbar-secondary-btn" @click="doFullCheck" :loading="checking">
-          {{ t('mavenRepo.fullCheck') }}
+          <el-icon style="margin-right: 6px;"><Check /></el-icon>{{ t('mavenRepo.fullCheck') }}
         </el-button>
-        <el-button size="small" text class="toolbar-icon-btn" @click="doRefresh">
+        <el-button size="small" text class="toolbar-icon-btn" @click="doRefresh" :title="t('common.refresh')">
           <el-icon><Refresh /></el-icon>
         </el-button>
       </div>
@@ -148,9 +150,15 @@
             <span class="detail-title">{{ t('mavenRepo.depTreeTitle') }}: {{ depTree.groupId }}:{{ depTree.artifactId }}:{{ depTree.version }}</span>
             <div class="detail-actions">
               <el-checkbox v-model="showMissingOnly" :label="t('mavenRepo.showMissing')" size="small" />
-              <el-button size="small" text @click="expandAllNodes">{{ t('mavenRepo.expandAll') }}</el-button>
-              <el-button size="small" text @click="collapseAllNodes">{{ t('mavenRepo.collapseAll') }}</el-button>
-              <el-button size="small" text @click="closeProjectDepTree">&times;</el-button>
+              <el-button size="small" text @click="expandAllNodes" :title="t('common.expand')">
+                <el-icon><Expand /></el-icon>
+              </el-button>
+              <el-button size="small" text @click="collapseAllNodes" :title="t('common.collapse')">
+                <el-icon><Fold /></el-icon>
+              </el-button>
+              <el-button size="small" text @click="closeProjectDepTree" :title="t('common.close')">
+                <el-icon><Close /></el-icon>
+              </el-button>
             </div>
           </div>
           <el-scrollbar class="tree-content">
@@ -167,10 +175,18 @@
               <div class="gav-card">
                 <div class="gav-text">{{ currentGroupId }}:{{ detail?.artifactId }}:{{ detail?.version }}</div>
                 <div class="gav-actions">
-                  <el-button size="small" @click="copyAs('maven')">{{ t('mavenRepo.copyMaven') }}</el-button>
-                  <el-button size="small" @click="copyAs('gradle')">{{ t('mavenRepo.copyGradle') }}</el-button>
-                  <el-button size="small" @click="copyAs('gradleKts')">{{ t('mavenRepo.copyGradleKts') }}</el-button>
-                  <el-button size="small" @click="copyAs('sbt')">{{ t('mavenRepo.copySbt') }}</el-button>
+                  <el-button size="small" @click="copyAs('maven')">
+                    <el-icon style="margin-right: 4px;"><CopyDocument /></el-icon>{{ t('mavenRepo.copyMaven') }}
+                  </el-button>
+                  <el-button size="small" @click="copyAs('gradle')">
+                    <el-icon style="margin-right: 4px;"><CopyDocument /></el-icon>{{ t('mavenRepo.copyGradle') }}
+                  </el-button>
+                  <el-button size="small" @click="copyAs('gradleKts')">
+                    <el-icon style="margin-right: 4px;"><CopyDocument /></el-icon>{{ t('mavenRepo.copyGradleKts') }}
+                  </el-button>
+                  <el-button size="small" @click="copyAs('sbt')">
+                    <el-icon style="margin-right: 4px;"><CopyDocument /></el-icon>{{ t('mavenRepo.copySbt') }}
+                  </el-button>
                 </div>
               </div>
               <div v-if="detail?.integrityIssues?.length" class="issues-section">
@@ -261,7 +277,7 @@
 <script setup>
 import { ref, computed, onMounted, defineComponent, h, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Box, Refresh, Search, Loading } from '@element-plus/icons-vue'
+import { Box, Refresh, Search, Loading, FolderOpened, Check, Expand, Fold, Close, CopyDocument } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { invoke } from '@tauri-apps/api/core'
 import { open as dialogOpen } from '@tauri-apps/plugin-dialog'
@@ -626,7 +642,7 @@ function formatDate(ts) {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -657,9 +673,9 @@ function formatDate(ts) {
   min-height: 52px;
   box-sizing: border-box;
   background: rgba(255,255,255,0.58);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 22px rgba(15,23,42,0.03);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 8px 22px rgba(60, 40, 20,0.03);
 }
 .toolbar-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
 .toolbar-spacer { flex: 1; }
@@ -668,8 +684,8 @@ function formatDate(ts) {
   font-weight: 600;
 }
 .toolbar-secondary-btn:not(.is-disabled) {
-  background: rgba(248,250,252,0.9);
-  border-color: rgba(15, 23, 42, 0.08);
+  background: rgba(248, 244, 232,0.9);
+  border-color: rgba(60, 40, 20, 0.08);
   color: var(--text-primary);
 }
 .toolbar-icon-btn {
@@ -678,13 +694,13 @@ function formatDate(ts) {
   padding: 0;
   border-radius: 10px;
   color: var(--text-secondary);
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 232,0.9);
+  border: 1px solid rgba(60, 40, 20, 0.06);
 }
 .toolbar-icon-btn:hover:not(.is-disabled) {
   color: var(--text-primary);
   background: rgba(255,255,255,0.96);
-  border-color: rgba(15, 23, 42, 0.1);
+  border-color: rgba(60, 40, 20, 0.1);
 }
 .repo-label {
   font-size: 11px;
@@ -705,8 +721,8 @@ function formatDate(ts) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background: rgba(248,250,252,0.9);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 232,0.9);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 10px;
 }
 .toolbar :deep(.el-button) { --el-border-radius-base: 10px; }
@@ -716,11 +732,11 @@ function formatDate(ts) {
   gap: 12px;
   margin: 14px 18px 0;
   padding: 10px 12px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248,250,252,0.9));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248, 244, 232,0.9));
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
   flex-wrap: wrap;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72), 0 8px 22px rgba(15,23,42,0.03);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72), 0 8px 22px rgba(60, 40, 20,0.03);
 }
 .stat-item {
   display: flex;
@@ -728,8 +744,8 @@ function formatDate(ts) {
   gap: 4px;
   min-height: 28px;
   padding: 6px 10px;
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 232,0.94);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 999px;
 }
 .stat-num { font-size: 14px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
@@ -742,23 +758,23 @@ function formatDate(ts) {
   display: flex;
   overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
+  padding: 0;
   gap: 0;
 }
 .left-panel {
-  width: 300px;
-  min-width: 300px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  width: 260px;
+  min-width: 260px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
-.search-box { padding: 10px; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.search-box { padding: 10px; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .search-box :deep(.el-input__wrapper) {
-  background: rgba(248,250,252,0.92);
-  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+  background: rgba(248, 244, 232,0.92);
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.08);
   border-radius: 10px;
 }
 .search-box :deep(.el-input__wrapper.is-focus) {
@@ -772,16 +788,16 @@ function formatDate(ts) {
   text-align: center;
   color: var(--text-tertiary);
   font-size: 13px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(248,250,252,0.9));
+  background: linear-gradient(180deg, rgba(255,255,255,0.74), rgba(248, 244, 232,0.9));
 }
 
 .project-modules-section {
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   max-height: 200px;
   overflow-y: auto;
-  background: linear-gradient(180deg, rgba(255,255,255,0.42), rgba(248,250,252,0.3));
+  background: linear-gradient(180deg, rgba(255,255,255,0.42), rgba(248, 244, 232,0.3));
 }
 .section-head {
   display: flex;
@@ -789,16 +805,16 @@ function formatDate(ts) {
   gap: 6px;
   padding: 10px 12px;
   background: rgba(255,255,255,0.66);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
 }
 .section-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.02em; text-transform: uppercase; }
 .section-count {
   font-size: 10px;
   color: var(--text-tertiary);
-  background: rgba(248,250,252,0.94);
+  background: rgba(248, 244, 232,0.94);
   padding: 1px 6px;
   border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(60, 40, 20, 0.06);
 }
 .section-close { margin-left: auto; cursor: pointer; color: var(--text-quaternary); font-size: 14px; line-height: 1; }
 .section-close:hover { color: var(--color-red); }
@@ -809,7 +825,7 @@ function formatDate(ts) {
   padding: 9px 12px;
   cursor: pointer;
   font-size: 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.05);
 }
 .module-row:last-child { border-bottom: none; }
 .module-row:hover { background: rgba(64, 158, 255, 0.06); }
@@ -833,7 +849,7 @@ function formatDate(ts) {
 .module-icon.is-root { background: var(--accent-blue); }
 .module-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 600; }
 .module-meta { font-size: 10px; color: var(--text-quaternary); }
-.tree-group { border-bottom: 1px solid rgba(15, 23, 42, 0.06); }
+.tree-group { border-bottom: 1px solid rgba(60, 40, 20, 0.06); }
 .tree-group-label {
   padding: 8px 10px;
   cursor: pointer;
@@ -851,10 +867,10 @@ function formatDate(ts) {
   margin-left: auto;
   font-size: 10px;
   color: var(--text-quaternary);
-  background: rgba(248,250,252,0.94);
+  background: rgba(248, 244, 232,0.94);
   padding: 1px 6px;
   border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   flex-shrink: 0;
 }
 .tree-artifact {
@@ -879,9 +895,9 @@ function formatDate(ts) {
 .right-panel {
   flex: 1;
   overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
 }
 .empty-detail {
   display: flex;
@@ -891,9 +907,9 @@ function formatDate(ts) {
   height: 100%;
   margin: 16px;
   color: var(--text-quaternary);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248,250,252,0.9));
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248, 244, 232,0.9));
 }
 .empty-icon { font-size: 64px; margin-bottom: 16px; }
 .project-overview-panel { padding: 18px; }
@@ -903,16 +919,16 @@ function formatDate(ts) {
 .module-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
 .module-card {
   padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248, 244, 232,0.92));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
 }
-.module-card:hover { border-color: rgba(64, 158, 255, 0.28); box-shadow: 0 10px 24px rgba(15,23,42,0.06); transform: translateY(-1px); }
+.module-card:hover { border-color: rgba(64, 158, 255, 0.28); box-shadow: 0 10px 24px rgba(60, 40, 20,0.06); transform: translateY(-1px); }
 .module-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.module-card-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 999px; color: var(--text-tertiary); background: rgba(248,250,252,0.94); border: 1px solid rgba(15, 23, 42, 0.06); }
+.module-card-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 999px; color: var(--text-tertiary); background: rgba(248, 244, 232,0.94); border: 1px solid rgba(60, 40, 20, 0.06); }
 .module-card-badge.is-root { color: var(--accent-blue); background: var(--accent-blue-bg); border-color: rgba(64, 158, 255, 0.16); }
 .module-card-packaging { font-size: 10px; color: var(--text-quaternary); }
 .module-card-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
@@ -920,24 +936,24 @@ function formatDate(ts) {
 .module-card-meta { display: flex; gap: 10px; font-size: 10px; color: var(--text-quaternary); flex-wrap: wrap; }
 .detail-panel { padding: 0; height: 100%; display: flex; flex-direction: column; }
 .detail-tabs { height: 100%; display: flex; flex-direction: column; }
-.detail-tabs :deep(.el-tabs__content) { flex: 1; overflow-y: auto; padding: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(248,250,252,0.18)); }
-.detail-tabs :deep(.el-tabs__header) { padding: 0 16px; margin: 0; background: rgba(255,255,255,0.46); border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
-.detail-tabs :deep(.el-tabs__nav-wrap::after) { background-color: rgba(15, 23, 42, 0.08); }
+.detail-tabs :deep(.el-tabs__content) { flex: 1; overflow-y: auto; padding: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(248, 244, 232,0.18)); }
+.detail-tabs :deep(.el-tabs__header) { padding: 0 16px; margin: 0; background: rgba(255,255,255,0.46); border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
+.detail-tabs :deep(.el-tabs__nav-wrap::after) { background-color: rgba(60, 40, 20, 0.08); }
 .tab-surface {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248, 244, 232,0.92));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
   padding: 14px;
 }
 .files-table :deep(.el-table) {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   overflow: hidden;
   background: rgba(255,255,255,0.82);
 }
 .files-table :deep(.el-table th.el-table__cell) {
-  background: rgba(248,250,252,0.94);
+  background: rgba(248, 244, 232,0.94);
   color: var(--text-secondary);
   font-weight: 700;
 }
@@ -951,9 +967,9 @@ function formatDate(ts) {
   gap: 10px;
   min-width: 260px;
   padding: 20px 22px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(248, 244, 232,0.92));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
 }
 .dep-hint-title {
@@ -968,11 +984,11 @@ function formatDate(ts) {
   color: var(--text-tertiary);
 }
 .gav-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248, 244, 232,0.92));
   border-radius: 16px;
   padding: 14px;
   margin-bottom: 16px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
 }
 .gav-text { font-family: monospace; font-size: 13px; color: var(--text-primary); font-weight: 600; margin-bottom: 10px; }
@@ -984,7 +1000,7 @@ function formatDate(ts) {
   gap: 8px;
   padding: 8px 10px;
   font-size: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 12px;
   background: rgba(255,255,255,0.62);
 }
@@ -1006,10 +1022,10 @@ function formatDate(ts) {
   white-space: pre-wrap;
   word-break: break-all;
   color: var(--text-primary);
-  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248,250,252,0.92));
+  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(248, 244, 232,0.92));
   padding: 16px;
   border-radius: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   max-height: 100%;
   overflow: auto;
   margin: 0;
@@ -1020,7 +1036,7 @@ function formatDate(ts) {
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-wrap: wrap;
   background: rgba(255,255,255,0.46);
 }
@@ -1055,9 +1071,9 @@ function formatDate(ts) {
   text-align: center;
   font-size: 14px;
   color: var(--text-secondary);
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248,250,252,0.9));
+  background: linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248, 244, 232,0.9));
 }
 .check-summary {
   display: flex;
@@ -1074,18 +1090,18 @@ function formatDate(ts) {
   font-size: 13px;
   font-weight: 700;
   color: var(--text-secondary);
-  background: rgba(248,250,252,0.94);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  background: rgba(248, 244, 232,0.94);
+  border: 1px solid rgba(60, 40, 20, 0.06);
 }
 .check-stat.is-error { color: var(--color-red); }
 .check-stat.is-warn { color: var(--color-orange); }
 .check-table :deep(.el-table) {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   overflow: hidden;
 }
 .check-table :deep(.el-table th.el-table__cell) {
-  background: rgba(248,250,252,0.94);
+  background: rgba(248, 244, 232,0.94);
   color: var(--text-secondary);
   font-weight: 700;
 }
@@ -1097,7 +1113,7 @@ function formatDate(ts) {
   padding: 0 16px;
   margin: 0 18px 18px;
   background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(247,249,252,0.9));
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11.5px;
   color: var(--text-tertiary);
@@ -1118,12 +1134,12 @@ function formatDate(ts) {
   .right-panel {
     width: 100%;
     min-width: 0;
-    border: 1px solid rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(60, 40, 20, 0.08);
     border-radius: 18px;
   }
 
   .status-bar {
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    border-top: 1px solid rgba(60, 40, 20, 0.08);
     border-radius: 18px;
   }
 }

@@ -439,6 +439,12 @@ const routes = [
     meta: { title: '终端连接' }
   },
   {
+    path: '/toolbox/multi-print',
+    name: 'multiPrint',
+    component: () => import('@/views/MultiPrint.vue'),
+    meta: { title: '多文件打印' }
+  },
+  {
     path: '/screenshot-overlay',
     name: 'screenshotOverlay',
     component: () => import('@/views/ScreenshotOverlay.vue'),

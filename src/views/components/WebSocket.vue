@@ -63,7 +63,7 @@
               </el-form-item>
             </el-form>
             <div v-if="messages.length > 0" style="margin-top: 16px; padding: 12px; background: #f5f7fa; border-radius: 4px; max-height: 300px; overflow-y: auto;">
-              <div v-for="(msg, index) in messages" :key="index" style="margin-bottom: 8px; padding: 8px; background: white; border-radius: 4px;">
+              <div v-for="(msg, index) in messages" :key="index" style="margin-bottom: 8px; padding: 8px; background: var(--bg-primary); border-radius: 4px;">
                 <el-tag :type="getMessageTagType(msg.type)" size="small" style="margin-right: 8px;">
                   {{ msg.type }}
                 </el-tag>

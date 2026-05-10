@@ -9,7 +9,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "tauri:dev2": "set CARGO_TARGET_DIR=../target_dev2&& tauri dev --config src-tauri/tauri.dev2.conf.json -- --features dev2",
     "dev:auto": "node scripts/auto-dev.cjs"
   },
   "dependencies": {

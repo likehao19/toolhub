@@ -15,8 +15,7 @@
       </div>
       <div class="header-actions">
         <el-button type="primary" size="small" @click="showConnDialog">
-          <el-icon><Plus /></el-icon>
-          {{ t('sshTerminal.newConnection') }}
+          <el-icon style="margin-right: 6px;"><Plus /></el-icon>{{ t('sshTerminal.newConnection') }}
         </el-button>
       </div>
     </div>
@@ -81,8 +80,8 @@
             <el-input v-model="currentSftpPath" size="small" @keyup.enter="loadSftpDir" style="flex:1">
               <template #prefix><el-icon><FolderOpened /></el-icon></template>
             </el-input>
-            <el-button size="small" @click="loadSftpDir"><el-icon><Refresh /></el-icon></el-button>
-            <el-button size="small" @click="sftpUpload"><el-icon><Upload /></el-icon> {{ t('sshTerminal.upload') }}</el-button>
+            <el-button size="small" text @click="loadSftpDir" :title="t('common.refresh')"><el-icon><Refresh /></el-icon></el-button>
+            <el-button size="small" @click="sftpUpload"><el-icon style="margin-right: 6px;"><Upload /></el-icon>{{ t('sshTerminal.upload') }}</el-button>
           </div>
           <div class="sftp-file-list">
             <div class="sftp-item sftp-parent" @dblclick="sftpGoUp" v-if="currentSftpPath !== '/'">
@@ -111,7 +110,7 @@
           <el-icon :size="48"><Monitor /></el-icon>
           <div class="empty-text">{{ t('sshTerminal.emptyHint') }}</div>
           <el-button type="primary" size="small" @click="showConnDialog" style="margin-top:12px">
-            <el-icon><Plus /></el-icon> {{ t('sshTerminal.newConnection') }}
+            <el-icon style="margin-right: 6px;"><Plus /></el-icon>{{ t('sshTerminal.newConnection') }}
           </el-button>
         </div>
 
@@ -120,11 +119,11 @@
           <span>{{ activeTab.title }}</span>
           <span v-if="activeTab.type === 'terminal'">{{ termSize }}</span>
           <div class="status-actions">
-            <el-button v-if="activeTab.connId" size="small" text @click="openSftp(activeTab.connId)">
-              <el-icon><FolderOpened /></el-icon> SFTP
+            <el-button v-if="activeTab.connId" size="small" text @click="openSftp(activeTab.connId)" :title="'SFTP'">
+              <el-icon><FolderOpened /></el-icon>
             </el-button>
-            <el-button v-if="activeTab.type === 'terminal'" size="small" text @click="historyPanelOpen = !historyPanelOpen">
-              <el-icon><Clock /></el-icon> 历史
+            <el-button v-if="activeTab.type === 'terminal'" size="small" text @click="historyPanelOpen = !historyPanelOpen" :title="t('sshTerminal.history')">
+              <el-icon><Clock /></el-icon>
             </el-button>
           </div>
         </div>
@@ -132,8 +131,8 @@
         <!-- 命令历史面板 -->
         <div class="bottom-panel" v-if="historyPanelOpen">
           <div class="panel-header">
-            <span>命令历史</span>
-            <el-input v-model="historyFilter" placeholder="搜索..." size="small" clearable style="width:180px" :prefix-icon="Search" />
+            <span>{{ t('sshTerminal.commandHistory') }}</span>
+            <el-input v-model="historyFilter" :placeholder="t('sshTerminal.searchPlaceholder')" size="small" clearable style="width:180px" :prefix-icon="Search" />
             <span class="panel-close" @click="historyPanelOpen = false">&times;</span>
           </div>
           <div class="panel-body">
@@ -141,7 +140,7 @@
               <span class="history-cmd">{{ h.cmd }}</span>
               <span class="history-time">{{ new Date(h.time).toLocaleTimeString() }}</span>
             </div>
-            <div v-if="!filteredHistory.length" class="panel-empty">暂无历史记录</div>
+            <div v-if="!filteredHistory.length" class="panel-empty">{{ t('sshTerminal.noHistory') }}</div>
           </div>
         </div>
 
@@ -150,16 +149,16 @@
 
     <!-- 连接右键菜单 -->
     <div v-if="contextMenu.visible" class="ctx-menu" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }">
-      <div class="ctx-item" @click="ctxConnect"><el-icon><Connection /></el-icon>连接</div>
+      <div class="ctx-item" @click="ctxConnect"><el-icon><Connection /></el-icon>{{ t('sshTerminal.ctxConnect') }}</div>
       <div class="ctx-item" @click="ctxEdit"><el-icon><EditIcon /></el-icon>{{ t('sshTerminal.editConnection') }}</div>
-      <div class="ctx-item ctx-danger" @click="ctxDelete"><el-icon><Delete /></el-icon>删除</div>
+      <div class="ctx-item ctx-danger" @click="ctxDelete"><el-icon><Delete /></el-icon>{{ t('sshTerminal.ctxDelete') }}</div>
     </div>
 
     <!-- SFTP 右键菜单 -->
     <div v-if="sftpCtxMenu.visible" class="ctx-menu" :style="{ left: sftpCtxMenu.x + 'px', top: sftpCtxMenu.y + 'px' }">
-      <div class="ctx-item" @click="sftpDownload" v-if="!sftpCtxMenu.item?.isDir"><el-icon><Download /></el-icon>下载</div>
-      <div class="ctx-item" @click="sftpRename"><el-icon><EditIcon /></el-icon>重命名</div>
-      <div class="ctx-item ctx-danger" @click="sftpDelete"><el-icon><Delete /></el-icon>删除</div>
+      <div class="ctx-item" @click="sftpDownload" v-if="!sftpCtxMenu.item?.isDir"><el-icon><Download /></el-icon>{{ t('sshTerminal.ctxDownload') }}</div>
+      <div class="ctx-item" @click="sftpRename"><el-icon><EditIcon /></el-icon>{{ t('sshTerminal.ctxRename') }}</div>
+      <div class="ctx-item ctx-danger" @click="sftpDelete"><el-icon><Delete /></el-icon>{{ t('sshTerminal.ctxDelete') }}</div>
     </div>
 
     <!-- Connection dialog -->
@@ -189,7 +188,9 @@
         <el-form-item v-if="connForm.authType === 'key'" :label="t('sshTerminal.keyFile')">
           <div class="dir-input-row">
             <el-input v-model="connForm.keyPath" placeholder="~/.ssh/id_rsa" />
-            <el-button @click="selectKeyFile">{{ t('sshTerminal.browse') }}</el-button>
+            <el-button @click="selectKeyFile">
+              <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('sshTerminal.browse') }}
+            </el-button>
           </div>
         </el-form-item>
         <el-form-item v-if="connForm.authType === 'key'" :label="t('sshTerminal.passphrase')">
@@ -434,18 +435,18 @@ async function initTerminal(tabId, conn) {
   termSize.value = `${cols}x${rows}`
 
   // 连接 SSH
-  terminal.writeln(`\x1b[33m连接 ${conn.username}@${conn.host}:${conn.port} ...\x1b[0m`)
+  terminal.writeln(`\x1b[33m${t('sshTerminal.connectingTo', { target: `${conn.username}@${conn.host}:${conn.port}` })}\x1b[0m`)
 
   // 监听主机密钥确认
   const unlistenHostKey = await listen(`ssh-hostkey-verify-${tabId}`, async (event) => {
     const { fingerprint, hostPort, isNew, oldFingerprint } = event.payload
-    const title = isNew ? '新主机密钥确认' : '⚠ 主机密钥变更警告'
+    const title = isNew ? t('sshTerminal.newHostKeyTitle') : t('sshTerminal.hostKeyChangedTitle')
     const msg = isNew
-      ? `首次连接 <b>${hostPort}</b><br><br>指纹: <code>${fingerprint}</code><br><br>是否信任此主机？`
-      : `<b>${hostPort}</b> 的主机密钥已变更！<br><br>旧指纹: <code>${oldFingerprint}</code><br>新指纹: <code>${fingerprint}</code><br><br><span style="color:#f38ba8">这可能意味着中间人攻击，是否继续？</span>`
+      ? t('sshTerminal.trustHostPrompt', { hostPort, fingerprint })
+      : t('sshTerminal.hostKeyChangedMsg', { hostPort, oldFingerprint, fingerprint })
     const type = isNew ? 'info' : 'error'
     try {
-      await ElMessageBox.confirm(msg, title, { type, confirmButtonText: '信任', cancelButtonText: '拒绝', dangerouslyUseHTMLString: true })
+      await ElMessageBox.confirm(msg, title, { type, confirmButtonText: t('sshTerminal.trustBtn'), cancelButtonText: t('sshTerminal.rejectBtn'), dangerouslyUseHTMLString: true })
       await invoke('ssh_host_key_response', { id: tabId, accepted: true, fingerprint, hostPort })
     } catch {
       await invoke('ssh_host_key_response', { id: tabId, accepted: false, fingerprint, hostPort })
@@ -474,7 +475,7 @@ async function initTerminal(tabId, conn) {
 
     terminal.writeln(`\x1b[32m${result.message}\x1b[0m\r\n`)
   } catch (e) {
-    terminal.writeln(`\x1b[31m连接失败: ${e}\x1b[0m`)
+    terminal.writeln(`\x1b[31m${t('sshTerminal.connectFailed', { error: e })}\x1b[0m`)
     unlistenHostKey()
     return
   }
@@ -523,7 +524,7 @@ async function initTerminal(tabId, conn) {
 
   // 监听远端断开
   const unlistenClose = await listen(`ssh-closed-${tabId}`, () => {
-    terminal.writeln('\r\n\x1b[31m[连接已断开]\x1b[0m')
+    terminal.writeln(`\r\n\x1b[31m${t('sshTerminal.connectionClosed')}\x1b[0m`)
   })
 
   terminals[tabId] = { terminal, fitAddon, unlisten, unlistenClose, unlistenHostKey, resizeHandler, resizeObserver }
@@ -640,7 +641,7 @@ async function sftpDownload() {
   if (!localPath) return
   try {
     await invoke('sftp_download', { id: tab.sshTabId, remotePath: item.path, localPath })
-    ElMessage.success('下载完成')
+    ElMessage.success(t('sshTerminal.downloadDone'))
   } catch (e) {
     ElMessage.error(String(e))
   }
@@ -653,9 +654,9 @@ async function sftpDelete() {
   const tab = activeTab.value
   if (!tab?.sshTabId) return
   try {
-    await ElMessageBox.confirm(`确定删除 ${item.name}？`, '删除确认', { type: 'warning' })
+    await ElMessageBox.confirm(t('sshTerminal.confirmDeleteFile', { name: item.name }), t('sshTerminal.deleteConfirmTitle'), { type: 'warning' })
     await invoke('sftp_remove', { id: tab.sshTabId, path: item.path, isDir: item.isDir })
-    ElMessage.success('已删除')
+    ElMessage.success(t('sshTerminal.fileDeleted'))
     loadSftpDir()
   } catch { /* cancelled or error */ }
 }
@@ -667,11 +668,11 @@ async function sftpRename() {
   const tab = activeTab.value
   if (!tab?.sshTabId) return
   try {
-    const { value: newName } = await ElMessageBox.prompt('输入新名称', '重命名', { inputValue: item.name })
+    const { value: newName } = await ElMessageBox.prompt(t('sshTerminal.enterNewName'), t('sshTerminal.renameTitle'), { inputValue: item.name })
     if (!newName || newName === item.name) return
     const parentDir = item.path.substring(0, item.path.lastIndexOf('/') + 1)
     await invoke('sftp_rename', { id: tab.sshTabId, oldPath: item.path, newPath: parentDir + newName })
-    ElMessage.success('重命名完成')
+    ElMessage.success(t('sshTerminal.renameDone'))
     loadSftpDir()
   } catch { /* cancelled or error */ }
 }
@@ -766,9 +767,9 @@ onBeforeUnmount(() => {
 
 /* Left panel */
 .left-panel {
-  width: 220px;
+  width: 260px;
+  min-width: 260px;
   background: rgba(30,30,46,0.7);
-  border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
   overflow: hidden;

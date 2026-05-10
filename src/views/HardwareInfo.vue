@@ -13,13 +13,11 @@
         </div>
       </div>
       <div class="header-right">
-        <el-button type="primary" :loading="loading" @click="refresh" size="small">
+        <el-button size="small" text :loading="loading" @click="refresh" :title="t('common.refresh')">
           <el-icon><Refresh /></el-icon>
-          {{ t('hardwareInfo.refresh') }}
         </el-button>
-        <el-button @click="copyAll" size="small">
+        <el-button size="small" text @click="copyAll" :title="t('hardwareInfo.copyAll')">
           <el-icon><CopyDocument /></el-icon>
-          {{ t('hardwareInfo.copyAll') }}
         </el-button>
       </div>
     </div>
@@ -206,7 +204,9 @@
       <!-- 错误提示 -->
       <el-result v-if="error && !loading" icon="error" :title="t('hardwareInfo.errorTitle')" :sub-title="error">
         <template #extra>
-          <el-button type="primary" @click="refresh">{{ t('hardwareInfo.retry') }}</el-button>
+          <el-button type="primary" @click="refresh">
+            <el-icon style="margin-right: 6px;"><Refresh /></el-icon>{{ t('hardwareInfo.retry') }}
+          </el-button>
         </template>
       </el-result>
     </div>
@@ -286,7 +286,7 @@ onMounted(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -357,10 +357,10 @@ onMounted(() => {
 .info-section {
   margin-bottom: 16px;
   padding: 16px 18px 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.72);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(15,23,42,0.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(60, 40, 20,0.04);
 }
 
 .section-title {
@@ -387,9 +387,9 @@ onMounted(() => {
 .sub-card {
   margin-bottom: 12px;
   padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 14px;
-  background: rgba(248,250,252,0.78);
+  background: rgba(248, 244, 232,0.78);
 }
 
 .sub-card:last-child {
@@ -415,7 +415,7 @@ onMounted(() => {
 
 :deep(.el-result) {
   margin-top: 12px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.68);
 }
@@ -445,7 +445,7 @@ onMounted(() => {
   }
 
   :deep(.el-descriptions) {
-    --el-descriptions-table-border: rgba(15, 23, 42, 0.08);
+    --el-descriptions-table-border: rgba(60, 40, 20, 0.08);
   }
 }
 </style>

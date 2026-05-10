@@ -74,6 +74,6 @@ const scrollElement = document.documentElement;
   overflow: hidden;
   border: 1px solid #ddd;
   border-radius: 4px;
-  background: #fff;
+  background: var(--bg-primary);
 }
 </style>

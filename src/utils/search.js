@@ -4,7 +4,10 @@
 
 import Fuse from 'fuse.js'
 import * as notesAPI from '@/utils/notes'
+import { readTextFile } from '@tauri-apps/plugin-fs'
 import Database from '@tauri-apps/plugin-sql'
+import { SEARCHABLE_TOOLS } from '@/utils/searchableTools'
+import { t } from '@/i18n'
 
 const DB_PATH = 'sqlite:productivity.db'
 let dbInstance = null
@@ -22,7 +25,7 @@ async function getDatabase() {
 export async function searchNotes(query, options = {}) {
   try {
     const notes = await notesAPI.listNotes()
-    
+
     if (!query || !query.trim()) {
       return notes.map(note => ({
         item: note,
@@ -30,26 +33,27 @@ export async function searchNotes(query, options = {}) {
         score: 0
       }))
     }
-    
+
+    // 只按文件名(name)匹配,不再用首行 title(常常是正文片段) 干扰结果
     const fuse = new Fuse(notes, {
-      keys: [
-        { name: 'title', weight: 0.7 },
-        { name: 'name', weight: 0.3 }
-      ],
+      keys: ['name'],
       threshold: 0.4,
       includeScore: true,
-      includeMatches: true
+      includeMatches: true,
+      ignoreLocation: true,
+      minMatchCharLength: 1
     })
-    
+
     const results = fuse.search(query)
-    
-    // 如果启用内容搜索，也搜索笔记内容
-    if (options.searchContent !== false) {
+
+    // 内容搜索默认关闭:笔记数百上千时整库 readTextFile 会卡顿,
+    // 用户主动 opts in (options.searchContent === true) 才走这条路径。
+    if (options.searchContent === true) {
       const contentResults = []
       for (const note of notes) {
         try {
-          const content = await notesAPI.readNote(note.name)
-          if (content.toLowerCase().includes(query.toLowerCase())) {
+          const content = note.path ? await readTextFile(note.path) : ''
+          if (content && content.toLowerCase().includes(query.toLowerCase())) {
             const existing = results.find(r => r.item.name === note.name)
             if (!existing) {
               contentResults.push({
@@ -63,13 +67,13 @@ export async function searchNotes(query, options = {}) {
               })
             }
           }
-        } catch (error) {
+        } catch {
           // 忽略读取错误
         }
       }
       results.push(...contentResults)
     }
-    
+
     return results.sort((a, b) => a.score - b.score)
   } catch (error) {
     return []
@@ -120,7 +124,7 @@ export async function saveSearchHistory(query, filters, module) {
       'INSERT INTO search_history (query, filters, module, created_at) VALUES (?, ?, ?, ?)',
       [query, JSON.stringify(filters || {}), module || 'notes', new Date().toISOString()]
     )
-  } catch (e) { /* ignore */ }
+  } catch (e) { console.warn("[search] module failed:", e) }
 }
 
 /**
@@ -190,20 +194,52 @@ export async function deleteSavedSearch(searchId) {
  * 跨模块搜索
  */
 export async function globalSearch(query, options = {}) {
-  const modules = options.modules || ['notes', 'todos', 'bookmarks', 'passwords', 'events']
+  const modules = options.modules || ['tools', 'notes', 'todos', 'bookmarks', 'passwords', 'events']
   const results = {
+    tools: [],
     notes: [],
     todos: [],
     bookmarks: [],
     passwords: [],
     events: []
   }
-  
+
   if (!query || !query.trim()) {
     return results
   }
-  
+
   try {
+    // 搜索工具(本地常量,瞬时返回,无 IO)
+    if (modules.includes('tools')) {
+      try {
+        const items = SEARCHABLE_TOOLS.map(tool => ({
+          id: tool.id,
+          title: t(tool.i18nKey),
+          name: t(tool.i18nKey),
+          path: tool.path,
+          icon: tool.icon,
+          // 把 id 也作为可搜索字段,允许英文 id 匹配(如搜 "git")
+          searchableId: tool.id.replace(/-/g, ' ')
+        }))
+        const fuse = new Fuse(items, {
+          keys: [
+            { name: 'title', weight: 0.6 },
+            { name: 'searchableId', weight: 0.4 }
+          ],
+          threshold: 0.4,
+          includeScore: true,
+          includeMatches: true,
+          ignoreLocation: true
+        })
+        const toolResults = fuse.search(query)
+        results.tools = toolResults.map(r => ({
+          ...r,
+          type: 'tool',
+          module: 'tools'
+        }))
+      } catch (e) { console.warn('[search] tools failed:', e) }
+    }
+
     // 搜索笔记
     if (modules.includes('notes')) {
       try {
@@ -213,7 +249,7 @@ export async function globalSearch(query, options = {}) {
           type: 'note',
           module: 'notes'
         }))
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn('[search] notes failed:', e) }
     }
     
     // 搜索待办
@@ -222,13 +258,12 @@ export async function globalSearch(query, options = {}) {
         const db = await getDatabase()
         const todos = await db.select('SELECT * FROM todos WHERE parent_id IS NULL')
         const fuse = new Fuse(todos, {
-          keys: [
-            { name: 'title', weight: 0.7 },
-            { name: 'description', weight: 0.3 }
-          ],
+          keys: ['title'],
           threshold: 0.4,
           includeScore: true,
-          includeMatches: true
+          includeMatches: true,
+          ignoreLocation: true,
+          minMatchCharLength: 1
         })
         const todoResults = fuse.search(query)
         results.todos = todoResults.map(r => ({
@@ -236,23 +271,21 @@ export async function globalSearch(query, options = {}) {
           type: 'todo',
           module: 'todos'
         }))
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("[search] module failed:", e) }
     }
-    
+
     // 搜索书签
     if (modules.includes('bookmarks')) {
       try {
         const db = await getDatabase()
         const bookmarks = await db.select('SELECT * FROM bookmarks')
         const fuse = new Fuse(bookmarks, {
-          keys: [
-            { name: 'title', weight: 0.5 },
-            { name: 'url', weight: 0.3 },
-            { name: 'description', weight: 0.2 }
-          ],
+          keys: ['title'],
           threshold: 0.4,
           includeScore: true,
-          includeMatches: true
+          includeMatches: true,
+          ignoreLocation: true,
+          minMatchCharLength: 1
         })
         const bookmarkResults = fuse.search(query)
         results.bookmarks = bookmarkResults.map(r => ({
@@ -260,24 +293,21 @@ export async function globalSearch(query, options = {}) {
           type: 'bookmark',
           module: 'bookmarks'
         }))
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("[search] module failed:", e) }
     }
-    
+
     // 搜索密码
     if (modules.includes('passwords')) {
       try {
         const db = await getDatabase()
         const passwords = await db.select('SELECT id, title, username, website, notes, created_at, updated_at FROM passwords')
         const fuse = new Fuse(passwords, {
-          keys: [
-            { name: 'title', weight: 0.5 },
-            { name: 'username', weight: 0.3 },
-            { name: 'website', weight: 0.2 },
-            { name: 'notes', weight: 0.1 }
-          ],
+          keys: ['title'],
           threshold: 0.4,
           includeScore: true,
-          includeMatches: true
+          includeMatches: true,
+          ignoreLocation: true,
+          minMatchCharLength: 1
         })
         const passwordResults = fuse.search(query)
         results.passwords = passwordResults.map(r => ({
@@ -285,23 +315,21 @@ export async function globalSearch(query, options = {}) {
           type: 'password',
           module: 'passwords'
         }))
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("[search] module failed:", e) }
     }
-    
+
     // 搜索日程
     if (modules.includes('events')) {
       try {
         const db = await getDatabase()
         const events = await db.select('SELECT * FROM calendar_events')
         const fuse = new Fuse(events, {
-          keys: [
-            { name: 'title', weight: 0.6 },
-            { name: 'description', weight: 0.3 },
-            { name: 'location', weight: 0.1 }
-          ],
+          keys: ['title'],
           threshold: 0.4,
           includeScore: true,
-          includeMatches: true
+          includeMatches: true,
+          ignoreLocation: true,
+          minMatchCharLength: 1
         })
         const eventResults = fuse.search(query)
         results.events = eventResults.map(r => ({
@@ -309,7 +337,7 @@ export async function globalSearch(query, options = {}) {
           type: 'event',
           module: 'events'
         }))
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.warn("[search] module failed:", e) }
     }
     
     // 保存搜索历史

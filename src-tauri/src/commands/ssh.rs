@@ -9,7 +9,6 @@ use async_trait::async_trait;
 use base64::Engine;
 use aes_gcm::{Aes256Gcm, KeyInit, Nonce};
 use aes_gcm::aead::Aead;
-use sha1::Digest;
 
 const B64: base64::engine::GeneralPurpose = base64::engine::general_purpose::STANDARD;
 
@@ -54,11 +53,15 @@ struct SshHandler {
     hk_notify: Arc<tokio::sync::Notify>,
 }
 
-/// 计算公钥指纹 (SHA1:xx:xx:...)
+/// 计算公钥指纹。
+///
+/// 用 russh_keys 自带的 `PublicKey::fingerprint()` —— SHA-256 的 base64 nopad,
+/// 即 OpenSSH 标准 `SHA256:xxx` 格式。
+///
+/// 旧实现 `sha1(format!("{:?}", key))` 是错的:Debug 输出格式不是 stable API,
+/// 依赖升级或字段顺序变化都会让指纹突变,known_hosts 全部失效,每次连接都被当成"新主机"。
 fn compute_fingerprint(key: &key::PublicKey) -> String {
-    let repr = format!("{:?}", key);
-    let hash = sha1::Sha1::digest(repr.as_bytes());
-    hash.iter().map(|b| format!("{:02x}", b)).collect::<Vec<_>>().join(":")
+    format!("SHA256:{}", key.fingerprint())
 }
 
 /// 加载 known_hosts
@@ -120,7 +123,12 @@ impl client::Handler for SshHandler {
             self.hk_notify.notified(),
         ).await {
             Ok(()) => {
-                let accepted = self.hk_response.lock().unwrap().take().unwrap_or(false);
+                // 旧:.unwrap() —— 临界区里另一线程 panic 会让 Mutex 中毒,
+                // 之后任何 lock().unwrap() 都会 panic,SSH 会话整体死掉。
+                // unwrap_or_else(|e| e.into_inner()) 表示「即使中毒也接受当前数据」,适合纯数据 Mutex。
+                let accepted = self.hk_response.lock()
+                    .unwrap_or_else(|e| e.into_inner())
+                    .take().unwrap_or(false);
                 Ok(accepted)
             }
             Err(_) => Ok(false),
@@ -134,7 +142,7 @@ impl client::Handler for SshHandler {
         _session: &mut client::Session,
     ) -> Result<(), Self::Error> {
         let is_terminal = {
-            let guard = self.terminal_channel_id.lock().unwrap();
+            let guard = self.terminal_channel_id.lock().unwrap_or_else(|e| e.into_inner());
             *guard == Some(channel)
         };
         if !is_terminal { return Ok(()); }
@@ -152,7 +160,7 @@ impl client::Handler for SshHandler {
         _session: &mut client::Session,
     ) -> Result<(), Self::Error> {
         let is_terminal = {
-            let guard = self.terminal_channel_id.lock().unwrap();
+            let guard = self.terminal_channel_id.lock().unwrap_or_else(|e| e.into_inner());
             *guard == Some(channel)
         };
         if !is_terminal { return Ok(()); }
@@ -165,7 +173,7 @@ impl client::Handler for SshHandler {
     async fn channel_eof(
         &mut self, channel: ChannelId, _session: &mut client::Session,
     ) -> Result<(), Self::Error> {
-        let is_terminal = { *self.terminal_channel_id.lock().unwrap() == Some(channel) };
+        let is_terminal = { *self.terminal_channel_id.lock().unwrap_or_else(|e| e.into_inner()) == Some(channel) };
         if is_terminal {
             let _ = self.app_handle.emit(&format!("ssh-closed-{}", self.session_id), "eof");
         }
@@ -175,7 +183,7 @@ impl client::Handler for SshHandler {
     async fn channel_close(
         &mut self, channel: ChannelId, _session: &mut client::Session,
     ) -> Result<(), Self::Error> {
-        let is_terminal = { *self.terminal_channel_id.lock().unwrap() == Some(channel) };
+        let is_terminal = { *self.terminal_channel_id.lock().unwrap_or_else(|e| e.into_inner()) == Some(channel) };
         if is_terminal {
             let _ = self.app_handle.emit(&format!("ssh-closed-{}", self.session_id), "closed");
         }
@@ -220,7 +228,9 @@ fn get_or_create_key(app: &AppHandle) -> Result<[u8; 32], String> {
 pub async fn encrypt_credential(app_handle: AppHandle, plaintext: String) -> Result<String, String> {
     if plaintext.is_empty() { return Ok(String::new()) }
     let key = get_or_create_key(&app_handle)?;
-    let cipher = Aes256Gcm::new_from_slice(&key).unwrap();
+    // 加密密钥固定 32 字节(rand::thread_rng 填充),Aes256Gcm::new_from_slice 不会失败,
+    // 但用 expect 取代 unwrap 留下明确的错误信息,真要变成 panic 也好排查。
+    let cipher = Aes256Gcm::new_from_slice(&key).expect("AES-256 key must be 32 bytes");
     let mut nonce_bytes = [0u8; 12];
     rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut nonce_bytes);
     let nonce = Nonce::from_slice(&nonce_bytes);
@@ -237,7 +247,7 @@ pub async fn decrypt_credential(app_handle: AppHandle, ciphertext: String) -> Re
     let combined = B64.decode(&ciphertext).map_err(|_| "base64 解码失败".to_string())?;
     if combined.len() < 13 { return Err("密文格式错误".into()) }
     let (nonce_bytes, ct) = combined.split_at(12);
-    let cipher = Aes256Gcm::new_from_slice(&key).unwrap();
+    let cipher = Aes256Gcm::new_from_slice(&key).expect("AES-256 key must be 32 bytes");
     let nonce = Nonce::from_slice(nonce_bytes);
     let pt = cipher.decrypt(nonce, ct).map_err(|_| "解密失败（密钥可能已变更）".to_string())?;
     String::from_utf8(pt).map_err(|_| "UTF-8 解码失败".into())
@@ -300,13 +310,14 @@ pub async fn ssh_connect(
     let auth_ok = match auth_type.as_str() {
         "key" => {
             let key_file = key_path.ok_or("未指定密钥文件路径")?;
-            let key_pair = if let Some(ref pass) = passphrase {
-                russh_keys::load_secret_key(&key_file, Some(pass))
-                    .map_err(|e| format!("加载密钥失败: {}", e))?
-            } else {
-                russh_keys::load_secret_key(&key_file, None)
-                    .map_err(|e| format!("加载密钥失败: {}", e))?
-            };
+            // load_secret_key 是阻塞文件 IO(还要解 PKCS#1/PKCS#8 / openssh 等多种格式),
+            // 直接跑在 tokio worker 上会卡其他并发任务。塞进 spawn_blocking 释放 worker。
+            let key_pair = tokio::task::spawn_blocking(move || {
+                russh_keys::load_secret_key(&key_file, passphrase.as_deref())
+            })
+            .await
+            .map_err(|e| format!("密钥任务失败: {}", e))?
+            .map_err(|e| format!("加载密钥失败: {}", e))?;
             handle.authenticate_publickey(&username, Arc::new(key_pair))
                 .await.map_err(|e| format!("密钥认证失败: {}", e))?
         }
@@ -323,7 +334,7 @@ pub async fn ssh_connect(
 
     let channel = handle.channel_open_session()
         .await.map_err(|e| format!("打开通道失败: {}", e))?;
-    *terminal_channel_id.lock().unwrap() = Some(channel.id());
+    *terminal_channel_id.lock().unwrap_or_else(|e| e.into_inner()) = Some(channel.id());
 
     let c = cols.unwrap_or(120);
     let r = rows.unwrap_or(36);
@@ -356,7 +367,7 @@ pub async fn ssh_host_key_response(
         save_known_hosts(&app_handle, &hosts);
     }
     if let Some(v) = state.host_key_verifiers.lock().await.get(&id) {
-        *v.response.lock().unwrap() = Some(accepted);
+        *v.response.lock().unwrap_or_else(|e| e.into_inner()) = Some(accepted);
         v.notify.notify_one();
     }
     Ok(())
@@ -379,8 +390,13 @@ pub async fn ssh_resize(state: State<'_, SshState>, id: String, cols: u32, rows:
 #[tauri::command]
 pub async fn ssh_disconnect(state: State<'_, SshState>, id: String) -> Result<String, String> {
     state.sftp_cache.lock().await.remove(&id);
-    let mut sessions = state.sessions.lock().await;
-    if let Some(s) = sessions.remove(&id) {
+    // 关键:先把 session 句柄从外层锁里 take 出来,立刻释放 sessions 的写锁,
+    // 再做 disconnect.await。否则网络断连这段时间(可能数秒)所有其他 ssh_* 命令都会被卡住。
+    let session = {
+        let mut sessions = state.sessions.lock().await;
+        sessions.remove(&id)
+    };
+    if let Some(s) = session {
         let _ = s.handle.lock().await.disconnect(Disconnect::ByApplication, "user disconnect", "").await;
         Ok("已断开连接".into())
     } else {

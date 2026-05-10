@@ -15,7 +15,7 @@
       </div>
       <div class="header-actions">
         <el-button type="primary" size="small" @click="doOpenFile">
-          <el-icon><FolderOpened /></el-icon> {{ t('sqliteManager.openFile') }}
+          <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('sqliteManager.openFile') }}
         </el-button>
       </div>
     </div>
@@ -85,8 +85,8 @@
             </div>
             <!-- Data tab toolbar -->
             <div v-if="activeTab === 'data' && currentTable" class="tab-toolbar">
-              <el-button size="small" text @click="loadTableData">
-                <el-icon><Refresh /></el-icon> {{ t('sqliteManager.refresh') }}
+              <el-button size="small" text @click="loadTableData" :title="t('common.refresh')">
+                <el-icon><Refresh /></el-icon>
               </el-button>
               <span class="tab-toolbar-info">{{ totalRows }} {{ t('sqliteManager.rowCount') }}</span>
             </div>
@@ -167,9 +167,11 @@
             <div class="sql-editor-area">
               <div class="sql-toolbar">
                 <el-button type="primary" size="small" @click="doExecuteSql" :loading="sqlRunning">
-                  <el-icon><CaretRight /></el-icon> {{ t('sqliteManager.execute') }}
+                  <el-icon style="margin-right: 6px;"><CaretRight /></el-icon>{{ t('sqliteManager.execute') }}
                 </el-button>
-                <el-button size="small" @click="sqlText = ''">{{ t('sqliteManager.clearSql') }}</el-button>
+                <el-button size="small" text @click="sqlText = ''" :title="t('sqliteManager.clearSql')">
+                  <el-icon><Delete /></el-icon>
+                </el-button>
                 <span class="sql-hint">Ctrl+Enter</span>
               </div>
               <textarea v-model="sqlText" class="sql-textarea" spellcheck="false"
@@ -227,7 +229,7 @@
 import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Coin, FolderOpened, Close, Refresh, CaretRight } from '@element-plus/icons-vue'
+import { Coin, FolderOpened, Close, Refresh, CaretRight, Delete } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import {
   pickSqliteFile, sqliteOpen, sqliteClose, sqliteTables,
@@ -438,7 +440,7 @@ onBeforeUnmount(async () => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   height: 58px;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -467,20 +469,19 @@ onBeforeUnmount(async () => {
 .header-actions :deep(.el-button) { --el-button-border-radius: 10px; }
 
 /* Main Body */
-.main-body { flex: 1; display: flex; overflow: hidden; padding: 18px 18px 0; min-height: 0; }
+.main-body { flex: 1; display: flex; overflow: hidden; padding: 0; min-height: 0; }
 
 /* Left Panel */
 .left-panel {
-  width: 250px;
-  min-width: 250px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
+  width: 260px;
+  min-width: 260px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  box-shadow: none;
 }
 .panel-section { padding: 6px 0; }
 .panel-title {
@@ -491,7 +492,7 @@ onBeforeUnmount(async () => {
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
-.panel-divider { height: 1px; background: rgba(15, 23, 42, 0.08); margin: 6px 0; }
+.panel-divider { height: 1px; background: rgba(60, 40, 20, 0.08); margin: 6px 0; }
 
 .history-item {
   display: flex; align-items: center; gap: 8px; padding: 9px 12px;
@@ -501,9 +502,9 @@ onBeforeUnmount(async () => {
 .history-item:hover { background: rgba(255,255,255,0.58); }
 .history-item.active {
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  border-color: rgba(10,132,255,0.14);
+  border-color: rgba(194, 65, 12,0.14);
   color: var(--accent-blue);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 .history-item.active .history-name { color: var(--accent-blue); }
 .history-item.active .history-path { color: var(--text-tertiary); }
@@ -528,9 +529,9 @@ onBeforeUnmount(async () => {
 .table-item:hover { background: rgba(255,255,255,0.58); }
 .table-item.active {
   background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  border-color: rgba(10,132,255,0.14);
+  border-color: rgba(194, 65, 12,0.14);
   color: var(--accent-blue);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(15,23,42,0.05);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 .table-icon { font-size: 12px; flex-shrink: 0; }
 .table-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -542,16 +543,16 @@ onBeforeUnmount(async () => {
   flex-direction: column;
   overflow: hidden;
   min-width: 0;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .empty-state {
   flex: 1; display: flex; flex-direction: column; align-items: center;
   justify-content: center; color: var(--text-quaternary); gap: 8px; font-size: 14px;
   margin: 18px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.5);
 }
@@ -563,14 +564,14 @@ onBeforeUnmount(async () => {
   font-size: 12px;
   padding: 24px;
   margin: 8px 10px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   background: rgba(255,255,255,0.52);
 }
 
 /* Tab Bar */
 .tab-bar {
-  display: flex; align-items: center; border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  display: flex; align-items: center; border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   background: rgba(255,255,255,0.66); flex-shrink: 0; padding: 0 14px;
 }
 .tab {
@@ -588,7 +589,7 @@ onBeforeUnmount(async () => {
 .data-table { flex: 1; }
 .col-type-badge {
   font-size: 9px; color: var(--text-quaternary); margin-left: 4px;
-  padding: 1px 6px; background: rgba(15, 23, 42, 0.05); border-radius: 999px;
+  padding: 1px 6px; background: rgba(60, 40, 20, 0.05); border-radius: 999px;
 }
 .pk-badge {
   font-size: 9px; color: #E6A23C; margin-left: 2px;
@@ -597,23 +598,23 @@ onBeforeUnmount(async () => {
 .null-val { color: var(--text-quaternary); font-style: italic; }
 .pagination-bar {
   display: flex; justify-content: center; padding: 10px;
-  border-top: 1px solid rgba(15, 23, 42, 0.08); flex-shrink: 0; background: rgba(255,255,255,0.62);
+  border-top: 1px solid rgba(60, 40, 20, 0.08); flex-shrink: 0; background: rgba(255,255,255,0.62);
 }
 
 /* Structure Tab */
 .create-sql {
-  margin: 0; padding: 14px; background: rgba(15, 23, 42, 0.04); border-radius: 14px;
+  margin: 0; padding: 14px; background: rgba(60, 40, 20, 0.04); border-radius: 14px;
   font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; line-height: 1.6;
   color: var(--text-primary); white-space: pre-wrap; word-break: break-all;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 /* SQL Tab */
 .sql-tab { display: flex; flex-direction: column; }
-.sql-editor-area { flex: 0 0 auto; display: flex; flex-direction: column; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.sql-editor-area { flex: 0 0 auto; display: flex; flex-direction: column; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .sql-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08); background: rgba(255,255,255,0.62);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08); background: rgba(255,255,255,0.62);
 }
 .sql-toolbar :deep(.el-button) { --el-button-border-radius: 10px; }
 .sql-hint { font-size: 10px; color: var(--text-quaternary); margin-left: auto; }
@@ -624,14 +625,14 @@ onBeforeUnmount(async () => {
   font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.6;
 }
 .sql-result-area { flex: 1; overflow: auto; }
-.sql-result-info { padding: 10px 12px; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+.sql-result-info { padding: 10px 12px; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .sql-error { padding: 12px; color: #F56C6C; font-size: 12px; font-family: monospace; white-space: pre-wrap; }
 
 /* Status Bar */
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 16px;
   margin: 0 18px 18px 268px;
-  background: rgba(255,255,255,0.72); border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255,255,255,0.72); border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
   border-radius: 0 0 18px 18px;
@@ -649,22 +650,21 @@ onBeforeUnmount(async () => {
 }
 
 @media (max-width: 1120px) {
-  .main-body { padding: 14px 14px 0; }
-  .left-panel { width: 224px; min-width: 224px; }
-  .status-bar { margin: 0 14px 14px 238px; }
+  .main-body { padding: 0; }
+  .left-panel { width: 220px; min-width: 220px; }
+  .status-bar { margin: 0 14px 14px 234px; }
 }
 
 @media (max-width: 900px) {
-  .main-body { flex-direction: column; padding-bottom: 14px; }
+  .main-body { flex-direction: column; padding: 0; }
   .left-panel {
     width: 100%;
     min-width: 0;
-    border-right: 1px solid rgba(15, 23, 42, 0.08);
-    border-radius: 18px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(60, 40, 20, 0.1);
     max-height: 260px;
   }
-  .right-area { border-radius: 18px; }
-  .status-bar { margin: 0 14px 14px; border-top: 1px solid rgba(15, 23, 42, 0.08); border-radius: 18px; }
+  .status-bar { margin: 0 14px 14px; border-top: 1px solid rgba(60, 40, 20, 0.08); }
 }
 
 @media (max-width: 720px) {

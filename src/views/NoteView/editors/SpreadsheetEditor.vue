@@ -377,7 +377,7 @@ defineExpose({
 .spreadsheet-editor-wrapper {
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
   flex: 1;

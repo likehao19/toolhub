@@ -8,10 +8,22 @@
         </div>
         <div v-if="isDiscussing" class="discussion-progress">
           <span class="progress-dot"></span>
-          {{ t('agentTeam.speaking', { name: currentAgentName, current: currentAgentIndex + 1, total: enabledAgents.length }) }}
+          <template v-if="singleAgentMode">
+            {{ getAgent(singleAgentMode)?.name }} 正在回答...
+          </template>
+          <template v-else>
+            {{ t('agentTeam.speaking', { name: currentAgentName, current: currentAgentIndex + 1, total: enabledAgents.length }) }}
+          </template>
         </div>
       </div>
       <div class="header-actions">
+        <el-button
+          size="small"
+          @click="showRolesDialog = true"
+          :icon="UserFilled"
+        >
+          管理角色
+        </el-button>
         <el-button
           v-if="isDiscussing"
           size="small"
@@ -32,127 +44,205 @@
       </div>
     </div>
 
-    <!-- 主内容区 -->
-    <div class="content-area">
-      <!-- 空状态：主题输入 -->
-      <div v-if="!hasDiscussion && !isDiscussing" class="topic-section">
-        <div class="topic-card">
-          <div class="topic-icon">
-            <i class="fas fa-users-gear"></i>
+    <!-- 主体：侧栏 + 主区 -->
+    <div class="main-body">
+      <!-- 历史会话侧边栏 -->
+      <div class="conversation-sidebar" :class="{ collapsed: sidebarCollapsed }">
+        <template v-if="!sidebarCollapsed">
+          <div class="sidebar-header">
+            <div class="sidebar-new-btn" @click="newDiscussion" title="新建讨论">
+              <i class="fas fa-plus"></i>
+              <span>新讨论</span>
+            </div>
+            <div class="sidebar-collapse-btn" @click="sidebarCollapsed = true" title="收起历史">
+              <i class="fas fa-angles-left"></i>
+            </div>
           </div>
-          <h2 class="topic-title">{{ t('agentTeam.title') }}</h2>
-          <p class="topic-desc">{{ t('agentTeam.desc') }}</p>
-
-          <div class="topic-input-area">
-            <textarea
-              v-model="topic"
-              :placeholder="t('agentTeam.topicPlaceholder')"
-              class="topic-input"
-              rows="3"
-              @keydown="handleTopicKeyDown"
-            ></textarea>
-          </div>
-
-          <div class="agent-selector">
-            <span class="selector-label">{{ t('agentTeam.participantLabel') }}</span>
-            <div class="agent-chips">
-              <div
-                v-for="agent in AGENT_ROLES"
-                :key="agent.id"
-                class="agent-chip"
-                :class="{ active: activeAgents.has(agent.id) }"
-                :style="activeAgents.has(agent.id) ? { borderColor: agent.color, background: agent.bgColor } : {}"
-                @click="toggleAgent(agent.id)"
-              >
-                <span class="chip-emoji">{{ agent.emoji }}</span>
-                <span class="chip-name">{{ agent.name }}</span>
+          <div class="sidebar-list">
+            <div
+              v-for="sess in sessionList"
+              :key="sess.id"
+              class="sidebar-item"
+              :class="{ active: sess.id === currentSessionId }"
+              @click="switchSession(sess.id)"
+            >
+              <i class="fas fa-comments sidebar-item-icon"></i>
+              <div class="sidebar-item-content">
+                <div class="sidebar-item-title">{{ sess.title }}</div>
+              </div>
+              <div class="sidebar-item-actions" @click.stop>
+                <i class="fas fa-trash-can sidebar-action-btn" @click="onDeleteSession(sess.id)"></i>
               </div>
             </div>
+            <div v-if="sessionList.length === 0" class="sidebar-empty">
+              <i class="fas fa-inbox"></i>
+              <span>暂无历史讨论</span>
+            </div>
           </div>
-
-          <el-button
-            type="primary"
-            size="large"
-            @click="startDiscussion"
-            :disabled="!topic.trim() || activeAgents.size === 0"
-            class="start-btn"
-          >
-            <i class="fas fa-play" style="margin-right: 6px;"></i>
-            {{ t('agentTeam.startDiscussion') }}
-          </el-button>
-        </div>
+        </template>
       </div>
 
-      <!-- 讨论消息流 -->
-      <div v-else class="messages-area" ref="messagesContainer">
-        <!-- 主题消息 -->
-        <div class="topic-message">
-          <div class="topic-message-icon">
-            <i class="fas fa-bullhorn"></i>
-          </div>
-          <div class="topic-message-content">
-            <div class="topic-message-label">{{ t('agentTeam.discussionTopic') }}</div>
-            <div class="topic-message-text">{{ discussionTopic }}</div>
+      <div v-if="sidebarCollapsed" class="sidebar-expand-btn" @click="sidebarCollapsed = false" title="展开历史">
+        <i class="fas fa-bars"></i>
+      </div>
+
+      <!-- 主内容区 -->
+      <div class="content-area">
+        <!-- 空状态：主题输入 -->
+        <div v-if="!hasDiscussion && !isDiscussing" class="topic-section">
+          <div class="topic-card">
+            <div class="topic-icon">
+              <i class="fas fa-users-gear"></i>
+            </div>
+            <h2 class="topic-title">{{ t('agentTeam.title') }}</h2>
+            <p class="topic-desc">{{ t('agentTeam.desc') }}</p>
+
+            <div class="topic-input-area">
+              <textarea
+                v-model="topic"
+                :placeholder="t('agentTeam.topicPlaceholder')"
+                class="topic-input"
+                rows="3"
+                @keydown="handleTopicKeyDown"
+              ></textarea>
+            </div>
+
+            <div class="agent-selector">
+              <span class="selector-label">{{ t('agentTeam.participantLabel') }}</span>
+              <div class="agent-chips">
+                <div
+                  v-for="agent in allRoles"
+                  :key="agent.id"
+                  class="agent-chip"
+                  :class="{ active: activeAgents.has(agent.id) }"
+                  :style="activeAgents.has(agent.id) ? { borderColor: agent.color, background: agent.bgColor } : {}"
+                  @click="toggleAgent(agent.id)"
+                >
+                  <span class="chip-emoji">{{ agent.emoji }}</span>
+                  <span class="chip-name">{{ agent.name }}</span>
+                </div>
+              </div>
+            </div>
+
+            <el-button
+              type="primary"
+              size="large"
+              @click="startDiscussion"
+              :disabled="!topic.trim() || activeAgents.size === 0"
+              class="start-btn"
+            >
+              <i class="fas fa-play" style="margin-right: 6px;"></i>
+              {{ t('agentTeam.startDiscussion') }}
+            </el-button>
           </div>
         </div>
 
-        <!-- 角色消息 -->
-        <div
-          v-for="(msg, index) in discussionMessages"
-          :key="index"
-          class="agent-message"
-          :style="{ '--agent-color': getAgent(msg.agentId)?.color }"
-        >
-          <div
-            class="agent-avatar"
-            :style="{ background: getAgent(msg.agentId)?.bgColor, borderColor: getAgent(msg.agentId)?.color }"
-          >
-            {{ getAgent(msg.agentId)?.emoji }}
-          </div>
-          <div class="agent-message-body">
-            <div class="agent-message-header">
-              <span class="agent-name" :style="{ color: getAgent(msg.agentId)?.color }">
-                {{ getAgent(msg.agentId)?.name }}
-              </span>
-              <span v-if="!msg.streaming && msg.content" class="agent-timestamp">
-                {{ msg.timestamp }}
-              </span>
+        <!-- 讨论消息流 -->
+        <div v-else class="messages-area" ref="messagesContainer">
+          <!-- 主题消息 -->
+          <div v-if="discussionTopic" class="topic-message">
+            <div class="topic-message-icon">
+              <i class="fas fa-bullhorn"></i>
             </div>
-            <div class="agent-message-content" :class="{ streaming: msg.streaming && msg.content }">
-              <template v-if="msg.error">
-                <div class="agent-error">
-                  <i class="fas fa-exclamation-triangle"></i> {{ msg.content }}
-                </div>
-              </template>
-              <template v-else-if="msg.content">
-                <div v-html="renderMarkdown(msg.content)"></div>
-              </template>
-              <template v-else-if="msg.streaming">
-                <div class="loading-dots">
-                  <span></span><span></span><span></span>
-                </div>
-              </template>
+            <div class="topic-message-content">
+              <div class="topic-message-label">{{ t('agentTeam.discussionTopic') }}</div>
+              <div class="topic-message-text">{{ discussionTopic }}</div>
             </div>
           </div>
+
+          <!-- 消息列表 -->
+          <template v-for="(msg, index) in discussionMessages" :key="msg.dbId || index">
+            <!-- 用户追问消息（白底气泡） -->
+            <div v-if="msg.isFollowUp || msg.isUser" class="user-message">
+              <div class="user-message-bubble">
+                <div class="user-message-content" v-html="renderMentionHighlight(msg.content)"></div>
+                <div v-if="msg.timestamp" class="user-message-timestamp">{{ msg.timestamp }}</div>
+              </div>
+              <div class="user-message-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+            </div>
+            <!-- Agent 消息 -->
+            <div
+              v-else
+              class="agent-message"
+              :style="{ '--agent-color': getAgent(msg.agentId)?.color }"
+            >
+              <div
+                class="agent-avatar"
+                :style="{ background: getAgent(msg.agentId)?.bgColor, borderColor: getAgent(msg.agentId)?.color }"
+              >
+                {{ getAgent(msg.agentId)?.emoji }}
+              </div>
+              <div class="agent-message-body">
+                <div class="agent-message-header">
+                  <span class="agent-name" :style="{ color: getAgent(msg.agentId)?.color }">
+                    {{ getAgent(msg.agentId)?.name }}
+                  </span>
+                  <span v-if="!msg.streaming && msg.content" class="agent-timestamp">
+                    {{ msg.timestamp }}
+                  </span>
+                </div>
+                <div class="agent-message-content" :class="{ streaming: msg.streaming && msg.content }">
+                  <template v-if="msg.error">
+                    <div class="agent-error">
+                      <i class="fas fa-exclamation-triangle"></i> {{ msg.content }}
+                    </div>
+                  </template>
+                  <template v-else-if="msg.content">
+                    <div v-html="renderMarkdown(msg.content)"></div>
+                  </template>
+                  <template v-else-if="msg.streaming">
+                    <div class="loading-dots">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
 
-        <!-- 讨论结束后的追问区 -->
-        <div v-if="hasDiscussion && !isDiscussing" class="followup-area">
-          <div class="followup-divider">
-            <span>{{ t('agentTeam.discussionEnd') }}</span>
+        <!-- 底部追问区（讨论开始后常驻） -->
+        <div v-if="hasDiscussion" class="followup-area">
+          <div v-if="!isDiscussing" class="followup-divider">
+            <span>{{ t('agentTeam.discussionEnd') }} · 可继续追问，输入 @ 选择角色</span>
           </div>
-          <div class="followup-input-wrapper">
+          <div class="followup-input-wrapper" :class="{ disabled: isDiscussing }">
+            <!-- @ 候选浮窗 -->
+            <div v-if="mentionMenuVisible" class="mention-menu">
+              <div class="mention-menu-title">选择角色</div>
+              <div
+                v-for="(role, idx) in mentionCandidates"
+                :key="role.id"
+                class="mention-item"
+                :class="{ active: idx === mentionActiveIndex }"
+                @mousedown.prevent="pickMention(role)"
+                @mouseenter="mentionActiveIndex = idx"
+              >
+                <span class="mention-emoji">{{ role.emoji }}</span>
+                <span class="mention-name" :style="{ color: role.color }">{{ role.name }}</span>
+              </div>
+              <div v-if="mentionCandidates.length === 0" class="mention-empty">
+                没有匹配的角色
+              </div>
+            </div>
+
             <textarea
+              ref="followUpRef"
               v-model="followUpInput"
-              :placeholder="t('agentTeam.followUpPlaceholder')"
+              :placeholder="isDiscussing ? '讨论进行中...' : t('agentTeam.followUpPlaceholder')"
               class="followup-input"
               rows="2"
+              :disabled="isDiscussing"
               @keydown="handleFollowUpKeyDown"
+              @input="onFollowUpInput"
+              @blur="hideMentionMenu"
             ></textarea>
             <button
               class="followup-send-btn"
               @click="continueDiscussion"
-              :disabled="!followUpInput.trim()"
+              :disabled="!followUpInput.trim() || isDiscussing"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path d="M7 11L12 6L17 11M12 18V7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -162,98 +252,225 @@
         </div>
       </div>
     </div>
+
+    <!-- 角色管理对话框 -->
+    <el-dialog
+      v-model="showRolesDialog"
+      width="1100px"
+      class="roles-dialog"
+    >
+      <template #header>
+        <div class="roles-dialog-header">
+          <div class="roles-dialog-title">
+            <span>角色管理</span>
+            <span class="roles-tip">内置角色不可删除，但可作为模板"复制为自定义"</span>
+          </div>
+          <el-button type="primary" size="small" @click="openRoleEditor()" :icon="Plus">
+            新建自定义角色
+          </el-button>
+        </div>
+      </template>
+
+      <div class="roles-table-wrapper">
+        <el-table :data="allRoles" style="width: 100%;" border height="100%" size="small">
+          <el-table-column label="角色" width="160">
+            <template #default="{ row }">
+              <div class="role-cell">
+                <span class="role-cell-emoji" :style="{ background: row.bgColor, borderColor: row.color }">
+                  {{ row.emoji }}
+                </span>
+                <span class="role-cell-name" :style="{ color: row.color }">{{ row.name }}</span>
+              </div>
+            </template>
+          </el-table-column>
+          <el-table-column label="类型" width="72" align="center">
+            <template #default="{ row }">
+              <el-tag :type="row.isBuiltin ? 'info' : 'success'" size="small">
+                {{ row.isBuiltin ? '内置' : '自定义' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="温度" width="64" align="center">
+            <template #default="{ row }">{{ row.temperature?.toFixed?.(2) ?? '-' }}</template>
+          </el-table-column>
+          <el-table-column label="提示词" min-width="280">
+            <template #default="{ row }">
+              <div class="role-prompt-preview" :title="row.systemPrompt">{{ row.systemPrompt }}</div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="140" align="center" fixed="right">
+            <template #default="{ row }">
+              <el-button size="small" @click="cloneRole(row)" :icon="CopyDocument" circle title="复制为自定义" />
+              <el-button
+                v-if="!row.isBuiltin"
+                size="small"
+                type="primary"
+                @click="openRoleEditor(row)"
+                :icon="Edit"
+                circle
+                title="编辑"
+              />
+              <el-button
+                v-if="!row.isBuiltin"
+                size="small"
+                type="danger"
+                @click="onDeleteRole(row)"
+                :icon="Delete"
+                circle
+                title="删除"
+              />
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <template #footer>
+        <el-button @click="showRolesDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 角色编辑对话框 -->
+    <el-dialog
+      v-model="showRoleEditor"
+      :title="roleForm.id ? '编辑角色' : '新建角色'"
+      width="640px"
+      top="8vh"
+      append-to-body
+    >
+      <el-form :model="roleForm" label-width="100px">
+        <el-form-item label="名称" required>
+          <el-input v-model="roleForm.name" placeholder="例如：小红书博主" maxlength="20" show-word-limit />
+        </el-form-item>
+        <el-form-item label="表情符号" required>
+          <el-input v-model="roleForm.emoji" placeholder="例如：✨" maxlength="4" />
+          <div class="emoji-picker">
+            <span
+              v-for="e in suggestedEmojis"
+              :key="e"
+              class="emoji-suggest"
+              @click="roleForm.emoji = e"
+            >{{ e }}</span>
+          </div>
+        </el-form-item>
+        <el-form-item label="主题色">
+          <el-color-picker v-model="roleForm.color" />
+          <span style="margin-left: 12px; font-size: 12px; color: #909399;">{{ roleForm.color }}</span>
+        </el-form-item>
+        <el-form-item label="温度">
+          <el-slider
+            v-model="roleForm.temperature"
+            :min="0"
+            :max="1"
+            :step="0.05"
+            show-input
+            :show-input-controls="false"
+            style="max-width: 360px;"
+          />
+          <span style="margin-left: 12px; font-size: 12px; color: #909399;">越低越稳定，越高越创意</span>
+        </el-form-item>
+        <el-form-item label="提示词" required>
+          <el-input
+            v-model="roleForm.systemPrompt"
+            type="textarea"
+            :rows="8"
+            placeholder="描述这个角色的身份、关注点、表达风格、输出长度..."
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showRoleEditor = false">取消</el-button>
+        <el-button type="primary" @click="onSaveRole" :disabled="!canSaveRole">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue'
 import { t } from '@/i18n'
 import { callAIStream, checkAIConfig } from '@/utils/ai/api'
-import { ElMessage } from 'element-plus'
-import { VideoPause, RefreshRight } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { VideoPause, RefreshRight, UserFilled, Plus, Edit, Delete, CopyDocument } from '@element-plus/icons-vue'
 import MarkdownIt from 'markdown-it'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
+import { useAgentTeam } from '@/composables/useAgentTeam'
 
-// ==================== 角色定义 ====================
+// ==================== Composable 状态 ====================
 
-const AGENT_ROLES = [
-  {
-    id: 'pm',
-    name: t('agentTeam.rolePM'),
-    emoji: '\u{1F4CB}',
-    color: '#409eff',
-    bgColor: 'rgba(64,158,255,0.08)',
-    systemPrompt: `你是一位经验丰富的产品经理。在团队讨论中，你从用户需求、市场价值、产品定位和商业可行性的角度分析问题。你善于：
-- 定义核心用户场景和需求优先级
-- 评估功能的商业价值和投入产出比
-- 提出清晰的产品路线图建议
-- 关注用户体验和竞品对比
-请用简洁专业的语言发表你的观点，必要时引用数据或案例。回复控制在300字以内。`,
-    temperature: 0.7
-  },
-  {
-    id: 'dev',
-    name: t('agentTeam.roleDev'),
-    emoji: '\u{1F4BB}',
-    color: '#67c23a',
-    bgColor: 'rgba(103,194,58,0.08)',
-    systemPrompt: `你是一位资深全栈工程师。在团队讨论中，你从技术架构、实现方案、性能和可维护性的角度分析问题。你善于：
-- 评估技术方案的可行性和复杂度
-- 提出具体的架构设计和技术选型建议
-- 识别潜在的技术风险和瓶颈
-- 估算开发工作量和技术债务
-请用简洁专业的语言发表你的观点，可以适当使用技术术语。回复控制在300字以内。`,
-    temperature: 0.6
-  },
-  {
-    id: 'designer',
-    name: t('agentTeam.roleDesigner'),
-    emoji: '\u{1F3A8}',
-    color: '#e6a23c',
-    bgColor: 'rgba(230,162,60,0.08)',
-    systemPrompt: `你是一位专业的UI/UX设计师。在团队讨论中，你从用户体验、交互设计、视觉规范和可用性的角度分析问题。你善于：
-- 分析用户交互流程和信息架构
-- 提出符合设计规范的界面方案
-- 关注无障碍性、响应式和一致性
-- 引用设计原则和最佳实践
-请用简洁专业的语言发表你的观点。回复控制在300字以内。`,
-    temperature: 0.8
-  },
-  {
-    id: 'tester',
-    name: t('agentTeam.roleTester'),
-    emoji: '\u{1F50D}',
-    color: '#f56c6c',
-    bgColor: 'rgba(245,108,108,0.08)',
-    systemPrompt: `你是一位细致的QA测试工程师。在团队讨论中，你从质量保障、边界条件、异常处理和风险控制的角度分析问题。你善于：
-- 识别潜在的缺陷和边界条件
-- 设计测试策略和验收标准
-- 提出自动化测试和持续集成建议
-- 关注安全性、兼容性和性能测试
-请用简洁专业的语言发表你的观点。回复控制在300字以内。`,
-    temperature: 0.5
-  },
-  {
-    id: 'ops',
-    name: t('agentTeam.roleOps'),
-    emoji: '\u{1F6E0}',
-    color: '#af52de',
-    bgColor: 'rgba(175,82,222,0.08)',
-    systemPrompt: `你是一位经验丰富的DevOps/运维架构师。在团队讨论中，你从部署运维、可观测性、成本控制和系统可靠性的角度分析问题。你善于：
-- 设计CI/CD流程和发布策略
-- 评估基础设施需求和成本
-- 提出监控、告警和灾备方案
-- 关注系统稳定性、扩展性和安全合规
-请用简洁专业的语言发表你的观点。回复控制在300字以内。`,
-    temperature: 0.6
-  }
-]
+const {
+  topic,
+  discussionTopic,
+  discussionMessages,
+  activeAgents,
+  isDiscussing,
+  currentAgentIndex,
+  followUpInput,
+  abortFlag,
+  currentSessionId,
+  allRoles,
+  sessionList,
+  enabledAgents,
+  hasDiscussion,
+  currentAgentName,
+  getAgent,
+  parseMention,
+  ensureLoaded,
+  saveCustomRole,
+  deleteCustomRole,
+  loadAllRoles,
+  createSession,
+  deleteSession,
+  loadSession,
+  startNewDiscussionView,
+  saveMessage,
+  updateMessageContent,
+  newAbortController,
+  abortCurrentStream
+} = useAgentTeam()
+
+// ==================== 本地 UI 状态 ====================
+
+const messagesContainer = ref(null)
+const followUpRef = ref(null)
+const sidebarCollapsed = ref(false)
+
+// 角色管理对话框
+const showRolesDialog = ref(false)
+const showRoleEditor = ref(false)
+const roleForm = ref({
+  id: '',
+  name: '',
+  emoji: '\u{1F31F}',
+  color: '#409eff',
+  bgColor: 'rgba(64,158,255,0.08)',
+  temperature: 0.7,
+  systemPrompt: ''
+})
+const suggestedEmojis = ['\u{1F31F}', '\u{1F680}', '\u{1F4A1}', '\u{1F381}', '\u{1F3AF}', '\u{1F517}', '\u{1F4A0}', '\u{1F389}', '\u{1F525}', '\u{1F308}', '\u{1F4DA}', '\u{1F50E}']
+
+const canSaveRole = computed(() =>
+  roleForm.value.name.trim() &&
+  roleForm.value.emoji.trim() &&
+  roleForm.value.systemPrompt.trim()
+)
+
+// @ 候选菜单
+const mentionMenuVisible = ref(false)
+const mentionCandidates = ref([])
+const mentionActiveIndex = ref(0)
+const mentionStartIndex = ref(-1)
+
+// 单 agent 模式（被 @ 选中时使用）
+const singleAgentMode = ref(null)
 
 // ==================== Markdown 渲染 ====================
 
+// 安全:html=false 让 markdown-it 转义嵌入的原生 HTML。
+// AI 流式输出/用户输入若含 <script>... 会被当文本展示而非执行。
+// 代码块的 HTML 由我们自己在 highlight 钩子里生成,不来自用户输入,所以仍然可以正常渲染。
 const md = new MarkdownIt({
-  html: true,
+  html: false,
   linkify: true,
   typographer: true,
   breaks: true,
@@ -267,49 +484,60 @@ const md = new MarkdownIt({
   }
 })
 
-// 复制代码（复用全局函数，如果不存在则注册）
-if (!window.copyCode) {
-  window.copyCode = function(button) {
-    const codeBlock = button.closest('.hljs-code-block')
-    const code = codeBlock.querySelector('code').textContent
-    navigator.clipboard.writeText(code).then(() => {
-      button.textContent = t('agentTeam.copiedBtn')
-      setTimeout(() => { button.textContent = t('agentTeam.copyBtn') }, 2000)
-    })
-  }
+// 全局复制代码函数 —— v-html 渲染的 onclick="copyCode(this)" 要能找到它。
+// 旧实现 `if (!window.copyCode)` 有顺序依赖问题:
+//   - AIConversation 先挂载设置了英文 'Copied!' 的版本,这里 if 跳过,
+//     AgentTeam 的代码块按钮被点时文案会是英文,不走 t()。
+//   - 这里设置后若未清理,i18n 切语言后闭包里的 t() 引用过时。
+// 修法和 AIConversation 对齐:保存前一个实现,卸载时还原/delete。
+const __prevCopyCodeAT = window.copyCode
+window.copyCode = function(button) {
+  const codeBlock = button.closest('.hljs-code-block')
+  const code = codeBlock.querySelector('code').textContent
+  navigator.clipboard.writeText(code).then(() => {
+    button.textContent = t('agentTeam.copiedBtn')
+    setTimeout(() => { button.textContent = t('agentTeam.copyBtn') }, 2000)
+  })
 }
+onBeforeUnmount(() => {
+  if (__prevCopyCodeAT) {
+    window.copyCode = __prevCopyCodeAT
+  } else {
+    try { delete window.copyCode } catch { window.copyCode = undefined }
+  }
+  // 卸载时中断当前流式请求,避免 onChunk 在组件销毁后仍写状态、
+  // 也防止 isDiscussing 残留 true(模块级单例,影响下次进入此页)。
+  abortCurrentStream('component-unmount')
+})
 
 const renderMarkdown = (content) => {
   if (!content) return ''
   return md.render(content)
 }
 
-// ==================== 状态 ====================
+// 用户消息：将 @角色名 高亮包裹
+const renderMentionHighlight = (content) => {
+  if (!content) return ''
+  let escaped = md.utils.escapeHtml(content)
+  // 按角色名长度倒序，避免短名误匹配
+  const sorted = [...allRoles.value].sort((a, b) => b.name.length - a.name.length)
+  for (const role of sorted) {
+    const escName = role.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const re = new RegExp(`@${escName}`, 'gu')
+    // role.name / role.color / role.bgColor 来自用户可编辑的角色表,
+    // 拼到 HTML / style 时必须转义,否则可被注入。
+    const safeName = md.utils.escapeHtml(role.name)
+    const safeColor = md.utils.escapeHtml(role.color)
+    const safeBg = md.utils.escapeHtml(role.bgColor)
+    escaped = escaped.replace(
+      re,
+      `<span class="mention-tag" style="background:${safeBg};color:${safeColor};border-color:${safeColor}">@${safeName}</span>`
+    )
+  }
+  return escaped
+}
 
-const topic = ref('')
-const discussionTopic = ref('')
-const discussionMessages = ref([])
-const activeAgents = ref(new Set(['pm', 'dev', 'designer', 'tester', 'ops']))
-const isDiscussing = ref(false)
-const currentAgentIndex = ref(0)
-const followUpInput = ref('')
-const abortFlag = ref(false)
-const messagesContainer = ref(null)
-
-const enabledAgents = computed(() =>
-  AGENT_ROLES.filter(a => activeAgents.value.has(a.id))
-)
-
-const currentAgentName = computed(() => {
-  const agent = enabledAgents.value[currentAgentIndex.value]
-  return agent?.name || ''
-})
-
-const hasDiscussion = computed(() => discussionMessages.value.length > 0)
-
-const getAgent = (agentId) => AGENT_ROLES.find(a => a.id === agentId)
-
-// ==================== 角色切换 ====================
+// ==================== 角色 / 会话 操作 ====================
 
 const toggleAgent = (agentId) => {
   const newSet = new Set(activeAgents.value)
@@ -321,6 +549,192 @@ const toggleAgent = (agentId) => {
   activeAgents.value = newSet
 }
 
+const switchSession = async (id) => {
+  if (id === currentSessionId.value || isDiscussing.value) return
+  await loadSession(id)
+  scrollToBottom()
+}
+
+const onDeleteSession = (id) => {
+  ElMessageBox.confirm('确定删除该讨论记录？删除后不可恢复。', '提示', {
+    type: 'warning'
+  }).then(async () => {
+    await deleteSession(id)
+    if (id === currentSessionId.value) {
+      startNewDiscussionView()
+    }
+    ElMessage.success('已删除')
+  }).catch(() => {})
+}
+
+const newDiscussion = () => {
+  if (isDiscussing.value) {
+    ElMessage.warning('请先停止当前讨论')
+    return
+  }
+  startNewDiscussionView()
+}
+
+// ==================== 角色编辑对话框 ====================
+
+const openRoleEditor = (role = null) => {
+  if (role) {
+    roleForm.value = {
+      id: role.id,
+      name: role.name,
+      emoji: role.emoji,
+      color: role.color,
+      bgColor: role.bgColor,
+      temperature: role.temperature,
+      systemPrompt: role.systemPrompt
+    }
+  } else {
+    roleForm.value = {
+      id: '',
+      name: '',
+      emoji: '\u{1F31F}',
+      color: '#409eff',
+      bgColor: 'rgba(64,158,255,0.08)',
+      temperature: 0.7,
+      systemPrompt: ''
+    }
+  }
+  showRoleEditor.value = true
+}
+
+const cloneRole = (role) => {
+  roleForm.value = {
+    id: '', // 清空 ID 表示新建
+    name: role.name + ' (副本)',
+    emoji: role.emoji,
+    color: role.color,
+    bgColor: role.bgColor,
+    temperature: role.temperature,
+    systemPrompt: role.systemPrompt
+  }
+  showRoleEditor.value = true
+}
+
+// 颜色变化时同步 bgColor（淡化版本）
+watch(() => roleForm.value.color, (newColor) => {
+  if (!newColor) return
+  // 简单地把 #RRGGBB 转 rgba(R,G,B,0.08)
+  const hex = newColor.replace('#', '')
+  if (hex.length === 6) {
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    roleForm.value.bgColor = `rgba(${r},${g},${b},0.08)`
+  }
+})
+
+// 讨论结束时自动 focus 追问框 —— 第一次讨论结束后,topic-section v-if 切成 false、
+// followup-area 才被挂载,焦点会丢到 body,用户视觉上"看到了输入框但打不了字"
+// (其实是没点击),体感就是"不能输入"。手动 focus 一次,符合直觉。
+watch(isDiscussing, (curr, prev) => {
+  if (prev && !curr && hasDiscussion.value) {
+    nextTick(() => {
+      followUpRef.value?.focus()
+    })
+  }
+})
+
+const onSaveRole = async () => {
+  try {
+    await saveCustomRole({
+      id: roleForm.value.id || undefined,
+      name: roleForm.value.name.trim(),
+      emoji: roleForm.value.emoji.trim(),
+      color: roleForm.value.color,
+      bgColor: roleForm.value.bgColor,
+      systemPrompt: roleForm.value.systemPrompt.trim(),
+      temperature: roleForm.value.temperature
+    })
+    ElMessage.success(roleForm.value.id ? '已更新' : '已新增')
+    showRoleEditor.value = false
+  } catch (e) {
+    ElMessage.error(e.message || '保存失败')
+  }
+}
+
+const onDeleteRole = (role) => {
+  ElMessageBox.confirm(`确定删除角色"${role.name}"？此操作不可恢复。`, '提示', {
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await deleteCustomRole(role.id)
+      ElMessage.success('已删除')
+    } catch (e) {
+      ElMessage.error(e.message || '删除失败')
+    }
+  }).catch(() => {})
+}
+
+// ==================== @ 提及菜单 ====================
+
+const onFollowUpInput = (e) => {
+  const text = e.target.value
+  const cursor = e.target.selectionStart || 0
+  // 从光标向前找 @ 符号
+  const before = text.slice(0, cursor)
+  const atIdx = before.lastIndexOf('@')
+  if (atIdx === -1) {
+    hideMentionMenu()
+    return
+  }
+  // @ 之前必须是空白或开头
+  const charBefore = atIdx > 0 ? before[atIdx - 1] : ' '
+  if (charBefore !== ' ' && charBefore !== '\n' && atIdx !== 0) {
+    hideMentionMenu()
+    return
+  }
+  // 取 @ 之后到光标的片段作为筛选关键词
+  const keyword = before.slice(atIdx + 1)
+  // 关键词内不允许有空格/换行
+  if (/\s/.test(keyword)) {
+    hideMentionMenu()
+    return
+  }
+
+  mentionStartIndex.value = atIdx
+  mentionCandidates.value = keyword
+    ? allRoles.value.filter(r =>
+        r.name.toLowerCase().includes(keyword.toLowerCase()) ||
+        r.id.toLowerCase().includes(keyword.toLowerCase())
+      )
+    : [...allRoles.value]
+  mentionActiveIndex.value = 0
+  mentionMenuVisible.value = true
+}
+
+const hideMentionMenu = () => {
+  // 用 setTimeout 留出一点时间让 click 触发
+  setTimeout(() => {
+    mentionMenuVisible.value = false
+  }, 150)
+}
+
+const pickMention = (role) => {
+  const text = followUpInput.value
+  const start = mentionStartIndex.value
+  if (start < 0) return
+  const cursor = followUpRef.value?.selectionStart ?? text.length
+  const before = text.slice(0, start)
+  const after = text.slice(cursor)
+  // 替换 @keyword 为 @角色名 + 空格
+  followUpInput.value = before + '@' + role.name + ' ' + after
+  mentionMenuVisible.value = false
+  mentionStartIndex.value = -1
+  // 把光标移到 @角色名 后面
+  nextTick(() => {
+    const newPos = (before + '@' + role.name + ' ').length
+    if (followUpRef.value) {
+      followUpRef.value.focus()
+      followUpRef.value.setSelectionRange(newPos, newPos)
+    }
+  })
+}
+
 // ==================== 上下文构建 ====================
 
 function buildContext(agent, previousMessages, topicText, followUp) {
@@ -330,6 +744,10 @@ function buildContext(agent, previousMessages, topicText, followUp) {
   ]
 
   for (const msg of previousMessages) {
+    if (msg.isFollowUp || msg.isUser) {
+      messages.push({ role: 'user', content: `【用户追问】${msg.content}` })
+      continue
+    }
     const sourceAgent = getAgent(msg.agentId)
     if (sourceAgent && msg.content && !msg.error) {
       messages.push({
@@ -344,7 +762,6 @@ function buildContext(agent, previousMessages, topicText, followUp) {
     messages.push({ role: 'user', content: `【追加问题】${followUp}` })
   }
 
-  // 替换最后一个 "请继续。"
   if (messages.length > 2 && messages[messages.length - 1].content === '请继续。') {
     messages.pop()
   }
@@ -373,116 +790,192 @@ const scrollToBottom = () => {
 
 const startDiscussion = async () => {
   if (!topic.value.trim()) return
-
   if (!(await checkAIConfig())) {
     ElMessage.warning(t('agentTeam.configWarning'))
     return
   }
 
-  discussionTopic.value = topic.value.trim()
+  const topicText = topic.value.trim()
+  const activeIds = Array.from(activeAgents.value)
+
+  // 创建新 session
+  const sessionId = await createSession(topicText, activeIds)
+  currentSessionId.value = sessionId
+
+  discussionTopic.value = topicText
   discussionMessages.value = []
   isDiscussing.value = true
   abortFlag.value = false
+  singleAgentMode.value = null
 
-  await runAgentDiscussion(discussionTopic.value)
+  await runAgentDiscussion(topicText, null, null)
 }
 
 const continueDiscussion = async () => {
   const followUp = followUpInput.value.trim()
   if (!followUp) return
-
   if (!(await checkAIConfig())) {
     ElMessage.warning(t('agentTeam.configWarningShort'))
     return
   }
 
+  // 如果当前没有 session（罕见，比如纯本地态），先建一个
+  if (!currentSessionId.value) {
+    const id = await createSession(discussionTopic.value || followUp, Array.from(activeAgents.value))
+    currentSessionId.value = id
+  }
+
+  // 解析 @ 提及
+  const { mentionedAgentId } = parseMention(followUp)
+
   followUpInput.value = ''
   isDiscussing.value = true
   abortFlag.value = false
+  singleAgentMode.value = mentionedAgentId
 
-  // 添加追问分隔
-  discussionMessages.value.push({
-    agentId: '_followup',
+  // 先持久化用户追问消息
+  const userMsg = {
+    agentId: '_user',
     content: followUp,
+    isFollowUp: true,
+    isUser: true,
     streaming: false,
-    isFollowUp: true
-  })
+    mentionedAgent: mentionedAgentId,
+    timestamp: new Date().toLocaleTimeString()
+  }
+  const dbId = await saveMessage(currentSessionId.value, userMsg)
+  discussionMessages.value.push({ ...userMsg, dbId })
+  scrollToBottom()
 
-  await runAgentDiscussion(discussionTopic.value, followUp)
+  await runAgentDiscussion(discussionTopic.value, followUp, mentionedAgentId)
 }
 
-const runAgentDiscussion = async (topicText, followUp = null) => {
-  const agents = enabledAgents.value
-
-  // 收集本轮之前已完成的消息（不含追问分隔）
-  const previousRoundMessages = discussionMessages.value.filter(
-    m => !m.isFollowUp && !m.streaming && m.content && !m.error
-  )
-
-  for (let i = 0; i < agents.length; i++) {
-    if (abortFlag.value) break
-
-    const agent = agents[i]
-    currentAgentIndex.value = i
-
-    // 添加占位消息
-    const msgIndex = discussionMessages.value.length
-    discussionMessages.value.push({
-      agentId: agent.id,
-      content: '',
-      streaming: true,
-      error: false,
-      timestamp: ''
-    })
-    scrollToBottom()
-
-    // 收集本轮前面角色的已完成消息
-    const contextMessages = [
-      ...previousRoundMessages,
-      ...discussionMessages.value.slice(
-        previousRoundMessages.length,
-        msgIndex
-      ).filter(m => !m.isFollowUp && m.content && !m.error && !m.streaming)
-    ]
-
-    const apiMessages = buildContext(agent, contextMessages, topicText, followUp)
-
-    try {
-      await callAIStream(apiMessages, (chunk, fullContent) => {
-        discussionMessages.value[msgIndex].content = fullContent
-        scrollToBottom()
-      }, {
-        temperature: agent.temperature,
-        maxTokens: 1000
-      })
-
-      discussionMessages.value[msgIndex].streaming = false
-      discussionMessages.value[msgIndex].timestamp = new Date().toLocaleTimeString()
-    } catch (error) {
-      discussionMessages.value[msgIndex].streaming = false
-      discussionMessages.value[msgIndex].error = true
-      discussionMessages.value[msgIndex].content = t('agentTeam.apiCallFailed', { msg: error.message })
-      discussionMessages.value[msgIndex].timestamp = new Date().toLocaleTimeString()
-    }
-
-    scrollToBottom()
+const runAgentDiscussion = async (topicText, followUp, mentionedAgentId) => {
+  // 决定本轮要发言的角色集合
+  let agents
+  if (mentionedAgentId) {
+    const target = getAgent(mentionedAgentId)
+    agents = target ? [target] : []
+  } else {
+    agents = enabledAgents.value
   }
 
-  isDiscussing.value = false
+  if (agents.length === 0) {
+    ElMessage.warning('没有可用的角色')
+    isDiscussing.value = false
+    return
+  }
+
+  // 本轮所有 agent 共用一个 AbortController:stop / 切换会话 / 卸载组件
+  // 都通过 abort 来真实中断 fetch,而不是只设标志位等当前 agent 跑完。
+  const streamController = newAbortController()
+
+  // try/finally 兜底:即使中途 buildContext / saveMessage / 数组访问抛出意外异常,
+  // 也保证 isDiscussing/singleAgentMode 复位,否则输入框会永久 disabled,
+  // 用户必须刷新页面才能继续追问。
+  try {
+    for (let i = 0; i < agents.length; i++) {
+      if (abortFlag.value) break
+
+      const agent = agents[i]
+      currentAgentIndex.value = i
+
+      // 占位消息（仅前端，先不入库）
+      const msgIndex = discussionMessages.value.length
+      discussionMessages.value.push({
+        agentId: agent.id,
+        content: '',
+        streaming: true,
+        error: false,
+        timestamp: ''
+      })
+      scrollToBottom()
+
+      // 上下文 = 当前占位之前的所有有效消息(不区分轮次,统一过滤)。
+      // 旧实现先取 previousRoundMessages,再 slice(prev.length, msgIndex) 拼"本轮新消息",
+      // 但 prev.length 是 filter 后的长度,用作原数组索引会与 streaming/error/empty
+      // 消息的位置错位,导致历史消息被重复或漏掉。这里直接对原数组 slice + filter,
+      // 保持索引一致。
+      const contextMessages = discussionMessages.value
+        .slice(0, msgIndex)
+        .filter(m => m.content && !m.error && !m.streaming)
+
+      const apiMessages = buildContext(agent, contextMessages, topicText, followUp)
+
+      let finalContent = ''
+      let isError = false
+      try {
+        await callAIStream(apiMessages, (chunk, fullContent) => {
+          // 中途被 abort:onChunk 仍可能因为缓冲被调用一两次,
+          // 但 callAIStream 内部循环会下次迭代检查 signal 并 throw,这里幂等无害。
+          discussionMessages.value[msgIndex].content = fullContent
+          finalContent = fullContent
+          scrollToBottom()
+        }, {
+          temperature: agent.temperature,
+          maxTokens: 1000,
+          signal: streamController.signal
+        })
+      } catch (error) {
+        isError = true
+        // AbortError / TimeoutError 不当作"AI 出错",改成"已停止"提示
+        if (error?.name === 'AbortError' || error?.name === 'TimeoutError'
+            || streamController.signal.aborted) {
+          finalContent = error?.name === 'TimeoutError'
+            ? '响应超时,已自动停止'
+            : '已停止'
+          discussionMessages.value[msgIndex].content = finalContent
+          discussionMessages.value[msgIndex].error = false
+          // abort 后立刻退出循环,不再发起后续 agent 请求
+          discussionMessages.value[msgIndex].streaming = false
+          discussionMessages.value[msgIndex].timestamp = new Date().toLocaleTimeString()
+          break
+        }
+        finalContent = t('agentTeam.apiCallFailed', { msg: error.message })
+        discussionMessages.value[msgIndex].error = true
+        discussionMessages.value[msgIndex].content = finalContent
+      }
+
+      discussionMessages.value[msgIndex].streaming = false
+      discussionMessages.value[msgIndex].timestamp = new Date().toLocaleTimeString()
+
+      // 持久化最终内容
+      try {
+        const dbId = await saveMessage(currentSessionId.value, {
+          agentId: agent.id,
+          content: finalContent,
+          isFollowUp: false,
+          isUser: false,
+          error: isError,
+          timestamp: discussionMessages.value[msgIndex].timestamp
+        })
+        discussionMessages.value[msgIndex].dbId = dbId
+      } catch (e) {
+        console.error('保存消息失败:', e)
+      }
+
+      scrollToBottom()
+    }
+  } finally {
+    // 防御性兜底:无论循环正常退出、abort、还是抛异常,
+    // 残留的 streaming 占位都要清掉(否则 hasDiscussion=true 但消息一直转圈,
+    // 加上 isDiscussing 误读,体感就是"输入框灰了")。
+    for (const m of discussionMessages.value) {
+      if (m.streaming) m.streaming = false
+    }
+    isDiscussing.value = false
+    singleAgentMode.value = null
+    currentAgentIndex.value = 0
+    abortFlag.value = false
+  }
 }
 
 const stopDiscussion = () => {
   abortFlag.value = true
+  // 真实中断当前 fetch:旧版只设标志位,要等当前 agent 把流读完才生效。
+  // 现在 abort 让 fetch 立刻 throw AbortError,流式内容就停。
+  abortCurrentStream('user-stop')
   ElMessage.info(t('agentTeam.stoppingAfterCurrent'))
-}
-
-const newDiscussion = () => {
-  discussionMessages.value = []
-  discussionTopic.value = ''
-  topic.value = ''
-  followUpInput.value = ''
-  isDiscussing.value = false
-  abortFlag.value = false
 }
 
 // ==================== 键盘事件 ====================
@@ -495,11 +988,44 @@ const handleTopicKeyDown = (e) => {
 }
 
 const handleFollowUpKeyDown = (e) => {
+  // @ 候选菜单的键盘导航
+  if (mentionMenuVisible.value && mentionCandidates.value.length > 0) {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      mentionActiveIndex.value = (mentionActiveIndex.value + 1) % mentionCandidates.value.length
+      return
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      mentionActiveIndex.value =
+        (mentionActiveIndex.value - 1 + mentionCandidates.value.length) % mentionCandidates.value.length
+      return
+    }
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault()
+      pickMention(mentionCandidates.value[mentionActiveIndex.value])
+      return
+    }
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      mentionMenuVisible.value = false
+      return
+    }
+  }
+
   if (e.key === 'Enter' && !e.shiftKey) {
     e.preventDefault()
     continueDiscussion()
   }
 }
+
+// ==================== 生命周期 ====================
+
+onMounted(async () => {
+  await ensureLoaded()
+  // 默认勾选前 5 个开发系角色（如果当前 activeAgents 还是默认值）
+  // 注：activeAgents 已在 composable 里初始化，这里不再重复
+})
 </script>
 
 <style scoped>
@@ -576,7 +1102,186 @@ const handleFollowUpKeyDown = (e) => {
   50% { opacity: 0.5; transform: scale(0.8); }
 }
 
-/* ==================== 主题输入区 ==================== */
+/* ==================== 主体两栏 ==================== */
+
+.main-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 历史侧栏 */
+.conversation-sidebar {
+  width: 240px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-tertiary, #f9fafb);
+  border-right: 1px solid var(--border-color, #e5e7eb);
+  transition: width 0.25s ease, min-width 0.25s ease;
+  overflow: hidden;
+}
+
+.conversation-sidebar.collapsed {
+  width: 0;
+  min-width: 0;
+  border-right: none;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 6px;
+}
+
+.sidebar-new-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  color: var(--text-primary, #374151);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  user-select: none;
+  white-space: nowrap;
+  background: var(--bg-primary, #fff);
+}
+
+.sidebar-new-btn:hover {
+  background: var(--bg-tertiary, #f3f4f6);
+  border-color: #d1d5db;
+}
+
+.sidebar-new-btn i {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.sidebar-collapse-btn,
+.sidebar-expand-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #9ca3af;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.sidebar-collapse-btn:hover,
+.sidebar-expand-btn:hover {
+  color: #374151;
+  background: #e5e7eb;
+}
+
+.sidebar-expand-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 20;
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.sidebar-list::-webkit-scrollbar { width: 4px; }
+.sidebar-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  margin-bottom: 1px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+}
+
+.sidebar-item:hover { background: #eeeff1; }
+.sidebar-item.active { background: #e5e7eb; }
+
+.sidebar-item-icon {
+  font-size: 13px;
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.sidebar-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-item-title {
+  font-size: 13px;
+  color: var(--text-primary, #374151);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+}
+
+.sidebar-item-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.12s;
+  flex-shrink: 0;
+}
+
+.sidebar-item:hover .sidebar-item-actions { opacity: 1; }
+
+.sidebar-action-btn {
+  font-size: 12px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+}
+
+.sidebar-action-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.sidebar-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 16px;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.sidebar-empty i {
+  font-size: 24px;
+  color: #d1d5db;
+}
+
+/* ==================== 主内容区 ==================== */
 
 .content-area {
   flex: 1;
@@ -591,6 +1296,7 @@ const handleFollowUpKeyDown = (e) => {
   align-items: center;
   justify-content: center;
   padding: 40px 20px;
+  overflow-y: auto;
 }
 
 .topic-card {
@@ -625,9 +1331,7 @@ const handleFollowUpKeyDown = (e) => {
   margin: 0 0 28px;
 }
 
-.topic-input-area {
-  margin-bottom: 20px;
-}
+.topic-input-area { margin-bottom: 20px; }
 
 .topic-input {
   width: 100%;
@@ -650,13 +1354,7 @@ const handleFollowUpKeyDown = (e) => {
   box-shadow: 0 0 0 3px rgba(64, 158, 255, 0.1);
 }
 
-.topic-input::placeholder {
-  color: var(--text-quaternary, #c0c4cc);
-}
-
-.agent-selector {
-  margin-bottom: 24px;
-}
+.agent-selector { margin-bottom: 24px; }
 
 .selector-label {
   font-size: 13px;
@@ -685,22 +1383,11 @@ const handleFollowUpKeyDown = (e) => {
   background: var(--bg-primary, #ffffff);
 }
 
-.agent-chip:hover {
-  border-color: #c0c4cc;
-}
+.agent-chip:hover { border-color: #c0c4cc; }
+.agent-chip.active { font-weight: 500; }
 
-.agent-chip.active {
-  font-weight: 500;
-}
-
-.chip-emoji {
-  font-size: 16px;
-}
-
-.chip-name {
-  font-size: 13px;
-  color: var(--text-primary, #374151);
-}
+.chip-emoji { font-size: 16px; }
+.chip-name { font-size: 13px; color: var(--text-primary, #374151); }
 
 .start-btn {
   min-width: 160px;
@@ -708,7 +1395,7 @@ const handleFollowUpKeyDown = (e) => {
   font-size: 15px;
 }
 
-/* ==================== 消息区域 ==================== */
+/* ==================== 消息区 ==================== */
 
 .messages-area {
   flex: 1;
@@ -718,20 +1405,9 @@ const handleFollowUpKeyDown = (e) => {
   scrollbar-color: #d1d5db transparent;
 }
 
-.messages-area::-webkit-scrollbar {
-  width: 6px;
-}
+.messages-area::-webkit-scrollbar { width: 6px; }
+.messages-area::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
 
-.messages-area::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
-}
-
-.messages-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* 主题消息 */
 .topic-message {
   display: flex;
   align-items: flex-start;
@@ -758,18 +1434,13 @@ const handleFollowUpKeyDown = (e) => {
   flex-shrink: 0;
 }
 
-.topic-message-content {
-  flex: 1;
-  min-width: 0;
-}
-
+.topic-message-content { flex: 1; min-width: 0; }
 .topic-message-label {
   font-size: 12px;
   color: var(--text-tertiary, #9ca3af);
   margin-bottom: 4px;
   font-weight: 500;
 }
-
 .topic-message-text {
   font-size: 15px;
   color: var(--text-primary, #1f2937);
@@ -777,7 +1448,67 @@ const handleFollowUpKeyDown = (e) => {
   word-break: break-word;
 }
 
-/* 角色消息 */
+/* 用户追问消息（右侧） */
+.user-message {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 12px;
+  max-width: 800px;
+  margin: 0 auto 24px;
+  animation: fadeSlideIn 0.4s ease;
+}
+
+.user-message-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.user-message-bubble {
+  max-width: 70%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-message-content {
+  padding: 10px 14px;
+  background: #e0f3ff;
+  color: #1f2937;
+  border-radius: 16px 4px 16px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.user-message-timestamp {
+  font-size: 11px;
+  color: var(--text-quaternary, #c0c4cc);
+  margin-top: 4px;
+}
+
+/* @角色名 高亮 */
+.user-message-content :deep(.mention-tag) {
+  display: inline-block;
+  padding: 1px 8px;
+  margin: 0 2px;
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Agent 消息 */
 .agent-message {
   display: flex;
   gap: 12px;
@@ -803,10 +1534,7 @@ const handleFollowUpKeyDown = (e) => {
   border: 1.5px solid;
 }
 
-.agent-message-body {
-  flex: 1;
-  min-width: 0;
-}
+.agent-message-body { flex: 1; min-width: 0; }
 
 .agent-message-header {
   display: flex;
@@ -815,15 +1543,8 @@ const handleFollowUpKeyDown = (e) => {
   margin-bottom: 6px;
 }
 
-.agent-name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.agent-timestamp {
-  font-size: 11px;
-  color: var(--text-quaternary, #c0c4cc);
-}
+.agent-name { font-size: 13px; font-weight: 600; }
+.agent-timestamp { font-size: 11px; color: var(--text-quaternary, #c0c4cc); }
 
 .agent-message-content {
   padding: 14px 18px;
@@ -838,16 +1559,9 @@ const handleFollowUpKeyDown = (e) => {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
-.agent-error {
-  color: #f56c6c;
-  font-size: 13px;
-}
+.agent-error { color: #f56c6c; font-size: 13px; }
+.agent-error i { margin-right: 4px; }
 
-.agent-error i {
-  margin-right: 4px;
-}
-
-/* 流式光标 */
 .agent-message-content.streaming :deep(> *:last-child)::after {
   content: '';
   display: inline-block;
@@ -865,12 +1579,7 @@ const handleFollowUpKeyDown = (e) => {
   51%, 100% { opacity: 0; }
 }
 
-/* Loading dots */
-.loading-dots {
-  display: flex;
-  gap: 6px;
-  padding: 4px 0;
-}
+.loading-dots { display: flex; gap: 6px; padding: 4px 0; }
 
 .loading-dots span {
   width: 8px;
@@ -892,14 +1601,18 @@ const handleFollowUpKeyDown = (e) => {
 
 .followup-area {
   max-width: 800px;
-  margin: 8px auto 24px;
+  width: 100%;
+  margin: 8px auto 16px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .followup-divider {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   color: var(--text-quaternary, #c0c4cc);
   font-size: 12px;
 }
@@ -920,6 +1633,8 @@ const handleFollowUpKeyDown = (e) => {
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+.followup-input-wrapper.disabled { opacity: 0.6; }
+
 .followup-input-wrapper:focus-within {
   border-color: #409eff;
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
@@ -939,9 +1654,7 @@ const handleFollowUpKeyDown = (e) => {
   box-sizing: border-box;
 }
 
-.followup-input::placeholder {
-  color: var(--text-quaternary, #c0c4cc);
-}
+.followup-input:disabled { cursor: not-allowed; }
 
 .followup-send-btn {
   position: absolute;
@@ -972,19 +1685,189 @@ const handleFollowUpKeyDown = (e) => {
   opacity: 0.6;
 }
 
+/* ==================== @ 候选菜单 ==================== */
+
+.mention-menu {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 12px;
+  right: 12px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--bg-primary, #fff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 50;
+  padding: 4px;
+}
+
+.mention-menu-title {
+  padding: 6px 10px 4px;
+  font-size: 11px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mention-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.mention-item.active,
+.mention-item:hover {
+  background: #f3f4f6;
+}
+
+.mention-emoji { font-size: 16px; }
+
+.mention-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.mention-empty {
+  padding: 12px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* ==================== 角色管理对话框 ==================== */
+
+/* 高度严格不超出窗口:top 占 4vh,底部留 4vh,所以 dialog 自身 ≤ 92vh。
+   再用一个 560px 的"理想默认",窗口够大时不会撑得过高。
+   表格内部纵向滚动。
+   注:Element Plus 的 el-dialog 通过 teleport 移到 body,scoped + :deep 在某些
+   场景命不中。下面同样的规则在文件末尾再写一份 unscoped 兜底。 */
+.roles-dialog :deep(.el-dialog) {
+  height: min(560px, 92vh) !important;
+  max-height: 92vh !important;
+  max-width: 95vw !important;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto !important;
+  overflow: hidden;
+}
+
+.roles-dialog :deep(.el-dialog__header) {
+  flex-shrink: 0;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border-color, #e4e7ed);
+  margin-right: 0;
+}
+
+.roles-dialog :deep(.el-dialog__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 24px;
+  overflow: hidden;
+}
+
+.roles-dialog :deep(.el-dialog__footer) {
+  flex-shrink: 0;
+  padding: 12px 24px;
+  border-top: 1px solid var(--border-color, #e4e7ed);
+}
+
+.roles-toolbar {
+  display: none; /* 已合并到 dialog header,保留旧 class 以防其他引用 */
+}
+
+.roles-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.roles-dialog-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+.roles-dialog-title > span:first-child {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color, #303133);
+}
+
+.roles-table-wrapper {
+  flex: 1;
+  min-height: 0;       /* 关键：让 flex 子元素允许收缩，table height:100% 才生效 */
+  overflow: hidden;
+}
+
+.roles-tip {
+  font-size: 12px;
+  color: #909399;
+}
+
+.role-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.role-cell-emoji {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border: 1.5px solid;
+  flex-shrink: 0;
+}
+
+.role-cell-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.role-prompt-preview {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emoji-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.emoji-suggest {
+  cursor: pointer;
+  padding: 4px 8px;
+  background: #f3f4f6;
+  border-radius: 6px;
+  font-size: 16px;
+  transition: background 0.12s;
+}
+
+.emoji-suggest:hover {
+  background: #e5e7eb;
+}
+
 /* ==================== Markdown 样式 ==================== */
 
-.agent-message-content :deep(p) {
-  margin: 8px 0;
-}
-
-.agent-message-content :deep(p:first-child) {
-  margin-top: 0;
-}
-
-.agent-message-content :deep(p:last-child) {
-  margin-bottom: 0;
-}
+.agent-message-content :deep(p) { margin: 8px 0; }
+.agent-message-content :deep(p:first-child) { margin-top: 0; }
+.agent-message-content :deep(p:last-child) { margin-bottom: 0; }
 
 .agent-message-content :deep(code) {
   background: rgba(0, 0, 0, 0.06);
@@ -1101,12 +1984,69 @@ const handleFollowUpKeyDown = (e) => {
   font-weight: 600;
 }
 
-.agent-message-content :deep(a) {
-  color: #409eff;
-  text-decoration: none;
+.agent-message-content :deep(a) { color: #409eff; text-decoration: none; }
+.agent-message-content :deep(a:hover) { text-decoration: underline; }
+</style>
+
+<!-- Unscoped 兜底:el-dialog 用 teleport 移到 body,scoped 的 :deep 在
+     teleported 节点上有时命不中(Vue 3 + 某些 element-plus 版本),
+     这里直接用全局选择器命中 .roles-dialog 类(由 class 透传到 .el-dialog)。
+     垂直居中:用 :has() 找到包含 .roles-dialog 的 .el-overlay-dialog,
+     把它变成 flex 容器,内部 .el-dialog margin: auto 自动居中。 -->
+<style>
+.el-overlay-dialog:has(.roles-dialog) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 16px 0;
 }
 
-.agent-message-content :deep(a:hover) {
-  text-decoration: underline;
+.roles-dialog,
+.roles-dialog.el-dialog,
+.el-overlay .el-dialog.roles-dialog,
+.el-overlay-dialog.roles-dialog .el-dialog,
+.roles-dialog .el-dialog {
+  height: min(560px, 92vh) !important;
+  max-height: 92vh !important;
+  max-width: 95vw !important;
+  width: 1100px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  /* margin auto 在父级 flex 居中下负责水平居中,垂直靠 .el-overlay-dialog 的 align-items */
+  margin: 0 auto !important;
+  top: auto !important;
+  overflow: hidden !important;
+}
+.roles-dialog .el-dialog__header,
+.roles-dialog.el-dialog .el-dialog__header {
+  flex-shrink: 0;
+  padding: 14px 20px !important;
+}
+.roles-dialog .el-dialog__body,
+.roles-dialog.el-dialog .el-dialog__body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important; /* 表格自带 border,不需要 body padding,让表格直接撑满 */
+}
+.roles-dialog .el-dialog__footer,
+.roles-dialog.el-dialog .el-dialog__footer {
+  flex-shrink: 0;
+  padding: 10px 20px !important;
+}
+.roles-dialog .roles-table-wrapper,
+.roles-dialog.el-dialog .roles-table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+/* 紧凑表格:更小的行高,一屏多展示几条 */
+.roles-dialog .el-table--small .el-table__cell {
+  padding: 4px 0 !important;
+}
+.roles-dialog .el-table--small .cell {
+  line-height: 1.4 !important;
 }
 </style>

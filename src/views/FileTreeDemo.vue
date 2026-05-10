@@ -185,7 +185,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   Search,
@@ -246,18 +246,25 @@ const treeProps = {
 }
 
 // 监听扫描时长
+// 旧实现:每次 isScanning 变 true 都新建 setInterval,之前的 timer 不会被清(只有在
+// !isScanning 时下一 tick 才清);组件在扫描中被卸载也不会清,timer 永久跑下去访问已 dispose 的 ref。
+let scanTimer = null
+const stopScanTimer = () => {
+  if (scanTimer !== null) { clearInterval(scanTimer); scanTimer = null }
+}
 watch(isScanning, (val) => {
   if (val) {
     startTime.value = Date.now()
-    const timer = setInterval(() => {
-      if (!isScanning.value) {
-        clearInterval(timer)
-        return
-      }
+    stopScanTimer()
+    scanTimer = setInterval(() => {
+      if (!isScanning.value) { stopScanTimer(); return }
       scanDuration.value = ((Date.now() - startTime.value) / 1000).toFixed(1)
     }, 100)
+  } else {
+    stopScanTimer()
   }
 })
+onBeforeUnmount(stopScanTimer)
 
 // 选择目录
 const selectDirectory = async () => {

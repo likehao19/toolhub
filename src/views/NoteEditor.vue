@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import {ref, computed, onMounted, nextTick, watch} from 'vue'
+import {ref, computed, onMounted, onBeforeUnmount, nextTick, watch} from 'vue'
 import { t } from '@/i18n'
 import {ElMessage, ElMessageBox} from 'element-plus'
 import {
@@ -83,6 +83,7 @@ import {TauriFileManager} from '@/utils/tauri'
 import {join, appDataDir} from '@tauri-apps/api/path'
 import {readTextFile, writeTextFile, readFile, writeFile, exists, mkdir, remove, rename} from '@tauri-apps/plugin-fs'
 import {markdownToHtml} from '@/utils/markdown'
+import {getNotesDir} from '@/utils/notes'
 import * as XLSX from 'xlsx'
 import mammoth from 'mammoth'
 import {Document as DocxDocument, Packer, Paragraph, TextRun, HeadingLevel} from 'docx'
@@ -173,9 +174,24 @@ function handleSave(v, html) {
 
 const onUploadImg = async (files, callback) => {
   // 示例：本地预览；生产中应将 files 上传到服务器后返回可访问的 URL 列表
-  const urls = files.map((f) => URL.createObjectURL(f))
+  // 旧实现:createObjectURL 后从不 revoke —— 每张图把对应 File 对象永久钉在内存里。
+  // 追踪到 createdObjectUrls,组件卸载时统一释放。
+  const urls = files.map((f) => {
+    const u = URL.createObjectURL(f)
+    createdObjectUrls.push(u)
+    return u
+  })
   callback(urls)
 }
+
+// 组件存活期间创建的 blob: URL,unmount 时一起释放,避免内存泄漏
+const createdObjectUrls = []
+onBeforeUnmount(() => {
+  for (const u of createdObjectUrls) {
+    try { URL.revokeObjectURL(u) } catch {}
+  }
+  createdObjectUrls.length = 0
+})
 
 onMounted(() => {
   const cached = localStorage.getItem('post.md')
@@ -275,8 +291,7 @@ const getSubFolders = (folder) => {
 // 加载笔记树
 const loadNotesTree = async () => {
   try {
-    const appDir = await appDataDir()
-    const notesDir = await join(appDir, 'notes')
+    const notesDir = await getNotesDir()
 
     // 确保目录存在
     if (!(await exists(notesDir))) {
@@ -455,8 +470,7 @@ const createFolder = async (parentFolder) => {
     })
 
     if (name && name.trim()) {
-      const appDir = await appDataDir()
-      const notesDir = await join(appDir, 'notes')
+      const notesDir = await getNotesDir()
 
       let parentPath = notesDir
       let parentKey = null
@@ -516,7 +530,7 @@ const renameFolder = async (folder) => {
     })
 
     if (newName && newName.trim() && newName !== folder.name) {
-      const newPath = await join(await appDataDir(), 'notes', newName.trim())
+      const newPath = await join(await getNotesDir(), newName.trim())
 
       // 重命名文件夹
       await rename(folder.path, newPath)
@@ -651,7 +665,7 @@ const showFileMenu = (event, file) => {
       try {
         const ext = file.extension || getFileExtension(file)
         const newFileName = value + (ext ? '.' + ext : '')
-        const newPath = await join(await appDataDir(), 'notes', file.folder || '', newFileName)
+        const newPath = await join(await getNotesDir(), file.folder || '', newFileName)
         await rename(file.path, newPath)
 
         // 更新文件信息
@@ -1155,7 +1169,7 @@ const scrollToHeading = (index) => {
   padding: 6px 12px;
   border-radius: 6px;
   border: 1px solid var(--border-color);
-  background: white;
+  background: var(--bg-primary);
   cursor: pointer;
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -1346,7 +1360,7 @@ const scrollToHeading = (index) => {
   align-items: center;
   padding: 0 20px;
   gap: 15px;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 .toolbar-group {
@@ -1400,7 +1414,7 @@ const scrollToHeading = (index) => {
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
-  background: #fff;
+  background: var(--bg-primary);
   justify-content: center;
   min-height: 120px;
 }
@@ -1491,7 +1505,7 @@ const scrollToHeading = (index) => {
 .editor-toolbar .btn {
   padding: 4px 8px;
   border: 1px solid var(--border-color);
-  background: white;
+  background: var(--bg-primary);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -1527,7 +1541,7 @@ const scrollToHeading = (index) => {
   font-size: 14px;
   line-height: 1.8;
   resize: none;
-  background: #fff;
+  background: var(--bg-primary);
 }
 
 /* ignore */
@@ -1642,7 +1656,7 @@ const scrollToHeading = (index) => {
 }
 
 .excel-cell-input:focus {
-  background: #fff;
+  background: var(--bg-primary);
   box-shadow: inset 0 0 0 2px var(--accent-color);
 }
 
@@ -1738,7 +1752,7 @@ const scrollToHeading = (index) => {
 
 .editor-top-toolbar {
   padding: 8px 16px 8px 12px;
-  background: #ffffff;
+  background: var(--bg-primary);
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -31,16 +31,14 @@
             </div>
           </el-option>
         </el-select>
-        <el-button size="small" @click="addRepo">
+        <el-button size="small" text @click="addRepo" :title="t('gitReport.addRepo')">
           <el-icon><FolderAdd /></el-icon>
-          {{ t('gitReport.addRepo') }}
         </el-button>
-        <el-button size="small" @click="scanRepos" :loading="scanning" :title="t('gitReport.rescan')">
+        <el-button size="small" text @click="scanRepos" :loading="scanning" :title="t('gitReport.rescan')">
           <el-icon><Search /></el-icon>
         </el-button>
         <el-button size="small" type="primary" @click="generate" :loading="generating">
-          <el-icon><Document /></el-icon>
-          {{ t('gitReport.generate') }}
+          <el-icon style="margin-right: 6px;"><Document /></el-icon>{{ t('gitReport.generate') }}
         </el-button>
       </div>
     </div>
@@ -77,8 +75,12 @@
       <div class="empty-icon">📊</div>
       <div class="empty-text">{{ t('gitReport.noRepo') }}</div>
       <div style="display:flex;gap:8px">
-        <el-button type="primary" @click="scanRepos" :loading="scanning">{{ t('gitReport.autoDetect') }}</el-button>
-        <el-button @click="addRepo">{{ t('gitReport.addRepo') }}</el-button>
+        <el-button type="primary" @click="scanRepos" :loading="scanning">
+          <el-icon style="margin-right: 6px;"><Search /></el-icon>{{ t('gitReport.autoDetect') }}
+        </el-button>
+        <el-button @click="addRepo">
+          <el-icon style="margin-right: 6px;"><FolderAdd /></el-icon>{{ t('gitReport.addRepo') }}
+        </el-button>
       </div>
     </div>
 
@@ -137,13 +139,11 @@
         <div class="panel-header">
           <span class="panel-title">{{ t('gitReport.preview') }}</span>
           <div class="panel-actions">
-            <el-button size="small" text @click="copyReport" :disabled="!reportMarkdown">
+            <el-button size="small" text @click="copyReport" :disabled="!reportMarkdown" :title="t('common.copy')">
               <el-icon><CopyDocument /></el-icon>
-              {{ t('gitReport.copy') }}
             </el-button>
-            <el-button size="small" text @click="exportReport" :disabled="!reportMarkdown">
+            <el-button size="small" text @click="exportReport" :disabled="!reportMarkdown" :title="t('common.export')">
               <el-icon><Download /></el-icon>
-              {{ t('gitReport.export') }}
             </el-button>
           </div>
         </div>
@@ -435,7 +435,7 @@ onMounted(async () => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -510,7 +510,7 @@ onMounted(async () => {
   justify-content: center;
   gap: 12px;
   margin: 18px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   background: rgba(255,255,255,0.6);
 }
@@ -524,33 +524,32 @@ onMounted(async () => {
   display: flex;
   overflow: hidden;
   min-height: 0;
-  padding: 14px 18px 0;
+  padding: 0;
   gap: 0;
 }
 
 .left-panel {
-  width: 380px;
-  min-width: 300px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
+  width: 260px;
+  min-width: 260px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: hidden;
 }
 .stats-cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   padding: 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .stat-card {
   text-align: center;
   padding: 10px 6px;
   background: rgba(255,255,255,0.68);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 14px;
 }
 .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
@@ -578,7 +577,7 @@ onMounted(async () => {
   padding: 8px 14px 8px 32px;
   margin: 0 10px 8px;
   font-size: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 12px;
   background: rgba(255,255,255,0.64);
 }
@@ -606,7 +605,7 @@ onMounted(async () => {
   padding: 24px;
   color: var(--text-quaternary);
   font-size: 13px;
-  border: 1px dashed rgba(15, 23, 42, 0.08);
+  border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   background: rgba(255,255,255,0.5);
 }
@@ -618,16 +617,16 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 0 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
 }
 .panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
   background: rgba(255,255,255,0.64);
 }
@@ -658,9 +657,9 @@ onMounted(async () => {
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 12px;
   line-height: 1.7;
-  background: rgba(248,250,252,0.88);
+  background: rgba(248, 244, 232,0.88);
   color: var(--text-primary);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   resize: none;
   box-shadow: none;
@@ -681,7 +680,7 @@ onMounted(async () => {
   padding: 0 16px;
   margin: 0 18px 18px;
   background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px;
   color: var(--text-tertiary);
@@ -720,11 +719,11 @@ onMounted(async () => {
     width: 100%;
     min-width: 0;
     border-radius: 18px;
-    border: 1px solid rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(60, 40, 20, 0.08);
   }
 
   .status-bar {
-    border-top: 1px solid rgba(15, 23, 42, 0.08);
+    border-top: 1px solid rgba(60, 40, 20, 0.08);
     border-radius: 18px;
   }
 }

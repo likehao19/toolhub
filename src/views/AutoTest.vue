@@ -28,7 +28,9 @@
         <div class="auto-sidebar">
           <div class="panel-toolbar">
             <span style="font-size:12px;font-weight:600">{{ t('autoTest.testSuites') }}</span>
-            <el-button size="small" text type="primary" @click="onAddTestSuite">+</el-button>
+            <el-button size="small" text type="primary" @click="onAddTestSuite" :title="t('common.add')">
+              <el-icon><Plus /></el-icon>
+            </el-button>
           </div>
           <div v-for="suite in testSuites" :key="suite.id" class="doc-item"
             :class="{ active: editSuiteId === suite.id }" @click="editSuiteId = suite.id">
@@ -45,9 +47,11 @@
               <el-input v-model="editingSuite.name" size="small" style="width:200px" />
               <div style="margin-left:auto;display:flex;gap:8px">
                 <el-button type="primary" size="small" :loading="suiteRunning" @click="doRunSuite">
-                  {{ t('autoTest.runSuite') }}
+                  <el-icon style="margin-right: 6px;"><VideoPlay /></el-icon>{{ t('autoTest.runSuite') }}
                 </el-button>
-                <el-button size="small" @click="doSaveSuite">{{ t('common.save') }}</el-button>
+                <el-button size="small" @click="doSaveSuite">
+                  <el-icon style="margin-right: 6px;"><Check /></el-icon>{{ t('common.save') }}
+                </el-button>
               </div>
             </div>
 
@@ -149,7 +153,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { DocumentChecked, Close } from '@element-plus/icons-vue'
+import { DocumentChecked, Close, Plus, VideoPlay, Check } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { METHOD_COLORS, uuid } from '@/utils/apiWorkbench/shared'
 import { loadCollections, flattenCollectionApis } from '@/utils/apiWorkbench/collections'
@@ -246,7 +250,7 @@ onMounted(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -276,42 +280,43 @@ onMounted(() => {
 .content-area {
   flex: 1;
   overflow: hidden;
-  padding: 14px 18px 0;
+  padding: 0;
   min-height: 0;
 }
 .auto-layout { flex: 1; display: flex; height: 100%; overflow: hidden; min-height: 0; }
 .auto-sidebar {
-  width: 250px;
-  min-width: 220px;
-  overflow-y: auto;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-right: none;
-  border-radius: 18px 0 0 18px;
-  background: linear-gradient(180deg, rgba(248, 250, 252, 0.94), rgba(241, 245, 249, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  width: 260px;
+  min-width: 260px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
 }
 .panel-toolbar {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 14px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .auto-main {
   flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 18px 0;
-  background: linear-gradient(180deg, rgba(252,253,255,0.99), rgba(245,247,250,0.98));
+  background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
 .suite-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 12px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08); background: rgba(255,255,255,0.6); flex-shrink: 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08); background: rgba(255,255,255,0.6); flex-shrink: 0;
 }
 .auto-steps { padding: 16px; flex: 1; overflow-y: auto; }
 .auto-step-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   padding: 12px;
   margin-bottom: 10px;
@@ -324,12 +329,12 @@ onMounted(() => {
 .step-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .step-num { font-size: 12px; font-weight: 700; color: var(--text-tertiary); width: 24px; flex-shrink: 0; }
 .step-result-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
-.step-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(15, 23, 42, 0.1); }
+.step-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(60, 40, 20, 0.1); }
 .suite-report { padding: 0 16px 16px; }
 
 .doc-item {
   display: flex; align-items: center; gap: 6px; padding: 10px 12px; cursor: pointer; font-size: 12px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.05);
 }
 .doc-item:hover { background: rgba(255,255,255,0.62); }
 .doc-item.active { background: linear-gradient(135deg, var(--accent-blue), #7c3aed); color: #fff; }
@@ -339,7 +344,7 @@ onMounted(() => {
 .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
 .empty-hint {
   text-align: center; color: var(--text-quaternary); font-size: 12px; padding: 24px;
-  border: 1px dashed rgba(15, 23, 42, 0.08); border-radius: 14px; background: rgba(255,255,255,0.5);
+  border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 14px; background: rgba(255,255,255,0.5);
 }
 .kv-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .kv-delete { flex-shrink: 0; font-size: 14px; color: var(--text-quaternary); cursor: pointer; }
@@ -347,7 +352,7 @@ onMounted(() => {
 
 .bench-stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
 .bench-stat-card {
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   padding: 10px;
   text-align: center;
@@ -361,12 +366,12 @@ onMounted(() => {
 .stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
 
 @media (max-width: 960px) {
-  .content-area { padding: 14px 14px 0; }
+  .content-area { padding: 0; }
   .auto-layout { flex-direction: column; }
   .auto-sidebar {
     width: 100%;
     min-width: 0;
-    border-right: 1px solid rgba(15, 23, 42, 0.08);
+    border-right: 1px solid rgba(60, 40, 20, 0.08);
     border-radius: 18px 18px 0 0;
     max-height: 280px;
   }

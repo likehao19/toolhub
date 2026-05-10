@@ -1,11 +1,16 @@
 <template>
-  <div class="productivity-sidebar" :class="{ collapsed: isCollapsed }">
+  <nav
+    class="productivity-sidebar"
+    :class="{ collapsed: isCollapsed }"
+    role="navigation"
+    :aria-label="t('sidebar.dashboard')"
+  >
     <div class="sidebar-header">
       <div v-show="!isCollapsed" class="sidebar-brand">
         <div class="brand-title">ToolHub</div>
         <div class="brand-subtitle">Workspace</div>
       </div>
-      <el-button text @click="toggleCollapse" class="collapse-btn">
+      <el-button text @click="toggleCollapse" class="collapse-btn" :aria-label="isCollapsed ? '展开侧栏' : '折叠侧栏'">
         <el-icon><Menu v-if="isCollapsed" /><Fold v-else /></el-icon>
       </el-button>
     </div>
@@ -20,8 +25,13 @@
         >
           <div
             class="menu-item menu-item-dashboard"
-            :class="{ active: currentPath === '/' }"
+            :class="{ active: isActive('/') }"
+            role="link"
+            tabindex="0"
+            :aria-current="isActive('/') ? 'page' : undefined"
             @click="navigateTo('/')"
+            @keydown.enter.prevent="navigateTo('/')"
+            @keydown.space.prevent="navigateTo('/')"
           >
             <span class="menu-icon-shell">
               <el-icon><HomeFilled /></el-icon>
@@ -38,7 +48,12 @@
         <div
           v-show="!isCollapsed"
           class="section-header section-header-static"
+          role="button"
+          tabindex="0"
+          :aria-expanded="favoritesExpanded"
           @click="toggleFavorites"
+          @keydown.enter.prevent="toggleFavorites"
+          @keydown.space.prevent="toggleFavorites"
         >
           <el-icon>
             <ArrowRight v-if="!favoritesExpanded" />
@@ -52,19 +67,24 @@
             <el-tooltip
               v-for="tool in favoriteTools"
               :key="tool.id"
-              :content="tool.name"
+              :content="getToolName(tool)"
               placement="right"
               :disabled="!isCollapsed"
             >
               <div
                 class="menu-item"
-                :class="{ active: currentPath === getToolPath(tool) }"
+                :class="{ active: isActive(getToolPath(tool)) }"
+                role="link"
+                tabindex="0"
+                :aria-current="isActive(getToolPath(tool)) ? 'page' : undefined"
                 @click="openFavoriteTool(tool)"
+                @keydown.enter.prevent="openFavoriteTool(tool)"
+                @keydown.space.prevent="openFavoriteTool(tool)"
               >
                 <span class="menu-icon-shell menu-icon-shell-emoji">
                   <span class="tool-emoji-icon">{{ tool.icon }}</span>
                 </span>
-                <span v-show="!isCollapsed" class="menu-label">{{ tool.name }}</span>
+                <span v-show="!isCollapsed" class="menu-label">{{ getToolName(tool) }}</span>
               </div>
             </el-tooltip>
           </template>
@@ -78,7 +98,11 @@
             <div
               v-show="!isCollapsed"
               class="menu-item favorites-empty-item"
+              role="link"
+              tabindex="0"
               @click="navigateTo('/toolbox')"
+              @keydown.enter.prevent="navigateTo('/toolbox')"
+              @keydown.space.prevent="navigateTo('/toolbox')"
             >
               <span class="menu-icon-shell">
                 <el-icon><Star /></el-icon>
@@ -100,7 +124,12 @@
         <div
           v-show="!isCollapsed"
           class="section-header"
+          role="button"
+          tabindex="0"
+          :aria-expanded="!!sectionExpanded[section.key]"
           @click="toggleSection(section.key)"
+          @keydown.enter.prevent="toggleSection(section.key)"
+          @keydown.space.prevent="toggleSection(section.key)"
         >
           <el-icon>
             <ArrowRight v-if="!sectionExpanded[section.key]" />
@@ -118,8 +147,13 @@
           >
             <div
               class="menu-item"
-              :class="{ active: currentPath === item.path && !item.isWindow }"
-              @click="navigateTo(item.path, item)"
+              :class="{ active: isActive(item.path) }"
+              role="link"
+              tabindex="0"
+              :aria-current="isActive(item.path) ? 'page' : undefined"
+              @click="navigateTo(item.path)"
+              @keydown.enter.prevent="navigateTo(item.path)"
+              @keydown.space.prevent="navigateTo(item.path)"
             >
               <span class="menu-icon-shell">
                 <el-icon><component :is="item.icon" /></el-icon>
@@ -143,8 +177,13 @@
         >
           <div
             class="menu-item toolbox-btn footer-entry"
-            :class="{ active: currentPath === '/toolbox' }"
+            :class="{ active: isActive('/toolbox') }"
+            role="link"
+            tabindex="0"
+            :aria-current="isActive('/toolbox') ? 'page' : undefined"
             @click="navigateTo('/toolbox')"
+            @keydown.enter.prevent="navigateTo('/toolbox')"
+            @keydown.space.prevent="navigateTo('/toolbox')"
           >
             <span class="menu-icon-shell">
               <el-icon><Briefcase /></el-icon>
@@ -164,8 +203,13 @@
         >
           <div
             class="menu-item footer-entry"
-            :class="{ active: currentPath === '/settings' }"
+            :class="{ active: isActive('/settings') }"
+            role="link"
+            tabindex="0"
+            :aria-current="isActive('/settings') ? 'page' : undefined"
             @click="navigateTo('/settings')"
+            @keydown.enter.prevent="navigateTo('/settings')"
+            @keydown.space.prevent="navigateTo('/settings')"
           >
             <span class="menu-icon-shell">
               <el-icon><Setting /></el-icon>
@@ -175,7 +219,7 @@
         </el-tooltip>
       </div>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script setup>
@@ -184,18 +228,46 @@ import { useRouter, useRoute } from 'vue-router'
 import {
   Menu, Fold, HomeFilled, Setting, ArrowRight, ArrowDown,
   Document, Lock, Link, List, Calendar, ChatDotRound, ChatLineRound, Briefcase,
-  Star, ChatRound
+  Star, ChatRound, UserFilled
 } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
-import { useFavoriteTools } from '@/composables/useFavoriteTools'
+import { useFavoriteTools, getToolName } from '@/composables/useFavoriteTools'
 
 const router = useRouter()
 const route = useRoute()
 
-const isCollapsed = ref(false)
+// ---- localStorage 持久化辅助 ----
+// 用 try/catch 兜住 storage 不可用 / quota 满 / JSON 损坏 等情况,坏数据不会拖崩组件
+const STORAGE_KEY_COLLAPSED = 'sidebar-collapsed'
+const STORAGE_KEY_FAV_EXPANDED = 'sidebar-favorites-expanded'
+const STORAGE_KEY_SECTIONS = 'sidebar-sections-expanded'
+
+const readBool = (key, fallback) => {
+  try {
+    const v = localStorage.getItem(key)
+    if (v === null) return fallback
+    return v === 'true'
+  } catch { return fallback }
+}
+const writeBool = (key, val) => {
+  try { localStorage.setItem(key, String(val)) } catch {}
+}
+const readJSON = (key, fallback) => {
+  try {
+    const v = localStorage.getItem(key)
+    if (v === null) return fallback
+    const parsed = JSON.parse(v)
+    return (parsed && typeof parsed === 'object') ? parsed : fallback
+  } catch { return fallback }
+}
+const writeJSON = (key, val) => {
+  try { localStorage.setItem(key, JSON.stringify(val)) } catch {}
+}
+
+const isCollapsed = ref(readBool(STORAGE_KEY_COLLAPSED, false))
 const currentPath = computed(() => route.path)
-const favoritesExpanded = ref(true)
+const favoritesExpanded = ref(readBool(STORAGE_KEY_FAV_EXPANDED, true))
 
 const { favoriteTools } = useFavoriteTools()
 
@@ -204,13 +276,17 @@ const toggleFavorites = () => {
   favoritesExpanded.value = !favoritesExpanded.value
 }
 
+// 持久化:三个 UI 状态都写回 localStorage,刷新后保持
+watch(isCollapsed, (v) => writeBool(STORAGE_KEY_COLLAPSED, v))
+watch(favoritesExpanded, (v) => writeBool(STORAGE_KEY_FAV_EXPANDED, v))
+
 // 点击常用工具
 const openFavoriteTool = (tool) => {
   const path = getToolPath(tool)
   if (path) {
     router.push(path)
   } else {
-    ElMessage.info(`${tool.name} - ${t('common.comingSoon')}`)
+    ElMessage.info(`${getToolName(tool)} - ${t('common.comingSoon')}`)
   }
 }
 
@@ -247,22 +323,20 @@ const toolPathMap = {
   'hardware-info': '/toolbox/hardware-info',
   'download-manager': '/toolbox/download-manager',
   'ssh-terminal': '/toolbox/ssh-terminal',
+  'multi-print': '/toolbox/multi-print',
 }
 
 const getToolPath = (tool) => toolPathMap[tool.id] ?? null
 
-// 启用的工具数量（从配置读取）
-const enabledToolsCount = computed(() => {
-  // TODO: 从配置文件读取启用的工具数量
-  return 5
-})
+// 工具箱里实际可用的工具数量(基于路由派生,不再硬编码 5)
+// TODO 未来若有 per-tool enable/disable 开关,这里改成读取启用列表的长度
+const enabledToolsCount = computed(() => Object.keys(toolPathMap).length)
 
-// 菜单结构 - 使用 ref 以支持深度响应式，图标用 markRaw 避免不必要的响应式转换
+// 菜单结构:每次 t() 重算保证语言切换时即时更新;图标用 markRaw 避免被 Vue 包成响应式
 const menuSections = computed(() => [
   {
     name: t('sidebar.knowledge'),
     key: 'knowledge',
-    expanded: true,
     items: [
       { title: t('sidebar.documents'), path: '/notes', icon: markRaw(Document) },
       { title: t('sidebar.credentials'), path: '/passwords', icon: markRaw(Lock) },
@@ -272,17 +346,16 @@ const menuSections = computed(() => [
   {
     name: t('sidebar.ai'),
     key: 'ai',
-    expanded: true,
     items: [
       { title: t('sidebar.aiConversation'), path: '/ai-conversation', icon: markRaw(ChatLineRound) },
       { title: t('sidebar.aiChat'), path: '/ai-chat', icon: markRaw(ChatDotRound) },
+      { title: t('sidebar.agentTeam'), path: '/agent-team', icon: markRaw(UserFilled) },
       { title: t('sidebar.chat'), path: '/chat', icon: markRaw(ChatRound) }
     ]
   },
   {
     name: t('sidebar.efficiency'),
     key: 'efficiency',
-    expanded: true,
     items: [
       { title: t('sidebar.todos'), path: '/todos', icon: markRaw(List) },
       { title: t('sidebar.calendar'), path: '/calendar', icon: markRaw(Calendar) }
@@ -290,8 +363,15 @@ const menuSections = computed(() => [
   }
 ])
 
-// 分类展开状态
-const sectionExpanded = reactive({ knowledge: true, ai: true, efficiency: true })
+// 分类展开状态:从 localStorage 恢复,默认全部展开
+const sectionExpanded = reactive(
+  readJSON(STORAGE_KEY_SECTIONS, { knowledge: true, ai: true, efficiency: true })
+)
+// 兜底:如果 storage 里有的 key 现在已经被删,或新增的 key 没有,补默认值
+;['knowledge', 'ai', 'efficiency'].forEach(k => {
+  if (typeof sectionExpanded[k] !== 'boolean') sectionExpanded[k] = true
+})
+watch(sectionExpanded, (v) => writeJSON(STORAGE_KEY_SECTIONS, v), { deep: true })
 
 // 切换侧边栏折叠
 const toggleCollapse = () => {
@@ -303,40 +383,21 @@ const toggleSection = (key) => {
   sectionExpanded[key] = !sectionExpanded[key]
 }
 
-// 导航
-const navigateTo = async (path, item) => {
-  if (!path) return
-
-  // 如果是独立窗口（如便签）
-  if (item?.isWindow) {
-    try {
-      const { getAllWebviewWindows } = await import('@tauri-apps/api/webviewWindow')
-
-      const allWindows = await getAllWebviewWindows()
-      const stickyWindow = allWindows.find(w => w.label === 'sticky-notes')
-
-      if (stickyWindow) {
-        await stickyWindow.show()
-        await stickyWindow.setFocus()
-      }
-    } catch (error) {
-      // ignore
-    }
-  } else {
-    // 普通路由导航
-    router.push(path)
-  }
+// active 判断:支持子路由前缀匹配。
+//   '/' 仅精确匹配根路径(否则任何路径都会是 dashboard active)
+//   其他路径:相等 OR 当前路径以 path+'/' 开头(比如 /toolbox 匹配 /toolbox/ssh-terminal)
+const isActive = (path) => {
+  if (!path) return false
+  const cur = currentPath.value
+  if (path === '/') return cur === '/'
+  return cur === path || cur.startsWith(path + '/')
 }
 
-// 监听路由变化，自动展开对应分类
-watch(currentPath, (newPath) => {
-  menuSections.value.forEach(section => {
-    const hasActiveItem = section.items.some(item => item.path === newPath)
-    if (hasActiveItem && !sectionExpanded[section.key]) {
-      sectionExpanded[section.key] = true
-    }
-  })
-})
+// 导航
+const navigateTo = (path) => {
+  if (!path) return
+  router.push(path)
+}
 </script>
 
 <style scoped>
@@ -577,7 +638,7 @@ watch(currentPath, (newPath) => {
 }
 
 .menu-item:hover .el-icon {
-  color: rgba(15, 23, 42, 0.92);
+  color: rgba(60, 40, 20, 0.92);
 }
 
 .menu-item:hover .menu-icon-shell {
@@ -590,7 +651,7 @@ watch(currentPath, (newPath) => {
   color: color-mix(in srgb, var(--accent-blue) 84%, #0f172a 16%);
   font-weight: 600;
   border-color: color-mix(in srgb, var(--accent-blue) 32%, transparent 68%);
-  box-shadow: 0 8px 14px rgba(13, 110, 253, 0.16);
+  box-shadow: 0 8px 14px rgba(194, 65, 12, 0.16);
 }
 
 .menu-item.active::before {
@@ -601,7 +662,7 @@ watch(currentPath, (newPath) => {
   bottom: 7px;
   width: 3px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  background: linear-gradient(180deg, #fb923c, #c2410c);
 }
 
 .menu-item.active .el-icon {

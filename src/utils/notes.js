@@ -288,44 +288,64 @@ export async function deleteNoteByPath(filePath) {
 }
 
 /**
- * 列出所有笔记
+ * 列出所有笔记。
+ * 递归扫描笔记根目录,跳过 images / ebooks / 下划线开头的系统目录,
+ * 这样"文档中心"里放在子文件夹下的 .md 也能被全局搜索到。
+ * 旧实现只读顶层,导致绝大多数用户的笔记搜不到。
  */
 export async function listNotes() {
   try {
-    const dir = await getNotesDir()
-    const entries = await readDir(dir)
-    
+    const root = await getNotesDir()
     const notes = []
-    for (const entry of entries) {
-      if (!entry.isDirectory && entry.name.endsWith('.md')) {
-        const noteName = entry.name.replace('.md', '')
-        const path = await join(dir, entry.name)
-        const content = await readTextFile(path)
-        
-        // 提取标题（第一行或第一个 # 标题）
-        let title = noteName
-        const lines = content.split('\n')
-        for (const line of lines) {
-          if (line.trim().startsWith('# ')) {
-            title = line.trim().substring(2)
-            break
-          } else if (line.trim()) {
-            title = line.trim()
-            break
-          }
+
+    const walk = async (dir, relPrefix = '') => {
+      let entries
+      try {
+        entries = await readDir(dir)
+      } catch {
+        return
+      }
+      for (const entry of entries) {
+        // 跳过隐藏 / 系统目录,避免扫到 images / ebooks / .git 等
+        if (entry.name.startsWith('.') || entry.name.startsWith('_')) continue
+        if (entry.isDirectory) {
+          if (entry.name === 'images' || entry.name === 'ebooks') continue
+          const sub = await join(dir, entry.name)
+          const nextPrefix = relPrefix ? `${relPrefix}/${entry.name}` : entry.name
+          await walk(sub, nextPrefix)
+          continue
         }
-        
+        if (!entry.name.endsWith('.md')) continue
+
+        const noteName = entry.name.replace(/\.md$/, '')
+        const path = await join(dir, entry.name)
+        // name 字段保留含子目录的相对路径(不带 .md),作为唯一标识,
+        // 避免不同子文件夹下的同名文件互相覆盖。
+        const relName = relPrefix ? `${relPrefix}/${noteName}` : noteName
+
+        let content = ''
+        try { content = await readTextFile(path) } catch {}
+
+        // 提取标题(第一行或第一个 # 标题)
+        let title = noteName
+        for (const line of content.split('\n')) {
+          const trimmed = line.trim()
+          if (trimmed.startsWith('# ')) { title = trimmed.substring(2); break }
+          if (trimmed) { title = trimmed; break }
+        }
+
         notes.push({
-          name: noteName,
+          name: relName,
           title,
           path,
           modified: entry.mtime || new Date()
         })
       }
     }
-    
+
+    await walk(root)
     return notes.sort((a, b) => new Date(b.modified) - new Date(a.modified))
-  } catch (error) {
+  } catch {
     return []
   }
 }

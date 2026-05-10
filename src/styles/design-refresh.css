@@ -631,7 +631,7 @@ button:hover,
 
 .todos-page-wrapper .todo-card:hover {
   border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--divider) 66%);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.11);
+  box-shadow: 0 10px 22px rgba(60, 40, 20, 0.11);
 }
 
 .todos-page-wrapper .card-actions .el-button.is-text {
@@ -672,7 +672,7 @@ button:hover,
 
 .notes-page-wrapper .action-card:hover {
   border-color: color-mix(in srgb, var(--accent-blue) 32%, var(--divider) 68%);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.11);
+  box-shadow: 0 10px 22px rgba(60, 40, 20, 0.11);
 }
 
 /* Password cards and tables */
@@ -689,7 +689,7 @@ button:hover,
 
 .passwords-page-wrapper .password-row:hover {
   border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--divider) 66%);
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.11);
+  box-shadow: 0 10px 22px rgba(60, 40, 20, 0.11);
 }
 
 .passwords-page-wrapper .row-actions .el-button.is-text {
@@ -740,7 +740,7 @@ button:hover,
 .calendar-wrapper .week-event:hover,
 .calendar-wrapper .day-event-item:hover {
   border-color: color-mix(in srgb, var(--accent-blue) 32%, var(--divider) 68%);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 10px 20px rgba(60, 40, 20, 0.1);
 }
 
 /* Toolbox cards and category strips */
@@ -778,7 +778,7 @@ button:hover,
 
 .toolbox-wrapper .tool-card:hover {
   border-color: color-mix(in srgb, var(--accent-blue) 34%, var(--divider) 66%);
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 12px 24px rgba(60, 40, 20, 0.12);
 }
 
 .toolbox-wrapper .favorite-btn {
@@ -842,7 +842,7 @@ button:hover,
 .bookmarks-page-wrapper .header,
 .settings-page-wrapper .header,
 .wallpaper-wrapper .wp-header,
-.credential-manager-page .header {
+.credential-manager .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -878,7 +878,7 @@ button:hover,
 .bookmarks-page-wrapper .header-left,
 .settings-page-wrapper .header-left,
 .wallpaper-wrapper .wp-header-left,
-.credential-manager-page .header-left,
+.credential-manager .header-left,
 .api-debug-wrapper .header-actions,
 .api-docs-wrapper .header-actions,
 .auto-test-wrapper .header-actions,
@@ -1048,7 +1048,7 @@ button:hover,
 .stat-card:hover,
 .summary-card:hover {
   border-color: color-mix(in srgb, var(--accent-blue) 30%, var(--divider) 70%);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 10px 24px rgba(60, 40, 20, 0.1);
 }
 
 .response-headers-table,
@@ -1373,7 +1373,7 @@ code {
 .passwords-page-wrapper .card-row,
 .notes-page-wrapper .card-row,
 .bookmarks-page-wrapper .card-row,
-.credential-manager-page .card-row {
+.credential-manager .card-row {
   border-radius: 0;
   border: 0;
   background: transparent;
@@ -1968,20 +1968,26 @@ code {
 }
 /* ===== Bookmarks & Todos sidebar refresh ===== */
 .bookmarks-page-wrapper .sidebar-left,
+.passwords-page-wrapper .sidebar-left,
+.credential-manager .sidebar-left,
 .todos-page-wrapper .sidebar-left {
   background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), color-mix(in srgb, var(--surface-panel-soft) 94%, #f8fbff 6%));
-  border: 1px solid color-mix(in srgb, var(--divider) 92%, rgba(13, 110, 253, 0.12) 8%);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.72);
+  border: 1px solid color-mix(in srgb, var(--divider) 92%, var(--accent-blue-bg) 8%);
+  box-shadow: 0 10px 24px rgba(60, 40, 20, 0.06), inset 0 1px 0 rgba(255,255,255,0.72);
 }
 
 .bookmarks-page-wrapper .sidebar-toolbar,
+.passwords-page-wrapper .sidebar-toolbar,
+.credential-manager .sidebar-toolbar,
 .todos-page-wrapper .sidebar-toolbar {
   padding: 12px 12px 10px;
   background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,249,255,0.92));
-  border-bottom: 1px solid color-mix(in srgb, var(--divider) 84%, rgba(13, 110, 253, 0.12) 16%);
+  border-bottom: 1px solid color-mix(in srgb, var(--divider) 84%, var(--accent-blue-bg) 16%);
 }
 
 .bookmarks-page-wrapper .sidebar-title,
+.passwords-page-wrapper .sidebar-title,
+.credential-manager .sidebar-title,
 .todos-page-wrapper .sidebar-title {
   font-size: 11px;
   font-weight: 800;
@@ -1991,6 +1997,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-list,
+.passwords-page-wrapper .category-list,
+.credential-manager .category-list,
 .todos-page-wrapper .category-list {
   padding: 10px 8px 12px;
   display: flex;
@@ -1999,6 +2007,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-divider,
+.passwords-page-wrapper .category-divider,
+.credential-manager .category-divider,
 .todos-page-wrapper .category-divider {
   height: 1px;
   margin: 4px 6px;
@@ -2006,6 +2016,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item,
+.passwords-page-wrapper .category-item,
+.credential-manager .category-item,
 .todos-page-wrapper .category-item {
   position: relative;
   display: grid;
@@ -2022,6 +2034,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item::before,
+.passwords-page-wrapper .category-item::before,
+.credential-manager .category-item::before,
 .todos-page-wrapper .category-item::before {
   content: '';
   position: absolute;
@@ -2036,26 +2050,34 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item:hover,
+.passwords-page-wrapper .category-item:hover,
+.credential-manager .category-item:hover,
 .todos-page-wrapper .category-item:hover {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 44%, #fff 56%), color-mix(in srgb, var(--accent-blue-bg) 22%, transparent 78%));
   border-color: color-mix(in srgb, var(--accent-blue) 18%, transparent 82%);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07), inset 0 1px 0 rgba(255,255,255,0.72);
+  box-shadow: 0 8px 18px rgba(60, 40, 20, 0.07), inset 0 1px 0 rgba(255,255,255,0.72);
 }
 
 .bookmarks-page-wrapper .category-item.active,
+.passwords-page-wrapper .category-item.active,
+.credential-manager .category-item.active,
 .todos-page-wrapper .category-item.active {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 84%, #fff 16%), color-mix(in srgb, var(--accent-blue-bg) 68%, rgba(255,255,255,0.2) 32%));
   border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent 74%);
-  box-shadow: 0 10px 22px rgba(13,110,253,0.12), inset 0 1px 0 rgba(255,255,255,0.78);
+  box-shadow: 0 10px 22px rgba(194,65,12,0.12), inset 0 1px 0 rgba(255,255,255,0.78);
 }
 
 .bookmarks-page-wrapper .category-item.active::before,
+.passwords-page-wrapper .category-item.active::before,
+.credential-manager .category-item.active::before,
 .todos-page-wrapper .category-item.active::before {
   opacity: 1;
-  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  background: linear-gradient(180deg, #fb923c, #c2410c);
 }
 
 .bookmarks-page-wrapper .category-icon,
+.passwords-page-wrapper .category-icon,
+.credential-manager .category-icon,
 .todos-page-wrapper .category-icon {
   display: inline-flex;
   align-items: center;
@@ -2067,6 +2089,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-name,
+.passwords-page-wrapper .category-name,
+.credential-manager .category-name,
 .todos-page-wrapper .category-name {
   min-width: 0;
   overflow: hidden;
@@ -2078,6 +2102,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-count,
+.passwords-page-wrapper .category-count,
+.credential-manager .category-count,
 .todos-page-wrapper .category-count {
   display: inline-flex;
   align-items: center;
@@ -2087,7 +2113,7 @@ code {
   padding: 0 8px;
   border-radius: 999px;
   background: rgba(255,255,255,0.86);
-  border: 1px solid rgba(15,23,42,0.06);
+  border: 1px solid rgba(60, 40, 20,0.06);
   color: var(--text-tertiary);
   font-size: 11px;
   font-weight: 700;
@@ -2096,13 +2122,17 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item.active .category-count,
+.passwords-page-wrapper .category-item.active .category-count,
+.credential-manager .category-item.active .category-count,
 .todos-page-wrapper .category-item.active .category-count {
   background: rgba(255,255,255,0.94);
   color: var(--accent-blue);
-  border-color: color-mix(in srgb, var(--accent-blue) 14%, rgba(15,23,42,0.06) 86%);
+  border-color: color-mix(in srgb, var(--accent-blue) 14%, rgba(60, 40, 20,0.06) 86%);
 }
 
 .bookmarks-page-wrapper .category-actions,
+.passwords-page-wrapper .category-actions,
+.credential-manager .category-actions,
 .todos-page-wrapper .category-actions {
   display: inline-flex;
   align-items: center;
@@ -2111,6 +2141,8 @@ code {
 }
 
 .bookmarks-page-wrapper .action-icon,
+.passwords-page-wrapper .action-icon,
+.credential-manager .action-icon,
 .todos-page-wrapper .action-icon {
   width: 18px;
   height: 18px;
@@ -2120,22 +2152,28 @@ code {
   border-radius: 999px;
   color: var(--text-quaternary);
   background: rgba(255,255,255,0.72);
-  border: 1px solid rgba(15,23,42,0.05);
+  border: 1px solid rgba(60, 40, 20,0.05);
 }
 
 .bookmarks-page-wrapper .action-icon:hover,
+.passwords-page-wrapper .action-icon:hover,
+.credential-manager .action-icon:hover,
 .todos-page-wrapper .action-icon:hover {
   color: var(--text-primary);
   background: #fff;
 }
 
 .bookmarks-page-wrapper .action-icon.del:hover,
+.passwords-page-wrapper .action-icon.del:hover,
+.credential-manager .action-icon.del:hover,
 .todos-page-wrapper .action-icon.del:hover {
   color: #dc2626;
   border-color: rgba(220,38,38,0.12);
 }
 
 .bookmarks-page-wrapper .category-favorite .favorite-icon,
+.passwords-page-wrapper .category-favorite .favorite-icon,
+.credential-manager .category-favorite .favorite-icon,
 .todos-page-wrapper .category-item .favorite-icon {
   color: #f59e0b;
 }
@@ -2143,6 +2181,8 @@ code {
 /* ===== Global visual weight reduction ===== */
 .app-content .page-eyebrow,
 .bookmarks-page-wrapper .sidebar-title,
+.passwords-page-wrapper .sidebar-title,
+.credential-manager .sidebar-title,
 .todos-page-wrapper .sidebar-title {
   font-weight: 600 !important;
   letter-spacing: 0.08em !important;
@@ -2183,7 +2223,7 @@ code {
 .passwords-page-wrapper .header,
 .notes-page-wrapper .header,
 .calendar-wrapper .header,
-.credential-manager-page .header,
+.credential-manager .header,
 .wallpaper-wrapper .wp-header,
 .app-content > .sqlite-mgr .header,
 .app-content > .img-b64-wrapper .header {
@@ -2220,27 +2260,37 @@ code {
 
 /* ===== Bookmarks / Todos sidebar compact refinement ===== */
 .bookmarks-page-wrapper .sidebar-left,
+.passwords-page-wrapper .sidebar-left,
+.credential-manager .sidebar-left,
 .todos-page-wrapper .sidebar-left {
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+  box-shadow: 0 6px 16px rgba(60, 40, 20, 0.04), inset 0 1px 0 rgba(255,255,255,0.7) !important;
 }
 
 .bookmarks-page-wrapper .sidebar-toolbar,
+.passwords-page-wrapper .sidebar-toolbar,
+.credential-manager .sidebar-toolbar,
 .todos-page-wrapper .sidebar-toolbar {
   padding: 8px 10px 7px !important;
 }
 
 .bookmarks-page-wrapper .category-list,
+.passwords-page-wrapper .category-list,
+.credential-manager .category-list,
 .todos-page-wrapper .category-list {
   padding: 6px !important;
   gap: 4px !important;
 }
 
 .bookmarks-page-wrapper .category-divider,
+.passwords-page-wrapper .category-divider,
+.credential-manager .category-divider,
 .todos-page-wrapper .category-divider {
   margin: 2px 4px !important;
 }
 
 .bookmarks-page-wrapper .category-item,
+.passwords-page-wrapper .category-item,
+.credential-manager .category-item,
 .todos-page-wrapper .category-item {
   grid-template-columns: 16px minmax(0, 1fr) auto auto !important;
   gap: 8px !important;
@@ -2251,6 +2301,8 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item::before,
+.passwords-page-wrapper .category-item::before,
+.credential-manager .category-item::before,
 .todos-page-wrapper .category-item::before {
   left: 4px !important;
   top: 6px !important;
@@ -2259,16 +2311,22 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item:hover,
+.passwords-page-wrapper .category-item:hover,
+.credential-manager .category-item:hover,
 .todos-page-wrapper .category-item:hover {
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255,255,255,0.65) !important;
+  box-shadow: 0 4px 10px rgba(60, 40, 20, 0.05), inset 0 1px 0 rgba(255,255,255,0.65) !important;
 }
 
 .bookmarks-page-wrapper .category-item.active,
+.passwords-page-wrapper .category-item.active,
+.credential-manager .category-item.active,
 .todos-page-wrapper .category-item.active {
-  box-shadow: 0 6px 14px rgba(13,110,253,0.08), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+  box-shadow: 0 6px 14px rgba(194,65,12,0.08), inset 0 1px 0 rgba(255,255,255,0.72) !important;
 }
 
 .bookmarks-page-wrapper .category-icon,
+.passwords-page-wrapper .category-icon,
+.credential-manager .category-icon,
 .todos-page-wrapper .category-icon {
   width: 16px !important;
   min-width: 16px !important;
@@ -2276,12 +2334,16 @@ code {
 }
 
 .bookmarks-page-wrapper .category-name,
+.passwords-page-wrapper .category-name,
+.credential-manager .category-name,
 .todos-page-wrapper .category-name {
   font-size: 12px !important;
   font-weight: 500 !important;
 }
 
 .bookmarks-page-wrapper .category-count,
+.passwords-page-wrapper .category-count,
+.credential-manager .category-count,
 .todos-page-wrapper .category-count {
   min-width: 20px !important;
   height: 18px !important;
@@ -2291,11 +2353,15 @@ code {
 }
 
 .bookmarks-page-wrapper .category-actions,
+.passwords-page-wrapper .category-actions,
+.credential-manager .category-actions,
 .todos-page-wrapper .category-actions {
   gap: 4px !important;
 }
 
 .bookmarks-page-wrapper .action-icon,
+.passwords-page-wrapper .action-icon,
+.credential-manager .action-icon,
 .todos-page-wrapper .action-icon {
   width: 16px !important;
   height: 16px !important;
@@ -2349,7 +2415,7 @@ code {
 .app-content .card-header,
 .app-content .res-header-row,
 .app-content .result-header {
-  background: #fff !important;
+  background: var(--bg-primary) !important;
   border: 1px solid var(--divider) !important;
   box-shadow: none !important;
   border-radius: 8px !important;
@@ -2368,7 +2434,7 @@ code {
 .app-content .bookmark-row,
 .app-content .note-card,
 .app-content .password-item {
-  background: #fff !important;
+  background: var(--bg-primary) !important;
   border: 1px solid var(--divider) !important;
   box-shadow: none !important;
   border-radius: 8px !important;
@@ -2381,28 +2447,31 @@ code {
 .app-content .password-item:hover {
   transform: none !important;
   box-shadow: none !important;
-  border-color: color-mix(in srgb, var(--divider) 75%, #cbd5e1 25%) !important;
+  border-color: color-mix(in srgb, var(--divider) 75%, var(--text-quaternary) 25%) !important;
 }
 
 .bookmarks-page-wrapper .sidebar-left,
+.credential-manager .sidebar-left,
 .todos-page-wrapper .sidebar-left,
 .notes-page-wrapper .sidebar-left,
 .passwords-page-wrapper .sidebar-left {
-  background: #fff !important;
+  background: var(--bg-primary) !important;
   border: 1px solid var(--divider) !important;
   box-shadow: none !important;
 }
 
 .bookmarks-page-wrapper .sidebar-toolbar,
+.credential-manager .sidebar-toolbar,
 .todos-page-wrapper .sidebar-toolbar,
 .notes-page-wrapper .sidebar-toolbar,
 .passwords-page-wrapper .sidebar-toolbar {
-  background: #fff !important;
+  background: var(--bg-primary) !important;
   border-bottom: 1px solid var(--divider) !important;
   padding: 8px 10px !important;
 }
 
 .bookmarks-page-wrapper .category-item,
+.credential-manager .category-item,
 .todos-page-wrapper .category-item,
 .notes-page-wrapper .category-item,
 .passwords-page-wrapper .category-item {
@@ -2413,6 +2482,7 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item::before,
+.credential-manager .category-item::before,
 .todos-page-wrapper .category-item::before,
 .notes-page-wrapper .category-item::before,
 .passwords-page-wrapper .category-item::before {
@@ -2420,29 +2490,32 @@ code {
 }
 
 .bookmarks-page-wrapper .category-item:hover,
+.credential-manager .category-item:hover,
 .todos-page-wrapper .category-item:hover,
 .notes-page-wrapper .category-item:hover,
 .passwords-page-wrapper .category-item:hover {
-  background: #f8fafc !important;
-  border-color: #e2e8f0 !important;
+  background: var(--bg-secondary) !important;
+  border-color: var(--divider) !important;
   box-shadow: none !important;
 }
 
 .bookmarks-page-wrapper .category-item.active,
+.credential-manager .category-item.active,
 .todos-page-wrapper .category-item.active,
 .notes-page-wrapper .category-item.active,
 .passwords-page-wrapper .category-item.active {
-  background: #eff6ff !important;
-  border-color: #bfdbfe !important;
+  background: var(--accent-blue-bg) !important;
+  border-color: color-mix(in srgb, var(--accent-blue) 30%, transparent 70%) !important;
   box-shadow: none !important;
 }
 
 .bookmarks-page-wrapper .category-count,
+.credential-manager .category-count,
 .todos-page-wrapper .category-count,
 .notes-page-wrapper .category-count,
 .passwords-page-wrapper .category-count {
-  background: #f8fafc !important;
-  border: 1px solid #e2e8f0 !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--divider) !important;
   box-shadow: none !important;
 }
 
@@ -2464,45 +2537,45 @@ code {
   box-shadow: none !important;
 }
 
-/* Toolbox: clean white theme final override */
+/* Toolbox: warm cream theme final override */
 .app-content .toolbox-wrapper .header {
-  border-bottom: 1px solid #e8edf4 !important;
-  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid var(--divider) !important;
+  background: var(--surface-panel) !important;
   box-shadow: none !important;
 }
 
 .app-content .toolbox-wrapper .content-area {
-  border: 1px solid #e6ecf3 !important;
-  background: #f8fafd !important;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid var(--divider) !important;
+  background: var(--bg-secondary) !important;
+  box-shadow: 0 8px 22px rgba(60, 40, 20, 0.05) !important;
 }
 
 .app-content .toolbox-wrapper .tool-category {
-  border: 1px solid #e7edf4 !important;
-  background: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03) !important;
+  border: 1px solid var(--divider) !important;
+  background: var(--bg-primary) !important;
+  box-shadow: 0 2px 8px rgba(60, 40, 20, 0.03) !important;
 }
 
 .app-content .toolbox-wrapper .tool-card {
-  border: 1px solid #e7edf4 !important;
-  background: #ffffff !important;
-  box-shadow: 0 2px 7px rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid var(--divider) !important;
+  background: var(--bg-primary) !important;
+  box-shadow: 0 2px 7px rgba(60, 40, 20, 0.04) !important;
 }
 
 .app-content .toolbox-wrapper .tool-card:hover {
-  border: 1px solid #d7e3f6 !important;
-  background: #fbfdff !important;
-  box-shadow: 0 10px 18px rgba(37, 99, 235, 0.1) !important;
+  border: 1px solid color-mix(in srgb, var(--accent-blue) 28%, var(--divider) 72%) !important;
+  background: var(--accent-warm-soft) !important;
+  box-shadow: 0 10px 18px rgba(194, 65, 12, 0.10) !important;
 }
 
 .app-content .toolbox-wrapper .category-header {
   background: transparent !important;
-  border-bottom: 1px dashed #e8edf4 !important;
+  border-bottom: 1px dashed var(--divider) !important;
   border-radius: 0 !important;
   padding: 0 2px 10px !important;
 }
 
 .app-content .toolbox-wrapper .favorite-btn {
-  border: 1px solid #e2e8f0 !important;
-  background: #f8fafc !important;
+  border: 1px solid var(--divider) !important;
+  background: var(--bg-secondary) !important;
 }

@@ -15,18 +15,15 @@
       </div>
       <div class="header-actions">
         <el-button type="primary" size="small" @click="showNewTaskDialog">
-          <el-icon><Plus /></el-icon>
-          {{ t('downloadManager.newTask') }}
+          <el-icon style="margin-right: 6px;"><Plus /></el-icon>{{ t('downloadManager.newTask') }}
         </el-button>
-        <el-button size="small" @click="handlePauseAll" :disabled="!connected">
+        <el-button size="small" text @click="handlePauseAll" :disabled="!connected" :title="t('downloadManager.pauseAll')">
           <el-icon><VideoPause /></el-icon>
-          {{ t('downloadManager.pauseAll') }}
         </el-button>
-        <el-button size="small" @click="handleUnpauseAll" :disabled="!connected">
+        <el-button size="small" text @click="handleUnpauseAll" :disabled="!connected" :title="t('downloadManager.resumeAll')">
           <el-icon><VideoPlay /></el-icon>
-          {{ t('downloadManager.resumeAll') }}
         </el-button>
-        <el-button size="small" @click="showSettingsDialog">
+        <el-button size="small" text @click="showSettingsDialog" :title="t('common.settings')">
           <el-icon><Setting /></el-icon>
         </el-button>
       </div>
@@ -237,11 +234,16 @@
             <el-form-item :label="t('downloadManager.saveDir')">
               <div class="dir-input-row">
                 <el-input v-model="newTaskForm.dir" :placeholder="defaultDir" />
-                <el-button @click="selectDir">{{ t('downloadManager.browse') }}</el-button>
+                <el-button @click="selectDir">
+                  <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('downloadManager.browse') }}
+                </el-button>
               </div>
             </el-form-item>
             <el-form-item :label="t('downloadManager.threads')">
-              <el-input-number v-model="newTaskForm.split" :min="1" :max="64" />
+              <div class="inline-control-row" style="flex-direction:column;align-items:stretch;gap:4px;">
+                <el-input-number v-model="newTaskForm.split" :min="1" :max="256" />
+                <span class="control-hint" style="font-size:11px;color:var(--text-quaternary);">{{ t('downloadManager.threadsHint') }}</span>
+              </div>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -249,13 +251,17 @@
         <el-tab-pane :label="t('downloadManager.torrentDownload')" name="torrent">
           <el-form label-width="80px" size="small">
             <el-form-item :label="t('downloadManager.torrentFile')">
-              <el-button @click="selectTorrent">{{ t('downloadManager.selectFile') }}</el-button>
+              <el-button @click="selectTorrent">
+                <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('downloadManager.selectFile') }}
+              </el-button>
               <span v-if="newTaskForm.torrentName" class="torrent-name">{{ newTaskForm.torrentName }}</span>
             </el-form-item>
             <el-form-item :label="t('downloadManager.saveDir')">
               <div class="dir-input-row">
                 <el-input v-model="newTaskForm.dir" :placeholder="defaultDir" />
-                <el-button @click="selectDir">{{ t('downloadManager.browse') }}</el-button>
+                <el-button @click="selectDir">
+                  <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('downloadManager.browse') }}
+                </el-button>
               </div>
             </el-form-item>
           </el-form>
@@ -294,7 +300,9 @@
         <el-form-item :label="t('downloadManager.defaultDir')">
           <div class="dir-input-row">
             <el-input v-model="settingsForm.dir" />
-            <el-button @click="selectSettingsDir">{{ t('downloadManager.browse') }}</el-button>
+            <el-button @click="selectSettingsDir">
+              <el-icon style="margin-right: 6px;"><FolderOpened /></el-icon>{{ t('downloadManager.browse') }}
+            </el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -396,7 +404,7 @@ const newTaskForm = ref({
   urls: '',
   filename: '',
   dir: '',
-  split: 16,
+  split: 64,
   torrentData: null,
   torrentName: '',
 })
@@ -481,19 +489,27 @@ function formatEta(total, completed, speed) {
 function getProgress(completed, total) {
   return aria2.getProgress(completed, total)
 }
-function getStatusText(status) {
-  return aria2.getStatusText(status)
-}
-function getStatusType(status) {
-  return aria2.getStatusType(status)
+
+const DOWNLOAD_DIR_LS_KEY = 'downloadManager.dir'
+
+/** Uint8Array → base64,分块避免 String.fromCharCode 大数组 stack overflow */
+function bytesToBase64(bytes) {
+  const CHUNK = 0x8000
+  let binary = ''
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK))
+  }
+  return btoa(binary)
 }
 
 async function startAndConnect() {
   connecting.value = true
   aria2Error.value = ''
   try {
-    // 获取默认下载目录
-    const dir = await invoke('get_default_download_dir')
+    // 优先用持久化的下载目录,fallback 到系统默认
+    const persistedDir = localStorage.getItem(DOWNLOAD_DIR_LS_KEY) || ''
+    const sysDir = await invoke('get_default_download_dir')
+    const dir = persistedDir || sysDir
     defaultDir.value = dir
 
     // 启动 aria2
@@ -574,7 +590,7 @@ function showNewTaskDialog() {
     urls: '',
     filename: '',
     dir: '',
-    split: 16,
+    split: 64,
     torrentData: null,
     torrentName: '',
   }
@@ -599,12 +615,7 @@ async function selectTorrent() {
   })
   if (selected) {
     const bytes = await readFile(selected)
-    // Uint8Array 转 base64
-    let binary = ''
-    for (let i = 0; i < bytes.length; i++) {
-      binary += String.fromCharCode(bytes[i])
-    }
-    newTaskForm.value.torrentData = btoa(binary)
+    newTaskForm.value.torrentData = bytesToBase64(bytes)
     newTaskForm.value.torrentName = selected.split(/[/\\]/).pop()
   }
 }
@@ -633,7 +644,12 @@ async function submitNewTask() {
       if (newTaskForm.value.dir) options.dir = newTaskForm.value.dir
       if (newTaskForm.value.filename) options.out = newTaskForm.value.filename
       if (newTaskForm.value.split) options.split = String(newTaskForm.value.split)
-      if (newTaskForm.value.split) options['max-connection-per-server'] = String(newTaskForm.value.split)
+      // aria2 的 max-connection-per-server 上限是 16,大于这个值整个 addUri 会被拒。
+      // split 没这个限制,所以不能直接复用 split 的值——这里 clamp 到 [1,16]。
+      if (newTaskForm.value.split) {
+        const cps = Math.min(16, Math.max(1, Number(newTaskForm.value.split) || 1))
+        options['max-connection-per-server'] = String(cps)
+      }
 
       // 区分磁力链接和普通 URL
       const magnetUrls = urls.filter(u => u.startsWith('magnet:'))
@@ -647,12 +663,14 @@ async function submitNewTask() {
         ElMessage.success(`${t('downloadManager.taskAdded')} (${normalUrls.length})`)
       }
 
-      // 磁力链接走获取资源流程
+      // 磁力链接走获取资源流程 —— filePicker 单实例,只能串行处理。
+      // 多个磁力一次粘贴时,只解析第一条,其余给提示让用户分批添加。
       if (magnetUrls.length > 0) {
         newTaskVisible.value = false
-        for (const magnet of magnetUrls) {
-          await startMagnetResolve(magnet, options)
+        if (magnetUrls.length > 1) {
+          ElMessage.warning(t('downloadManager.magnetBatchHint'))
         }
+        await startMagnetResolve(magnetUrls[0], options)
       } else {
         newTaskVisible.value = false
       }
@@ -682,8 +700,14 @@ async function submitNewTask() {
  * 磁力链接：添加任务并等待元数据解析，然后弹出文件选择
  */
 async function startMagnetResolve(magnetUri, options = {}) {
-  // 添加磁力链接，暂停以等待用户选择文件
-  const gid = await aria2.addUri([magnetUri], { ...options, pause: 'false' })
+  // pause:'false' —— 元数据获取阶段必须放行,否则永远拉不到 .torrent 内容,卡在"获取元数据中"
+  // pause-metadata:'true' —— 元数据拉完后,aria2 自动生成的"实际下载任务"立即暂停,
+  //                          这样用户能在 0 字节下载之前看到文件列表并选择,不会有提前下载窗口
+  const gid = await aria2.addUri([magnetUri], {
+    ...options,
+    pause: 'false',
+    'pause-metadata': 'true',
+  })
   await openFilePicker(gid)
 }
 
@@ -755,6 +779,9 @@ async function openFilePicker(gid) {
  */
 async function pollRealTask(gid) {
   let elapsed = 0
+  // 旧代码这里直接 setInterval 赋值,如果调用方忘了在调用前 clear,前一个 timer 会泄漏。
+  // 防御性地先 clear 再赋值。
+  clearFilePickerPoll()
   filePickerPollTimer = setInterval(async () => {
     elapsed += 1
     try {
@@ -886,14 +913,18 @@ async function handleRemove(task) {
       t('downloadManager.deleteTitle'),
       { type: 'warning' }
     )
+  } catch {
+    return // 用户取消
+  }
+  try {
     if (task.status === 'active' || task.status === 'waiting' || task.status === 'paused') {
       await aria2.forceRemove(task.gid)
     } else {
       await aria2.removeDownloadResult(task.gid)
     }
     refreshTasks()
-  } catch {
-    // 取消
+  } catch (e) {
+    ElMessage.error(`${t('downloadManager.removeFailed')}: ${e.message || e}`)
   }
 }
 
@@ -954,6 +985,8 @@ async function applySettings() {
     if (settingsForm.value.dir) {
       options.dir = settingsForm.value.dir
       defaultDir.value = settingsForm.value.dir
+      // 持久化:下次 startAndConnect 启动 aria2 时直接用这个目录,避免重启后丢失
+      localStorage.setItem(DOWNLOAD_DIR_LS_KEY, settingsForm.value.dir)
     }
     await aria2.changeGlobalOption(options)
     ElMessage.success(t('downloadManager.settingsApplied'))
@@ -1012,7 +1045,7 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 0 18px;
   background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,249,252,0.82));
-  border-bottom: 1px solid rgba(15,23,42,0.08);
+  border-bottom: 1px solid rgba(60, 40, 20,0.08);
   min-height: 58px;
   box-sizing: border-box;
   backdrop-filter: blur(18px);
@@ -1035,10 +1068,10 @@ onBeforeUnmount(() => {
   flex-direction: column;
   overflow: hidden;
   margin: 14px 18px 18px;
-  background: linear-gradient(180deg, rgba(250,252,255,0.72), rgba(241,245,249,0.62));
+  background: linear-gradient(180deg, rgba(250, 246, 238,0.72), rgba(240, 233, 220,0.62));
   border: 1px solid rgba(255,255,255,0.52);
   border-radius: 22px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 12px 28px rgba(15,23,42,0.04);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 12px 28px rgba(60, 40, 20,0.04);
   backdrop-filter: blur(18px);
 }
 .content-inner {
@@ -1059,16 +1092,16 @@ onBeforeUnmount(() => {
   gap: 20px;
   padding: 28px 32px;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(241,245,249,0.6));
+  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(240, 233, 220,0.6));
   border: 1px solid rgba(255,255,255,0.6);
-  box-shadow: 0 4px 20px rgba(15,23,42,0.04);
+  box-shadow: 0 4px 20px rgba(60, 40, 20,0.04);
 }
 .connect-card-icon {
   width: 64px; height: 64px;
   display: flex; align-items: center; justify-content: center;
   border-radius: 16px;
-  background: linear-gradient(135deg, #dbeafe, #eff6ff);
-  color: #3b82f6;
+  background: linear-gradient(135deg, #fed7aa, #fff1e6);
+  color: var(--accent-blue);
   flex-shrink: 0;
 }
 .connect-card-body { flex: 1; min-width: 0; }
@@ -1095,7 +1128,7 @@ onBeforeUnmount(() => {
 }
 .stat-card:hover {
   transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 6px 16px rgba(15,23,42,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 6px 16px rgba(60, 40, 20,0.06);
 }
 .stat-card-icon {
   width: 40px; height: 40px;
@@ -1104,10 +1137,10 @@ onBeforeUnmount(() => {
   font-size: 16px; font-weight: 700;
   flex-shrink: 0;
 }
-.stat-download .stat-card-icon { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb; }
+.stat-download .stat-card-icon { background: linear-gradient(135deg, #fed7aa, #fdba74); color: var(--accent-blue); }
 .stat-upload .stat-card-icon { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669; }
 .stat-active .stat-card-icon { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
-.stat-done .stat-card-icon { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4f46e5; }
+.stat-done .stat-card-icon { background: linear-gradient(135deg, #fee5d3, #fdba74); color: var(--accent-blue-hover); }
 .stat-card-info { min-width: 0; }
 .stat-card-value { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .stat-card-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
@@ -1140,8 +1173,8 @@ onBeforeUnmount(() => {
 .tab-btn.active {
   background: rgba(255,255,255,0.82);
   color: var(--text-primary);
-  border-color: rgba(15,23,42,0.06);
-  box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+  border-color: rgba(60, 40, 20,0.06);
+  box-shadow: 0 1px 3px rgba(60, 40, 20,0.06);
   font-weight: 600;
 }
 .tab-count {
@@ -1153,10 +1186,10 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
-  background: rgba(15,23,42,0.05);
+  background: rgba(60, 40, 20,0.05);
   color: var(--text-tertiary);
 }
-.tab-btn.active .tab-count { background: rgba(59,130,246,0.1); color: #3b82f6; }
+.tab-btn.active .tab-count { background: var(--accent-blue-bg); color: var(--accent-blue); }
 .search-input { width: 200px; }
 
 /* ===== Task list ===== */
@@ -1181,15 +1214,15 @@ onBeforeUnmount(() => {
   padding: 14px 16px;
   border-radius: 14px;
   background: rgba(255,255,255,0.58);
-  border: 1px solid rgba(15,23,42,0.05);
+  border: 1px solid rgba(60, 40, 20,0.05);
   transition: transform .15s, border-color .2s, box-shadow .2s, background .2s;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
 }
 .task-item:hover {
   transform: translateY(-1px);
   background: rgba(255,255,255,0.78);
-  border-color: rgba(96,165,250,0.18);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 8px 20px rgba(59,130,246,0.06);
+  border-color: color-mix(in srgb, var(--accent-blue) 22%, transparent 78%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 8px 20px rgba(194,65,12,0.06);
 }
 .task-item.task-error {
   border-color: rgba(239,68,68,0.18);
@@ -1205,7 +1238,7 @@ onBeforeUnmount(() => {
   font-size: 18px;
   margin-top: 2px;
 }
-.icon-active { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #3b82f6; }
+.icon-active { background: linear-gradient(135deg, #fed7aa, #fdba74); color: var(--accent-blue); }
 .icon-complete { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669; }
 .icon-error { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
 .icon-paused { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #6b7280; }
@@ -1236,16 +1269,16 @@ onBeforeUnmount(() => {
   transition: all .15s;
   font-size: 14px;
 }
-.action-btn:hover { background: rgba(15,23,42,0.06); color: var(--text-primary); }
+.action-btn:hover { background: rgba(60, 40, 20,0.06); color: var(--text-primary); }
 .action-resume:hover { background: rgba(16,185,129,0.1); color: #059669; }
-.action-folder:hover { background: rgba(59,130,246,0.1); color: #3b82f6; }
+.action-folder:hover { background: var(--accent-blue-bg); color: var(--accent-blue); }
 .action-delete:hover { background: rgba(239,68,68,0.1); color: #dc2626; }
 
 /* Progress bar */
 .task-progress-bar { display: flex; align-items: center; gap: 8px; }
 .progress-track {
   flex: 1; height: 5px;
-  background: rgba(15,23,42,0.06);
+  background: rgba(60, 40, 20,0.06);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -1254,12 +1287,12 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   transition: width .4s ease;
 }
-.fill-active { background: linear-gradient(90deg, #60a5fa, #3b82f6); }
+.fill-active { background: linear-gradient(90deg, #fdba74, #c2410c); }
 .fill-complete { background: linear-gradient(90deg, #34d399, #10b981); }
 .fill-error { background: linear-gradient(90deg, #f87171, #ef4444); }
-.fill-paused { background: #cbd5e1; }
+.fill-paused { background: var(--text-quaternary); }
 .fill-waiting { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
-.fill-removed { background: #e2e8f0; }
+.fill-removed { background: var(--bg-tertiary); }
 .progress-text { font-size: 11px; font-weight: 600; color: var(--text-tertiary); min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
 
 /* Task bottom row */
@@ -1267,7 +1300,7 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   font-size: 11px; color: var(--text-tertiary);
 }
-.meta-speed { color: #3b82f6; font-weight: 600; }
+.meta-speed { color: var(--accent-blue); font-weight: 600; }
 .meta-upload { color: #10b981; font-weight: 600; }
 .meta-eta { color: var(--text-secondary); }
 .meta-error { color: #ef4444; }
@@ -1323,7 +1356,7 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid rgba(15,23,42,0.06);
+  border-bottom: 1px solid rgba(60, 40, 20,0.06);
   margin-bottom: 8px;
 }
 .picker-selected-info { font-size: 12px; color: var(--text-secondary); }
@@ -1347,7 +1380,7 @@ onBeforeUnmount(() => {
   cursor: pointer;
   transition: background .15s;
 }
-.picker-file-item:hover { background: rgba(59,130,246,0.04); }
+.picker-file-item:hover { background: var(--accent-blue-bg); }
 .picker-file-name {
   flex: 1; min-width: 0;
   font-size: 12px; color: var(--text-primary);

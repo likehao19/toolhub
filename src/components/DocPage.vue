@@ -92,14 +92,14 @@ defineProps({
 <style scoped>
 .doc-page {
   min-height: 100%;
-  background: #ffffff;
+  background: var(--surface-page);
   padding: 0;
 }
 
 .doc-page-header {
   padding: 40px 40px 32px;
   border-bottom: 1px solid #e4e7ed;
-  background: #ffffff;
+  background: var(--surface-page);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
@@ -128,7 +128,7 @@ defineProps({
   padding: 40px;
   max-width: 1200px;
   margin: 0 auto;
-  background: #ffffff;
+  background: var(--surface-page);
 }
 
 .doc-section {

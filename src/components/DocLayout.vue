@@ -185,7 +185,7 @@ onMounted(() => {
 /* ignore */
 .doc-sidebar {
   width: 260px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border-right: 1px solid #e4e7ed;
   overflow: hidden;
   transition: width 0.3s ease;
@@ -316,7 +316,7 @@ onMounted(() => {
   z-index: 1000;
   width: 40px;
   height: 40px;
-  background: #ffffff;
+  background: var(--bg-primary);
   border: 1px solid #e4e7ed;
   border-left: none;
   border-radius: 0 8px 8px 0;

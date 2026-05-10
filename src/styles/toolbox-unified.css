@@ -87,7 +87,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   flex: 0 0 auto;
   min-height: 58px;
@@ -135,7 +136,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.header-left, .wp-header-left) {
   display: flex !important;
   align-items: center !important;
@@ -172,7 +174,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.header-right, .wp-header-right) {
   display: flex !important;
   align-items: center !important;
@@ -209,7 +212,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.header-actions, .toolbar-actions) {
   display: flex !important;
   align-items: center !important;
@@ -246,7 +250,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) .page-title-block {
   display: flex !important;
   align-items: flex-start !important;
@@ -284,7 +289,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.page-eyebrow) {
   display: none !important;
 }
@@ -318,7 +324,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.breadcrumb, .header-title) {
   display: flex;
   align-items: center;
@@ -364,7 +371,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.breadcrumb-link) {
   color: var(--tb-primary) !important;
   cursor: pointer !important;
@@ -401,7 +409,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.breadcrumb-link:hover) {
   color: var(--tb-primary) !important;
   text-decoration: underline !important;
@@ -436,7 +445,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.breadcrumb-sep, .breadcrumb-divider) {
   margin: 0 1px !important;
   color: var(--tb-muted) !important;
@@ -472,7 +482,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.breadcrumb-link, .breadcrumb-sep, .breadcrumb-divider) {
   font-size: 15px !important;
 }
@@ -506,7 +517,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) .breadcrumb :is(.el-icon, .icon, [class*="icon"]) {
   display: inline-flex !important;
   align-items: center;
@@ -545,7 +557,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :not(.header):not(.page-header):not(.wp-header):not(.reader-header) {
   margin: 0 !important;
   padding: 0 !important;
@@ -584,7 +597,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :not(.header):not(.page-header):not(.wp-header):not(.reader-header):not(:last-child) {
   border-bottom: 1px solid var(--tb-line) !important;
 }
@@ -894,7 +908,7 @@
 .app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus) {
   border-color: #2f6fe4 !important;
   box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.12) !important;
-  background: #ffffff !important;
+  background: var(--bg-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input__inner {
@@ -924,7 +938,7 @@
 .app-content.toolbox-unified-shell .el-textarea__inner:focus {
   border-color: #2f6fe4 !important;
   box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.12) !important;
-  background: #ffffff !important;
+  background: var(--bg-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input-number {
@@ -951,8 +965,8 @@
 .app-content.toolbox-unified-shell .el-button--default:hover {
   color: #0f172a !important;
   border-color: #b9c9de !important;
-  background: #ffffff !important;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1) !important;
+  background: var(--bg-primary) !important;
+  box-shadow: 0 6px 16px rgba(60, 40, 20, 0.1) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--primary:hover {
@@ -1005,7 +1019,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(.content-area, .main-content, .bench-layout, .workspace-shell, .main-area, .work-area) {
   gap: 0 !important;
   padding: 0 !important;
@@ -1162,7 +1177,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(
   .main-container,
   .content-area,
@@ -1211,7 +1227,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.main-container, .content-area, .workspace-shell, .main-content, .work-area) {
   padding: 0 !important;
   margin: 0 !important;
@@ -1222,10 +1239,12 @@
 /* unify inner split panes and replace card split with divider split */
 .app-content.toolbox-unified-shell :is(
   .main-container,
+  .main-body,
   .content-area,
   .workspace-shell,
   .main-content,
   .bench-layout,
+  .auto-layout,
   .debug-layout,
   .main-area,
   .work-area,
@@ -1239,6 +1258,9 @@
   .left-panel,
   .file-panel,
   .config-panel,
+  .category-nav,
+  .info-panel,
+  .auto-sidebar,
   .request-panel,
   .bench-config,
   .docs-list-panel,
@@ -1252,6 +1274,7 @@
   .response-panel,
   .bench-results,
   .docs-form-panel,
+  .docs-preview,
   .mock-edit-panel,
   .output-panel
 ) {
@@ -1267,10 +1290,12 @@
 
 .app-content.toolbox-unified-shell :is(
   .main-container,
+  .main-body,
   .content-area,
   .workspace-shell,
   .main-content,
   .bench-layout,
+  .auto-layout,
   .debug-layout,
   .main-area,
   .work-area,
@@ -1284,6 +1309,9 @@
   .left-panel,
   .file-panel,
   .config-panel,
+  .category-nav,
+  .info-panel,
+  .auto-sidebar,
   .request-panel,
   .bench-config,
   .docs-list-panel,
@@ -1297,6 +1325,7 @@
   .response-panel,
   .bench-results,
   .docs-form-panel,
+  .docs-preview,
   .mock-edit-panel,
   .output-panel
 ):not(:first-child) {
@@ -1439,7 +1468,7 @@
 /* Network toolbox pages: unified practical workspace layout */
 .app-content.toolbox-unified-shell .network-tool-page .content-area {
   display: grid !important;
-  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   min-height: 0 !important;
 }
 
@@ -1450,7 +1479,7 @@
 }
 
 .app-content.toolbox-unified-shell .network-tool-page .config-panel {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .network-tool-page .result-panel {
@@ -1598,12 +1627,12 @@
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout {
   display: grid !important;
-  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   min-height: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .main-panel {
@@ -1635,7 +1664,7 @@
 /* Git manager: keep file list and diff area balanced */
 .app-content.toolbox-unified-shell .git-manager-wrapper .main-content {
   display: grid !important;
-  grid-template-columns: minmax(280px, 420px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   min-height: 0 !important;
 }
 
@@ -1674,7 +1703,7 @@
 /* Maven repo: left tree + right detail with linear section rhythm */
 .app-content.toolbox-unified-shell .maven-wrapper .main-area {
   display: grid !important;
-  grid-template-columns: minmax(300px, 420px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   min-height: 0 !important;
 }
 
@@ -1721,7 +1750,7 @@
 /* Mock service: rules and editor two-pane workspace */
 .app-content.toolbox-unified-shell .mock-service-wrapper .mock-layout {
   display: grid !important;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   min-height: 0 !important;
 }
 
@@ -1741,7 +1770,7 @@
 /* Auto test: suite list + editor/report panel */
 .app-content.toolbox-unified-shell .auto-test-wrapper .auto-layout {
   display: grid !important;
-  grid-template-columns: minmax(260px, 340px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   min-height: 0 !important;
 }
 
@@ -1816,7 +1845,7 @@
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
   padding: 0 !important;
   gap: 0 !important;
-  grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper :is(.sidebar-left, .content-area) {
@@ -1826,7 +1855,7 @@
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .sdk-workspace {
@@ -1849,7 +1878,7 @@
 }
 
 .app-content.toolbox-unified-shell .redis-client .left-panel {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .redis-client .tab-bar {
@@ -1892,7 +1921,7 @@
 }
 
 .app-content.toolbox-unified-shell .sqlite-mgr .left-panel {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .sqlite-mgr :is(.tab-bar, .sql-toolbar, .pagination-bar) {
@@ -1914,7 +1943,7 @@
 .app-content.toolbox-unified-shell .api-docs-wrapper .docs-edit {
   min-height: 0 !important;
   display: grid !important;
-  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .api-docs-wrapper :is(.docs-list-panel, .docs-form-panel, .docs-preview) {
@@ -1924,7 +1953,7 @@
 }
 
 .app-content.toolbox-unified-shell .api-docs-wrapper .docs-list-panel {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .api-docs-wrapper .doc-item {
@@ -1980,7 +2009,7 @@
 }
 
 .app-content.toolbox-unified-shell .ssh-terminal-wrapper .left-panel {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .ssh-terminal-wrapper .tab-bar {
@@ -2050,8 +2079,8 @@
   --tb-text: #1d1d1f;
   --tb-muted: #6e6e73;
   --tb-muted-2: #8a8d93;
-  --tb-primary: #0a84ff;
-  --tb-hover: rgba(10, 132, 255, 0.08);
+  --tb-primary: #c2410c;
+  --tb-hover: rgba(194, 65, 12, 0.08);
   --tb-divider: 1px solid var(--tb-line);
   background: #f5f5f7 !important;
 }
@@ -2085,7 +2114,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   background: #f5f5f7 !important;
   color: var(--tb-text) !important;
@@ -2121,7 +2151,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   min-height: 52px !important;
   padding: 0 18px !important;
@@ -2344,7 +2375,7 @@
 }
 
 .app-content.toolbox-unified-shell :is(.tab.active, .tab-btn.active, .menu-item.active, .conn-item.active, .db-item.active, .table-item.active, .doc-item.active, .category-item.active, .compact-file-row.active) {
-  background: rgba(10, 132, 255, 0.1) !important;
+  background: rgba(194, 65, 12, 0.1) !important;
   color: var(--tb-text) !important;
   border-color: transparent !important;
 }
@@ -2623,19 +2654,19 @@
 
 /* Palette override at absolute end: this wins over every older toolbox rule above. */
 .app-content.toolbox-unified-shell {
-  --tb-bg: #f6f9fc !important;
-  --tb-bg-soft: #fbfdff !important;
-  --tb-line: rgba(111, 128, 151, 0.13) !important;
-  --tb-line-strong: rgba(111, 128, 151, 0.18) !important;
+  --tb-bg: #faf7f0 !important;
+  --tb-bg-soft: #fdfbf6 !important;
+  --tb-line: rgba(120, 100, 80, 0.13) !important;
+  --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
   --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
-  --tb-panel-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-panel-line: rgba(120, 100, 80, 0.13) !important;
   --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(31, 45, 61, 0.025) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
-    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2667,11 +2698,12 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2703,7 +2735,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
@@ -2763,29 +2796,29 @@
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
-  border-color: rgba(111, 128, 151, 0.16) !important;
+  border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
-  border-color: rgba(111, 128, 151, 0.16) !important;
+  border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 /* Actual final palette: keep this block last so page/component styles cannot restore the old gray tone. */
 .app-content.toolbox-unified-shell {
-  --tb-bg: #f6f9fc !important;
-  --tb-bg-soft: #fbfdff !important;
-  --tb-line: rgba(111, 128, 151, 0.13) !important;
-  --tb-line-strong: rgba(111, 128, 151, 0.18) !important;
+  --tb-bg: #faf7f0 !important;
+  --tb-bg-soft: #fdfbf6 !important;
+  --tb-line: rgba(120, 100, 80, 0.13) !important;
+  --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
   --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
-  --tb-panel-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-panel-line: rgba(120, 100, 80, 0.13) !important;
   --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(31, 45, 61, 0.025) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
-    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2817,11 +2850,12 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2853,7 +2887,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
@@ -2913,29 +2948,29 @@
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
-  border-color: rgba(111, 128, 151, 0.16) !important;
+  border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
-  border-color: rgba(111, 128, 151, 0.16) !important;
+  border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 /* Final soft palette: lighter toolbox pages with a subtle app-like gradient */
 .app-content.toolbox-unified-shell {
   --tb-bg: #f5f8fb;
-  --tb-bg-soft: #fbfdff;
+  --tb-bg-soft: #fdfbf6;
   --tb-line: rgba(112, 130, 153, 0.14);
   --tb-line-strong: rgba(112, 130, 153, 0.18);
   --tb-panel-bg: rgba(255, 255, 255, 0.56);
   --tb-panel-bg-strong: rgba(255, 255, 255, 0.68);
   --tb-panel-line: rgba(112, 130, 153, 0.14);
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 8px 22px rgba(31, 45, 61, 0.025);
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 8px 22px rgba(60, 40, 20, 0.04);
   --tb-control-bg: rgba(255, 255, 255, 0.62);
   --tb-row-hover: rgba(255, 255, 255, 0.42);
   background:
     linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f3f7fb 100%) !important;
+    linear-gradient(180deg, #fdfbf6 0%, #f3f1ea 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2967,11 +3002,12 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   background:
     linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f3f7fb 100%) !important;
+    linear-gradient(180deg, #fdfbf6 0%, #f3f1ea 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3003,7 +3039,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.62)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
@@ -3078,8 +3115,8 @@
   --tb-layout-pad-y: 14px;
   --tb-panel-bg: rgba(255, 255, 255, 0.72);
   --tb-panel-bg-strong: rgba(255, 255, 255, 0.82);
-  --tb-panel-line: rgba(15, 23, 42, 0.08);
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 10px 24px rgba(15, 23, 42, 0.04);
+  --tb-panel-line: rgba(60, 40, 20, 0.08);
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 10px 24px rgba(60, 40, 20, 0.04);
   background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%) !important;
 }
 
@@ -3112,7 +3149,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   width: 100% !important;
   height: 100% !important;
@@ -3151,7 +3189,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   min-height: 58px !important;
   padding: 0 18px !important;
@@ -3459,7 +3498,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   width: 100% !important;
   height: 100% !important;
@@ -3538,7 +3578,7 @@
 .app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus, .el-textarea__inner:focus) {
   border-color: #4a78d9 !important;
   box-shadow: 0 0 0 3px var(--tb-control-focus) !important;
-  background: #fbfdff !important;
+  background: #fdfbf6 !important;
 }
 
 .app-content.toolbox-unified-shell .el-button {
@@ -3670,7 +3710,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(
   .header,
   .page-header,
@@ -3729,7 +3770,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.toolbar, .filter-bar, .stats-bar, .summary-strip, .hint-row, .regex-input-area, .status-bar, .bottom-bar) {
   padding: 10px 18px !important;
   border-bottom: var(--tb-divider) !important;
@@ -3764,7 +3806,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) :is(
   .content-area,
   .main-area,
@@ -3901,7 +3944,7 @@
 .app-content.toolbox-unified-shell .hex-converter-wrapper .input-panel,
 .app-content.toolbox-unified-shell .git-manager-wrapper .file-panel,
 .app-content.toolbox-unified-shell .git-report-wrapper .left-panel {
-  border-right: var(--tb-divider) !important;
+  border-right: 0 !important;
 }
 
 .app-content.toolbox-unified-shell .network-tool-page :is(.log-item, .stat-card),
@@ -4021,7 +4064,7 @@
 
 /* Network family: IP / DNS / Speed / WebSocket */
 .app-content.toolbox-unified-shell .network-tool-page .content-area {
-  grid-template-columns: minmax(360px, 430px) minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .network-tool-page :is(.config-panel, .result-panel) {
@@ -4053,7 +4096,7 @@
 }
 
 .app-content.toolbox-unified-shell .regex-wrapper .main-area {
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.95fr) !important;
+  grid-template-columns: minmax(0, 1fr) 260px !important;
 }
 
 .app-content.toolbox-unified-shell .hex-converter-wrapper .main-area {
@@ -4061,12 +4104,14 @@
 }
 
 .app-content.toolbox-unified-shell .crypto-wrapper .main-body {
-  grid-template-columns: minmax(350px, 0.95fr) minmax(0, 1fr) !important;
+  /* 原来是三栏 260px | 1fr | 260px,第三栏给已删除的右侧 info-panel 预留位置,
+     导致 content-area 右边永远空 260px。改成两栏即可。 */
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 /* Git / diff */
 .app-content.toolbox-unified-shell .git-manager-wrapper .main-content {
-  grid-template-columns: minmax(330px, 0.8fr) minmax(0, 1.2fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .git-manager-wrapper :is(.dir-item, .file-item, .log-item) {
@@ -4076,7 +4121,7 @@
 }
 
 .app-content.toolbox-unified-shell .git-report-wrapper .main-content {
-  grid-template-columns: minmax(340px, 0.85fr) minmax(0, 1.15fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .file-diff-wrapper :is(.toolbar, .status-bar) {
@@ -4089,7 +4134,7 @@
 
 /* API workbench pages */
 .app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout {
-  grid-template-columns: minmax(300px, 0.7fr) minmax(0, 1.3fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .split-panels {
@@ -4103,20 +4148,20 @@
 }
 
 .app-content.toolbox-unified-shell .api-docs-wrapper .docs-edit {
-  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .mock-service-wrapper .mock-layout {
-  grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 /* Perf / auto test */
 .app-content.toolbox-unified-shell .perf-test-wrapper .bench-layout {
-  grid-template-columns: minmax(330px, 0.78fr) minmax(0, 1.22fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .auto-test-wrapper .auto-layout {
-  grid-template-columns: minmax(300px, 0.74fr) minmax(0, 1.26fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.perf-test-wrapper, .auto-test-wrapper) :is(.bench-stat-card, .stat-card) {
@@ -4126,7 +4171,7 @@
 /* Resource / media pages */
 .app-content.toolbox-unified-shell .img-b64-wrapper .main-area,
 .app-content.toolbox-unified-shell .img-cvt-wrapper .main-area {
-  grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.img-b64-wrapper, .img-cvt-wrapper, .screenshot-mgr-wrapper, .wallpaper-wrapper) :is(.drop-zone, .preview-card, .preview-area, .history-card, .action-card, .wp-card) {
@@ -4137,7 +4182,7 @@
 .app-content.toolbox-unified-shell .redis-client .main-body,
 .app-content.toolbox-unified-shell .sqlite-mgr .main-body,
 .app-content.toolbox-unified-shell .ssh-terminal-wrapper .main-body {
-  grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.28fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.redis-client, .sqlite-mgr, .ssh-terminal-wrapper) :is(.tab, .tab-btn, .menu-item, .db-item, .table-item, .conn-item, .sftp-item) {
@@ -4151,7 +4196,7 @@
 
 /* System and manager pages */
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
-  grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .port-manager-wrapper .table-area,
@@ -4241,24 +4286,25 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(245, 250, 255, 0.98) 0%, rgba(251, 253, 255, 0.9) 46%, rgba(243, 249, 247, 0.94) 100%),
-    linear-gradient(180deg, #fbfdff 0%, #f4f8fb 100%) !important;
+    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
 }
 
 .app-content.toolbox-unified-shell {
-  --tb-bg: #f6f9fc !important;
-  --tb-bg-soft: #fbfdff !important;
-  --tb-line: rgba(111, 128, 151, 0.13) !important;
-  --tb-line-strong: rgba(111, 128, 151, 0.18) !important;
+  --tb-bg: #faf7f0 !important;
+  --tb-bg-soft: #fdfbf6 !important;
+  --tb-line: rgba(120, 100, 80, 0.13) !important;
+  --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
   --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
-  --tb-panel-line: rgba(111, 128, 151, 0.13) !important;
+  --tb-panel-line: rgba(120, 100, 80, 0.13) !important;
   --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(31, 45, 61, 0.025) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -4290,7 +4336,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
@@ -4350,18 +4397,18 @@
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
-  border-color: rgba(111, 128, 151, 0.16) !important;
+  border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
-  border-color: rgba(111, 128, 151, 0.16) !important;
+  border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 /* FINAL TOOLBOX SOFT PALETTE - keep at absolute file end. */
 .app-content.toolbox-unified-shell {
   --tb-bg: #f4f8fc !important;
-  --tb-bg-soft: #fbfdff !important;
+  --tb-bg-soft: #fdfbf6 !important;
   --tb-line: rgba(100, 116, 139, 0.11) !important;
   --tb-line-strong: rgba(100, 116, 139, 0.17) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.48) !important;
@@ -4370,7 +4417,7 @@
   --tb-control-bg: rgba(255, 255, 255, 0.64) !important;
   --tb-hover: rgba(255, 255, 255, 0.34) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.34) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66), 0 10px 24px rgba(31, 45, 61, 0.025) !important;
+  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66), 0 10px 24px rgba(60, 40, 20, 0.04) !important;
 }
 
 .app-content.toolbox-unified-shell,
@@ -4440,7 +4487,8 @@
   .log-analyzer-wrapper,
   .hardware-info-page,
   .download-manager-wrapper,
-  .ssh-terminal-wrapper
+  .ssh-terminal-wrapper,
+  .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 252, 255, 0.5)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
@@ -5168,7 +5216,7 @@
 /* FINAL SDK MANAGER POLISH - divider layout, narrow nav and full-width work area. */
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .main-container {
   display: grid !important;
-  grid-template-columns: 152px minmax(0, 1fr) !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
   gap: 0 !important;
   width: 100% !important;
   height: calc(100% - 58px) !important;
@@ -5180,9 +5228,9 @@
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .sidebar-left {
-  width: 152px !important;
-  min-width: 152px !important;
-  max-width: 152px !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  max-width: 260px !important;
   border: 0 !important;
   border-right: 1px solid var(--tb-line-strong) !important;
   border-radius: 0 !important;
@@ -5408,9 +5456,9 @@
 }
 
 .app-content.toolbox-unified-shell .git-report-wrapper .left-panel {
-  flex: 0 0 340px !important;
-  width: 340px !important;
-  min-width: 280px !important;
+  flex: 0 0 260px !important;
+  width: 260px !important;
+  min-width: 260px !important;
 }
 
 .app-content.toolbox-unified-shell .git-report-wrapper .right-panel {
@@ -5484,6 +5532,10 @@
   grid-template-columns: 260px minmax(0, 1fr) !important;
   width: 100% !important;
   min-width: 0 !important;
+}
+
+.app-content.toolbox-unified-shell .api-debug-wrapper .debug-layout.sidebar-collapsed {
+  grid-template-columns: 0 minmax(0, 1fr) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .sidebar-area {
@@ -5626,4 +5678,228 @@
   margin: 18px !important;
   background: rgba(255,255,255,0.36) !important;
   border: 1px dashed rgba(100, 116, 139, 0.16) !important;
+}
+
+/* FINAL INPUT-NUMBER NO INNER BORDER - kill all separator lines around +/- buttons. */
+.app-content.toolbox-unified-shell .el-input-number .el-input-number__decrease,
+.app-content.toolbox-unified-shell .el-input-number .el-input-number__increase {
+  border: 0 !important;
+  border-left: 0 !important;
+  border-right: 0 !important;
+  border-top: 0 !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-content.toolbox-unified-shell .el-input-number .el-input,
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper,
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper:hover,
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper.is-focus,
+.app-content.toolbox-unified-shell .el-input-number .el-input__wrapper:focus-within {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   FINAL UNIFIED LAYOUT - 260px left side + divider for ALL
+   left-right toolbox pages. Must stay last for highest priority.
+   ============================================================ */
+
+/* 2-column layouts: 260px | flex */
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .content-area,
+  .api-debug-wrapper .debug-layout,
+  .api-docs-wrapper .docs-edit,
+  .mock-service-wrapper .mock-layout,
+  .perf-test-wrapper .bench-layout,
+  .auto-test-wrapper .auto-layout,
+  .git-manager-wrapper .main-content,
+  .git-report-wrapper .main-content,
+  .maven-wrapper .main-area,
+  .img-cvt-wrapper .main-area,
+  .img-b64-wrapper .main-area,
+  .redis-client .main-body,
+  .sqlite-mgr .main-body,
+  .ssh-terminal-wrapper .main-body,
+  .sdk-manager-wrapper .main-container,
+  .log-analyzer-wrapper .content-area
+) {
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+/* 2-column layout: 260px | flex (CryptoTool 加密解密)
+   原本是 260px | 1fr | 260px,第三栏给 info-panel 预留位置;
+   info-panel 已经被合并到算法栏的感叹号气泡里,第三栏要去掉,否则 content-area 右侧空一大片。
+   注意:这条比文件前面的同名规则后写,CSS 后写后赢,这里也必须改对。 */
+.app-content.toolbox-unified-shell .crypto-wrapper .main-body {
+  display: grid !important;
+  grid-template-columns: 260px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+/* RegexTester：左主区 + 右 260px 结果栏 */
+.app-content.toolbox-unified-shell .regex-wrapper .main-area {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 260px !important;
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+/* Strip card style + ensure divider on every panel */
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .content-area,
+  .api-debug-wrapper .debug-layout,
+  .api-docs-wrapper .docs-edit,
+  .mock-service-wrapper .mock-layout,
+  .perf-test-wrapper .bench-layout,
+  .auto-test-wrapper .auto-layout,
+  .git-manager-wrapper .main-content,
+  .git-report-wrapper .main-content,
+  .maven-wrapper .main-area,
+  .img-cvt-wrapper .main-area,
+  .img-b64-wrapper .main-area,
+  .redis-client .main-body,
+  .sqlite-mgr .main-body,
+  .ssh-terminal-wrapper .main-body,
+  .sdk-manager-wrapper .main-container,
+  .log-analyzer-wrapper .content-area,
+  .crypto-wrapper .main-body,
+  .regex-wrapper .main-area
+) > * {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .content-area,
+  .api-debug-wrapper .debug-layout,
+  .api-docs-wrapper .docs-edit,
+  .mock-service-wrapper .mock-layout,
+  .perf-test-wrapper .bench-layout,
+  .auto-test-wrapper .auto-layout,
+  .git-manager-wrapper .main-content,
+  .git-report-wrapper .main-content,
+  .maven-wrapper .main-area,
+  .img-cvt-wrapper .main-area,
+  .img-b64-wrapper .main-area,
+  .redis-client .main-body,
+  .sqlite-mgr .main-body,
+  .ssh-terminal-wrapper .main-body,
+  .sdk-manager-wrapper .main-container,
+  .log-analyzer-wrapper .content-area,
+  .crypto-wrapper .main-body,
+  .regex-wrapper .main-area
+) > *:not(:first-child) {
+  border-left: 1px solid rgba(60, 40, 20, 0.18) !important;
+}
+
+/* SshTerminal：深色主题分割线覆盖 */
+.app-content.toolbox-unified-shell .ssh-terminal-wrapper .main-body > *:not(:first-child) {
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Reset any remaining outer padding wrappers around layouts */
+.app-content.toolbox-unified-shell :is(
+  .perf-test-wrapper,
+  .mock-service-wrapper,
+  .auto-test-wrapper,
+  .api-debug-wrapper,
+  .api-docs-wrapper,
+  .log-analyzer-wrapper,
+  .maven-wrapper
+) .content-area {
+  padding: 0 !important;
+}
+
+.app-content.toolbox-unified-shell :is(
+  .redis-client,
+  .sqlite-mgr,
+  .ssh-terminal-wrapper,
+  .crypto-wrapper
+) .main-body {
+  padding: 0 !important;
+}
+
+/* Left panels: scroll inside the panel, not the whole page */
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .config-panel,
+  .api-debug-wrapper .sidebar-area,
+  .api-debug-wrapper .left-sidebar,
+  .api-docs-wrapper .docs-list-panel,
+  .mock-service-wrapper .mock-rules-panel,
+  .perf-test-wrapper .bench-config,
+  .auto-test-wrapper .auto-sidebar,
+  .git-manager-wrapper .file-panel,
+  .git-report-wrapper .left-panel,
+  .maven-wrapper .left-panel,
+  .img-cvt-wrapper .left-panel,
+  .redis-client .left-panel,
+  .sqlite-mgr .left-panel,
+  .ssh-terminal-wrapper .left-panel,
+  .sdk-manager-wrapper .sidebar-left,
+  .log-analyzer-wrapper .left-panel,
+  .crypto-wrapper .category-nav,
+  .crypto-wrapper .info-panel
+) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  scrollbar-width: thin;
+}
+
+/* Hide outer scrollbar visual gutter when not needed */
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .config-panel,
+  .api-debug-wrapper .sidebar-area,
+  .api-debug-wrapper .left-sidebar,
+  .api-docs-wrapper .docs-list-panel,
+  .mock-service-wrapper .mock-rules-panel,
+  .perf-test-wrapper .bench-config,
+  .auto-test-wrapper .auto-sidebar,
+  .git-manager-wrapper .file-panel,
+  .git-report-wrapper .left-panel,
+  .maven-wrapper .left-panel,
+  .img-cvt-wrapper .left-panel,
+  .redis-client .left-panel,
+  .sqlite-mgr .left-panel,
+  .ssh-terminal-wrapper .left-panel,
+  .sdk-manager-wrapper .sidebar-left,
+  .log-analyzer-wrapper .left-panel,
+  .crypto-wrapper .category-nav,
+  .crypto-wrapper .info-panel
+)::-webkit-scrollbar {
+  width: 5px;
+}
+.app-content.toolbox-unified-shell :is(
+  .network-tool-page .config-panel,
+  .api-debug-wrapper .sidebar-area,
+  .api-debug-wrapper .left-sidebar,
+  .api-docs-wrapper .docs-list-panel,
+  .mock-service-wrapper .mock-rules-panel,
+  .perf-test-wrapper .bench-config,
+  .auto-test-wrapper .auto-sidebar,
+  .git-manager-wrapper .file-panel,
+  .git-report-wrapper .left-panel,
+  .maven-wrapper .left-panel,
+  .img-cvt-wrapper .left-panel,
+  .redis-client .left-panel,
+  .sqlite-mgr .left-panel,
+  .ssh-terminal-wrapper .left-panel,
+  .sdk-manager-wrapper .sidebar-left,
+  .log-analyzer-wrapper .left-panel,
+  .crypto-wrapper .category-nav,
+  .crypto-wrapper .info-panel
+)::-webkit-scrollbar-thumb {
+  background: rgba(60, 40, 20, 0.18);
+  border-radius: 3px;
 }

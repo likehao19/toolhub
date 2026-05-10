@@ -138,6 +138,7 @@ export async function initDatabase() {
         title TEXT,
         tags TEXT,
         category TEXT,
+        category_color TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
       )`,
@@ -437,12 +438,22 @@ async function migrateToVersion2(db) {
     if (!error.message?.includes('duplicate column')) {
     }
   }
+
+  // 兜底:历史 schema 漂移过(早期 note_metadata 缺 title;后期建表又缺 title),
+  // 这里幂等加列,缺哪个补哪个,duplicate 时忽略。
+  for (const stmt of [
+    'ALTER TABLE note_metadata ADD COLUMN title TEXT',
+    'ALTER TABLE note_metadata ADD COLUMN category_color TEXT',
+  ]) {
+    try { await db.execute(stmt) } catch { /* duplicate column ignore */ }
+  }
   
   // 创建新表
   const newTables = [
     `CREATE TABLE IF NOT EXISTS note_metadata (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       note_name TEXT NOT NULL UNIQUE,
+      title TEXT,
       tags TEXT,
       category TEXT,
       category_color TEXT,

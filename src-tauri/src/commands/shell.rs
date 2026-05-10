@@ -65,6 +65,12 @@ pub struct CommandResult {
     pub stderr: String,
 }
 
+/// 命令执行超时上限(秒)。
+///
+/// 旧实现 cmd.output() 没有超时,被调用的程序卡住会让整个 Tauri 任务永久挂起,
+/// 占满 tokio blocking pool。30 秒覆盖绝大多数 CLI 工具,长任务请走流式接口。
+const SHELL_TIMEOUT_SECS: u64 = 30;
+
 /// 执行系统命令（处理 Windows 编码）
 ///
 /// # Arguments
@@ -82,7 +88,7 @@ pub async fn execute_shell_command(
     args: Vec<String>,
 ) -> Result<CommandResult, String> {
     // 在异步任务中执行命令
-    let result = tokio::task::spawn_blocking(move || {
+    let task = tokio::task::spawn_blocking(move || {
         let mut cmd = StdCommand::new(&program);
         cmd.args(&args);
 
@@ -102,9 +108,24 @@ pub async fn execute_shell_command(
             stdout: decode_windows_output(&output.stdout),
             stderr: decode_windows_output(&output.stderr),
         })
-    })
+    });
+
+    // 关键:超时仅取消等待,不能强制杀已 spawn 的子进程(spawn_blocking 内部 std::process::Command
+    // 没有 cancellation token)。但至少让前端尽快得到错误,避免 Tauri 任务永久挂起。
+    let result = match tokio::time::timeout(
+        std::time::Duration::from_secs(SHELL_TIMEOUT_SECS),
+        task,
+    )
     .await
-    .map_err(|e| format!("任务执行失败: {}", e))?;
+    {
+        Ok(joined) => joined.map_err(|e| format!("任务执行失败: {}", e))?,
+        Err(_) => {
+            return Err(format!(
+                "命令执行超时({} 秒)。如需运行长任务,请使用流式/后台命令接口",
+                SHELL_TIMEOUT_SECS
+            ));
+        }
+    };
 
     result
 }

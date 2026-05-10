@@ -572,7 +572,16 @@ function getCurrentCfi() {
 }
 
 // 定期保存
-let saveTimer = setInterval(() => saveCurrentProgress(), 30000)
+// 旧:setInterval 直接调 async 函数,前一次没完下一次又触发,
+// 数据库 write 并发会导致进度乱序甚至 SQLITE_BUSY。
+let isSaving = false
+let saveTimer = setInterval(async () => {
+  if (isSaving) return
+  isSaving = true
+  try { await saveCurrentProgress() }
+  catch (e) { console.warn('[ebook] auto-save failed:', e) }
+  finally { isSaving = false }
+}, 30000)
 onBeforeUnmount(() => clearInterval(saveTimer))
 
 // ---- 目录 ----

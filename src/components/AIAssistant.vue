@@ -399,7 +399,7 @@ const formatTime = (date) => {
 }
 
 .message-text {
-  background: white;
+  background: var(--bg-primary);
   padding: 12px 16px;
   border-radius: 8px;
   line-height: 1.6;
@@ -429,7 +429,7 @@ const formatTime = (date) => {
 }
 
 .confirmation-details {
-  background: white;
+  background: var(--bg-primary);
   padding: 8px 12px;
   border-radius: 4px;
   margin-bottom: 12px;
@@ -469,7 +469,7 @@ const formatTime = (date) => {
   display: flex;
   gap: 4px;
   padding: 12px 16px;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 8px;
   width: fit-content;
 }
@@ -501,13 +501,13 @@ const formatTime = (date) => {
 
 .input-container {
   padding: 16px 20px;
-  background: white;
+  background: var(--bg-primary);
   border-top: 1px solid #dcdfe6;
 }
 
 .history-toggle {
   padding: 0 20px 16px;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .history-list {

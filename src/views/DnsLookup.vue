@@ -8,7 +8,7 @@
             <el-icon><Connection /></el-icon>
             <span class="breadcrumb-link" @click="router.push('/toolbox')">{{ t('toolbox.title') }}</span>
             <span class="breadcrumb-sep">/</span>
-            <span>DNS 查询</span>
+            <span>{{ t('dnsLookup.title') }}</span>
           </div>
         </div>
       </div>
@@ -16,24 +16,28 @@
 
     <div class="content-area">
       <aside class="config-panel">
-        <div class="panel-title">查询配置</div>
+        <div class="panel-title">{{ t('dnsLookup.queryConfig') }}</div>
         <el-form label-width="72px" size="small">
-          <el-form-item label="域名">
-            <el-input v-model="domain" placeholder="例如：example.com" clearable @keyup.enter="submit" />
+          <el-form-item :label="t('dnsLookup.domain')">
+            <el-input v-model="domain" :placeholder="t('dnsLookup.domainPlaceholder')" clearable @keyup.enter="submit" />
           </el-form-item>
-          <el-form-item label="记录类型">
+          <el-form-item :label="t('dnsLookup.recordType')">
             <el-select v-model="recordType" style="width: 100%">
               <el-option v-for="item in recordTypes" :key="item" :label="item" :value="item" />
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" :loading="loading" @click="submit">开始查询</el-button>
-            <el-button @click="clearResult">清空</el-button>
+            <el-button type="primary" :loading="loading" @click="submit">
+              <el-icon style="margin-right: 6px;"><Search /></el-icon>{{ t('dnsLookup.startQuery') }}
+            </el-button>
+            <el-button @click="clearResult">
+              <el-icon style="margin-right: 6px;"><Delete /></el-icon>{{ t('dnsLookup.clear') }}
+            </el-button>
           </el-form-item>
         </el-form>
 
         <div class="history-card">
-          <div class="sub-title">最近查询</div>
+          <div class="sub-title">{{ t('dnsLookup.recentQueries') }}</div>
           <div v-if="historyList.length" class="history-list">
             <div
               v-for="item in historyList"
@@ -45,7 +49,7 @@
               <el-tag size="small">{{ item.recordType }}</el-tag>
             </div>
           </div>
-          <div v-else class="hint">暂无查询历史</div>
+          <div v-else class="hint">{{ t('dnsLookup.noHistory') }}</div>
         </div>
       </aside>
 
@@ -55,24 +59,26 @@
             <div class="meta-row">
               <el-tag size="small">{{ result.domain }}</el-tag>
               <el-tag size="small" type="success">{{ result.recordType }}</el-tag>
-              <el-tag size="small" type="info">耗时 {{ result.elapsedMs }} ms</el-tag>
+              <el-tag size="small" type="info">{{ t('dnsLookup.elapsed', { ms: result.elapsedMs }) }}</el-tag>
             </div>
-            <el-button text size="small" @click="copyAll">复制全部</el-button>
+            <el-button text size="small" @click="copyAll" :title="t('common.copy')">
+              <el-icon style="margin-right: 4px;"><CopyDocument /></el-icon>{{ t('dnsLookup.copyAll') }}
+            </el-button>
           </div>
 
-          <el-table :data="result.answers || []" size="small" stripe empty-text="暂无记录">
-            <el-table-column prop="name" label="名称" min-width="180" show-overflow-tooltip />
-            <el-table-column prop="recordType" label="类型" width="100" />
-            <el-table-column prop="ttl" label="TTL" width="100" />
-            <el-table-column prop="value" label="值" min-width="260" show-overflow-tooltip />
-            <el-table-column label="操作" width="100">
+          <el-table :data="result.answers || []" size="small" stripe :empty-text="t('dnsLookup.emptyResult')">
+            <el-table-column prop="name" :label="t('dnsLookup.colName')" min-width="180" show-overflow-tooltip />
+            <el-table-column prop="recordType" :label="t('dnsLookup.colType')" width="100" />
+            <el-table-column prop="ttl" :label="t('dnsLookup.colTtl')" width="100" />
+            <el-table-column prop="value" :label="t('dnsLookup.colValue')" min-width="260" show-overflow-tooltip />
+            <el-table-column :label="t('dnsLookup.colActions')" width="100">
               <template #default="scope">
-                <el-button text size="small" @click="copyValue(scope.row.value)">复制</el-button>
+                <el-button text size="small" @click="copyValue(scope.row.value)" :title="t('common.copy')"><el-icon><CopyDocument /></el-icon></el-button>
               </template>
             </el-table-column>
           </el-table>
         </template>
-        <div v-else class="empty-hint">输入域名并选择记录类型后开始查询</div>
+        <div v-else class="empty-hint">{{ t('dnsLookup.emptyHint') }}</div>
       </section>
     </div>
   </div>
@@ -82,7 +88,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Connection } from '@element-plus/icons-vue'
+import { Connection, CopyDocument, Search, Delete } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { dnsLookup } from '@/utils/networkTools'
 import { writeText } from '@/utils/tauri/clipboard'
@@ -115,18 +121,18 @@ function saveHistory(entry) {
 
 async function copyValue(value) {
   if (!value) {
-    ElMessage.warning('暂无可复制内容')
+    ElMessage.warning(t('dnsLookup.noCopyContent'))
     return
   }
   try {
     await writeText(String(value))
-    ElMessage.success('已复制')
+    ElMessage.success(t('dnsLookup.copied'))
   } catch {}
 }
 
 async function copyAll() {
   if (!result.value?.answers?.length) {
-    ElMessage.warning('暂无可复制内容')
+    ElMessage.warning(t('dnsLookup.noCopyContent'))
     return
   }
   const text = result.value.answers
@@ -134,7 +140,7 @@ async function copyAll() {
     .join('\n')
   try {
     await writeText(text)
-    ElMessage.success('结果已复制')
+    ElMessage.success(t('dnsLookup.resultCopied'))
   } catch {}
 }
 
@@ -166,15 +172,17 @@ function clearResult() {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(340px, 420px) minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
   overflow: hidden;
 }
 
 .config-panel {
   min-height: 0;
-  overflow: auto;
-  padding: 16px 18px;
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  padding: 14px 18px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-title,
@@ -183,7 +191,7 @@ function clearResult() {
   font-weight: 600;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.1);
 }
 
 .history-card {
@@ -201,7 +209,7 @@ function clearResult() {
   justify-content: space-between;
   gap: 8px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   cursor: pointer;
 }
 
@@ -222,7 +230,7 @@ function clearResult() {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 
 .meta-row {
@@ -257,6 +265,6 @@ function clearResult() {
 
 @media (max-width: 1100px) {
   .content-area { grid-template-columns: 1fr; }
-  .config-panel { border-right: 0; border-bottom: 1px solid rgba(15, 23, 42, 0.08); }
+  .config-panel { border-right: 0; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 }
 </style>

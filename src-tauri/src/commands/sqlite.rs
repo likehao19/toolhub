@@ -82,6 +82,27 @@ where
     f(&conn)
 }
 
+/// 校验 SQLite 标识符(表名/索引名)。
+///
+/// PRAGMA 不支持参数化绑定,所以表名只能字符串拼接。但只转义双引号是不够的:
+/// `\0` 会截断 SQL,反引号、注释符、控制字符都可能被恶意/损坏的输入注入。
+/// 这里走严格白名单 —— 只允许字母、数字、下划线、$ 和点(限定 schema.table)。
+fn validate_identifier(name: &str) -> Result<(), String> {
+    if name.is_empty() {
+        return Err("标识符不能为空".to_string());
+    }
+    if name.len() > 128 {
+        return Err("标识符过长".to_string());
+    }
+    let valid = name.chars().all(|c| {
+        c.is_ascii_alphanumeric() || c == '_' || c == '$' || c == '.'
+    });
+    if !valid {
+        return Err(format!("非法的 SQL 标识符: {:?}", name));
+    }
+    Ok(())
+}
+
 fn row_value(row: &rusqlite::Row, idx: usize) -> serde_json::Value {
     use rusqlite::types::ValueRef;
     match row.get_ref(idx) {
@@ -172,11 +193,12 @@ pub async fn sqlite_table_info(
     conn_id: String,
     table: String,
 ) -> Result<Vec<ColumnInfo>, String> {
+    validate_identifier(&table)?;
     let pool = get_pool().read().await;
     let entry = pool.get(&conn_id).ok_or("Connection not found")?;
 
     with_conn(entry, |conn| {
-        let sql = format!("PRAGMA table_info(\"{}\")", table.replace('"', "\"\""));
+        let sql = format!("PRAGMA table_info(\"{}\")", table);
         let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
 
         let rows = stmt
@@ -205,11 +227,12 @@ pub async fn sqlite_table_indexes(
     conn_id: String,
     table: String,
 ) -> Result<Vec<IndexInfo>, String> {
+    validate_identifier(&table)?;
     let pool = get_pool().read().await;
     let entry = pool.get(&conn_id).ok_or("Connection not found")?;
 
     with_conn(entry, |conn| {
-        let sql = format!("PRAGMA index_list(\"{}\")", table.replace('"', "\"\""));
+        let sql = format!("PRAGMA index_list(\"{}\")", table);
         let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
 
         let index_list: Vec<(String, bool)> = stmt
@@ -222,7 +245,9 @@ pub async fn sqlite_table_indexes(
 
         let mut result = Vec::new();
         for (name, unique) in index_list {
-            let col_sql = format!("PRAGMA index_info(\"{}\")", name.replace('"', "\"\""));
+            // index 名来自 sqlite_master,但仍然走一次校验防御性编程
+            validate_identifier(&name)?;
+            let col_sql = format!("PRAGMA index_info(\"{}\")", name);
             let cols: Vec<String> = conn
                 .prepare(&col_sql)
                 .map_err(|e| e.to_string())?
@@ -317,13 +342,14 @@ pub async fn sqlite_count(
     conn_id: String,
     table: String,
 ) -> Result<i64, String> {
+    validate_identifier(&table)?;
     let pool = get_pool().read().await;
     let entry = pool.get(&conn_id).ok_or("Connection not found")?;
 
     with_conn(entry, |conn| {
         let sql = format!(
             "SELECT COUNT(*) FROM \"{}\"",
-            table.replace('"', "\"\"")
+            table
         );
         conn.query_row(&sql, [], |row| row.get(0))
             .map_err(|e| e.to_string())

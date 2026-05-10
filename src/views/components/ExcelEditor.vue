@@ -169,7 +169,7 @@ defineExpose({
 .btn-small {
   padding: 4px 8px;
   border: 1px solid var(--border-color, #e1e4e8);
-  background: white;
+  background: var(--bg-primary);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -230,7 +230,7 @@ defineExpose({
 }
 
 .excel-cell-input:focus {
-  background: #fff;
+  background: var(--bg-primary);
   box-shadow: inset 0 0 0 2px var(--accent-color, #3498db);
 }
 </style>
