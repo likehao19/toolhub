@@ -48,7 +48,7 @@ const tag = `v${next}`;
 console.log(`\n  ${pkg.version} -> ${next}  (tag: ${tag})\n`);
 
 const status = shTry('git status --porcelain') || '';
-const dirty = status.split('\n').filter(l => l && !/\.claude\/worktrees\//.test(l));
+const dirty = status.split('\n').filter(l => l && !/\.claude\//.test(l));
 if (dirty.length) {
   console.error('Uncommitted changes detected. Commit or stash first:\n' + dirty.join('\n'));
   process.exit(1);
