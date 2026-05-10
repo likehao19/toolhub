@@ -10,7 +10,8 @@ const REMOTES = [
 ];
 
 function sh(cmd, opts = {}) {
-  return execSync(cmd, { stdio: opts.silent ? 'pipe' : 'inherit', encoding: 'utf8' }).toString().trim();
+  const result = execSync(cmd, { stdio: opts.silent ? 'pipe' : 'inherit', encoding: 'utf8' });
+  return result ? result.toString().trim() : '';
 }
 
 function shTry(cmd) {
