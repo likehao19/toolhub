@@ -16,8 +16,6 @@ jobs:
         include:
           - platform: 'macos-latest'
             args: '--target universal-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
           - platform: 'windows-latest'
             args: ''
 
@@ -40,12 +38,6 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
-
-      - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev
 
       - name: Install npm dependencies
         run: npm ci
@@ -74,6 +66,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: '--max-old-space-size=6144'
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'ToolHub ${{ github.ref_name }}'
@@ -83,7 +76,6 @@ jobs:
             ## Downloads
             - **Windows**: `.msi` (WiX) or `.exe` (NSIS)
             - **macOS**: `.dmg` (universal: Intel + Apple Silicon)
-            - **Linux**: `.AppImage` or `.deb`
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
