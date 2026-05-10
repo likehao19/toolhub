@@ -38,26 +38,27 @@ pub async fn capture_screen_fast() -> Result<Vec<ScreenCaptureMeta>, String> {
         for monitor in monitors {
             let img = monitor
                 .capture_image()
-                .map_err(|e| format!("截图失败 ({}): {}", monitor.name(), e))?;
+                .map_err(|e| format!("截图失败 ({}): {}", monitor.name().unwrap_or_default(), e))?;
 
             let ts = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
                 .as_millis();
-            let file_path = tmp_dir.join(format!("cap-{}-{}.bmp", monitor.id(), ts));
+            let id = monitor.id().unwrap_or(0);
+            let file_path = tmp_dir.join(format!("cap-{}-{}.bmp", id, ts));
 
             img.save_with_format(&file_path, image::ImageFormat::Bmp)
                 .map_err(|e| format!("保存BMP失败: {}", e))?;
 
             captures.push(ScreenCaptureMeta {
-                id: monitor.id(),
-                name: monitor.name().to_string(),
-                x: monitor.x(),
-                y: monitor.y(),
-                width: monitor.width(),
-                height: monitor.height(),
+                id,
+                name: monitor.name().unwrap_or_default(),
+                x: monitor.x().unwrap_or(0),
+                y: monitor.y().unwrap_or(0),
+                width: monitor.width().unwrap_or(0),
+                height: monitor.height().unwrap_or(0),
                 path: file_path.to_string_lossy().to_string(),
-                scale_factor: monitor.scale_factor(),
+                scale_factor: monitor.scale_factor().unwrap_or(1.0),
             });
         }
 
@@ -97,26 +98,27 @@ pub async fn capture_all_screens() -> Result<Vec<ScreenCaptureMeta>, String> {
         for monitor in monitors {
             let img = monitor
                 .capture_image()
-                .map_err(|e| format!("截图失败 ({}): {}", monitor.name(), e))?;
+                .map_err(|e| format!("截图失败 ({}): {}", monitor.name().unwrap_or_default(), e))?;
 
             let ts = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap_or_default()
                 .as_millis();
-            let file_path = tmp_dir.join(format!("full-{}-{}.png", monitor.id(), ts));
+            let id = monitor.id().unwrap_or(0);
+            let file_path = tmp_dir.join(format!("full-{}-{}.png", id, ts));
 
             img.save_with_format(&file_path, image::ImageFormat::Png)
                 .map_err(|e| format!("保存PNG失败: {}", e))?;
 
             captures.push(ScreenCaptureMeta {
-                id: monitor.id(),
-                name: monitor.name().to_string(),
-                x: monitor.x(),
-                y: monitor.y(),
-                width: monitor.width(),
-                height: monitor.height(),
+                id,
+                name: monitor.name().unwrap_or_default(),
+                x: monitor.x().unwrap_or(0),
+                y: monitor.y().unwrap_or(0),
+                width: monitor.width().unwrap_or(0),
+                height: monitor.height().unwrap_or(0),
                 path: file_path.to_string_lossy().to_string(),
-                scale_factor: monitor.scale_factor(),
+                scale_factor: monitor.scale_factor().unwrap_or(1.0),
             });
         }
 
@@ -133,15 +135,15 @@ pub async fn list_visible_windows() -> Result<Vec<WindowInfo>, String> {
         let windows = xcap::Window::all().map_err(|e| format!("枚举窗口失败: {}", e))?;
         Ok(windows
             .iter()
-            .filter(|w| !w.is_minimized() && w.width() > 50 && w.height() > 50)
+            .filter(|w| !w.is_minimized().unwrap_or(false) && w.width().unwrap_or(0) > 50 && w.height().unwrap_or(0) > 50)
             .map(|w| WindowInfo {
-                id: w.id(),
-                title: w.title().to_string(),
-                app_name: w.app_name().to_string(),
-                x: w.x(),
-                y: w.y(),
-                width: w.width(),
-                height: w.height(),
+                id: w.id().unwrap_or(0),
+                title: w.title().unwrap_or_default(),
+                app_name: w.app_name().unwrap_or_default(),
+                x: w.x().unwrap_or(0),
+                y: w.y().unwrap_or(0),
+                width: w.width().unwrap_or(0),
+                height: w.height().unwrap_or(0),
             })
             .collect())
     })

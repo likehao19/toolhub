@@ -9,7 +9,11 @@
     "build": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "dev:auto": "node scripts/auto-dev.cjs"
+    "dev:auto": "node scripts/auto-dev.cjs",
+    "push": "node scripts/push-all.cjs",
+    "release": "node scripts/release.cjs",
+    "release:minor": "node scripts/release.cjs minor",
+    "release:major": "node scripts/release.cjs major"
   },
   "dependencies": {
     "@antv/g6": "^5.0.51",

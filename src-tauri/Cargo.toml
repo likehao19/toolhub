@@ -58,7 +58,7 @@ tower = "0.4"
 tower-http = { version = "0.5", features = ["cors"] }
 reqwest = { version = "0.12", features = ["stream"] }
 redis = { version = "0.27", features = ["tokio-comp", "connection-manager"] }
-xcap = "0.0.14"
+xcap = "0.9"
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "bmp", "ico"] }
 kamadak-exif = "0.5"
 rusqlite = { version = "0.31", features = ["bundled"] }
