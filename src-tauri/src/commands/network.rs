@@ -53,7 +53,6 @@ fn escape_ps_single_quotes(input: &str) -> String {
     input.replace('\'', "''")
 }
 
-#[cfg(target_os = "windows")]
 fn normalize_record_type(record_type: &str) -> Result<&'static str, String> {
     match record_type.trim().to_uppercase().as_str() {
         "A" => Ok("A"),
