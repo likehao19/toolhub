@@ -1,5 +1,11 @@
 name: Release
 
+# 顶层声明：GITHUB_TOKEN 需要 contents:write 才能让 tauri-action 创建 Release。
+# v1.0.5 时 GitHub 把默认 token 权限收紧为 read-only,仅靠 job-level permissions
+# 不够,必须在 workflow 顶层 explicit 写出来才能覆盖 repo default。
+permissions:
+  contents: write
+
 on:
   push:
     tags:
