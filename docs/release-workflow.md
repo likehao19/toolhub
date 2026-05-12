@@ -15,7 +15,7 @@
 | 本地分支 | `toolhub-dev-style`（开发分支） |
 | 推送映射 | `origin/toolhub-dev-style` ↔ `github/main` |
 | Tauri 版本 | v2 |
-| 构建平台 | **Windows + macOS**（Linux 已移除，用户不需要） |
+| 构建平台 | **Windows + macOS Apple Silicon**（Intel Mac 已移除：runner 长期排队 24h 超时，Intel 用户走 Rosetta 2） |
 | Workflow 文件 | `.github/workflows/release.yml` |
 | 触发条件 | 仅 push 形如 `v*.*.*` 的 tag 才触发构建 |
 | 当前最新 release | 看 `git tag --list "v*"` 或 `gh release list` |
@@ -306,15 +306,14 @@ export HTTPS_PROXY=http://127.0.0.1:7890 HTTP_PROXY=http://127.0.0.1:7890
 "/c/Program Files/GitHub CLI/gh.exe" release view vX.Y.Z --repo likehao19/toolhub --json assets --jq '.assets[] | "\(.name)  (\(.size / 1024 / 1024 | floor) MB)"'
 ```
 
-正常应有 **5** 个文件：
+正常应有 **4** 个文件：
 
 | 文件 | 平台 | 用途 |
 |---|---|---|
 | `ToolHub_X.X.X_x64_zh-CN.msi` | Windows | MSI 中文 |
 | `ToolHub_X.X.X_x64_en-US.msi` | Windows | MSI 英文 |
 | `ToolHub_X.X.X_x64-setup.exe` | Windows | NSIS 安装包 |
-| `ToolHub_X.X.X_aarch64.dmg` | macOS Apple Silicon | M1/M2/M3 安装包 |
-| `ToolHub_X.X.X_x64.dmg` | macOS Intel | Intel Mac 安装包 |
+| `ToolHub_X.X.X_aarch64.dmg` | macOS Apple Silicon | M1/M2/M3+ 安装包（Intel Mac 用户走 Rosetta 2 跑此包）|
 
 ### 6.2. 发布
 
@@ -357,14 +356,14 @@ on:
 matrix:
   include:
     - platform: 'macos-14'                              # ARM runner
-      args: '--target aarch64-apple-darwin'             # Apple Silicon (M1/M2/M3)
-    - platform: 'macos-13'                              # Intel runner
-      args: '--target x86_64-apple-darwin'              # Intel Mac
+      args: '--target aarch64-apple-darwin'             # Apple Silicon (M1/M2/M3+)
     - platform: 'windows-latest'
       args: ''
 ```
 
-**为什么不用 universal？** universal binary 是 aarch64 + x86_64 两份合并，dmg 体积约 44MB（单架构 ~22MB 的 2 倍）。Apple Silicon 用户装 universal 浪费一半空间，所以拆成两个独立包，每个 ~22MB。
+**为什么不构建 Intel Mac？** GitHub Actions 的 `macos-13` Intel runner 长期容量紧张，发版时排队等不到 runner，常常 24h 超时（v1.0.4 即如此）。Apple Silicon 2020 年开始 5 年覆盖率已经很高，且 macOS 自带 Rosetta 2 自动转译 ARM 包，Intel Mac 用户直接下 `aarch64.dmg` 也能跑（性能损失对 UI/工具类应用基本无感）。
+
+**为什么不用 universal？** universal binary 是 aarch64 + x86_64 两份合并，dmg 体积约 44MB（单架构 ~22MB 的 2 倍）。Apple Silicon 用户装 universal 浪费一半空间。
 
 **关键 step：**
 
@@ -382,9 +381,8 @@ matrix:
 **典型耗时：**
 - Windows: 18-22 分钟（首次无缓存约 25 分钟）
 - macOS aarch64 (M1 runner): 18-22 分钟
-- macOS x86_64 (Intel runner): 20-25 分钟（Intel runner 略慢于 ARM）
 
-**三个 job 并行跑**，总时长由最慢的决定，约 25 分钟。
+**两个 job 并行跑**，总时长由最慢的决定，约 22-25 分钟。
 
 ---
 

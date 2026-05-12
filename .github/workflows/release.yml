@@ -14,10 +14,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-14'           # ARM runner — native Apple Silicon build
+          - platform: 'macos-14'           # ARM runner — Apple Silicon (M1/M2/M3+)
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-13'           # Intel runner — native x86_64 build
-            args: '--target x86_64-apple-darwin'
+            # 不再构建 macos-13 (Intel)：GitHub Actions Intel runner 长期排队 24h 拿不到资源，
+            # 且 Apple Silicon 自 2020 年起 5 年覆盖率高，Intel Mac 用户可用 Rosetta 2 跑 ARM 版。
           - platform: 'windows-latest'
             args: ''
 
@@ -76,8 +76,8 @@ jobs:
 
             ## Downloads
             - **Windows**: `.msi` (WiX) or `.exe` (NSIS)
-            - **macOS Apple Silicon (M1/M2/M3)**: `aarch64.dmg`
-            - **macOS Intel**: `x64.dmg`
+            - **macOS (Apple Silicon M1/M2/M3+)**: `aarch64.dmg`
+            - **macOS Intel**: 请下载上面 Apple Silicon 版本，macOS 会通过 Rosetta 2 自动转译运行
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
