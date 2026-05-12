@@ -15,7 +15,7 @@
 | 本地分支 | `toolhub-dev-style`（开发分支） |
 | 推送映射 | `origin/toolhub-dev-style` ↔ `github/main` |
 | Tauri 版本 | v2 |
-| 构建平台 | **Windows + macOS Apple Silicon**（Intel Mac 已移除：runner 长期排队 24h 超时，Intel 用户走 Rosetta 2） |
+| 构建平台 | **Windows + macOS aarch64 + macOS x86_64**（macOS Intel 通过 ARM runner 交叉编译,绕开 macos-13 Intel runner 24h 排队问题） |
 | Workflow 文件 | `.github/workflows/release.yml` |
 | 触发条件 | 仅 push 形如 `v*.*.*` 的 tag 才触发构建 |
 | 当前最新 release | 看 `git tag --list "v*"` 或 `gh release list` |
@@ -306,14 +306,15 @@ export HTTPS_PROXY=http://127.0.0.1:7890 HTTP_PROXY=http://127.0.0.1:7890
 "/c/Program Files/GitHub CLI/gh.exe" release view vX.Y.Z --repo likehao19/toolhub --json assets --jq '.assets[] | "\(.name)  (\(.size / 1024 / 1024 | floor) MB)"'
 ```
 
-正常应有 **4** 个文件：
+正常应有 **5** 个文件：
 
 | 文件 | 平台 | 用途 |
 |---|---|---|
 | `ToolHub_X.X.X_x64_zh-CN.msi` | Windows | MSI 中文 |
 | `ToolHub_X.X.X_x64_en-US.msi` | Windows | MSI 英文 |
 | `ToolHub_X.X.X_x64-setup.exe` | Windows | NSIS 安装包 |
-| `ToolHub_X.X.X_aarch64.dmg` | macOS Apple Silicon | M1/M2/M3+ 安装包（Intel Mac 用户走 Rosetta 2 跑此包）|
+| `ToolHub_X.X.X_aarch64.dmg` | macOS Apple Silicon | M1/M2/M3+ 原生包 |
+| `ToolHub_X.X.X_x64.dmg` | macOS Intel | Intel Mac 包（ARM runner 交叉编译产出） |
 
 ### 6.2. 发布
 
@@ -355,15 +356,20 @@ on:
 ```yaml
 matrix:
   include:
-    - platform: 'macos-14'                              # ARM runner
+    - platform: 'macos-14'                              # ARM runner — 原生编译
       args: '--target aarch64-apple-darwin'             # Apple Silicon (M1/M2/M3+)
+      rust_target: ''                                   # 用 host default
+    - platform: 'macos-14'                              # 同 ARM runner — 交叉编译
+      args: '--target x86_64-apple-darwin'              # Intel Mac
+      rust_target: 'x86_64-apple-darwin'                # 需额外装 x86_64 toolchain
     - platform: 'windows-latest'
       args: ''
+      rust_target: ''
 ```
 
-**为什么不构建 Intel Mac？** GitHub Actions 的 `macos-13` Intel runner 长期容量紧张，发版时排队等不到 runner，常常 24h 超时（v1.0.4 即如此）。Apple Silicon 2020 年开始 5 年覆盖率已经很高，且 macOS 自带 Rosetta 2 自动转译 ARM 包，Intel Mac 用户直接下 `aarch64.dmg` 也能跑（性能损失对 UI/工具类应用基本无感）。
+**为什么 Intel Mac 包跑在 ARM runner 上？** GitHub Actions 的 `macos-13` Intel runner 长期容量紧张，发版时排队等不到 runner，常常 24h 超时（v1.0.4 即如此）。Apple 工具链原生支持 ARM host 交叉编译到 x86_64（M1 Mac 上 build Intel app 的标准做法），而 ARM runner 资源充足、性能比 Intel Xeon 强，跑出来的 x64.dmg 跟原生 Intel 编的二进制行为完全一致。
 
-**为什么不用 universal？** universal binary 是 aarch64 + x86_64 两份合并，dmg 体积约 44MB（单架构 ~22MB 的 2 倍）。Apple Silicon 用户装 universal 浪费一半空间。
+**为什么不用 universal？** universal binary 是 aarch64 + x86_64 两份合并，dmg 体积约 44MB（单架构 ~22MB 的 2 倍）。Apple Silicon 用户装 universal 浪费一半空间，所以拆成两个独立包，每个 ~22MB。
 
 **关键 step：**
 
@@ -380,9 +386,10 @@ matrix:
 
 **典型耗时：**
 - Windows: 18-22 分钟（首次无缓存约 25 分钟）
-- macOS aarch64 (M1 runner): 18-22 分钟
+- macOS aarch64 (ARM runner 原生): 12-15 分钟
+- macOS x86_64 (ARM runner 交叉编译): 15-20 分钟（cross compile 比原生略慢但远快于 Intel runner 原生）
 
-**两个 job 并行跑**，总时长由最慢的决定，约 22-25 分钟。
+**三个 job 并行跑**，总时长由最慢的决定，约 22-25 分钟。
 
 ---
 
