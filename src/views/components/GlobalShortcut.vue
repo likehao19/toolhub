@@ -19,7 +19,7 @@
                   v-model="shortcutForm.shortcut"
                   placeholder="例如: CommandOrControl+Shift+C"
                 />
-                <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+                <div style="font-size: 12px; color: var(--el-text-color-secondary); margin-top: 4px;">
                   支持的修饰键: CommandOrControl, Alt, Shift, Meta, Super
                 </div>
               </el-form-item>
@@ -59,7 +59,7 @@
           <el-card shadow="hover">
             <el-space direction="vertical" style="width: 100%;">
               <div>
-                <h4 style="margin: 0 0 12px 0; color: #303133;">快速注册常用快捷键</h4>
+                <h4 style="margin: 0 0 12px 0; color: var(--el-text-color-primary);">快速注册常用快捷键</h4>
                 <el-space wrap>
                   <el-button @click="quickRegister('CommandOrControl+Shift+C')">
                     Ctrl/Cmd+Shift+C
@@ -77,7 +77,7 @@
               </div>
               <el-divider />
               <div>
-                <h4 style="margin: 0 0 12px 0; color: #303133;">批量操作</h4>
+                <h4 style="margin: 0 0 12px 0; color: var(--el-text-color-primary);">批量操作</h4>
                 <el-space>
                   <el-button type="danger" @click="unregisterAllShortcuts" :disabled="registeredShortcuts.length === 0">
                     <el-icon><Delete /></el-icon>

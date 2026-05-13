@@ -61,7 +61,7 @@
               </el-descriptions-item>
             </el-descriptions>
             <el-divider />
-            <div style="padding: 12px; background: #f5f7fa; border-radius: 4px; margin-top: 16px;">
+            <div style="padding: 12px; background: var(--el-fill-color-light); border-radius: 4px; margin-top: 16px;">
               <div style="font-weight: 600; margin-bottom: 8px;">配置示例（在 tauri.conf.json 中）：</div>
               <pre style="margin: 0; font-size: 12px; white-space: pre-wrap;">{
   "plugins": {

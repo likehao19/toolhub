@@ -151,12 +151,12 @@ const showInfo = () => {
 
 .el-timeline-item h4 {
   margin: 0 0 8px 0;
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .el-timeline-item p {
   margin: 0;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
 }
 

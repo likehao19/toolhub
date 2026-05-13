@@ -81,7 +81,7 @@
           <el-card shadow="hover">
             <el-space direction="vertical" style="width: 100%;">
               <div>
-                <h4 style="margin: 0 0 12px 0; color: #303133;">快速请求示例</h4>
+                <h4 style="margin: 0 0 12px 0; color: var(--el-text-color-primary);">快速请求示例</h4>
                 <el-space wrap>
                   <el-button @click="quickRequest('GET', 'https://api.github.com/users/octocat')">
                     GitHub API

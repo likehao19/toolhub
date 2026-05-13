@@ -395,7 +395,7 @@ onMounted(async () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -428,14 +428,14 @@ onMounted(async () => {
 
 .form-tip {
   font-size: 12px;
-  color: #999;
+  color: var(--text-tertiary);
   margin-top: 4px;
 }
 
 .log-container {
   max-height: 300px;
   overflow-y: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   font-size: 13px;
@@ -449,7 +449,7 @@ onMounted(async () => {
 }
 
 .log-time {
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 11px;
   margin-right: 8px;
 }
@@ -460,7 +460,7 @@ onMounted(async () => {
 
 .empty-log {
   text-align: center;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 20px;
 }
 
@@ -471,7 +471,7 @@ onMounted(async () => {
 .group-title {
   font-weight: 600;
   margin-bottom: 12px;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 </style>

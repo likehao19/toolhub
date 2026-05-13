@@ -3588,7 +3588,7 @@
 .app-content.toolbox-unified-shell .el-button--default {
   background: #f4f8fc !important;
   border: 1px solid #d6e0ec !important;
-  color: #1f2937 !important;
+  color: var(--el-text-color-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default:hover {
@@ -4724,7 +4724,7 @@
 }
 
 .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .label-text {
-  color: #1f2937 !important;
+  color: var(--el-text-color-primary) !important;
   font-size: 13px !important;
   font-weight: 600 !important;
 }

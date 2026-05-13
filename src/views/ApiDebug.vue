@@ -1174,7 +1174,7 @@ onMounted(() => {
 }
 .row-icon { font-size: 14px; flex-shrink: 0; color: #d2a55a; }
 .folder-icon { color: #d2a55a; }
-.collection-icon { color: #6b7280; }
+.collection-icon { color: var(--el-text-color-regular); }
 .tree-row.active .folder-icon,
 .tree-row.active .collection-icon { color: var(--accent-blue); }
 
@@ -1227,7 +1227,7 @@ onMounted(() => {
   width: 14px;
   height: 14px;
   font-size: 12px;
-  color: var(--text-secondary, #606266);
+  color: var(--text-secondary, var(--el-text-color-regular));
   transition: transform 0.18s ease, color 0.15s;
 }
 .row-chevron.expanded { transform: rotate(90deg); }
@@ -1276,8 +1276,8 @@ onMounted(() => {
   pointer-events: auto;
 }
 .history-status { font-size: 10px; font-weight: 600; flex-shrink: 0; }
-.history-status.ok { color: #67C23A; }
-.history-status.err { color: #F56C6C; }
+.history-status.ok { color: var(--el-color-success); }
+.history-status.err { color: var(--el-color-danger); }
 .empty-hint {
   text-align: center;
   color: var(--text-quaternary);
@@ -1562,8 +1562,8 @@ onMounted(() => {
   border-bottom: 1px solid rgba(60, 40, 20, 0.08); flex-shrink: 0;
 }
 .status-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
-.status-badge.ok { color: #67C23A; background: rgba(103,194,58,0.12); }
-.status-badge.err { color: #F56C6C; background: rgba(245,108,108,0.12); }
+.status-badge.ok { color: var(--el-color-success); background: rgba(103,194,58,0.12); }
+.status-badge.err { color: var(--el-color-danger); background: rgba(245,108,108,0.12); }
 .status-meta { font-size: 11px; color: var(--text-tertiary); }
 .response-tabs { flex: 1; display: flex; flex-direction: column; min-height: 0; }
 .response-tabs :deep(.el-tabs__content) { flex: 1; overflow: auto; }

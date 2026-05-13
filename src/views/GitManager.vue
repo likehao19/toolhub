@@ -760,9 +760,9 @@ onMounted(() => {
 }
 
 .remote-status { font-size: 11px; font-weight: 600; }
-.remote-status .ahead { color: #67c23a; margin-right: 4px; }
-.remote-status .behind { color: #e6a23c; }
-.remote-status .synced { color: #67c23a; }
+.remote-status .ahead { color: var(--el-color-success); margin-right: 4px; }
+.remote-status .behind { color: var(--el-color-warning); }
+.remote-status .synced { color: var(--el-color-success); }
 
 .branch-select { width: 160px; }
 
@@ -1013,11 +1013,11 @@ onMounted(() => {
   text-align: center;
   flex-shrink: 0;
 }
-.file-status.modified { color: #409EFF; }
-.file-status.added { color: #67C23A; }
-.file-status.deleted { color: #F56C6C; }
-.file-status.renamed { color: #409EFF; }
-.file-status.untracked { color: #909399; }
+.file-status.modified { color: var(--accent-blue); }
+.file-status.added { color: var(--el-color-success); }
+.file-status.deleted { color: var(--el-color-danger); }
+.file-status.renamed { color: var(--accent-blue); }
+.file-status.untracked { color: var(--el-text-color-secondary); }
 
 .file-name {
   overflow: hidden;
@@ -1074,8 +1074,8 @@ onMounted(() => {
   white-space: pre;
   padding: 0 8px;
 }
-.diff-line.add { background: rgba(103, 194, 58, 0.1); color: #67c23a; }
-.diff-line.del { background: rgba(245, 108, 108, 0.1); color: #f56c6c; }
+.diff-line.add { background: rgba(103, 194, 58, 0.1); color: var(--el-color-success); }
+.diff-line.del { background: rgba(245, 108, 108, 0.1); color: var(--el-color-danger); }
 .diff-line.hunk { color: var(--accent-blue); font-weight: 600; background: rgba(64, 158, 255, 0.05); }
 .diff-line.meta { color: var(--text-tertiary); }
 .diff-line.context { color: var(--text-secondary); }

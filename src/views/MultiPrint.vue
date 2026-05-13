@@ -239,7 +239,7 @@
 
         <el-form-item :label="t('multiPrint.footer')">
           <el-switch v-model="settings.showFooter" />
-          <span style="margin-left: 12px; font-size: 12px; color: #909399;">{{ t('multiPrint.footerHint') }}</span>
+          <span style="margin-left: 12px; font-size: 12px; color: var(--el-text-color-secondary);">{{ t('multiPrint.footerHint') }}</span>
         </el-form-item>
 
         <template v-if="settings.showFooter">
@@ -253,7 +253,7 @@
 
         <el-form-item :label="t('multiPrint.grayscale')">
           <el-switch v-model="settings.grayscale" />
-          <span style="margin-left: 12px; font-size: 12px; color: #909399;">{{ t('multiPrint.grayscaleHint') }}</span>
+          <span style="margin-left: 12px; font-size: 12px; color: var(--el-text-color-secondary);">{{ t('multiPrint.grayscaleHint') }}</span>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -567,7 +567,7 @@ function buildPrintHtml() {
     color: #4b5563;
     display: flex;
     justify-content: space-between;
-    border-top: 1px solid #d1d5db;
+    border-top: 1px solid var(--el-border-color);
     background: white;
   }
   .footer .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 8px; }
@@ -790,7 +790,7 @@ onBeforeUnmount(() => {
 }
 
 .meta-loading { color: var(--accent-blue); }
-.meta-error { color: #f56c6c; }
+.meta-error { color: var(--el-color-danger); }
 
 .file-actions {
   display: flex;
@@ -829,7 +829,7 @@ onBeforeUnmount(() => {
 
 .file-act-btn.danger:hover:not(:disabled) {
   background: rgba(245, 108, 108, 0.12);
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 
 /* ==================== 中间：内容区（对齐 CryptoTool） ==================== */
@@ -930,16 +930,16 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background: #fafafa;
+  background: var(--el-fill-color-lighter);
   min-height: 0;
 }
 
 .page-thumb-footer {
   padding: 4px 8px;
   font-size: 10px;
-  color: #6b7280;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
+  color: var(--el-text-color-regular);
+  background: var(--el-fill-color-lighter);
+  border-top: 1px solid var(--el-border-color-light);
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -952,7 +952,7 @@ onBeforeUnmount(() => {
   flex: 1;
 }
 
-.footer-page { flex-shrink: 0; color: #9ca3af; }
+.footer-page { flex-shrink: 0; color: var(--el-text-color-secondary); }
 
 /* ==================== 响应式 ==================== */
 @media (max-width: 1180px) {

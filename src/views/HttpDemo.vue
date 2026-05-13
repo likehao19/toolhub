@@ -147,7 +147,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -181,7 +181,7 @@ const goBack = () => {
 .response-body {
   max-height: 400px;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   font-size: 12px;

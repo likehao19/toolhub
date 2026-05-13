@@ -553,8 +553,8 @@ onMounted(async () => {
   border-radius: 14px;
 }
 .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
-.stat-value.green { color: #67c23a; }
-.stat-value.red { color: #f56c6c; }
+.stat-value.green { color: var(--el-color-success); }
+.stat-value.red { color: var(--el-color-danger); }
 .stat-label { font-size: 10px; color: var(--text-tertiary); margin-top: 2px; }
 
 .commit-groups { padding: 10px 0; }

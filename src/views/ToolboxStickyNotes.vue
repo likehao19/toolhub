@@ -505,7 +505,7 @@ const openStickyNotes = async () => {
 .breadcrumb .el-icon { font-size: 15px; color: #ff9800; }
 .breadcrumb-link { cursor: pointer; color: var(--accent-blue); transition: color 0.2s; }
 .breadcrumb-link:hover { color: var(--accent-blue); text-decoration: underline; }
-.breadcrumb-sep { color: #c0c4cc; font-weight: 400; }
+.breadcrumb-sep { color: var(--el-text-color-placeholder); font-weight: 400; }
 .header-actions { display: flex; gap: 8px; }
 .header-actions :deep(.el-button) {
   --el-button-border-radius: 10px;
@@ -520,8 +520,8 @@ const openStickyNotes = async () => {
 }
 .content-area::-webkit-scrollbar { width: 6px; }
 .content-area::-webkit-scrollbar-track { background: transparent; border-radius: 3px; }
-.content-area::-webkit-scrollbar-thumb { background: #dcdfe6; border-radius: 3px; }
-.content-area::-webkit-scrollbar-thumb:hover { background: #c0c4cc; }
+.content-area::-webkit-scrollbar-thumb { background: var(--el-border-color); border-radius: 3px; }
+.content-area::-webkit-scrollbar-thumb:hover { background: var(--el-text-color-placeholder); }
 
 .overview-grid {
   display: grid;
@@ -602,7 +602,7 @@ const openStickyNotes = async () => {
   flex: 1;
   min-width: 0;
 }
-.label-text { font-size: 13px; color: #303133; font-weight: 500; }
+.label-text { font-size: 13px; color: var(--el-text-color-primary); font-weight: 500; }
 .label-desc { font-size: 12px; color: #a8abb2; line-height: 1.4; }
 .setting-control {
   display: flex;
@@ -625,7 +625,7 @@ const openStickyNotes = async () => {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  border: 1px solid #dcdfe6;
+  border: 1px solid var(--el-border-color);
   border-radius: 8px;
   padding: 0 12px;
   cursor: pointer;
@@ -633,8 +633,8 @@ const openStickyNotes = async () => {
   transition: border-color 0.2s, box-shadow 0.2s;
   user-select: none;
 }
-.shortcut-input:hover { border-color: #c0c4cc; }
-.shortcut-input.recording { border-color: #409eff; box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15); }
+.shortcut-input:hover { border-color: var(--el-text-color-placeholder); }
+.shortcut-input.recording { border-color: var(--accent-blue); box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15); }
 .keycap {
   display: inline-flex;
   align-items: center;
@@ -645,24 +645,24 @@ const openStickyNotes = async () => {
   font-size: 11px;
   font-family: "PingFang SC";
   font-weight: 500;
-  color: #303133;
-  background: linear-gradient(180deg, #f5f7fa 0%, #e8eaed 100%);
-  border: 1px solid #c0c4cc;
+  color: var(--el-text-color-primary);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, #e8eaed 100%);
+  border: 1px solid var(--el-text-color-placeholder);
   border-bottom-width: 2px;
   border-radius: 4px;
   line-height: 1;
   white-space: nowrap;
 }
-.keycap.active { color: #409eff; border-color: #a0cfff; background: linear-gradient(180deg, #ecf5ff 0%, #d9ecff 100%); }
-.keycap-sep { font-size: 11px; color: #c0c4cc; margin: 0 1px; }
-.shortcut-clear { font-size: 16px; color: #c0c4cc; cursor: pointer; line-height: 1; transition: color 0.2s; }
-.shortcut-clear:hover { color: #f56c6c; }
-.shortcut-placeholder { font-size: 12px; color: #c0c4cc; }
-.recording-hint { font-size: 12px; color: #909399; animation: blink 1s ease-in-out infinite; }
-.recording-dot { width: 6px; height: 6px; border-radius: 50%; background: #409eff; animation: blink 0.8s ease-in-out infinite; }
+.keycap.active { color: var(--accent-blue); border-color: #a0cfff; background: linear-gradient(180deg, #ecf5ff 0%, #d9ecff 100%); }
+.keycap-sep { font-size: 11px; color: var(--el-text-color-placeholder); margin: 0 1px; }
+.shortcut-clear { font-size: 16px; color: var(--el-text-color-placeholder); cursor: pointer; line-height: 1; transition: color 0.2s; }
+.shortcut-clear:hover { color: var(--el-color-danger); }
+.shortcut-placeholder { font-size: 12px; color: var(--el-text-color-placeholder); }
+.recording-hint { font-size: 12px; color: var(--el-text-color-secondary); animation: blink 1s ease-in-out infinite; }
+.recording-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); animation: blink 0.8s ease-in-out infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 .folder-option { display: inline-flex; align-items: center; font-size: 13px; }
-.folder-indent { color: #c0c4cc; margin-right: 2px; }
+.folder-indent { color: var(--el-text-color-placeholder); margin-right: 2px; }
 
 .status-bar {
   min-height: 34px;

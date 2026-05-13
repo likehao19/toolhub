@@ -592,7 +592,7 @@ onBeforeUnmount(async () => {
   padding: 1px 6px; background: rgba(60, 40, 20, 0.05); border-radius: 999px;
 }
 .pk-badge {
-  font-size: 9px; color: #E6A23C; margin-left: 2px;
+  font-size: 9px; color: var(--el-color-warning); margin-left: 2px;
   padding: 1px 6px; background: rgba(230,162,60,0.12); border-radius: 999px; font-weight: 700;
 }
 .null-val { color: var(--text-quaternary); font-style: italic; }
@@ -626,7 +626,7 @@ onBeforeUnmount(async () => {
 }
 .sql-result-area { flex: 1; overflow: auto; }
 .sql-result-info { padding: 10px 12px; font-size: 12px; color: var(--text-secondary); border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
-.sql-error { padding: 12px; color: #F56C6C; font-size: 12px; font-family: monospace; white-space: pre-wrap; }
+.sql-error { padding: 12px; color: var(--el-color-danger); font-size: 12px; font-family: monospace; white-space: pre-wrap; }
 
 /* Status Bar */
 .status-bar {
@@ -638,9 +638,9 @@ onBeforeUnmount(async () => {
   border-radius: 0 0 18px 18px;
 }
 .status-dot {
-  width: 7px; height: 7px; border-radius: 50%; background: #909399; flex-shrink: 0;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--el-text-color-secondary); flex-shrink: 0;
 }
-.status-dot.connected { background: #67C23A; box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
+.status-dot.connected { background: var(--el-color-success); box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
 .status-sep { color: var(--border-color); }
 
 /* Scrollbar */

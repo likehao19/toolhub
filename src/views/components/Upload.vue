@@ -22,7 +22,7 @@
                   <el-icon><FolderOpened /></el-icon>
                   选择文件
                 </el-button>
-                <span v-if="uploadForm.filePath" style="margin-left: 12px; color: #666">
+                <span v-if="uploadForm.filePath" style="margin-left: 12px; color: var(--text-secondary)">
                   {{ uploadForm.filePath }}
                 </span>
               </el-form-item>

@@ -52,7 +52,7 @@
       <aside class="sidebar-right" :class="{ active: showTOC && showEditor && currentFileType === 'md' }">
         <div class="toc-header">
           <span><el-icon><Menu/></el-icon> {{ t('noteEditor.outline') }}</span>
-          <el-icon style="cursor:pointer; color:#999" @click="toggleTOC">
+          <el-icon style="cursor:pointer; color:var(--text-tertiary)" @click="toggleTOC">
             <Close/>
           </el-icon>
         </div>
@@ -1471,7 +1471,7 @@ const scrollToHeading = (index) => {
 
 .card-menu-btn:hover {
   background: #dcdcdc;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .file-card:hover .card-menu-btn {
@@ -1495,7 +1495,7 @@ const scrollToHeading = (index) => {
 .editor-toolbar {
   padding: 8px 20px;
   border-bottom: 1px solid var(--border-color);
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
   display: flex;
   gap: 15px;
   font-size: 0.9rem;
@@ -1527,7 +1527,7 @@ const scrollToHeading = (index) => {
 
 .editor-toolbar .el-icon:hover {
   background: #e1e4e8;
-  color: #333;
+  color: var(--text-primary);
 }
 
 /* ignore */
@@ -1561,7 +1561,7 @@ const scrollToHeading = (index) => {
 .split-editor-right {
   flex: 1;
   overflow-y: auto;
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
   padding: 40px 60px;
 }
 
@@ -1610,7 +1610,7 @@ const scrollToHeading = (index) => {
 }
 
 .excel-row-header {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border: 1px solid var(--border-color);
   padding: 8px;
   font-weight: 600;
@@ -1628,7 +1628,7 @@ const scrollToHeading = (index) => {
 }
 
 .excel-col-header {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border: 1px solid var(--border-color);
   padding: 8px;
   font-weight: 600;
@@ -1747,7 +1747,7 @@ const scrollToHeading = (index) => {
 
 .editor-header-bar {
   padding: 8px 12px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .editor-top-toolbar {

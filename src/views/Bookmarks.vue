@@ -682,17 +682,17 @@ const getCategoryIcon = (iconName) => {
 // 获取图标颜色
 const getIconColor = (iconName) => {
   const colorMap = {
-    'ChromeFilled': '#409EFF',
-    'Document': '#67C23A',
-    'FolderOpened': '#E6A23C',
-    'ShoppingCart': '#F56C6C',
-    'VideoCamera': '#F56C6C',
-    'Guide': '#909399',
+    'ChromeFilled': 'var(--accent-blue)',
+    'Document': 'var(--el-color-success)',
+    'FolderOpened': 'var(--el-color-warning)',
+    'ShoppingCart': 'var(--el-color-danger)',
+    'VideoCamera': 'var(--el-color-danger)',
+    'Guide': 'var(--el-text-color-secondary)',
     'Trophy': '#FFB800',
-    'Picture': '#E6A23C',
-    'Tools': '#909399'
+    'Picture': 'var(--el-color-warning)',
+    'Tools': 'var(--el-text-color-secondary)'
   }
-  return colorMap[iconName] || '#409EFF'
+  return colorMap[iconName] || 'var(--accent-blue)'
 }
 
 // 获取收藏数量

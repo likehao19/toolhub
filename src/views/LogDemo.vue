@@ -179,7 +179,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -213,7 +213,7 @@ const goBack = () => {
 .log-container {
   max-height: 400px;
   overflow-y: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   font-size: 13px;
@@ -230,23 +230,23 @@ const goBack = () => {
 }
 
 .log-item.debug {
-  border-left: 3px solid #909399;
+  border-left: 3px solid var(--el-text-color-secondary);
 }
 
 .log-item.info {
-  border-left: 3px solid #409eff;
+  border-left: 3px solid var(--accent-blue);
 }
 
 .log-item.warn {
-  border-left: 3px solid #e6a23c;
+  border-left: 3px solid var(--el-color-warning);
 }
 
 .log-item.error {
-  border-left: 3px solid #f56c6c;
+  border-left: 3px solid var(--el-color-danger);
 }
 
 .log-time {
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 11px;
   min-width: 80px;
 }
@@ -258,19 +258,19 @@ const goBack = () => {
 }
 
 .log-item.debug .log-level {
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .log-item.info .log-level {
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .log-item.warn .log-level {
-  color: #e6a23c;
+  color: var(--el-color-warning);
 }
 
 .log-item.error .log-level {
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 
 .log-content {
@@ -280,7 +280,7 @@ const goBack = () => {
 
 .empty-log {
   text-align: center;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 20px;
 }
 </style>

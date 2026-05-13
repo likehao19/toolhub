@@ -22,7 +22,7 @@
             @change="handleAutoStartToggle"
             :loading="autostartLoading"
           />
-          <span style="margin-left: 10px; color: #909399; font-size: 12px;">
+          <span style="margin-left: 10px; color: var(--el-text-color-secondary); font-size: 12px;">
             {{ t('settings.autoStartHint') }}
           </span>
         </el-form-item>
@@ -132,7 +132,7 @@
             v-model="aiAssistantSettings.enableFloatingBall"
             @change="handleFloatingBallSettingChange"
           />
-          <div style="margin-left: 10px; color: #909399; font-size: 12px;">
+          <div style="margin-left: 10px; color: var(--el-text-color-secondary); font-size: 12px;">
             <div>{{ t('settings.enableBallHint') }}</div>
             <div style="margin-top: 4px;">{{ t('settings.enableBallShortcut') }}</div>
           </div>

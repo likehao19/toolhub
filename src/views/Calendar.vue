@@ -543,7 +543,7 @@ const eventForm = ref({
   recurrenceCount: 10,
   recurrenceEndDate: '',
   category: '',
-  color: '#409eff'
+  color: 'var(--accent-blue)'
 })
 
 const showCustomReminderDialog = ref(false)
@@ -667,7 +667,7 @@ const handleExport = async () => {
       end_time: e.end_time,
       location: e.location || '',
       category: e.category || '',
-      color: e.color || '#409eff',
+      color: e.color || 'var(--accent-blue)',
       repeat_rule: e.repeat_rule || null,
       reminder_rules: e.reminder_rules || null
     }))
@@ -726,7 +726,7 @@ const handleListViewDateChange = () => { /* computed 自动响应,留空 */ }
 
 // 获取事件颜色
 const getEventColor = (event) => {
-  return event.color || '#409eff'
+  return event.color || 'var(--accent-blue)'
 }
 
 // 处理日期双击事件
@@ -757,7 +757,7 @@ const showCreateDialog = () => {
     recurrenceCount: 10,
     recurrenceEndDate: '',
     category: '',
-    color: '#409eff'
+    color: 'var(--accent-blue)'
   }
   dialogVisible.value = true
 }
@@ -833,7 +833,7 @@ const editEvent = async (event) => {
     recurrenceCount: recurrence?.count || 10,
     recurrenceEndDate: recurrence?.endDate || '',
     category: event.category || '',
-    color: event.color || '#409eff'
+    color: event.color || 'var(--accent-blue)'
   }
   viewDialogVisible.value = false
   dialogVisible.value = true
@@ -1129,7 +1129,7 @@ const executeImport = async () => {
         [
           event.title, event.description || null, event.start_time, event.end_time || null,
           event.location || null, event.reminder_minutes || null, event.repeat_rule || null,
-          event.category || null, event.color || '#409eff', now, now
+          event.category || null, event.color || 'var(--accent-blue)', now, now
         ]
       )
       successCount++
@@ -1268,7 +1268,7 @@ onMounted(async () => {
    四个按钮里只有 Plus 是 primary,其它(Bell/Upload/Download)本来就是深色图标,
    统一指定深色不会影响它们。 */
 .toolbar-btn :deep(.el-icon) {
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .content-container {

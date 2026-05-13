@@ -102,7 +102,7 @@
                 :stroke-width="4"
                 :show-text="true"
                 :format="(p) => `${p}%`"
-                color="#409eff"
+                color="var(--accent-blue)"
               />
             </div>
 

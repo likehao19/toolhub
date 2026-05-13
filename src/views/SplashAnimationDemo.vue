@@ -213,7 +213,7 @@ onMounted(async () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -255,7 +255,7 @@ onMounted(async () => {
 }
 
 .animation-card.selected {
-  border: 2px solid #409eff;
+  border: 2px solid var(--accent-blue);
   background: #ecf5ff;
 }
 
@@ -273,12 +273,12 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 8px;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .preview-desc {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .preview-section {
@@ -294,7 +294,7 @@ onMounted(async () => {
 
 .preview-tip {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   margin-top: 8px;
 }
 </style>

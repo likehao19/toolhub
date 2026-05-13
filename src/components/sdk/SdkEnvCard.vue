@@ -105,12 +105,12 @@ defineProps({
 
 .status-chip.ok .chip-dot {
   width: 7px; height: 7px; border-radius: 50%;
-  background: #67c23a;
+  background: var(--el-color-success);
 }
 
 .status-chip.warn .chip-dot {
   width: 7px; height: 7px; border-radius: 50%;
-  background: #e6a23c;
+  background: var(--el-color-warning);
 }
 
 .status-chip.version strong {

@@ -1241,9 +1241,9 @@ onBeforeUnmount(() => {
 .icon-active { background: linear-gradient(135deg, #fed7aa, #fdba74); color: var(--accent-blue); }
 .icon-complete { background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669; }
 .icon-error { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
-.icon-paused { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #6b7280; }
+.icon-paused { background: linear-gradient(135deg, var(--el-fill-color-light), var(--el-border-color-light)); color: var(--el-text-color-regular); }
 .icon-waiting { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
-.icon-removed { background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #9ca3af; }
+.icon-removed { background: linear-gradient(135deg, var(--el-fill-color-light), var(--el-border-color-light)); color: var(--el-text-color-secondary); }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .icon-spin { animation: spin 1.2s linear infinite; }

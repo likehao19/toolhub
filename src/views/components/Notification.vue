@@ -129,7 +129,7 @@
                   :step="10"
                   style="width: 150px;"
                 />
-                <span style="margin-left: 10px; color: #909399; font-size: 12px;">像素</span>
+                <span style="margin-left: 10px; color: var(--el-text-color-secondary); font-size: 12px;">像素</span>
               </el-form-item>
               <el-form-item label="窗口高度">
                 <el-input-number 
@@ -139,7 +139,7 @@
                   :step="10"
                   style="width: 150px;"
                 />
-                <span style="margin-left: 10px; color: #909399; font-size: 12px;">像素</span>
+                <span style="margin-left: 10px; color: var(--el-text-color-secondary); font-size: 12px;">像素</span>
               </el-form-item>
               <el-form-item label="任务栏边距" v-if="customForm.positionType === 'screen'">
                 <el-input-number 
@@ -149,7 +149,7 @@
                   :step="5"
                   style="width: 150px;"
                 />
-                <span style="margin-left: 10px; color: #909399; font-size: 12px;">像素（用于避免被任务栏遮挡）</span>
+                <span style="margin-left: 10px; color: var(--el-text-color-secondary); font-size: 12px;">像素（用于避免被任务栏遮挡）</span>
               </el-form-item>
               
               <el-form-item>

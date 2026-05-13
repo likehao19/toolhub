@@ -239,14 +239,14 @@ const handleCommand = (cmd) => {
 
 .folder-arrow {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s;
   flex-shrink: 0;
 }
 
 .folder-arrow.expanded {
   transform: rotate(90deg);
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .folder-icon {
@@ -271,22 +271,22 @@ const handleCommand = (cmd) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #303133;
+  color: var(--el-text-color-primary);
   transition: color 0.2s;
 }
 
 .folder-item:hover .folder-name {
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .folder-item.active .folder-name {
-  color: #409eff;
+  color: var(--accent-blue);
   font-weight: 600;
 }
 
 .folder-count {
   font-size: 11px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   background: #f4f4f5;
   padding: 2px 6px;
   border-radius: 10px;
@@ -298,11 +298,11 @@ const handleCommand = (cmd) => {
 
 .folder-item:hover .folder-count {
   background: #e1f0ff;
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .folder-item.active .folder-count {
-  background: #409eff;
+  background: var(--accent-blue);
   color: #ffffff;
 }
 
@@ -319,7 +319,7 @@ const handleCommand = (cmd) => {
 .sub-folders {
   margin-left: 16px;
   padding-left: 12px;
-  border-left: 2px solid #e4e7ed;
+  border-left: 2px solid var(--el-border-color-light);
   margin-top: 4px;
   position: relative;
 }
@@ -331,12 +331,12 @@ const handleCommand = (cmd) => {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(to bottom, transparent, #e4e7ed 10%, #e4e7ed 90%, transparent);
+  background: linear-gradient(to bottom, transparent, var(--el-border-color-light) 10%, var(--el-border-color-light) 90%, transparent);
   transition: background 0.3s;
 }
 
 .sub-folders:hover::before {
-  background: linear-gradient(to bottom, transparent, #409eff 10%, #409eff 90%, transparent);
+  background: linear-gradient(to bottom, transparent, var(--accent-blue) 10%, var(--accent-blue) 90%, transparent);
   opacity: 0.3;
 }
 </style>

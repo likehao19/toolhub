@@ -98,7 +98,7 @@ defineProps({
 
 .doc-page-header {
   padding: 40px 40px 32px;
-  border-bottom: 1px solid #e4e7ed;
+  border-bottom: 1px solid var(--el-border-color-light);
   background: var(--surface-page);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
@@ -110,7 +110,7 @@ defineProps({
   font-size: 32px;
   font-weight: 600;
   margin: 0 0 16px 0;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .title-icon {
@@ -119,7 +119,7 @@ defineProps({
 
 .page-description {
   font-size: 16px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   margin: 0;
   line-height: 1.8;
 }
@@ -138,10 +138,10 @@ defineProps({
 .section-title {
   font-size: 24px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin: 0 0 28px 0;
   padding-bottom: 16px;
-  border-bottom: 2px solid #e4e7ed;
+  border-bottom: 2px solid var(--el-border-color-light);
   position: relative;
 }
 
@@ -152,7 +152,7 @@ defineProps({
   left: 0;
   width: 60px;
   height: 2px;
-  background: #409eff;
+  background: var(--accent-blue);
 }
 
 .section-content {
@@ -166,26 +166,26 @@ defineProps({
 }
 
 :deep(.el-table th) {
-  background: #f5f7fa;
-  color: #303133;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
   font-weight: 600;
 }
 
 :deep(.el-table td) {
-  border-bottom: 1px solid #ebeef5;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 :deep(.el-table--border) {
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 /* ignore */
 .method-item {
   margin-bottom: 32px;
   padding: 24px;
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
   border-radius: 8px;
-  border-left: 4px solid #409eff;
+  border-left: 4px solid var(--accent-blue);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
   transition: all 0.3s ease;
 }
@@ -198,10 +198,10 @@ defineProps({
 .method-name {
   font-size: 18px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin: 0 0 12px 0;
   font-family: "PingFang SC";
-  background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #66b1ff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -209,7 +209,7 @@ defineProps({
 
 .method-desc {
   font-size: 15px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   margin: 0 0 20px 0;
   line-height: 1.8;
 }
@@ -217,7 +217,7 @@ defineProps({
 .method-params {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #e4e7ed;
+  border-top: 1px solid var(--el-border-color-light);
 }
 
 .param-item {
@@ -235,7 +235,7 @@ defineProps({
 
 .param-name {
   font-weight: 600;
-  color: #409eff;
+  color: var(--accent-blue);
   font-family: "PingFang SC";
   min-width: 140px;
   padding: 4px 8px;
@@ -244,16 +244,16 @@ defineProps({
 }
 
 .param-type {
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-family: "PingFang SC";
   min-width: 120px;
   padding: 4px 8px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 4px;
 }
 
 .param-desc {
-  color: #606266;
+  color: var(--el-text-color-regular);
   flex: 1;
   line-height: 1.6;
 }

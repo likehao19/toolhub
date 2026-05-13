@@ -59,7 +59,7 @@ defineExpose({
   width: 100%;
   height: 100%;
   overflow: auto;
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
   padding: 20px;
 }
 
@@ -72,7 +72,7 @@ defineExpose({
   font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .word-editor-content:focus {

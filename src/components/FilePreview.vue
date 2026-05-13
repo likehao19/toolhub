@@ -15,7 +15,7 @@
 
       <!-- 错误状态 -->
       <div v-else-if="error" class="error-state">
-        <el-icon :size="50" color="#f56c6c"><CircleClose /></el-icon>
+        <el-icon :size="50" color="var(--el-color-danger)"><CircleClose /></el-icon>
         <p>{{ error }}</p>
       </div>
 
@@ -68,7 +68,7 @@
 
       <!-- 不支持的文件类型 -->
       <div v-else class="unsupported-state">
-        <el-icon :size="50" color="#909399"><Document /></el-icon>
+        <el-icon :size="50" color="var(--el-text-color-secondary)"><Document /></el-icon>
         <p>不支持预览此文件类型</p>
         <el-tag>{{ fileExtension?.toUpperCase() || '未知' }}</el-tag>
       </div>
@@ -311,12 +311,12 @@ const resetState = () => {
 .error-state p,
 .unsupported-state p {
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
   margin: 0;
 }
 
 .error-state p {
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 
 /* ignore */
@@ -354,7 +354,7 @@ const resetState = () => {
   align-items: center;
   padding: 15px;
   border-bottom: 1px solid #e0e0e0;
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
 }
 
 .code-view {

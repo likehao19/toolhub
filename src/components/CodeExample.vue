@@ -70,7 +70,7 @@ const copyCode = async () => {
 <style scoped>
 .code-example {
   margin: 28px 0;
-  border: 1px solid #e4e7ed;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 12px;
   overflow: hidden;
   background: var(--bg-primary);
@@ -87,14 +87,14 @@ const copyCode = async () => {
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
-  border-bottom: 1px solid #e4e7ed;
+  background: linear-gradient(135deg, var(--el-fill-color-light) 0%, #ffffff 100%);
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 .example-title {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .example-demo {
@@ -103,8 +103,8 @@ const copyCode = async () => {
 }
 
 .example-code {
-  border-top: 1px solid #e4e7ed;
-  background: #fafafa;
+  border-top: 1px solid var(--el-border-color-light);
+  background: var(--el-fill-color-lighter);
 }
 
 .code-header {
@@ -112,13 +112,13 @@ const copyCode = async () => {
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px;
-  background: #f5f7fa;
-  border-bottom: 1px solid #e4e7ed;
+  background: var(--el-fill-color-light);
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 .code-lang {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-weight: 500;
   text-transform: uppercase;
 }
@@ -126,13 +126,13 @@ const copyCode = async () => {
 .code-content {
   margin: 0;
   padding: 24px;
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
   overflow-x: auto;
   font-family: "PingFang SC";
   font-size: 13px;
   line-height: 1.8;
-  color: #303133;
-  border-top: 1px solid #e4e7ed;
+  color: var(--el-text-color-primary);
+  border-top: 1px solid var(--el-border-color-light);
 }
 
 .code-content code {

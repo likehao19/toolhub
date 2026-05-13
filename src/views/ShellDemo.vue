@@ -214,7 +214,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -248,7 +248,7 @@ const goBack = () => {
 .output-pre {
   margin: 0;
   padding: 8px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 4px;
   font-family: "PingFang SC";
   font-size: 12px;
@@ -258,7 +258,7 @@ const goBack = () => {
 
 .output-pre.error {
   background: #fef0f0;
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 
 .command-group {
@@ -268,7 +268,7 @@ const goBack = () => {
 .group-title {
   font-weight: 600;
   margin-bottom: 8px;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 </style>

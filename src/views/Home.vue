@@ -143,11 +143,11 @@
               <div class="stat-label">{{ t('home.totalPasswords') }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value" style="color: #67c23a;">{{ passwordStats.strong }}</div>
+              <div class="stat-value" style="color: var(--el-color-success);">{{ passwordStats.strong }}</div>
               <div class="stat-label">{{ t('home.strongPasswords') }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-value" style="color: #f56c6c;">{{ passwordStats.weak }}</div>
+              <div class="stat-value" style="color: var(--el-color-danger);">{{ passwordStats.weak }}</div>
               <div class="stat-label">{{ t('home.weakPasswords') }}</div>
             </div>
           </div>
@@ -413,7 +413,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   padding: 20px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   overflow-y: auto;
 }
 
@@ -428,7 +428,7 @@ onUnmounted(() => {
 .dashboard-title {
   font-size: 28px;
   font-weight: 700;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin: 0;
 }
 
@@ -467,7 +467,7 @@ onUnmounted(() => {
 
 .card-icon {
   font-size: 20px;
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .card-title {
@@ -475,7 +475,7 @@ onUnmounted(() => {
 }
 
 .card-badge {
-  background: #409eff;
+  background: var(--accent-blue);
   color: white;
   padding: 2px 8px;
   border-radius: 10px;
@@ -499,13 +499,13 @@ onUnmounted(() => {
 .date-main {
   font-size: 24px;
   font-weight: 700;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin-bottom: 8px;
 }
 
 .date-sub {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 /* ignore */
@@ -525,7 +525,7 @@ onUnmounted(() => {
 }
 
 .todo-item:hover {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .todo-text {
@@ -535,7 +535,7 @@ onUnmounted(() => {
 
 .todo-text.completed {
   text-decoration: line-through;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 /* ignore */
@@ -550,7 +550,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 10px;
-  border-left: 3px solid #409eff;
+  border-left: 3px solid var(--accent-blue);
   background: #f0f9ff;
   border-radius: 4px;
 }
@@ -558,14 +558,14 @@ onUnmounted(() => {
 .event-time {
   font-size: 12px;
   font-weight: 600;
-  color: #409eff;
+  color: var(--accent-blue);
   white-space: nowrap;
 }
 
 .event-title {
   flex: 1;
   font-size: 14px;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 /* ignore */
@@ -592,12 +592,12 @@ onUnmounted(() => {
 .note-title {
   flex: 1;
   font-size: 14px;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .note-time {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 /* ignore */
@@ -630,12 +630,12 @@ onUnmounted(() => {
 
 .bookmark-icon-fallback {
   font-size: 32px;
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .bookmark-name {
   font-size: 12px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -657,13 +657,13 @@ onUnmounted(() => {
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #409eff;
+  color: var(--accent-blue);
   margin-bottom: 8px;
 }
 
 .stat-label {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 /* ignore */

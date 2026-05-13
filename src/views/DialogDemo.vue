@@ -126,7 +126,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -160,7 +160,7 @@ const goBack = () => {
 .result-box {
   margin-top: 16px;
   padding: 12px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 4px;
 }
 

@@ -30,7 +30,7 @@
                 <el-icon><Document /></el-icon>
                 保存文件
               </el-button>
-              <div v-if="selectedPath" style="margin-top: 16px; padding: 12px; background: #f5f7fa; border-radius: 4px;">
+              <div v-if="selectedPath" style="margin-top: 16px; padding: 12px; background: var(--el-fill-color-light); border-radius: 4px;">
                 <strong>选择结果：</strong>
                 <pre style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ selectedPath }}</pre>
               </div>

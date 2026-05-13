@@ -482,8 +482,8 @@ onBeforeUnmount(() => {
 .breadcrumb-link:hover { text-decoration: underline; }
 .breadcrumb-sep { color: var(--text-tertiary); }
 .header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.mock-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #909399; transition: background 0.15s, box-shadow 0.15s; }
-.mock-status-dot.running { background: #67C23A; box-shadow: 0 0 0 3px rgba(103,194,58,0.18); }
+.mock-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--el-text-color-secondary); transition: background 0.15s, box-shadow 0.15s; }
+.mock-status-dot.running { background: var(--el-color-success); box-shadow: 0 0 0 3px rgba(103,194,58,0.18); }
 
 /* 端口输入框:原本 width:100px + 默认左右双侧按钮,5 位端口号 65535 会和按钮挤在一起。
    改成 controls-position=right(两个箭头堆在右侧 24px 列) + 宽度 130px,数字区有 ~96px 空间不再重叠。
@@ -616,8 +616,8 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   flex-shrink: 0;
 }
-.status-pill.ok { color: #67C23A; background: rgba(103,194,58,0.12); }
-.status-pill.err { color: #F56C6C; background: rgba(245,108,108,0.12); }
+.status-pill.ok { color: var(--el-color-success); background: rgba(103,194,58,0.12); }
+.status-pill.err { color: var(--el-color-danger); background: rgba(245,108,108,0.12); }
 
 /* ---- 滚动主体 ---- */
 .form-scroll {
@@ -870,7 +870,7 @@ onBeforeUnmount(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #67c23a;
+  background: var(--el-color-success);
 }
 .form-actions :deep(.el-button) {
   height: 30px;
@@ -999,7 +999,7 @@ onBeforeUnmount(() => {
 .log-exp-tag {
   font-size: 10.5px;
   font-weight: 600;
-  color: #e6a23c;
+  color: var(--el-color-warning);
   background: rgba(230, 162, 60, 0.12);
   padding: 1px 6px;
   border-radius: 4px;
@@ -1028,8 +1028,8 @@ onBeforeUnmount(() => {
   padding: 1px 7px;
   border-radius: 4px;
 }
-.status-badge.ok { color: #67C23A; background: rgba(103,194,58,0.1); }
-.status-badge.err { color: #F56C6C; background: rgba(245,108,108,0.1); }
+.status-badge.ok { color: var(--el-color-success); background: rgba(103,194,58,0.1); }
+.status-badge.err { color: var(--el-color-danger); background: rgba(245,108,108,0.1); }
 
 /* ---- 通用 ---- */
 .method-tag { font-size: 10px; font-weight: 700; flex-shrink: 0; width: 40px; }

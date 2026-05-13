@@ -33,7 +33,7 @@ const initH = ref(0)
 
 // 标注状态
 const currentTool = ref(null)
-const drawColor = ref('#F56C6C')
+const drawColor = ref('var(--el-color-danger)')
 const drawWidth = ref(2)
 const annotations = ref([])
 const redoStack = ref([])
@@ -577,7 +577,7 @@ function redo() {
   position: absolute;
   z-index: 25;
   background: rgba(255,255,255,0.9);
-  border: 2px solid #409EFF;
+  border: 2px solid var(--accent-blue);
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 16px;

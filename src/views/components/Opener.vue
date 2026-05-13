@@ -36,7 +36,7 @@
               <el-icon><FolderOpened /></el-icon>
               选择并打开文件/目录
             </el-button>
-            <div v-if="openedPath" style="margin-top: 12px; padding: 12px; background: #f5f7fa; border-radius: 4px;">
+            <div v-if="openedPath" style="margin-top: 12px; padding: 12px; background: var(--el-fill-color-light); border-radius: 4px;">
               <strong>已打开：</strong>
               <pre style="margin: 8px 0 0 0;">{{ openedPath }}</pre>
             </div>

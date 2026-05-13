@@ -1064,7 +1064,7 @@ watch(showRenameDialog, (v) => {
   border-color: rgba(47, 111, 228, 0.18);
 }
 .conn-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--text-quaternary); grid-row: span 2; align-self: start; margin-top: 4px; }
-.conn-dot.connected { background: var(--color-green, #67c23a); box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
+.conn-dot.connected { background: var(--color-green, var(--el-color-success)); box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
 .conn-name { font-weight: 600; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conn-host { font-size: 10px; color: var(--text-quaternary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conn-empty {
@@ -1222,10 +1222,10 @@ watch(showRenameDialog, (v) => {
   text-transform: uppercase;
   flex-shrink: 0;
 }
-.type-string { background: rgba(103, 194, 58, 0.12); color: var(--color-green, #67c23a); }
-.type-hash { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue, #409eff); }
-.type-list { background: rgba(230, 162, 60, 0.12); color: var(--color-orange, #e6a23c); }
-.type-set { background: rgba(245, 108, 108, 0.12); color: var(--color-red, #f56c6c); }
+.type-string { background: rgba(103, 194, 58, 0.12); color: var(--color-green, var(--el-color-success)); }
+.type-hash { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue, var(--accent-blue)); }
+.type-list { background: rgba(230, 162, 60, 0.12); color: var(--color-orange, var(--el-color-warning)); }
+.type-set { background: rgba(245, 108, 108, 0.12); color: var(--color-red, var(--el-color-danger)); }
 .type-zset { background: rgba(191, 90, 242, 0.12); color: var(--color-purple, #bf5af2); }
 .type-stream { background: rgba(100, 210, 255, 0.12); color: var(--color-teal, #64d2ff); }
 .detail-meta {
@@ -1334,7 +1334,7 @@ watch(showRenameDialog, (v) => {
   border-radius: 0 0 18px 18px;
 }
 .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--text-quaternary); margin-right: 6px; }
-.status-dot.connected { background: var(--color-green, #67c23a); box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
+.status-dot.connected { background: var(--color-green, var(--el-color-success)); box-shadow: 0 0 0 3px rgba(103, 194, 58, 0.14); }
 .status-right { margin-left: auto; }
 
 /* Context menu */
@@ -1351,7 +1351,7 @@ watch(showRenameDialog, (v) => {
 }
 .ctx-item { padding: 7px 16px; font-size: 13px; color: var(--text-primary); cursor: pointer; }
 .ctx-item:hover { background: rgba(60, 40, 20, 0.05); }
-.ctx-danger { color: var(--color-red, #f56c6c); }
+.ctx-danger { color: var(--color-red, var(--el-color-danger)); }
 
 .conn-list::-webkit-scrollbar,
 .key-tree-wrapper::-webkit-scrollbar,

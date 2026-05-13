@@ -427,7 +427,7 @@ const handleDrop = async (e, targetFolder) => {
 }
 
 .folder-actions i.del:hover {
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 
 .action-dropdown {
@@ -438,7 +438,7 @@ const handleDrop = async (e, targetFolder) => {
 
 .rename-input,
 .new-file-input {
-  border: 1px solid #409eff;
+  border: 1px solid var(--accent-blue);
   border-radius: 3px;
   padding: 2px 6px;
   outline: none;
@@ -453,7 +453,7 @@ const handleDrop = async (e, targetFolder) => {
 
 .new-folder-input {
   width: 100%;
-  border: 1px solid #409eff;
+  border: 1px solid var(--accent-blue);
   border-radius: 3px;
   padding: 4px 8px;
   outline: none;

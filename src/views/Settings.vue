@@ -80,8 +80,8 @@
           :status="migrationProgress === 100 ? 'success' : undefined"
           style="margin-bottom: 20px;"
         />
-        <p style="color: #606266; margin-top: 12px;">{{ migrationStatus }}</p>
-        <p v-if="migrateMode === 'move'" style="color: #909399; font-size: 12px; margin-top: 8px;">
+        <p style="color: var(--el-text-color-regular); margin-top: 12px;">{{ migrationStatus }}</p>
+        <p v-if="migrateMode === 'move'" style="color: var(--el-text-color-secondary); font-size: 12px; margin-top: 8px;">
           {{ migrationProgress < 100 ? t('settings.migrationMovingHint') : t('settings.migrationMoveDone') }}
         </p>
       </div>
@@ -688,20 +688,20 @@ onMounted(async () => {
   border-radius: 6px;
   border: none !important;
   background: #f7f8fa !important;
-  box-shadow: 0 0 0 1px var(--divider, #dcdfe6) inset !important;
+  box-shadow: 0 0 0 1px var(--divider, var(--el-border-color)) inset !important;
   transition: box-shadow var(--transition-fast);
 }
 
 .settings-page-wrapper .settings-section :deep(.el-input__wrapper:hover),
 .settings-page-wrapper .settings-section :deep(.el-select__wrapper:hover),
 .settings-page-wrapper .settings-section :deep(.el-textarea__inner:hover) {
-  box-shadow: 0 0 0 1px var(--text-quaternary, #c0c4cc) inset !important;
+  box-shadow: 0 0 0 1px var(--text-quaternary, var(--el-text-color-placeholder)) inset !important;
 }
 
 .settings-page-wrapper .settings-section :deep(.el-input__wrapper.is-focus),
 .settings-page-wrapper .settings-section :deep(.el-select__wrapper.is-focused),
 .settings-page-wrapper .settings-section :deep(.el-textarea__inner:focus) {
-  box-shadow: 0 0 0 1px var(--accent-blue, #409eff) inset !important;
+  box-shadow: 0 0 0 1px var(--accent-blue, var(--accent-blue)) inset !important;
 }
 
 /* 统一紧凑高度：filterable 的 el-select 在默认尺寸下 wrapper 会被 input + tag + placeholder 撑高，
@@ -850,7 +850,7 @@ onMounted(async () => {
 
 .settings-section :deep(.control-hint) {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   margin-top: 4px;
 }
 

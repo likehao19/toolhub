@@ -9,7 +9,7 @@
   >
     <div class="close-dialog-content">
       <div class="icon-wrapper">
-        <el-icon :size="48" color="#409eff">
+        <el-icon :size="48" color="var(--accent-blue)">
           <QuestionFilled />
         </el-icon>
       </div>
@@ -75,7 +75,7 @@ defineExpose({
 
 .message {
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 20px;
   line-height: 1.6;
 }

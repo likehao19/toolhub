@@ -392,19 +392,19 @@
         <el-form-item :label="t('passwords.iconLabel')">
           <el-select v-model="categoryForm.icon" :placeholder="t('passwords.selectIcon')">
             <el-option value="Monitor" :label="t('passwords.iconWebsite')">
-              <el-icon class="icon-opt" style="color: #409EFF;"><Monitor /></el-icon> {{ t('passwords.iconWebsite') }}
+              <el-icon class="icon-opt" style="color: var(--accent-blue);"><Monitor /></el-icon> {{ t('passwords.iconWebsite') }}
             </el-option>
             <el-option value="Download" :label="t('passwords.iconSoftware')">
-              <el-icon class="icon-opt" style="color: #67C23A;"><Download /></el-icon> {{ t('passwords.iconSoftware') }}
+              <el-icon class="icon-opt" style="color: var(--el-color-success);"><Download /></el-icon> {{ t('passwords.iconSoftware') }}
             </el-option>
             <el-option value="CreditCard" :label="t('passwords.iconBankCard')">
-              <el-icon class="icon-opt" style="color: #F56C6C;"><CreditCard /></el-icon> {{ t('passwords.iconBankCard') }}
+              <el-icon class="icon-opt" style="color: var(--el-color-danger);"><CreditCard /></el-icon> {{ t('passwords.iconBankCard') }}
             </el-option>
             <el-option value="Key" :label="t('passwords.iconKey')">
-              <el-icon class="icon-opt" style="color: #E6A23C;"><Key /></el-icon> {{ t('passwords.iconKey') }}
+              <el-icon class="icon-opt" style="color: var(--el-color-warning);"><Key /></el-icon> {{ t('passwords.iconKey') }}
             </el-option>
             <el-option value="Folder" :label="t('passwords.iconFolder')">
-              <el-icon class="icon-opt" style="color: #909399;"><Folder /></el-icon> {{ t('passwords.iconFolder') }}
+              <el-icon class="icon-opt" style="color: var(--el-text-color-secondary);"><Folder /></el-icon> {{ t('passwords.iconFolder') }}
             </el-option>
             <el-option value="ShoppingCart" :label="t('passwords.iconShopping')">
               <el-icon class="icon-opt" style="color: #FF6B9D;"><ShoppingCart /></el-icon> {{ t('passwords.iconShopping') }}
@@ -1451,11 +1451,11 @@ const getCategoryIcon = (iconName) => {
 // 获取图标颜色
 const getIconColor = (iconName) => {
   const colorMap = {
-    'Monitor': '#409EFF',
-    'Download': '#67C23A',
-    'CreditCard': '#F56C6C',
-    'Key': '#E6A23C',
-    'Folder': '#909399',
+    'Monitor': 'var(--accent-blue)',
+    'Download': 'var(--el-color-success)',
+    'CreditCard': 'var(--el-color-danger)',
+    'Key': 'var(--el-color-warning)',
+    'Folder': 'var(--el-text-color-secondary)',
     'ShoppingCart': '#FF6B9D',
     'House': '#8E44AD',
     'Phone': '#3498DB',
@@ -1480,7 +1480,7 @@ const getIconColor = (iconName) => {
     'Tickets': '#009688',
     'Files': '#607D8B'
   }
-  return colorMap[iconName] || '#909399'
+  return colorMap[iconName] || 'var(--el-text-color-secondary)'
 }
 
 // 获取分类中的密码数量

@@ -45,7 +45,7 @@
           <el-card shadow="hover">
             <el-space direction="vertical" style="width: 100%;">
               <div>
-                <h4 style="margin: 0 0 12px 0; color: #303133;">基础控制</h4>
+                <h4 style="margin: 0 0 12px 0; color: var(--el-text-color-primary);">基础控制</h4>
                 <el-space wrap>
                   <el-button @click="handleMinimize">
                     <el-icon><Minus /></el-icon>
@@ -65,7 +65,7 @@
               <el-divider />
               
               <div>
-                <h4 style="margin: 0 0 12px 0; color: #303133;">窗口设置</h4>
+                <h4 style="margin: 0 0 12px 0; color: var(--el-text-color-primary);">窗口设置</h4>
                 <el-space direction="vertical" style="width: 100%;">
                   <el-input
                     v-model="windowTitle"
@@ -110,7 +110,7 @@
               <el-divider />
               
               <div>
-                <h4 style="margin: 0 0 12px 0; color: #303133;">窗口状态</h4>
+                <h4 style="margin: 0 0 12px 0; color: var(--el-text-color-primary);">窗口状态</h4>
                 <el-descriptions :column="2" border>
                   <el-descriptions-item label="是否最大化">
                     <el-tag :type="isMaximized ? 'success' : 'info'">
@@ -187,7 +187,7 @@ const close = () => {
 <style>
 .title-bar {
   height: 32px;
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
   display: flex;
   align-items: center;
   padding: 0 8px;

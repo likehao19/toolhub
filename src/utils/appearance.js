@@ -27,8 +27,11 @@ function resolveTheme(theme) {
 
 export function applyThemeMode(theme = 'light') {
   const root = getRoot()
+  const resolved = resolveTheme(theme)
   root.setAttribute('data-theme-setting', theme)
-  root.setAttribute('data-theme', resolveTheme(theme))
+  root.setAttribute('data-theme', resolved)
+  // Element Plus 暗色 CSS 的选择器是 html.dark, 必须同步切 class 才能让 el-* 组件进入暗色模式。
+  root.classList.toggle('dark', resolved === 'dark')
 }
 
 export function applyFontSize(size) {

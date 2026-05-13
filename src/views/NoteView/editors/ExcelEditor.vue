@@ -196,7 +196,7 @@ const applyMergesToHot = (merges) => {
 // 预定义颜色
 const predefineColors = ref([
   '#ffffff',
-  '#f5f5f5',
+  'var(--el-fill-color-light)',
   '#d9d9d9',
   '#bfbfbf',
   '#8c8c8c',
@@ -680,7 +680,7 @@ defineExpose({
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
 }
 
 .excel-toolbar {
@@ -702,7 +702,7 @@ defineExpose({
 
 .toolbar-label {
   font-size: 12px;
-  color: #666;
+  color: var(--text-secondary);
   margin-left: 4px;
 }
 
@@ -728,13 +728,13 @@ defineExpose({
 
 .excel-editor-wrapper :deep(.handsontable th) {
   background: #f0f0f0;
-  color: #666;
+  color: var(--text-secondary);
   font-weight: 600;
 }
 
 .excel-editor-wrapper :deep(.handsontable .currentRow),
 .excel-editor-wrapper :deep(.handsontable .currentCol) {
-  background-color: #f5f5f5;
+  background-color: var(--el-fill-color-light);
 }
 
 .excel-editor-wrapper :deep(.handsontable .area) {
@@ -742,7 +742,7 @@ defineExpose({
 }
 
 .excel-editor-wrapper :deep(.handsontable .htDimmed) {
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 /* ignore */

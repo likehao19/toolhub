@@ -168,8 +168,8 @@
       >
         <template #default="{ node, data }">
           <span class="tree-node">
-            <el-icon v-if="data.is_dir" color="#409EFF"><Folder /></el-icon>
-            <el-icon v-else color="#67C23A"><Document /></el-icon>
+            <el-icon v-if="data.is_dir" color="var(--accent-blue)"><Folder /></el-icon>
+            <el-icon v-else color="var(--el-color-success)"><Document /></el-icon>
             <span class="node-label">{{ data.name }}</span>
             <el-tag v-if="!data.is_dir && data.extension" size="small" type="info">
               {{ data.extension }}

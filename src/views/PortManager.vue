@@ -370,10 +370,10 @@ onMounted(() => {
   border-radius: 10px;
   line-height: 18px;
 }
-.state-badge.listening { background: rgba(103, 194, 58, 0.12); color: #67c23a; }
+.state-badge.listening { background: rgba(103, 194, 58, 0.12); color: var(--el-color-success); }
 .state-badge.established { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue); }
-.state-badge.time-wait { background: rgba(230, 162, 60, 0.12); color: #e6a23c; }
-.state-badge.close-wait { background: rgba(245, 108, 108, 0.12); color: #f56c6c; }
+.state-badge.time-wait { background: rgba(230, 162, 60, 0.12); color: var(--el-color-warning); }
+.state-badge.close-wait { background: rgba(245, 108, 108, 0.12); color: var(--el-color-danger); }
 .state-badge.other { background: rgba(248, 244, 232,0.9); color: var(--text-tertiary); }
 .system-tag { font-size: 11px; color: var(--text-quaternary); }
 
@@ -399,7 +399,7 @@ onMounted(() => {
   padding: 1px 6px;
   border-radius: 8px;
 }
-.stat-chip.listening { background: rgba(103, 194, 58, 0.1); color: #67c23a; }
+.stat-chip.listening { background: rgba(103, 194, 58, 0.1); color: var(--el-color-success); }
 .stat-chip.established { background: rgba(64, 158, 255, 0.1); color: var(--accent-blue); }
 .page-info {
   margin-left: auto;

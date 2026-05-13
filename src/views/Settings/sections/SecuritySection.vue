@@ -69,7 +69,7 @@
           v-if="systemPrivilege.envScope === 'system' && !systemPrivilege.authorized"
           :label="t('settings.systemPrivilegeActionTitle')"
         >
-          <div style="font-size: 12px; color: #909399;">
+          <div style="font-size: 12px; color: var(--el-text-color-secondary);">
             {{ t('settings.systemPrivilegeActionDesc') }}
           </div>
         </el-form-item>
@@ -89,7 +89,7 @@
             :inactive-text="t('common.off')"
             @change="handlePasswordSettingChange"
           />
-          <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+          <div style="font-size: 12px; color: var(--el-text-color-secondary); margin-top: 4px;">
             {{ t('settings.requirePwdHint') }}
           </div>
         </el-form-item>
@@ -106,7 +106,7 @@
             <el-option :label="t('common.time.min30')" :value="30" />
             <el-option :label="t('common.never')" :value="0" />
           </el-select>
-          <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+          <div style="font-size: 12px; color: var(--el-text-color-secondary); margin-top: 4px;">
             {{ t('settings.autoLockHint') }}
           </div>
         </el-form-item>
@@ -115,7 +115,7 @@
           <el-button type="primary" @click="showChangePasswordDialog = true">
             {{ t('settings.changeMasterPwd') }}
           </el-button>
-          <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+          <div style="font-size: 12px; color: var(--el-text-color-secondary); margin-top: 4px;">
             {{ t('settings.changeMasterPwdHint') }}
           </div>
         </el-form-item>

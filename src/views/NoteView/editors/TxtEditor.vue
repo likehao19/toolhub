@@ -55,10 +55,10 @@ const handleInput = () => {
   line-height: 1.6;
   resize: none;
   background: var(--bg-primary);
-  color: #333;
+  color: var(--text-primary);
 }
 
 .txt-editor:focus {
-  background: #fafafa;
+  background: var(--el-fill-color-lighter);
 }
 </style>

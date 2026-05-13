@@ -156,7 +156,7 @@ defineExpose({
   display: flex;
   align-items: center;
   gap: 10px;
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
 }
 
 .sheet-name-input {
@@ -190,7 +190,7 @@ defineExpose({
 }
 
 .excel-header-cell {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border: 1px solid var(--border-color, #e1e4e8);
   padding: 8px;
   font-weight: 600;
@@ -202,7 +202,7 @@ defineExpose({
 }
 
 .excel-row-header {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border: 1px solid var(--border-color, #e1e4e8);
   padding: 8px;
   font-weight: 600;

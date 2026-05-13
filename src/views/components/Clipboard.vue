@@ -16,7 +16,7 @@
             <el-button type="primary" @click="readClipboard">
               读取剪贴板
             </el-button>
-            <div v-if="clipboardContent" style="margin-top: 16px; padding: 12px; background: #f5f7fa; border-radius: 4px;">
+            <div v-if="clipboardContent" style="margin-top: 16px; padding: 12px; background: var(--el-fill-color-light); border-radius: 4px;">
               <strong>剪贴板内容：</strong>
               <pre style="margin: 8px 0 0 0; white-space: pre-wrap;">{{ clipboardContent }}</pre>
             </div>
@@ -74,7 +74,7 @@
                 写入剪贴板
               </el-button>
               
-              <div v-if="clipboardContent" style="padding: 12px; background: #f5f7fa; border-radius: 4px;">
+              <div v-if="clipboardContent" style="padding: 12px; background: var(--el-fill-color-light); border-radius: 4px;">
                 <div style="font-weight: 600; margin-bottom: 8px;">当前剪贴板内容：</div>
                 <pre style="margin: 0; white-space: pre-wrap; word-break: break-all;">{{ clipboardContent }}</pre>
               </div>

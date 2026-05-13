@@ -261,7 +261,7 @@ const scrollToCategory = (categoryName) => {
   gap: 12px;
   font-size: 28px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin: 0 0 32px 0;
 }
 
@@ -300,13 +300,13 @@ const scrollToCategory = (categoryName) => {
 .category-name {
   font-size: 18px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin-bottom: 8px;
 }
 
 .category-count {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 /* ignore */
@@ -330,13 +330,13 @@ const scrollToCategory = (categoryName) => {
 .feature-title {
   font-size: 20px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin-bottom: 12px;
 }
 
 .feature-desc {
   font-size: 14px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   line-height: 1.6;
 }
 
@@ -372,12 +372,12 @@ const scrollToCategory = (categoryName) => {
 .component-title {
   font-size: 18px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .component-desc {
   font-size: 14px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   line-height: 1.6;
   margin-bottom: 16px;
 }

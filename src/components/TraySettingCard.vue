@@ -77,7 +77,7 @@ const { hideToTray, showWindow } = useWindow()
 
 .settings-section h4 {
   margin-bottom: 12px;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1rem;
 }
 
@@ -89,7 +89,7 @@ const { hideToTray, showWindow } = useWindow()
 
 .current-setting {
   margin-top: 10px;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.85rem;
 }
 

@@ -386,7 +386,7 @@ onUnmounted(() => {
 }
 
 .control-buttons .icon-btn {
-  color: #1f2937;
+  color: var(--el-text-color-primary);
   border-color: transparent;
   background: transparent;
   transition: all 0.2s;

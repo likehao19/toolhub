@@ -49,7 +49,7 @@
               <div style="line-height: 1.8">
                 <p>CLI 插件用于解析应用程序启动时的命令行参数。</p>
                 <p>在终端中运行应用时，可以传递参数，例如：</p>
-                <pre style="background: #f5f7fa; padding: 8px; border-radius: 4px; margin-top: 8px;">
+                <pre style="background: var(--el-fill-color-light); padding: 8px; border-radius: 4px; margin-top: 8px;">
 ./app.exe --help
 ./app.exe --version
 ./app.exe --config path/to/config.json
@@ -100,7 +100,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -134,7 +134,7 @@ const goBack = () => {
 .json-display {
   max-height: 400px;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   font-size: 12px;

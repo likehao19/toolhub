@@ -66,7 +66,7 @@
             :class="{ active: selectedCategory === 'today' }"
             @click="selectCategory('today')"
           >
-            <el-icon class="category-icon" style="color: #409eff;"><Calendar /></el-icon>
+            <el-icon class="category-icon" style="color: var(--accent-blue);"><Calendar /></el-icon>
             <span class="category-name">{{ t('todos.todayTodos') }}</span>
             <span class="category-count">{{ getTodayCount() }}</span>
           </div>
@@ -77,7 +77,7 @@
             :class="{ active: selectedCategory === 'important' }"
             @click="selectCategory('important')"
           >
-            <el-icon class="category-icon" style="color: #f56c6c;"><StarFilled /></el-icon>
+            <el-icon class="category-icon" style="color: var(--el-color-danger);"><StarFilled /></el-icon>
             <span class="category-name">{{ t('todos.important') }}</span>
             <span class="category-count">{{ getImportantCount() }}</span>
           </div>
@@ -88,7 +88,7 @@
             :class="{ active: selectedCategory === 'completed' }"
             @click="selectCategory('completed')"
           >
-            <el-icon class="category-icon" style="color: #67c23a;"><CircleCheck /></el-icon>
+            <el-icon class="category-icon" style="color: var(--el-color-success);"><CircleCheck /></el-icon>
             <span class="category-name">{{ t('todos.completedTodos') }}</span>
             <span class="category-count">{{ getCompletedCount() }}</span>
           </div>
@@ -339,7 +339,7 @@
         <!-- 提醒设置 -->
         <el-form-item :label="t('todos.reminder')">
           <el-switch v-model="todoForm.reminder_enabled" />
-          <span style="margin-left: 10px; color: #909399; font-size: 12px;">
+          <span style="margin-left: 10px; color: var(--el-text-color-secondary); font-size: 12px;">
             {{ t('todos.enableReminder') }}
           </span>
         </el-form-item>
@@ -362,7 +362,7 @@
               :placeholder="t('todos.selectReminderTime')"
               style="width: 100%;"
             />
-            <div style="font-size: 12px; color: #909399; margin-top: 4px;">
+            <div style="font-size: 12px; color: var(--el-text-color-secondary); margin-top: 4px;">
               {{ t('todos.reminderTimeHint') }}
             </div>
           </el-form-item>
@@ -388,16 +388,16 @@
         <el-form-item :label="t('todos.icon')">
           <el-select v-model="categoryForm.icon" :placeholder="t('todos.selectIcon')">
             <el-option value="Folder" :label="t('todos.iconFolder')">
-              <el-icon style="color: #909399;"><Folder /></el-icon> {{ t('todos.iconFolder') }}
+              <el-icon style="color: var(--el-text-color-secondary);"><Folder /></el-icon> {{ t('todos.iconFolder') }}
             </el-option>
             <el-option value="CollectionTag" :label="t('todos.iconTag')">
-              <el-icon style="color: #409EFF;"><CollectionTag /></el-icon> {{ t('todos.iconTag') }}
+              <el-icon style="color: var(--accent-blue);"><CollectionTag /></el-icon> {{ t('todos.iconTag') }}
             </el-option>
             <el-option value="Calendar" :label="t('todos.iconCalendar')">
-              <el-icon style="color: #67C23A;"><Calendar /></el-icon> {{ t('todos.iconCalendar') }}
+              <el-icon style="color: var(--el-color-success);"><Calendar /></el-icon> {{ t('todos.iconCalendar') }}
             </el-option>
             <el-option value="Briefcase" :label="t('todos.iconWork')">
-              <el-icon style="color: #E6A23C;"><Briefcase /></el-icon> {{ t('todos.iconWork') }}
+              <el-icon style="color: var(--el-color-warning);"><Briefcase /></el-icon> {{ t('todos.iconWork') }}
             </el-option>
             <el-option value="Reading" :label="t('todos.iconStudy')">
               <el-icon style="color: #8E44AD;"><Reading /></el-icon> {{ t('todos.iconStudy') }}
@@ -446,16 +446,16 @@
         <el-form-item :label="t('todos.icon')">
           <el-select v-model="editCategoryForm.icon" :placeholder="t('todos.selectIcon')">
             <el-option value="Folder" :label="t('todos.iconFolder')">
-              <el-icon style="color: #909399;"><Folder /></el-icon> {{ t('todos.iconFolder') }}
+              <el-icon style="color: var(--el-text-color-secondary);"><Folder /></el-icon> {{ t('todos.iconFolder') }}
             </el-option>
             <el-option value="CollectionTag" :label="t('todos.iconTag')">
-              <el-icon style="color: #409EFF;"><CollectionTag /></el-icon> {{ t('todos.iconTag') }}
+              <el-icon style="color: var(--accent-blue);"><CollectionTag /></el-icon> {{ t('todos.iconTag') }}
             </el-option>
             <el-option value="Calendar" :label="t('todos.iconCalendar')">
-              <el-icon style="color: #67C23A;"><Calendar /></el-icon> {{ t('todos.iconCalendar') }}
+              <el-icon style="color: var(--el-color-success);"><Calendar /></el-icon> {{ t('todos.iconCalendar') }}
             </el-option>
             <el-option value="Briefcase" :label="t('todos.iconWork')">
-              <el-icon style="color: #E6A23C;"><Briefcase /></el-icon> {{ t('todos.iconWork') }}
+              <el-icon style="color: var(--el-color-warning);"><Briefcase /></el-icon> {{ t('todos.iconWork') }}
             </el-option>
             <el-option value="Reading" :label="t('todos.iconStudy')">
               <el-icon style="color: #8E44AD;"><Reading /></el-icon> {{ t('todos.iconStudy') }}
@@ -699,10 +699,10 @@ const getCategoryIcon = (iconName) => {
 // 获取图标颜色
 const getIconColor = (iconName) => {
   const colorMap = {
-    'Folder': '#909399',
-    'CollectionTag': '#409EFF',
-    'Calendar': '#67C23A',
-    'Briefcase': '#E6A23C',
+    'Folder': 'var(--el-text-color-secondary)',
+    'CollectionTag': 'var(--accent-blue)',
+    'Calendar': 'var(--el-color-success)',
+    'Briefcase': 'var(--el-color-warning)',
     'Reading': '#8E44AD',
     'ShoppingCart': '#FF6B9D',
     'House': '#3498DB',
@@ -712,7 +712,7 @@ const getIconColor = (iconName) => {
     'Dish': '#E67E22',
     'Connection': '#9B59B6'
   }
-  return colorMap[iconName] || '#909399'
+  return colorMap[iconName] || 'var(--el-text-color-secondary)'
 }
 
 // 获取子任务

@@ -8,6 +8,8 @@ import examplePlugin from './plugins/examplePlugin';
 
 // 导入 Element Plus 样式
 import 'element-plus/dist/index.css'
+// Element Plus 暗色样式（选择器为 html.dark，需要 utils/appearance.js 同步给 <html> 加 .dark class）
+import 'element-plus/theme-chalk/dark/css-vars.css'
 // 导入全局通用样式
 import './styles/common.css'
 // 导入全站视觉升级样式

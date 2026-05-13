@@ -179,7 +179,7 @@ onUnmounted(() => {
   border-radius: 8px;
   overflow: hidden;
   position: relative;
-  border: 2px solid #e4e7ed;
+  border: 2px solid var(--el-border-color-light);
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 

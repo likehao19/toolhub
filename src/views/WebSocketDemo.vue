@@ -226,7 +226,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -260,7 +260,7 @@ const goBack = () => {
 .message-log {
   max-height: 400px;
   overflow-y: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   font-size: 13px;
@@ -282,8 +282,8 @@ const goBack = () => {
 }
 
 .message-item.system {
-  background: #f5f5f5;
-  color: #666;
+  background: var(--el-fill-color-light);
+  color: var(--text-secondary);
 }
 
 .message-item.error {
@@ -292,7 +292,7 @@ const goBack = () => {
 }
 
 .message-time {
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 11px;
   margin-right: 8px;
 }
@@ -303,7 +303,7 @@ const goBack = () => {
 
 .empty-log {
   text-align: center;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 20px;
 }
 </style>

@@ -207,7 +207,7 @@ const createCustomWindow = async () => {
 .window-custom-demo {
   height: 100vh;
   overflow-y: auto;
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
 }
 
 .content {
@@ -267,7 +267,7 @@ const createCustomWindow = async () => {
 }
 
 pre {
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
   padding: 16px;
   border-radius: 4px;
   overflow-x: auto;

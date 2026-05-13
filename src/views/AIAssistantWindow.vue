@@ -264,7 +264,7 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   overflow: hidden;
 }
 
@@ -341,12 +341,12 @@ onMounted(() => {
 
 .welcome-message h3 {
   font-size: 20px;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin: 0 0 8px 0;
 }
 
 .welcome-message p {
-  color: #909399;
+  color: var(--el-text-color-secondary);
   margin: 0 0 24px 0;
 }
 
@@ -360,7 +360,7 @@ onMounted(() => {
 
 .command-item {
   background: var(--bg-primary);
-  border: 1px solid #e4e7ed;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 8px;
   padding: 12px;
   display: flex;
@@ -428,7 +428,7 @@ onMounted(() => {
   background: var(--bg-primary);
   padding: 10px 14px;
   border-radius: 12px;
-  color: #303133;
+  color: var(--el-text-color-primary);
   font-size: 14px;
   line-height: 1.6;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -457,13 +457,13 @@ onMounted(() => {
 
 .message-result.success {
   background: #f0f9ff;
-  color: #67c23a;
+  color: var(--el-color-success);
   border: 1px solid #d9ecff;
 }
 
 .message-result.error {
   background: #fef0f0;
-  color: #f56c6c;
+  color: var(--el-color-danger);
   border: 1px solid #fde2e2;
 }
 
@@ -481,7 +481,7 @@ onMounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #909399;
+  background: var(--el-text-color-secondary);
   animation: loading-bounce 1.4s infinite ease-in-out both;
 }
 
@@ -506,7 +506,7 @@ onMounted(() => {
 .input-area {
   padding: 12px;
   background: var(--bg-primary);
-  border-top: 1px solid #e4e7ed;
+  border-top: 1px solid var(--el-border-color-light);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -536,11 +536,11 @@ onMounted(() => {
 }
 
 .message-list::-webkit-scrollbar-thumb {
-  background: #dcdfe6;
+  background: var(--el-border-color);
   border-radius: 3px;
 }
 
 .message-list::-webkit-scrollbar-thumb:hover {
-  background: #c0c4cc;
+  background: var(--el-text-color-placeholder);
 }
 </style>

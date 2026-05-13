@@ -652,7 +652,7 @@ function formatBytes(bytes) {
 .file-item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); font-weight: 500; }
 .file-item-size { color: var(--text-tertiary); flex-shrink: 0; font-variant-numeric: tabular-nums; }
 .file-item-remove { cursor: pointer; color: var(--text-quaternary); flex-shrink: 0; }
-.file-item-remove:hover { color: var(--accent-red, #f56c6c); }
+.file-item-remove:hover { color: var(--accent-red, var(--el-color-danger)); }
 
 /* 设置区：分行无卡片 */
 .settings {
@@ -820,7 +820,7 @@ function formatBytes(bytes) {
 .size-bar-wrap { display: flex; gap: 4px; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(60, 40, 20, 0.06); margin-bottom: 8px; }
 .size-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
 .before-bar { background: var(--accent-blue); }
-.after-bar { background: #67c23a; }
+.after-bar { background: var(--el-color-success); }
 .size-labels {
   display: flex;
   justify-content: space-between;
@@ -829,8 +829,8 @@ function formatBytes(bytes) {
   color: var(--text-tertiary);
   flex-wrap: wrap;
 }
-.size-down { color: #67c23a; font-weight: 600; }
-.size-up { color: #f56c6c; font-weight: 600; }
+.size-down { color: var(--el-color-success); font-weight: 600; }
+.size-up { color: var(--el-color-danger); font-weight: 600; }
 
 /* 批量表格：去除外框卡片，让 el-table 自身样式生效 */
 .batch-table {

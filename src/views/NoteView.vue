@@ -3325,7 +3325,7 @@ const formatFileTime = (time) => {
 .file-name-display {
   font-size: 14px;
   font-weight: 500;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .header-actions .btn {
@@ -3666,7 +3666,7 @@ const formatFileTime = (time) => {
 }
 
 .loading-icon {
-  color: #409eff;
+  color: var(--accent-blue);
   animation: rotate 1s linear infinite;
 }
 
@@ -3682,7 +3682,7 @@ const formatFileTime = (time) => {
 .loading-text {
   margin-top: 12px;
   font-size: 14px;
-  color: #606266;
+  color: var(--el-text-color-regular);
 }
 
 .view-list {
@@ -3861,7 +3861,7 @@ const formatFileTime = (time) => {
   font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.8;
-  color: #333;
+  color: var(--text-primary);
 }
 
 /* ignore */
@@ -4099,21 +4099,21 @@ const formatFileTime = (time) => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 8px;
   overflow: hidden;
 }
 
 .compare-header {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px 16px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 .compare-header h4 {
   margin: 0;
   font-size: 14px;
-  color: #606266;
+  color: var(--el-text-color-regular);
 }
 
 .compare-content {
@@ -4130,7 +4130,7 @@ const formatFileTime = (time) => {
   font-family: "PingFang SC";
   font-size: 13px;
   line-height: 1.6;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .version-empty {
@@ -4152,7 +4152,7 @@ const formatFileTime = (time) => {
 .folder-tree-select {
   max-height: 400px;
   overflow-y: auto;
-  border: 1px solid #dcdfe6;
+  border: 1px solid var(--el-border-color);
   border-radius: 4px;
   padding: 10px;
 }
@@ -4168,12 +4168,12 @@ const formatFileTime = (time) => {
 }
 
 .folder-tree-select :deep(.el-tree-node__content:hover) {
-  background-color: #f5f7fa;
+  background-color: var(--el-fill-color-light);
 }
 
 .folder-tree-select :deep(.el-tree-node.is-current > .el-tree-node__content) {
   background-color: #ecf5ff;
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .tree-node-label {
@@ -4188,6 +4188,6 @@ const formatFileTime = (time) => {
 }
 
 .folder-tree-select :deep(.el-tree-node.is-current) .tree-node-label .el-icon {
-  color: #409eff;
+  color: var(--accent-blue);
 }
 </style>

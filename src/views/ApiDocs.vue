@@ -737,7 +737,7 @@ onMounted(() => {
   width: 14px;
   height: 14px;
   font-size: 12px;
-  color: var(--text-secondary, #606266);
+  color: var(--text-secondary, var(--el-text-color-regular));
   transition: transform 0.18s ease, color 0.15s;
 }
 .row-chevron.expanded {
@@ -1108,7 +1108,7 @@ onMounted(() => {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #67c23a;
+  background: var(--el-color-success);
 }
 .form-actions :deep(.el-button) {
   height: 30px;

@@ -949,7 +949,7 @@
   border-bottom: 1px solid var(--divider) !important;
 }
 
-/* 对话侧栏 #f9fafb 冷白 → 暖奶油，#e5e7eb 冷灰边 → divider */
+/* 对话侧栏 var(--el-fill-color-lighter) 冷白 → 暖奶油，var(--el-border-color-light) 冷灰边 → divider */
 .app-content :is(.ai-conversation-wrapper, .ai-chat-wrapper) .conversation-sidebar {
   background: var(--bg-primary) !important;
   border-right: 1px solid var(--divider) !important;
@@ -1427,7 +1427,7 @@
    2. .overview-card 是 18px 圆角白卡 + 阴影 + 1px 冷灰边（4 张并排重）
    3. .settings-section 也是 18px 圆角边框（卡中卡 → 嵌套）
    4. .keycap 写死 "PingFang SC" → 全局 --font-family 没生效
-   5. 大量冷色：#303133 / #a8abb2 / #c0c4cc / #dcdfe6 / #909399 / #409eff
+   5. 大量冷色：var(--el-text-color-primary) / #a8abb2 / var(--el-text-color-placeholder) / var(--el-border-color) / var(--el-text-color-secondary) / var(--accent-blue)
    ============================================================ */
 
 /* 1) wrapper：去冷蓝灰渐变 */

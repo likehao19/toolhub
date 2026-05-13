@@ -205,7 +205,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -243,7 +243,7 @@ const goBack = () => {
 .group-title {
   font-weight: 600;
   margin-bottom: 12px;
-  color: #666;
+  color: var(--text-secondary);
 }
 </style>
 

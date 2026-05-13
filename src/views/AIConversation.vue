@@ -205,7 +205,7 @@
                 v-model="apiSettings.openai.baseUrl"
                 placeholder="https://api.openai.com/v1"
               />
-              <span style="font-size: 12px; color: #909399;">{{ t('aiConv.defaultHint') }} https://api.openai.com/v1</span>
+              <span style="font-size: 12px; color: var(--el-text-color-secondary);">{{ t('aiConv.defaultHint') }} https://api.openai.com/v1</span>
             </el-form-item>
             <el-form-item :label="t('aiConv.model')">
               <el-select v-model="apiSettings.openai.model" style="width: 100%;">
@@ -216,7 +216,7 @@
             </el-form-item>
             <el-form-item :label="t('aiConv.streamOutput')">
               <el-switch v-model="apiSettings.openai.stream" />
-              <span style="font-size: 12px; color: #909399; margin-left: 8px;">{{ t('aiConv.streamHint') }}</span>
+              <span style="font-size: 12px; color: var(--el-text-color-secondary); margin-left: 8px;">{{ t('aiConv.streamHint') }}</span>
             </el-form-item>
           </el-form>
         </el-tab-pane>
@@ -236,18 +236,18 @@
                 v-model="apiSettings.claude.baseUrl"
                 placeholder="https://api.anthropic.com"
               />
-              <span style="font-size: 12px; color: #909399;">{{ t('aiConv.defaultHint') }} https://api.anthropic.com{{ t('aiConv.claudeProxyHint') }}</span>
+              <span style="font-size: 12px; color: var(--el-text-color-secondary);">{{ t('aiConv.defaultHint') }} https://api.anthropic.com{{ t('aiConv.claudeProxyHint') }}</span>
             </el-form-item>
             <el-form-item :label="t('aiConv.model')">
               <el-input
                 v-model="apiSettings.claude.model"
                 :placeholder="t('aiConv.exampleModel')"
               />
-              <span style="font-size: 12px; color: #909399;">{{ t('aiConv.claudeModelHint') }}</span>
+              <span style="font-size: 12px; color: var(--el-text-color-secondary);">{{ t('aiConv.claudeModelHint') }}</span>
             </el-form-item>
             <el-form-item :label="t('aiConv.streamOutput')">
               <el-switch v-model="apiSettings.claude.stream" />
-              <span style="font-size: 12px; color: #909399; margin-left: 8px;">{{ t('aiConv.streamTypingHint') }}</span>
+              <span style="font-size: 12px; color: var(--el-text-color-secondary); margin-left: 8px;">{{ t('aiConv.streamTypingHint') }}</span>
             </el-form-item>
             <el-form-item>
               <el-button
@@ -288,7 +288,7 @@
                 v-model="customApiForm.baseUrl"
                 placeholder="https://api.example.com/v1"
               />
-              <span style="font-size: 12px; color: #909399;">
+              <span style="font-size: 12px; color: var(--el-text-color-secondary);">
                 {{ t('aiConv.openaiCompatHint') }}
               </span>
             </el-form-item>
@@ -300,7 +300,7 @@
             </el-form-item>
             <el-form-item :label="t('aiConv.streamOutput')">
               <el-switch v-model="customApiForm.stream" />
-              <span style="font-size: 12px; color: #909399; margin-left: 8px;">
+              <span style="font-size: 12px; color: var(--el-text-color-secondary); margin-left: 8px;">
                 {{ t('aiConv.streamHint') }}
               </span>
             </el-form-item>
@@ -322,7 +322,7 @@
                 <el-tag v-else-if="customApiFormTestResult === 'failed'" type="danger" size="small">
                   ✗ 连接失败
                 </el-tag>
-                <span v-else style="color: #909399;">{{ t('aiConv.testApiHint') }}</span>
+                <span v-else style="color: var(--el-text-color-secondary);">{{ t('aiConv.testApiHint') }}</span>
               </span>
             </el-form-item>
 
@@ -447,7 +447,7 @@
             v-model="customApiForm.baseUrl"
             placeholder="https://api.example.com/v1"
           />
-          <span style="font-size: 12px; color: #909399;">
+          <span style="font-size: 12px; color: var(--el-text-color-secondary);">
             {{ t('aiConv.openaiCompatHint') }}
           </span>
         </el-form-item>
@@ -459,7 +459,7 @@
         </el-form-item>
         <el-form-item :label="t('aiConv.streamOutput')">
           <el-switch v-model="customApiForm.stream" />
-          <span style="font-size: 12px; color: #909399; margin-left: 8px;">
+          <span style="font-size: 12px; color: var(--el-text-color-secondary); margin-left: 8px;">
             {{ t('aiConv.streamHint') }}
           </span>
         </el-form-item>
@@ -481,7 +481,7 @@
             <el-tag v-else-if="customApiFormTestResult === 'failed'" type="danger" size="small">
               ✗ 连接失败
             </el-tag>
-            <span v-else style="color: #909399;">{{ t('aiConv.testApiHint') }}</span>
+            <span v-else style="color: var(--el-text-color-secondary);">{{ t('aiConv.testApiHint') }}</span>
           </span>
         </el-form-item>
 
@@ -1699,7 +1699,7 @@ onMounted(async () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: var(--bg-secondary, #f9fafb);
+  background: var(--bg-secondary, var(--el-fill-color-lighter));
 }
 
 .header {
@@ -1708,7 +1708,7 @@ onMounted(async () => {
   align-items: center;
   padding: 12px 20px;
   background-color: var(--bg-primary, #ffffff);
-  border-bottom: 1px solid var(--border-color, #e4e7ed);
+  border-bottom: 1px solid var(--border-color, var(--el-border-color-light));
   height: 50px;
   box-sizing: border-box;
 }
@@ -1756,8 +1756,8 @@ onMounted(async () => {
   min-width: 260px;
   display: flex;
   flex-direction: column;
-  background: var(--bg-tertiary, #f9fafb);
-  border-right: 1px solid var(--border-color, #e5e7eb);
+  background: var(--bg-tertiary, var(--el-fill-color-lighter));
+  border-right: 1px solid var(--border-color, var(--el-border-color-light));
   transition: width 0.25s ease, min-width 0.25s ease;
   overflow: hidden;
 }
@@ -1783,8 +1783,8 @@ onMounted(async () => {
   gap: 8px;
   padding: 8px 12px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  color: #374151;
+  border: 1px solid var(--el-border-color-light);
+  color: var(--el-text-color-primary);
   font-size: 13px;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
@@ -1794,13 +1794,13 @@ onMounted(async () => {
 }
 
 .sidebar-new-btn:hover {
-  background: #f3f4f6;
-  border-color: #d1d5db;
+  background: var(--el-fill-color-light);
+  border-color: var(--el-border-color);
 }
 
 .sidebar-new-btn i {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--el-text-color-regular);
 }
 
 .sidebar-collapse-btn {
@@ -1810,7 +1810,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   border-radius: 8px;
   transition: color 0.15s, background 0.15s;
   font-size: 13px;
@@ -1818,8 +1818,8 @@ onMounted(async () => {
 }
 
 .sidebar-collapse-btn:hover {
-  color: #374151;
-  background: #e5e7eb;
+  color: var(--el-text-color-primary);
+  background: var(--el-border-color-light);
 }
 
 /* 折叠态：展开按钮浮在聊天区左上角 */
@@ -1833,7 +1833,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--el-text-color-regular);
   border-radius: 8px;
   z-index: 20;
   transition: color 0.15s, background 0.15s;
@@ -1842,7 +1842,7 @@ onMounted(async () => {
 
 .sidebar-expand-btn:hover {
   color: #111827;
-  background: #f3f4f6;
+  background: var(--el-fill-color-light);
 }
 
 .sidebar-list {
@@ -1850,7 +1850,7 @@ onMounted(async () => {
   overflow-y: auto;
   padding: 4px 8px;
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--el-border-color) transparent;
 }
 
 .sidebar-list::-webkit-scrollbar {
@@ -1858,7 +1858,7 @@ onMounted(async () => {
 }
 
 .sidebar-list::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--el-border-color);
   border-radius: 2px;
 }
 
@@ -1879,12 +1879,12 @@ onMounted(async () => {
 }
 
 .sidebar-item.active {
-  background: #e5e7eb;
+  background: var(--el-border-color-light);
 }
 
 .sidebar-item-icon {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   flex-shrink: 0;
 }
 
@@ -1895,7 +1895,7 @@ onMounted(async () => {
 
 .sidebar-item-title {
   font-size: 13px;
-  color: #374151;
+  color: var(--el-text-color-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1916,7 +1916,7 @@ onMounted(async () => {
 
 .sidebar-action-btn {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -1934,13 +1934,13 @@ onMounted(async () => {
   align-items: center;
   gap: 8px;
   padding: 40px 16px;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 
 .sidebar-empty i {
   font-size: 24px;
-  color: #d1d5db;
+  color: var(--el-border-color);
 }
 
 .content-container {
@@ -1948,7 +1948,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--bg-secondary, #f9fafb);
+  background: var(--bg-secondary, var(--el-fill-color-lighter));
 }
 
 .messages-container {
@@ -1956,8 +1956,8 @@ onMounted(async () => {
   overflow-y: auto;
   padding: 40px 20px;
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
-  background: var(--bg-secondary, #f9fafb);
+  scrollbar-color: var(--el-border-color) transparent;
+  background: var(--bg-secondary, var(--el-fill-color-lighter));
 }
 
 .messages-container::-webkit-scrollbar {
@@ -1965,12 +1965,12 @@ onMounted(async () => {
 }
 
 .messages-container::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--el-border-color);
   border-radius: 3px;
 }
 
 .messages-container::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: var(--el-text-color-secondary);
 }
 
 .messages-container::-webkit-scrollbar-track {
@@ -1983,13 +1983,13 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #6b7280;
+  color: var(--el-text-color-regular);
 }
 
 .empty-state i {
   font-size: 72px;
   margin-bottom: 20px;
-  color: #d1d5db;
+  color: var(--el-border-color);
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -2000,12 +2000,12 @@ onMounted(async () => {
   margin: 6px 0;
   font-size: 18px;
   font-weight: 500;
-  color: #374151;
+  color: var(--el-text-color-primary);
 }
 
 .empty-state .hint {
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   margin-top: 4px;
 }
 
@@ -2076,23 +2076,23 @@ onMounted(async () => {
 }
 
 .user-message {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-primary);
   border-radius: 18px 18px 4px 18px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .assistant-message {
   background: var(--bg-primary, #ffffff);
-  color: #1f2937;
+  color: var(--el-text-color-primary);
   border-radius: 18px 18px 18px 4px;
-  border: 1px solid var(--border-color, #e5e7eb);
+  border: 1px solid var(--border-color, var(--el-border-color-light));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .message-time {
   font-size: 11px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   margin-top: 4px;
   text-align: right;
 }
@@ -2129,7 +2129,7 @@ onMounted(async () => {
   padding: 16px 20px;
   background: var(--bg-primary);
   border-radius: 18px 18px 18px 4px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--el-border-color-light);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -2163,7 +2163,7 @@ onMounted(async () => {
 .input-area {
   padding: 20px;
   background: var(--bg-primary, #ffffff);
-  border-top: 1px solid var(--border-color, #e4e7ed);
+  border-top: 1px solid var(--border-color, var(--el-border-color-light));
 }
 
 .input-wrapper {
@@ -2171,14 +2171,14 @@ onMounted(async () => {
   max-width: 800px;
   margin: 0 auto;
   background: var(--bg-primary, #ffffff);
-  border: 1.5px solid var(--border-color, #d1d5db);
+  border: 1.5px solid var(--border-color, var(--el-border-color));
   border-radius: 24px;
   transition: all 0.2s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .input-wrapper:focus-within {
-  border-color: #409eff;
+  border-color: var(--accent-blue);
   box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
 }
 
@@ -2196,7 +2196,7 @@ onMounted(async () => {
   background: transparent;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--el-border-color) transparent;
 }
 
 .message-input::-webkit-scrollbar {
@@ -2204,16 +2204,16 @@ onMounted(async () => {
 }
 
 .message-input::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--el-border-color);
   border-radius: 2px;
 }
 
 .message-input::placeholder {
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
 }
 
 .message-input:disabled {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   cursor: not-allowed;
 }
 
@@ -2225,7 +2225,7 @@ onMounted(async () => {
   height: 36px;
   border-radius: 50%;
   border: none;
-  background: #409eff;
+  background: var(--accent-blue);
   color: white;
   display: flex;
   align-items: center;
@@ -2245,7 +2245,7 @@ onMounted(async () => {
 }
 
 .send-button:disabled {
-  background: #e4e7ed;
+  background: var(--el-border-color-light);
   cursor: not-allowed;
   opacity: 0.6;
 }
@@ -2271,7 +2271,7 @@ onMounted(async () => {
 .input-hint {
   text-align: center;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   margin-top: 12px;
 }
 
@@ -2381,9 +2381,9 @@ onMounted(async () => {
   border-left: 3px solid #10b981;
   padding-left: 16px;
   margin: 16px 0;
-  color: #6b7280;
+  color: var(--el-text-color-regular);
   font-style: italic;
-  background: #f9fafb;
+  background: var(--el-fill-color-lighter);
   padding: 12px 16px;
   border-radius: 4px;
 }
@@ -2394,20 +2394,20 @@ onMounted(async () => {
   margin: 16px 0;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--el-border-color-light);
 }
 
 .message-text :deep(th),
 .message-text :deep(td) {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--el-border-color-light);
   padding: 10px 14px;
   text-align: left;
 }
 
 .message-text :deep(th) {
-  background: #f9fafb;
+  background: var(--el-fill-color-lighter);
   font-weight: 600;
-  color: #374151;
+  color: var(--el-text-color-primary);
 }
 
 .message-text :deep(td) {
@@ -2434,7 +2434,7 @@ onMounted(async () => {
 
 .message-text :deep(hr) {
   border: none;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--el-border-color-light);
   margin: 20px 0;
 }
 
@@ -2477,7 +2477,7 @@ onMounted(async () => {
 
 .settings-dialog :deep(.el-dialog__header) {
   padding: 20px 24px;
-  border-bottom: 1px solid #e4e7ed;
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 .settings-dialog :deep(.el-dialog__body) {
@@ -2485,7 +2485,7 @@ onMounted(async () => {
   overflow-y: auto;
   padding: 0;
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--el-border-color) transparent;
 }
 
 .settings-dialog :deep(.el-dialog__body)::-webkit-scrollbar {
@@ -2493,7 +2493,7 @@ onMounted(async () => {
 }
 
 .settings-dialog :deep(.el-dialog__body)::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: var(--el-border-color);
   border-radius: 3px;
 }
 
@@ -2510,8 +2510,8 @@ onMounted(async () => {
 .settings-dialog :deep(.el-tabs__header) {
   margin: 0;
   padding: 0 24px;
-  background: #fafbfc;
-  border-bottom: 1px solid #e4e7ed;
+  background: var(--el-fill-color-lighter);
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 .settings-dialog :deep(.el-tabs__content) {
@@ -2523,9 +2523,9 @@ onMounted(async () => {
 }
 
 .settings-dialog :deep(.el-dialog__footer) {
-  border-top: 1px solid #e4e7ed;
+  border-top: 1px solid var(--el-border-color-light);
   padding: 16px 24px;
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
 }
 
 /* 自定义API表格样式 */

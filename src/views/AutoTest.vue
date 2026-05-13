@@ -79,8 +79,8 @@
                   <span v-if="suiteResults[si].response" style="font-size:11px;color:var(--text-tertiary)">
                     {{ suiteResults[si].response.status }} · {{ suiteResults[si].response.time }}ms
                   </span>
-                  <span v-if="suiteResults[si].error" style="font-size:11px;color:#F56C6C">{{ suiteResults[si].error }}</span>
-                  <span v-if="suiteResults[si].reason" style="font-size:11px;color:#E6A23C">{{ suiteResults[si].reason }}</span>
+                  <span v-if="suiteResults[si].error" style="font-size:11px;color:var(--el-color-danger)">{{ suiteResults[si].error }}</span>
+                  <span v-if="suiteResults[si].reason" style="font-size:11px;color:var(--el-color-warning)">{{ suiteResults[si].reason }}</span>
                 </div>
 
                 <!-- Assertions -->
@@ -361,8 +361,8 @@ onMounted(() => {
 .bench-stat-card.ok { border-color: rgba(103,194,58,0.3); }
 .bench-stat-card.err { border-color: rgba(245,108,108,0.3); }
 .stat-val { font-size: 20px; font-weight: 700; color: var(--text-primary); }
-.bench-stat-card.ok .stat-val { color: #67C23A; }
-.bench-stat-card.err .stat-val { color: #F56C6C; }
+.bench-stat-card.ok .stat-val { color: var(--el-color-success); }
+.bench-stat-card.err .stat-val { color: var(--el-color-danger); }
 .stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
 
 @media (max-width: 960px) {

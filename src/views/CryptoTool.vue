@@ -1069,8 +1069,8 @@ function copyOutput() {
   padding: 6px 0;
 }
 
-.verify-result.match { color: #67c23a; }
-.verify-result.mismatch { color: #f56c6c; }
+.verify-result.match { color: var(--el-color-success); }
+.verify-result.mismatch { color: var(--el-color-danger); }
 
 .rainbow-result {
   font-size: 13px;
@@ -1079,7 +1079,7 @@ function copyOutput() {
 
 .rainbow-found code {
   font-weight: var(--font-weight-bold);
-  color: #e6a23c;
+  color: var(--el-color-warning);
   background: rgba(230, 162, 60, 0.1);
   padding: 2px 6px;
   border-radius: 4px;

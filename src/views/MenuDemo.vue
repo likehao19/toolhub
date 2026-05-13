@@ -261,7 +261,7 @@ const createDynamicMenu = async () => {
 .menu-demo {
   height: 100vh;
   overflow-y: auto;
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
 }
 
 .content {
@@ -310,12 +310,12 @@ const createDynamicMenu = async () => {
 
 .log-empty {
   text-align: center;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 20px;
 }
 
 pre {
-  background: #f5f5f5;
+  background: var(--el-fill-color-light);
   padding: 16px;
   border-radius: 4px;
   overflow-x: auto;

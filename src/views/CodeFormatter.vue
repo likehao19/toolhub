@@ -434,8 +434,8 @@ function doClear() {
   background: transparent;
   border: 0;
 }
-.status-msg.ok { color: #67c23a; }
-.status-msg.err { color: #f56c6c; }
+.status-msg.ok { color: var(--el-color-success); }
+.status-msg.err { color: var(--el-color-danger); }
 .status-spacer { flex: 1; }
 .status-hint { color: var(--text-quaternary); font-size: 10.5px; }
 </style>

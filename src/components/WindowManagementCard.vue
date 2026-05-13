@@ -72,7 +72,7 @@ const { childWindowUrl, creatingWindow, createChildWindow } = useWindow()
 
 .tips {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .tips ul {

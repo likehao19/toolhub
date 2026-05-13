@@ -319,7 +319,7 @@ const formatTime = (date) => {
   flex: 1;
   overflow-y: auto;
   padding: 20px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .welcome-message {
@@ -329,18 +329,18 @@ const formatTime = (date) => {
 
 .welcome-icon {
   font-size: 48px;
-  color: #409eff;
+  color: var(--accent-blue);
   margin-bottom: 16px;
 }
 
 .welcome-message h3 {
   font-size: 20px;
-  color: #303133;
+  color: var(--el-text-color-primary);
   margin-bottom: 8px;
 }
 
 .welcome-message p {
-  color: #909399;
+  color: var(--el-text-color-secondary);
   margin-bottom: 24px;
 }
 
@@ -353,7 +353,7 @@ const formatTime = (date) => {
 
 .example-title {
   font-size: 14px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   margin-bottom: 8px;
 }
 
@@ -384,12 +384,12 @@ const formatTime = (date) => {
 }
 
 .message.user .message-avatar {
-  background: #409eff;
+  background: var(--accent-blue);
   color: white;
 }
 
 .message.assistant .message-avatar {
-  background: #67c23a;
+  background: var(--el-color-success);
   color: white;
 }
 
@@ -407,13 +407,13 @@ const formatTime = (date) => {
 }
 
 .message.user .message-text {
-  background: #409eff;
+  background: var(--accent-blue);
   color: white;
 }
 
 .confirmation-box {
   background: #fff9e6;
-  border: 1px solid #e6a23c;
+  border: 1px solid var(--el-color-warning);
   border-radius: 8px;
   padding: 12px;
   margin-top: 8px;
@@ -423,7 +423,7 @@ const formatTime = (date) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #e6a23c;
+  color: var(--el-color-warning);
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -457,12 +457,12 @@ const formatTime = (date) => {
 
 .result-box.success {
   background: #f0f9ff;
-  color: #67c23a;
+  color: var(--el-color-success);
 }
 
 .result-box.error {
   background: #fef0f0;
-  color: #f56c6c;
+  color: var(--el-color-danger);
 }
 
 .typing-indicator {
@@ -478,7 +478,7 @@ const formatTime = (date) => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #909399;
+  background: var(--el-text-color-secondary);
   animation: typing 1.4s infinite;
 }
 
@@ -502,7 +502,7 @@ const formatTime = (date) => {
 .input-container {
   padding: 16px 20px;
   background: var(--bg-primary);
-  border-top: 1px solid #dcdfe6;
+  border-top: 1px solid var(--el-border-color);
 }
 
 .history-toggle {
@@ -518,7 +518,7 @@ const formatTime = (date) => {
 
 .history-item {
   padding: 12px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 8px;
 }
 
@@ -531,11 +531,11 @@ const formatTime = (date) => {
 
 .history-time {
   font-size: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .history-content {
   font-size: 14px;
-  color: #606266;
+  color: var(--el-text-color-regular);
 }
 </style>

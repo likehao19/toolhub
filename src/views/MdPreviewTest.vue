@@ -65,7 +65,7 @@ const scrollElement = document.documentElement;
 .md-preview-test h2 {
   margin-bottom: 20px;
   padding-bottom: 10px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid var(--accent-blue);
 }
 
 .demo-container {

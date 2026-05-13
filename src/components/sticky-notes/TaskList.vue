@@ -375,7 +375,7 @@ onUnmounted(() => {
 
 .input.completed {
   text-decoration: line-through;
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
 }
 
 .title-input {

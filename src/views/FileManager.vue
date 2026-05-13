@@ -553,7 +553,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .toolbar {
@@ -562,7 +562,7 @@ onMounted(async () => {
   justify-content: space-between;
   padding: 12px 24px;
   background: var(--bg-primary);
-  border-bottom: 1px solid #e4e7ed;
+  border-bottom: 1px solid var(--el-border-color-light);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
@@ -573,7 +573,7 @@ onMounted(async () => {
 .breadcrumb-empty {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .toolbar-actions {
@@ -591,7 +591,7 @@ onMounted(async () => {
 .sidebar {
   width: 240px;
   background: var(--bg-primary);
-  border-right: 1px solid #e4e7ed;
+  border-right: 1px solid var(--el-border-color-light);
   display: flex;
   flex-direction: column;
 }
@@ -600,9 +600,9 @@ onMounted(async () => {
   padding: 16px 20px;
   font-weight: 600;
   font-size: 14px;
-  color: #303133;
-  border-bottom: 1px solid #e4e7ed;
-  background: #fafafa;
+  color: var(--el-text-color-primary);
+  border-bottom: 1px solid var(--el-border-color-light);
+  background: var(--el-fill-color-lighter);
 }
 
 .tree-container {
@@ -625,7 +625,7 @@ onMounted(async () => {
 
 .node-label {
   font-size: 14px;
-  color: #303133;
+  color: var(--el-text-color-primary);
   font-weight: 500;
 }
 
@@ -634,7 +634,7 @@ onMounted(async () => {
 }
 
 :deep(.el-tree-node__expand-icon) {
-  color: #409eff;
+  color: var(--accent-blue);
   font-weight: bold;
 }
 
@@ -653,7 +653,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .empty-icon {
@@ -665,19 +665,19 @@ onMounted(async () => {
 .empty-title {
   font-size: 18px;
   font-weight: 600;
-  color: #606266;
+  color: var(--el-text-color-regular);
   margin-bottom: 8px;
 }
 
 .empty-description {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .status-bar {
   padding: 12px 20px;
-  background: #fafafa;
-  border-bottom: 1px solid #e4e7ed;
+  background: var(--el-fill-color-lighter);
+  border-bottom: 1px solid var(--el-border-color-light);
 }
 
 /* ignore */
@@ -686,11 +686,11 @@ onMounted(async () => {
   flex-direction: row;
   align-items: center;
   padding: 14px 20px;
-  background: linear-gradient(to right, #f5f7fa, #fafbfc);
-  border-bottom: 2px solid #dcdfe6;
+  background: linear-gradient(to right, var(--el-fill-color-light), var(--el-fill-color-lighter));
+  border-bottom: 2px solid var(--el-border-color);
   font-size: 13px;
   font-weight: 600;
-  color: #606266;
+  color: var(--el-text-color-regular);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -760,7 +760,7 @@ onMounted(async () => {
   justify-content: center;
   height: 100%;
   padding: 40px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .empty-file-icon {
@@ -772,13 +772,13 @@ onMounted(async () => {
 .empty-file-text {
   font-size: 16px;
   font-weight: 600;
-  color: #606266;
+  color: var(--el-text-color-regular);
   margin-bottom: 8px;
 }
 
 .empty-file-hint {
   font-size: 13px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .file-item-wrapper {
@@ -838,7 +838,7 @@ onMounted(async () => {
   padding: 14px 20px !important;
   cursor: pointer;
   transition: all 0.25s ease;
-  border-bottom: 1px solid #f5f7fa;
+  border-bottom: 1px solid var(--el-fill-color-light);
   background: var(--bg-primary);
   position: relative;
   width: 100% !important;
@@ -854,7 +854,7 @@ onMounted(async () => {
 }
 
 .file-item-row:nth-child(even) {
-  background: #fafbfc;
+  background: var(--el-fill-color-lighter);
 }
 
 .file-item-row.folder-row {
@@ -862,7 +862,7 @@ onMounted(async () => {
 }
 
 .file-item-row.folder-row:nth-child(even) {
-  background: linear-gradient(90deg, #e0f2fe 0%, #fafbfc 100%);
+  background: linear-gradient(90deg, #e0f2fe 0%, var(--el-fill-color-lighter) 100%);
 }
 
 .file-item-row::before {
@@ -872,7 +872,7 @@ onMounted(async () => {
   top: 0;
   height: 100%;
   width: 3px;
-  background: linear-gradient(to bottom, #409eff, #67c23a);
+  background: linear-gradient(to bottom, var(--accent-blue), var(--el-color-success));
   opacity: 0;
   transition: opacity 0.25s ease;
 }
@@ -934,7 +934,7 @@ onMounted(async () => {
   max-width: none !important;
   font-size: 14px;
   font-weight: 500;
-  color: #303133;
+  color: var(--el-text-color-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap !important;
@@ -947,7 +947,7 @@ onMounted(async () => {
 
 .file-row-name.folder-name {
   font-weight: 600;
-  color: #409eff;
+  color: var(--accent-blue);
 }
 
 .file-row-name .dir-indicator {
@@ -989,13 +989,13 @@ onMounted(async () => {
 }
 
 .file-row-type .type-folder {
-  background: linear-gradient(135deg, #409eff, #66b1ff);
+  background: linear-gradient(135deg, var(--accent-blue), #66b1ff);
   color: white;
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
 }
 
 .file-row-type .type-file {
-  background: linear-gradient(135deg, #67c23a, #85ce61);
+  background: linear-gradient(135deg, var(--el-color-success), #85ce61);
   color: white;
   box-shadow: 0 2px 6px rgba(103, 194, 58, 0.25);
 }
@@ -1007,7 +1007,7 @@ onMounted(async () => {
   flex-shrink: 0 !important;
   flex-grow: 0 !important;
   font-size: 13px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   text-align: right !important;
   padding-right: 10px !important;
   padding-left: 0 !important;
@@ -1029,12 +1029,12 @@ onMounted(async () => {
 
 .tree-container::-webkit-scrollbar-track,
 .file-list::-webkit-scrollbar-track {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .tree-container::-webkit-scrollbar-thumb,
 .file-list::-webkit-scrollbar-thumb {
-  background: #c0c4cc;
+  background: var(--el-text-color-placeholder);
   border-radius: 4px;
 }
 
@@ -1049,7 +1049,7 @@ onMounted(async () => {
 }
 
 :deep(.el-breadcrumb__inner) {
-  color: #409eff;
+  color: var(--accent-blue);
   cursor: pointer;
   transition: color 0.2s;
 }
@@ -1076,7 +1076,7 @@ onMounted(async () => {
 }
 
 :deep(.el-tree-node.is-current > .el-tree-node__content) {
-  background-color: #409eff;
+  background-color: var(--accent-blue);
   color: white;
 }
 

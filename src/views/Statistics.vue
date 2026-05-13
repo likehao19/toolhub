@@ -236,7 +236,7 @@ const notesTrendOption = computed(() => {
         data: filteredTrend.map(d => d.count),
         smooth: true,
         areaStyle: {},
-        itemStyle: { color: '#409eff' }
+        itemStyle: { color: 'var(--accent-blue)' }
       }
     ]
   }
@@ -271,14 +271,14 @@ const todosTrendOption = computed(() => {
         type: 'line',
         data: filteredTrend.map(d => d.completed || 0),
         smooth: true,
-        itemStyle: { color: '#67c23a' }
+        itemStyle: { color: 'var(--el-color-success)' }
       },
       {
         name: t('statistics.created'),
         type: 'line',
         data: filteredTrend.map(d => d.created || 0),
         smooth: true,
-        itemStyle: { color: '#409eff' }
+        itemStyle: { color: 'var(--accent-blue)' }
       }
     ]
   }
@@ -431,14 +431,14 @@ const productivityTrendOption = computed(() => {
         type: 'line',
         data: notesData,
         smooth: true,
-        itemStyle: { color: '#409eff' }
+        itemStyle: { color: 'var(--accent-blue)' }
       },
       {
         name: t('statistics.todosCompleted'),
         type: 'line',
         data: todosData,
         smooth: true,
-        itemStyle: { color: '#67c23a' }
+        itemStyle: { color: 'var(--el-color-success)' }
       }
     ]
   }
@@ -476,7 +476,7 @@ onMounted(() => {
   padding: 24px;
   height: 100%;
   overflow-y: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .page-header {
@@ -494,7 +494,7 @@ onMounted(() => {
   margin: 0;
   font-size: 24px;
   font-weight: 600;
-  color: #303133;
+  color: var(--el-text-color-primary);
 }
 
 .header-actions {
@@ -526,7 +526,7 @@ onMounted(() => {
   gap: 24px;
   margin-bottom: 24px;
   padding: 20px;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   border-radius: 8px;
 }
 
@@ -538,13 +538,13 @@ onMounted(() => {
 .stat-value {
   font-size: 32px;
   font-weight: 600;
-  color: #409eff;
+  color: var(--accent-blue);
   margin-bottom: 8px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 
 .chart-container {
@@ -575,11 +575,11 @@ onMounted(() => {
   }
 
   .stat-value {
-    color: #409eff;
+    color: var(--accent-blue);
   }
 
   .stat-label {
-    color: #aaa;
+    color: var(--text-quaternary);
   }
 }
 </style>

@@ -57,7 +57,7 @@
               
               <el-divider />
               
-              <div v-if="separateInfo.platform" style="padding: 12px; background: #f5f7fa; border-radius: 4px;">
+              <div v-if="separateInfo.platform" style="padding: 12px; background: var(--el-fill-color-light); border-radius: 4px;">
                 <div style="font-weight: 600; margin-bottom: 8px;">单独获取的结果：</div>
                 <el-descriptions :column="1" border>
                   <el-descriptions-item label="平台">

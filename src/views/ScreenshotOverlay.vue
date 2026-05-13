@@ -98,7 +98,7 @@ const selH = computed(() => Math.abs(endY.value - startY.value))
 
 // Annotation
 const currentTool = ref(null)
-const drawColor = ref('#F56C6C')
+const drawColor = ref('var(--el-color-danger)')
 const drawWidth = ref(2)
 const annotations = ref([])
 const redoStack = ref([])
@@ -125,7 +125,7 @@ const showAnnoCanvas = computed(() => phase.value === 'selected' || phase.value 
 // Magnifier
 const magX = ref(0), magY = ref(0), magColor = ref('#000000')
 
-const presetColors = ['#F56C6C', '#E6A23C', '#67C23A', '#409EFF', '#a855f7', '#ffffff', '#000000']
+const presetColors = ['var(--el-color-danger)', 'var(--el-color-warning)', 'var(--el-color-success)', 'var(--accent-blue)', '#a855f7', '#ffffff', '#000000']
 const drawTools = [
   { id: 'rect', icon: '□', label: t('screenshot.toolRect') },
   { id: 'ellipse', icon: '○', label: t('screenshot.toolEllipse') },
@@ -287,13 +287,13 @@ function drawBackground() {
     ctx.drawImage(screenImage.value, 0, 0)
     ctx.restore()
 
-    ctx.strokeStyle = '#409EFF'
+    ctx.strokeStyle = 'var(--accent-blue)'
     ctx.lineWidth = 2
     ctx.setLineDash([])
     ctx.strokeRect(selX.value, selY.value, selW.value, selH.value)
 
     const handles = getSelectionHandles()
-    ctx.fillStyle = '#409EFF'
+    ctx.fillStyle = 'var(--accent-blue)'
     handles.forEach(h => { ctx.fillRect(h.x - 3, h.y - 3, 6, 6) })
   }
 }
@@ -609,7 +609,7 @@ function updateMagnifier(px, py) {
   ctx.imageSmoothingEnabled = false
   ctx.clearRect(0, 0, 120, 120)
   ctx.drawImage(screenImage.value, px - 4, py - 4, 9, 9, 0, 0, 120, 120)
-  ctx.strokeStyle = '#409EFF'; ctx.lineWidth = 1
+  ctx.strokeStyle = 'var(--accent-blue)'; ctx.lineWidth = 1
   const s = 120 / 9
   ctx.strokeRect(60 - s / 2, 60 - s / 2, s, s)
   // 从缓存的 ImageData 取色
@@ -808,7 +808,7 @@ async function closeSelf() {
   transition: all 0.1s; user-select: none;
 }
 .tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
-.tool-btn.active { background: #409EFF; color: #fff; }
+.tool-btn.active { background: var(--accent-blue); color: #fff; }
 .action-btn { width: auto; padding: 0 8px; font-size: 12px; }
 .pin-btn:hover { background: rgba(103,194,58,0.3); }
 .cancel-btn:hover { background: rgba(245,108,108,0.3); }
@@ -828,13 +828,13 @@ async function closeSelf() {
 .magnifier canvas { display: block; border-radius: 4px; image-rendering: pixelated; }
 .mag-info {
   display: flex; justify-content: space-between;
-  padding: 2px 4px; font-size: 10px; color: #aaa; font-family: monospace;
+  padding: 2px 4px; font-size: 10px; color: var(--text-quaternary); font-family: monospace;
 }
 .text-input-overlay {
   position: absolute;
   z-index: 25;
   background: rgba(255,255,255,0.9);
-  border: 2px solid #409EFF;
+  border: 2px solid var(--accent-blue);
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 16px;

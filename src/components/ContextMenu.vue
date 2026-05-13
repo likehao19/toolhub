@@ -191,7 +191,7 @@ onUnmounted(() => {
 .context-menu {
   position: fixed;
   background: var(--bg-primary);
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--el-border-color);
   border-radius: 4px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   z-index: 10000;
@@ -212,14 +212,14 @@ onUnmounted(() => {
 }
 
 .context-menu-item:hover:not(.separator):not(.disabled) {
-  background-color: #f3f4f6;
+  background-color: var(--el-fill-color-light);
 }
 
 .context-menu-item.separator {
   height: 1px;
   padding: 0;
   margin: 2px 0;
-  background-color: #e5e7eb;
+  background-color: var(--el-border-color-light);
   cursor: default;
 }
 
@@ -229,13 +229,13 @@ onUnmounted(() => {
 }
 
 .menu-text {
-  color: #374151;
+  color: var(--el-text-color-primary);
   white-space: nowrap;
   flex: 1;
 }
 
 .menu-shortcut {
-  color: #9ca3af;
+  color: var(--el-text-color-secondary);
   font-size: 12px;
   white-space: nowrap;
   font-family: "PingFang SC";

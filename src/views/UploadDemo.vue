@@ -22,7 +22,7 @@
                 <el-icon><FolderOpened /></el-icon>
                 选择文件
               </el-button>
-              <span v-if="uploadForm.filePath" style="margin-left: 12px; color: #666">
+              <span v-if="uploadForm.filePath" style="margin-left: 12px; color: var(--text-secondary)">
                 {{ uploadForm.filePath }}
               </span>
             </el-form-item>
@@ -140,7 +140,7 @@ const goBack = () => {
   width: 100%;
   height: 100vh;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 
 .demo-view {
@@ -174,7 +174,7 @@ const goBack = () => {
 .response-body {
   max-height: 300px;
   overflow: auto;
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
   padding: 12px;
   border-radius: 4px;
   font-size: 12px;

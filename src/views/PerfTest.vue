@@ -364,8 +364,8 @@ function doStopBench() {
 .bench-stat-card:nth-child(4n) { border-right: 0; }
 /* 最后一行无下边框（8 项时第 5-8 个） */
 .bench-stat-card:nth-last-child(-n+4) { border-bottom: 0; }
-.bench-stat-card.ok .stat-val { color: #67C23A; }
-.bench-stat-card.err .stat-val { color: #F56C6C; }
+.bench-stat-card.ok .stat-val { color: var(--el-color-success); }
+.bench-stat-card.err .stat-val { color: var(--el-color-danger); }
 .stat-val {
   font-size: 20px;
   font-weight: 700;
@@ -418,7 +418,7 @@ function doStopBench() {
   border-radius: 3px;
   transition: width 0.3s;
 }
-.qps-bar { background: linear-gradient(90deg, #409EFF, #67C23A); }
+.qps-bar { background: linear-gradient(90deg, var(--accent-blue), var(--el-color-success)); }
 .chart-val {
   width: 70px;
   color: var(--text-secondary);

@@ -482,7 +482,7 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 8px;
   left: 8px;
-  background: #67c23a;
+  background: var(--el-color-success);
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -599,7 +599,7 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 .ctx-item:hover { background: rgba(240, 233, 220,0.9); }
-.ctx-danger { color: #f56c6c; }
+.ctx-danger { color: var(--el-color-danger); }
 .ctx-sep { height: 1px; background: rgba(60, 40, 20, 0.08); margin: 4px 0; }
 
 .setting-hint { font-size: 12px; color: var(--text-quaternary); margin-top: 6px; }
