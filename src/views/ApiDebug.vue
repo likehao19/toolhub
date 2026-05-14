@@ -966,7 +966,7 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 .header {
   display: flex;
@@ -1012,13 +1012,13 @@ onMounted(() => {
   letter-spacing: 0;
 }
 .api-debug-wrapper :deep(.el-button--primary) {
-  color: #fff;
+  color: var(--el-color-white);
   background: linear-gradient(180deg, #4c82e6 0%, #316bd0 100%);
   border-color: rgba(49, 107, 208, 0.85);
   box-shadow: 0 6px 14px rgba(49, 107, 208, 0.18), inset 0 1px 0 rgba(255,255,255,0.26);
 }
 .api-debug-wrapper :deep(.el-button--primary:hover) {
-  color: #fff;
+  color: var(--el-color-white);
   background: linear-gradient(180deg, #5a8dea 0%, #3a72d6 100%);
   border-color: rgba(58, 114, 214, 0.9);
 }
@@ -1092,7 +1092,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   border: 1px solid rgba(60, 40, 20, 0.14);
   border-radius: 11px;
   z-index: 20;
@@ -1104,7 +1104,7 @@ onMounted(() => {
 .sidebar-toggle.collapsed { left: 0; }
 .sidebar-toggle:hover {
   color: var(--accent-blue);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: 0 3px 10px rgba(47, 111, 228, 0.18);
 }
 .sidebar-tabs { display: flex; padding: 10px 10px 8px; gap: 6px; }
@@ -1333,7 +1333,7 @@ onMounted(() => {
 .method-select :deep(.el-select__wrapper) {
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
   padding: 0 10px;
 }
@@ -1349,7 +1349,7 @@ onMounted(() => {
 .url-input :deep(.el-input__wrapper) {
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
   padding: 0 12px;
 }
@@ -1457,7 +1457,7 @@ onMounted(() => {
   border: 1px solid rgba(60, 40, 20, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   padding: 0;
 }
 .kv-row {
@@ -1507,7 +1507,7 @@ onMounted(() => {
 .kv-editor :deep(.el-input__wrapper.is-focus),
 .kv-editor :deep(.el-select__wrapper.is-focused),
 .kv-editor :deep(.el-autocomplete .el-input__wrapper.is-focus) {
-  background: #fff !important;
+  background: var(--el-bg-color-overlay) !important;
   box-shadow: inset 0 0 0 1.5px var(--accent-blue) !important;
 }
 .kv-editor > .el-button {

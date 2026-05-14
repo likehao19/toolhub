@@ -202,18 +202,18 @@ const cssVars = {
   '--bg-body': '#f7f9fb',
   '--bg-sidebar': '#fcfcfc',
   '--bg-content': '#ffffff',
-  '--border-color': '#e1e4e8',
+  '--border-color': 'var(--el-border-color-light)',
   '--text-primary': '#2c3e50',
   '--text-secondary': '#606f7b',
-  '--accent-color': '#3498db',
+  '--accent-color': 'var(--accent-blue)',
   '--hover-bg': '#edf2f7',
-  '--danger-color': '#e74c3c',
+  '--danger-color': 'var(--color-red)',
   '--success-color': '#2ecc71',
-  '--icon-folder': '#f1c40f',
-  '--icon-md': '#3498db',
-  '--icon-word': '#2980b9',
+  '--icon-folder': 'var(--color-yellow)',
+  '--icon-md': 'var(--accent-blue)',
+  '--icon-word': 'var(--accent-blue-hover)',
   '--icon-excel': '#27ae60',
-  '--icon-txt': '#95a5a6'
+  '--icon-txt': 'var(--el-text-color-secondary)'
 }
 
 // 应用 CSS 变量
@@ -1104,18 +1104,18 @@ const scrollToHeading = (index) => {
   --bg-body: #f7f9fb;
   --bg-sidebar: #fcfcfc;
   --bg-content: #ffffff;
-  --border-color: #e1e4e8;
+  --border-color: var(--el-border-color-light);
   --text-primary: #2c3e50;
   --text-secondary: #606f7b;
-  --accent-color: #3498db;
+  --accent-color: var(--accent-blue);
   --hover-bg: #edf2f7;
-  --danger-color: #e74c3c;
+  --danger-color: var(--color-red);
   --success-color: #2ecc71;
-  --icon-folder: #f1c40f;
-  --icon-md: #3498db;
-  --icon-word: #2980b9;
+  --icon-folder: var(--color-yellow);
+  --icon-md: var(--accent-blue);
+  --icon-word: var(--accent-blue-hover);
   --icon-excel: #27ae60;
-  --icon-txt: #95a5a6;
+  --icon-txt: var(--el-text-color-secondary);
 }
 
 .md-editor {
@@ -1191,8 +1191,8 @@ const scrollToHeading = (index) => {
 }
 
 .btn-primary:hover {
-  background: #2980b9;
-  border-color: #2980b9;
+  background: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
   color: white;
 }
 
@@ -1526,7 +1526,7 @@ const scrollToHeading = (index) => {
 }
 
 .editor-toolbar .el-icon:hover {
-  background: #e1e4e8;
+  background: var(--el-border-color-light);
   color: var(--text-primary);
 }
 

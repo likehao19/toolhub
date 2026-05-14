@@ -537,7 +537,7 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 .header {
   display: flex;
@@ -626,7 +626,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   border: 1px solid rgba(60, 40, 20, 0.14);
   border-radius: 11px;
   z-index: 20;
@@ -638,7 +638,7 @@ onMounted(() => {
 .sidebar-toggle.collapsed { left: 0; }
 .sidebar-toggle:hover {
   color: var(--accent-blue);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: 0 3px 10px rgba(47, 111, 228, 0.18);
 }
 
@@ -802,7 +802,7 @@ onMounted(() => {
 .method-select :deep(.el-select__wrapper) {
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
   padding: 0 10px;
 }
@@ -827,7 +827,7 @@ onMounted(() => {
 .path-input :deep(.el-input__wrapper) {
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
   padding: 0 12px;
 }
@@ -963,12 +963,12 @@ onMounted(() => {
 .form-row :deep(.el-input__wrapper) {
   height: 30px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.1);
 }
 .form-row :deep(.el-textarea__inner) {
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.1);
   padding: 8px 12px;
   font-size: 12.5px;
@@ -988,7 +988,7 @@ onMounted(() => {
   border: 1px solid rgba(60, 40, 20, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
 }
 .kv-table-head,
 .kv-table-row {
@@ -1037,7 +1037,7 @@ onMounted(() => {
 }
 .kv-table :deep(.el-input__wrapper.is-focus),
 .kv-table :deep(.el-select__wrapper.is-focused) {
-  background: #fff !important;
+  background: var(--el-bg-color-overlay) !important;
   box-shadow: inset 0 0 0 1.5px var(--accent-blue) !important;
 }
 .kv-col-act { display: flex; justify-content: center; align-items: center; }
@@ -1072,7 +1072,7 @@ onMounted(() => {
   font-size: 12.5px;
   line-height: 1.65;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.1);
   padding: 12px 14px;
   color: var(--text-primary);

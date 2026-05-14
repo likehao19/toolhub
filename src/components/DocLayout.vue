@@ -269,7 +269,7 @@ onMounted(() => {
 }
 
 .menu-item.active {
-  background-color: #ecf5ff;
+  background-color: var(--el-color-primary-light-9);
   color: var(--accent-blue);
   font-weight: 500;
 }

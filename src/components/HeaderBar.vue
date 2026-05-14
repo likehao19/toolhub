@@ -393,14 +393,14 @@ onUnmounted(() => {
 .app-name {
   font-size: 14px;
   font-weight: var(--font-weight-semibold);
-  color: #0f172a;
+  color: var(--el-text-color-primary);
   letter-spacing: 0.02em;
   -webkit-app-region: drag;
   padding: 0;
   border-radius: 0;
   background: transparent;
   border: none;
-  -webkit-text-fill-color: #0f172a;
+  -webkit-text-fill-color: var(--el-text-color-primary);
 }
 
 .header-right {
@@ -426,19 +426,19 @@ onUnmounted(() => {
 
 .header-button:hover {
   background: rgba(255, 255, 255, 0.96);
-  color: #0f172a;
+  color: var(--el-text-color-primary);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(60, 40, 20, 0.12);
 }
 
 .header-button.close-button:hover {
   background: var(--color-red);
-  color: #ffffff;
+  color: var(--el-color-white);
   border-color: transparent;
 }
 
 .header-button.pin-button.active {
-  color: #2f6fe4;
+  color: var(--accent-blue);
   border-color: rgba(47, 111, 228, 0.38);
   background: rgba(47, 111, 228, 0.12);
 }
@@ -458,7 +458,7 @@ onUnmounted(() => {
   --el-input-bg-color: rgba(255, 255, 255, 0.72);
   --el-input-border-color: color-mix(in srgb, var(--border-color) 85%, #dce7f6 15%);
   --el-input-hover-border-color: #b7c8dd;
-  --el-input-focus-border-color: #2f6fe4;
+  --el-input-focus-border-color: var(--accent-blue);
 }
 
 .global-search :deep(.el-input__wrapper) {
@@ -474,7 +474,7 @@ onUnmounted(() => {
 }
 
 .global-search :deep(.el-input__wrapper.is-focus) {
-  border-color: #2f6fe4;
+  border-color: var(--accent-blue);
   box-shadow: 0 0 0 2px rgba(47, 111, 228, 0.14) !important;
 }
 
@@ -593,7 +593,7 @@ onUnmounted(() => {
 
 .item-title mark {
   background: transparent;
-  color: #2f6fe4;
+  color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
   padding: 0;
 }
@@ -609,7 +609,7 @@ onUnmounted(() => {
 
 .item-desc mark {
   background: transparent;
-  color: #2f6fe4;
+  color: var(--accent-blue);
   padding: 0;
 }
 

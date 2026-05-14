@@ -79,7 +79,7 @@
           <!-- 根目录新建文件夹输入框 -->
           <li v-if="creatingFolderParent === 'root'" class="root-new-folder-wrapper">
             <div class="new-folder-input-wrapper">
-              <i class="fa-solid fa-folder" style="color: #f1c40f; margin-right: 8px;"></i>
+              <i class="fa-solid fa-folder" style="color: var(--color-yellow); margin-right: 8px;"></i>
               <input
                 ref="newFolderInputRef"
                 type="text"
@@ -559,18 +559,18 @@ const cssVars = {
   '--bg-body': '#f7f9fb',
   '--bg-sidebar': '#fcfcfc',
   '--bg-content': '#ffffff',
-  '--border-color': '#e1e4e8',
+  '--border-color': 'var(--el-border-color-light)',
   '--text-primary': '#2c3e50',
   '--text-secondary': '#606f7b',
-  '--accent-color': '#3498db',
+  '--accent-color': 'var(--accent-blue)',
   '--hover-bg': '#edf2f7',
-  '--danger-color': '#e74c3c',
+  '--danger-color': 'var(--color-red)',
   '--success-color': '#2ecc71',
-  '--icon-folder': '#f1c40f',
-  '--icon-md': '#3498db',
-  '--icon-word': '#2980b9',
+  '--icon-folder': 'var(--color-yellow)',
+  '--icon-md': 'var(--accent-blue)',
+  '--icon-word': 'var(--accent-blue-hover)',
   '--icon-excel': '#27ae60',
-  '--icon-txt': '#95a5a6'
+  '--icon-txt': 'var(--el-text-color-secondary)'
 }
 
 // 绑定滚动事件的辅助函数
@@ -3220,19 +3220,19 @@ const formatFileTime = (time) => {
   --bg-body: #f7f9fb;
   --bg-sidebar: #fcfcfc;
   --bg-content: #ffffff;
-  --border-color: #e1e4e8;
+  --border-color: var(--el-border-color-light);
   --text-primary: #2c3e50;
   --text-secondary: #606f7b;
-  --accent-color: #3498db;
+  --accent-color: var(--accent-blue);
   --hover-bg: #edf2f7;
   --active-bg: #e6f4ff;
-  --danger-color: #e74c3c;
+  --danger-color: var(--color-red);
   --success-color: #2ecc71;
-  --icon-folder: #f1c40f;
-  --icon-md: #3498db;
-  --icon-word: #2980b9;
+  --icon-folder: var(--color-yellow);
+  --icon-md: var(--accent-blue);
+  --icon-word: var(--accent-blue-hover);
   --icon-excel: #27ae60;
-  --icon-txt: #95a5a6;
+  --icon-txt: var(--el-text-color-secondary);
 }
 
 .notes-page-wrapper {
@@ -3241,7 +3241,7 @@ const formatFileTime = (time) => {
   overflow: hidden;
   font-family: "PingFang SC";
   color: var(--text-primary);
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
   height: 100%;
   width: 100%;
 }
@@ -3354,8 +3354,8 @@ const formatFileTime = (time) => {
 }
 
 .btn-primary:hover {
-  background: #2980b9;
-  border-color: #2980b9;
+  background: var(--accent-blue-hover);
+  border-color: var(--accent-blue-hover);
   color: white;
 }
 
@@ -4172,7 +4172,7 @@ const formatFileTime = (time) => {
 }
 
 .folder-tree-select :deep(.el-tree-node.is-current > .el-tree-node__content) {
-  background-color: #ecf5ff;
+  background-color: var(--el-color-primary-light-9);
   color: var(--accent-blue);
 }
 

@@ -551,7 +551,7 @@ onUnmounted(() => {
   gap: 12px;
   padding: 10px;
   border-left: 3px solid var(--accent-blue);
-  background: #f0f9ff;
+  background: var(--el-color-primary-light-9);
   border-radius: 4px;
 }
 
@@ -586,7 +586,7 @@ onUnmounted(() => {
 }
 
 .note-item:hover {
-  background: #f0f9ff;
+  background: var(--el-color-primary-light-9);
 }
 
 .note-title {
@@ -619,7 +619,7 @@ onUnmounted(() => {
 }
 
 .bookmark-item:hover {
-  background: #f0f9ff;
+  background: var(--el-color-primary-light-9);
 }
 
 .bookmark-icon {

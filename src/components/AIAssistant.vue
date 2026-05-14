@@ -456,7 +456,7 @@ const formatTime = (date) => {
 }
 
 .result-box.success {
-  background: #f0f9ff;
+  background: var(--el-color-primary-light-9);
   color: var(--el-color-success);
 }
 

@@ -470,7 +470,7 @@ const doClear = () => {
   padding: 2px 0;
   font-size: 11px;
   font-weight: 600;
-  color: #ef4444;
+  color: var(--color-red);
   background: transparent;
   border: 0;
   border-radius: 0;

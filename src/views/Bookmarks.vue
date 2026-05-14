@@ -1257,7 +1257,7 @@ onUnmounted(() => {
   flex-direction: column;
   overflow: hidden;
   color: var(--text-primary);
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
   height: 100%;
   width: 100%;
   position: relative;

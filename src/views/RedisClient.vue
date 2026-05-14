@@ -1088,7 +1088,7 @@ watch(showRenameDialog, (v) => {
   background: rgba(60, 40, 20, 0.04);
 }
 .db-item:hover { background: rgba(60, 40, 20, 0.08); color: var(--text-primary); }
-.db-item.active { background: var(--accent-blue); color: #fff; box-shadow: 0 6px 16px rgba(194, 65, 12,0.2); }
+.db-item.active { background: var(--accent-blue); color: var(--el-color-white); box-shadow: 0 6px 16px rgba(194, 65, 12,0.2); }
 
 /* Right area */
 .right-area {
@@ -1263,7 +1263,7 @@ watch(showRenameDialog, (v) => {
 }
 
 /* CLI */
-.cli-tab { background: #1e1e2e; color: #cdd6f4; }
+.cli-tab { background: #1e1e2e; color: var(--el-text-color-regular); }
 .cli-output { flex: 1; overflow-y: auto; padding: 12px 16px; font-family: 'Cascadia Code', Consolas, monospace; font-size: 13px; }
 .cli-entry { margin-bottom: 8px; }
 .cli-cmd { color: #89b4fa; }
@@ -1274,7 +1274,7 @@ watch(showRenameDialog, (v) => {
 .cli-nil { color: #6c7086; }
 .cli-error { color: #f38ba8; }
 .cli-status { color: #a6e3a1; }
-.cli-array { color: #cdd6f4; }
+.cli-array { color: var(--el-text-color-regular); }
 
 .cli-input-area {
   display: flex;
@@ -1286,7 +1286,7 @@ watch(showRenameDialog, (v) => {
 .cli-prompt-input { color: #a6e3a1; font-family: 'Cascadia Code', Consolas, monospace; font-size: 13px; margin-right: 8px; white-space: nowrap; }
 .cli-input { flex: 1; }
 .cli-input :deep(.el-input__wrapper) { background: transparent; box-shadow: none; }
-.cli-input :deep(.el-input__inner) { color: #cdd6f4; font-family: 'Cascadia Code', Consolas, monospace; font-size: 13px; }
+.cli-input :deep(.el-input__inner) { color: var(--el-text-color-regular); font-family: 'Cascadia Code', Consolas, monospace; font-size: 13px; }
 
 /* Server info */
 .info-tab { overflow-y: auto; padding: 16px; background: transparent; }

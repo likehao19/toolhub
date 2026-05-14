@@ -858,7 +858,7 @@ onMounted(async () => {
 }
 
 .file-item-row.folder-row {
-  background: linear-gradient(90deg, #f0f9ff 0%, #ffffff 100%);
+  background: linear-gradient(90deg, var(--el-color-primary-light-9) 0%, #ffffff 100%);
 }
 
 .file-item-row.folder-row:nth-child(even) {
@@ -878,12 +878,12 @@ onMounted(async () => {
 }
 
 .file-item-row:hover {
-  background: #ecf5ff !important;
+  background: var(--el-color-primary-light-9) !important;
   box-shadow: inset 0 1px 0 rgba(64, 158, 255, 0.1), inset 0 -1px 0 rgba(64, 158, 255, 0.1);
 }
 
 .file-item-row.folder-row:hover {
-  background: linear-gradient(90deg, #d9ecff 0%, #ecf5ff 100%) !important;
+  background: linear-gradient(90deg, #d9ecff 0%, var(--el-color-primary-light-9) 100%) !important;
 }
 
 .file-item-row:hover::before {
@@ -1072,7 +1072,7 @@ onMounted(async () => {
 }
 
 :deep(.el-tree-node__content:hover) {
-  background-color: #ecf5ff;
+  background-color: var(--el-color-primary-light-9);
 }
 
 :deep(.el-tree-node.is-current > .el-tree-node__content) {

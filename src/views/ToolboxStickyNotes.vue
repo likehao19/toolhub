@@ -468,7 +468,7 @@ const openStickyNotes = async () => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 
 .header {
@@ -653,7 +653,7 @@ const openStickyNotes = async () => {
   line-height: 1;
   white-space: nowrap;
 }
-.keycap.active { color: var(--accent-blue); border-color: #a0cfff; background: linear-gradient(180deg, #ecf5ff 0%, #d9ecff 100%); }
+.keycap.active { color: var(--accent-blue); border-color: #a0cfff; background: linear-gradient(180deg, var(--el-color-primary-light-9) 0%, #d9ecff 100%); }
 .keycap-sep { font-size: 11px; color: var(--el-text-color-placeholder); margin: 0 1px; }
 .shortcut-clear { font-size: 16px; color: var(--el-text-color-placeholder); cursor: pointer; line-height: 1; transition: color 0.2s; }
 .shortcut-clear:hover { color: var(--el-color-danger); }

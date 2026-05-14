@@ -790,7 +790,7 @@ function onKeyDown(e) {
 .search-results { max-height: 240px; overflow-y: auto; margin-top: 8px; }
 .search-item { padding: 6px 8px; font-size: 12px; cursor: pointer; border-radius: 4px; }
 .search-item:hover { background: rgba(128,128,128,0.1); }
-.search-item :deep(mark) { background: #ffeb3b; color: #000; border-radius: 2px; padding: 0 1px; }
+.search-item :deep(mark) { background: #ffeb3b; color: var(--text-primary); border-radius: 2px; padding: 0 1px; }
 
 /* Reader body */
 .reader-body { flex: 1; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }

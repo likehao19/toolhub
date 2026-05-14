@@ -489,7 +489,7 @@ function swapBases() {
 .input-panel .panel-textarea :deep(.el-textarea__inner):focus {
   border-color: var(--accent-blue);
   box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.1);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
 }
 .output-panel .panel-textarea :deep(.el-textarea__inner) { color: var(--text-primary); }
 

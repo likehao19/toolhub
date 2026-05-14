@@ -214,7 +214,7 @@ const handleCommand = (cmd) => {
 }
 
 .folder-item.active {
-  background: linear-gradient(135deg, #ecf5ff 0%, #e1f0ff 100%);
+  background: linear-gradient(135deg, var(--el-color-primary-light-9) 0%, #e1f0ff 100%);
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
 }
 
@@ -303,7 +303,7 @@ const handleCommand = (cmd) => {
 
 .folder-item.active .folder-count {
   background: var(--accent-blue);
-  color: #ffffff;
+  color: var(--el-color-white);
 }
 
 .folder-actions {

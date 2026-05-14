@@ -13,7 +13,7 @@
       </div>
       <div class="header-actions">
         <span class="fav-hint">
-          <el-icon style="color: #f59e0b"><StarFilled /></el-icon>
+          <el-icon style="color: var(--color-orange)"><StarFilled /></el-icon>
           {{ t('toolbox.favHint') }}
         </span>
         <el-button type="primary" size="small" @click="goToSettings">
@@ -282,7 +282,7 @@ const goToSettings = () => {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
 }
 
 .content-area {
@@ -345,7 +345,7 @@ const goToSettings = () => {
   padding: 0 2px 10px;
   font-size: 13px;
   font-weight: 700;
-  color: #334155;
+  color: var(--el-text-color-regular);
   user-select: none;
   margin-bottom: 10px;
   border-bottom: 1px dashed var(--divider);
@@ -522,13 +522,13 @@ const goToSettings = () => {
 
 .favorite-btn.starred {
   opacity: 1 !important;
-  color: #f59e0b;
+  color: var(--color-orange);
   background: rgba(245, 158, 11, 0.09);
 }
 
 .favorite-btn:hover {
   opacity: 1 !important;
-  color: #f59e0b;
+  color: var(--color-orange);
   background: rgba(245, 158, 11, 0.11);
 }
 

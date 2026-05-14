@@ -138,7 +138,7 @@
 /* ========== 按钮体系 ========== */
 .btn-primary {
   background: var(--accent-blue);
-  color: #ffffff;
+  color: var(--el-color-white);
   border: none;
   border-radius: var(--radius-sm);
   padding: 6px 14px;

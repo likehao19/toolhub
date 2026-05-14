@@ -526,7 +526,7 @@ statusText.value = t('imageToBase64.ready')
 }
 .preview-clear-btn:hover {
   color: var(--el-color-danger);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   border-color: rgba(245, 108, 108, 0.4);
 }
 .hidden-input { display: none; }

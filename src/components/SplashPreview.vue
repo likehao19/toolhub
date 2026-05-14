@@ -391,7 +391,7 @@ onUnmounted(() => {
 
 .animation-minimal .spinner {
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-top: 2px solid #fff;
+  border-top: 2px solid var(--el-bg-color-overlay);
   width: 30px;
   height: 30px;
 }
@@ -427,7 +427,7 @@ onUnmounted(() => {
 
 /* ignore */
 .animation-matrix {
-  background: #000 !important;
+  background: var(--el-bg-color-page) !important;
   color: #0f0;
 }
 
@@ -505,7 +505,7 @@ onUnmounted(() => {
 
 /* ignore */
 .animation-space {
-  background: #000 !important;
+  background: var(--el-bg-color-page) !important;
   background-image: 
     radial-gradient(2px 2px at 20% 30%, white, transparent),
     radial-gradient(2px 2px at 60% 70%, white, transparent),

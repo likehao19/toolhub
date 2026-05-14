@@ -507,7 +507,7 @@
    ----------------------------------------------------------------
    背景：toolbox-unified.css 给 30+ 个工具页（CryptoTool / RegexTester /
    HexConverter / RedisClient …）建了一套独立的"冷蓝"主题（--tb-bg: #f4f8fc,
-   --tb-primary: #2f6fe4, 蓝色 radial-gradient 背景）。这一节把它整套换成
+   --tb-primary: var(--accent-blue), 蓝色 radial-gradient 背景）。这一节把它整套换成
    暖奶油 + 暖橙 + divider hairline，让所有工具子页和资源收藏页风格一致。
    ============================================================ */
 
@@ -779,14 +779,14 @@
     0 0 0 3px color-mix(in srgb, var(--accent-warm) 14%, transparent 86%) !important;
 }
 
-/* 7) 按钮：覆盖 toolbox-unified.css 里写死的蓝色（#2f6fe4 渐变与阴影） */
+/* 7) 按钮：覆盖 toolbox-unified.css 里写死的蓝色（var(--accent-blue) 渐变与阴影） */
 .app-content.toolbox-unified-shell .el-button--primary,
 .app-content.toolbox-unified-shell .el-button--primary:hover {
   background: var(--accent-warm) !important;
   background-image: none !important;
   border-color: var(--accent-warm) !important;
   box-shadow: none !important;
-  color: #ffffff !important;
+  color: var(--el-color-white) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--primary:hover {
@@ -798,7 +798,7 @@
   box-shadow: none !important;
 }
 
-/* 8) 链接、active 文本：覆盖写死的 #2f6fe4 文本色 */
+/* 8) 链接、active 文本：覆盖写死的 var(--accent-blue) 文本色 */
 .app-content.toolbox-unified-shell :is(.breadcrumb-link, .el-link, .el-link--primary) {
   color: var(--accent-warm) !important;
 }
@@ -841,7 +841,7 @@
   color: var(--text-tertiary) !important;
 }
 
-/* 默认按钮文本 / 边框（写死 #334155 / #475569 / #d8e2ef / #d5e0ec / #b9c9de / #c1d0e2） */
+/* 默认按钮文本 / 边框（写死 var(--el-text-color-regular) / #475569 / #d8e2ef / #d5e0ec / #b9c9de / #c1d0e2） */
 .app-content.toolbox-unified-shell .el-button--default {
   color: var(--text-secondary) !important;
   border-color: var(--divider) !important;
@@ -1353,19 +1353,19 @@
 /* 已收藏：始终满显暖橙（不被父级 hover 规则盖掉） */
 .app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn.starred {
   opacity: 1 !important;
-  color: #d97706 !important;
+  color: var(--color-orange) !important;
   background: transparent !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .favorite-btn.starred {
   opacity: 1 !important;
-  color: #d97706 !important;
+  color: var(--color-orange) !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn:hover {
   opacity: 1 !important;
-  color: #d97706 !important;
-  background: color-mix(in srgb, #d97706 14%, transparent 86%) !important;
+  color: var(--color-orange) !important;
+  background: color-mix(in srgb, var(--color-orange) 14%, transparent 86%) !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn .el-icon {
@@ -1380,19 +1380,19 @@
 /* 已收藏：始终满显暖橙（不被 hover 行为遮蔽） */
 .app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn.starred {
   opacity: 1 !important;
-  color: #d97706 !important;
+  color: var(--color-orange) !important;
   background: transparent !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .tool-card:hover .favorite-btn.starred {
   opacity: 1 !important;
-  color: #d97706 !important;
+  color: var(--color-orange) !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .favorite-btn:hover {
   opacity: 1 !important;
-  color: #d97706 !important;
-  background: color-mix(in srgb, #d97706 14%, transparent 86%) !important;
+  color: var(--color-orange) !important;
+  background: color-mix(in srgb, var(--color-orange) 14%, transparent 86%) !important;
 }
 
 /* 10) 顶部条（header）：暖白渐变 + divider 底线，去 button glow */
@@ -1406,7 +1406,7 @@
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .fav-hint .el-icon {
-  color: #d97706 !important;
+  color: var(--color-orange) !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .header-actions .el-button {
@@ -1423,7 +1423,7 @@
    16. 便签管理页（ToolboxStickyNotes.vue）—— 拉直 + 暖系化
    ----------------------------------------------------------------
    原页问题：
-   1. wrapper 用了 #eef2f6 → #e7ecf3 冷蓝灰渐变（与暖奶油主调脱节）
+   1. wrapper 用了 var(--el-fill-color-light) → var(--el-fill-color-light) 冷蓝灰渐变（与暖奶油主调脱节）
    2. .overview-card 是 18px 圆角白卡 + 阴影 + 1px 冷灰边（4 张并排重）
    3. .settings-section 也是 18px 圆角边框（卡中卡 → 嵌套）
    4. .keycap 写死 "PingFang SC" → 全局 --font-family 没生效

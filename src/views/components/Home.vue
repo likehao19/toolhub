@@ -204,7 +204,7 @@ const scrollToCategory = (categoryName) => {
 /* ignore */
 .hero-section {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #ffffff;
+  color: var(--el-color-white);
   padding: 80px 40px;
   text-align: center;
 }
@@ -217,7 +217,7 @@ const scrollToCategory = (categoryName) => {
   font-size: 48px;
   font-weight: 700;
   margin: 0 0 16px 0;
-  color: #ffffff;
+  color: var(--el-color-white);
 }
 
 .hero-icon {

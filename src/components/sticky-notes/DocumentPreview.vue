@@ -134,7 +134,7 @@ onUnmounted(() => {
   resize: none;
   font-size: 12px;
   line-height: 1.5;
-  color: #334155;
+  color: var(--el-text-color-regular);
   background: transparent;
   font-family: inherit;
   scrollbar-gutter: stable;
@@ -174,16 +174,16 @@ onUnmounted(() => {
 
 .hint {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
 }
 
 .status {
   font-size: 11px;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   transition: color 0.2s;
 }
 
 .status.unsaved {
-  color: #f59e0b;
+  color: var(--color-orange);
 }
 </style>

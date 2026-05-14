@@ -152,7 +152,7 @@ defineExpose({
 
 .excel-toolbar {
   padding: 10px 20px;
-  border-bottom: 1px solid var(--border-color, #e1e4e8);
+  border-bottom: 1px solid var(--border-color, var(--el-border-color-light));
   display: flex;
   align-items: center;
   gap: 10px;
@@ -161,14 +161,14 @@ defineExpose({
 
 .sheet-name-input {
   padding: 4px 8px;
-  border: 1px solid var(--border-color, #e1e4e8);
+  border: 1px solid var(--border-color, var(--el-border-color-light));
   border-radius: 4px;
   font-size: 0.85rem;
 }
 
 .btn-small {
   padding: 4px 8px;
-  border: 1px solid var(--border-color, #e1e4e8);
+  border: 1px solid var(--border-color, var(--el-border-color-light));
   background: var(--bg-primary);
   border-radius: 4px;
   cursor: pointer;
@@ -191,7 +191,7 @@ defineExpose({
 
 .excel-header-cell {
   background: var(--el-fill-color-light);
-  border: 1px solid var(--border-color, #e1e4e8);
+  border: 1px solid var(--border-color, var(--el-border-color-light));
   padding: 8px;
   font-weight: 600;
   text-align: center;
@@ -203,7 +203,7 @@ defineExpose({
 
 .excel-row-header {
   background: var(--el-fill-color-light);
-  border: 1px solid var(--border-color, #e1e4e8);
+  border: 1px solid var(--border-color, var(--el-border-color-light));
   padding: 8px;
   font-weight: 600;
   text-align: center;
@@ -214,7 +214,7 @@ defineExpose({
 }
 
 .excel-cell {
-  border: 1px solid var(--border-color, #e1e4e8);
+  border: 1px solid var(--border-color, var(--el-border-color-light));
   padding: 0;
   position: relative;
 }
@@ -231,6 +231,6 @@ defineExpose({
 
 .excel-cell-input:focus {
   background: var(--bg-primary);
-  box-shadow: inset 0 0 0 2px var(--accent-color, #3498db);
+  box-shadow: inset 0 0 0 2px var(--accent-color, var(--accent-blue));
 }
 </style>

@@ -21,7 +21,7 @@
         <i class="fa-solid fa-caret-right"></i>
       </span>
       <div class="tree-info">
-        <i class="fa-solid fa-folder" style="color: #f1c40f;"></i>
+        <i class="fa-solid fa-folder" style="color: var(--color-yellow);"></i>
         <!-- 正常显示或重命名输入框 -->
         <span v-if="renamingFolderKey !== getFolderKey(folder)">{{ folder.name }}</span>
         <input 
@@ -340,7 +340,7 @@ const handleDrop = async (e, targetFolder) => {
 
 .tree-item-wrapper.active {
   background: var(--active-bg, #e6f4ff) !important;
-  color: var(--accent-color, #3498db);
+  color: var(--accent-color, var(--accent-blue));
   font-weight: 600;
 }
 
@@ -477,7 +477,7 @@ const handleDrop = async (e, targetFolder) => {
 /* ignore */
 .file-node .tree-item-wrapper.active {
   background: var(--active-bg, #e6f4ff) !important;
-  color: var(--accent-color, #3498db);
+  color: var(--accent-color, var(--accent-blue));
   font-weight: 500;
 }
 </style>

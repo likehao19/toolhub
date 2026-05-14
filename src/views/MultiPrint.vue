@@ -79,8 +79,8 @@
             @click="activeFileIdx = idx"
           >
             <div class="file-icon">
-              <el-icon v-if="f.type === 'pdf'" style="color:#e74c3c"><Document /></el-icon>
-              <el-icon v-else style="color:#3498db"><Picture /></el-icon>
+              <el-icon v-if="f.type === 'pdf'" style="color:var(--color-red)"><Document /></el-icon>
+              <el-icon v-else style="color:var(--accent-blue)"><Picture /></el-icon>
             </div>
             <div class="file-info">
               <div class="file-name" :title="f.name">{{ f.name }}</div>

@@ -278,7 +278,7 @@ const goBack = () => {
 }
 
 .message-item.received {
-  background: #f0f9ff;
+  background: var(--el-color-primary-light-9);
 }
 
 .message-item.system {

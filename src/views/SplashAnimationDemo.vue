@@ -256,7 +256,7 @@ onMounted(async () => {
 
 .animation-card.selected {
   border: 2px solid var(--accent-blue);
-  background: #ecf5ff;
+  background: var(--el-color-primary-light-9);
 }
 
 .animation-preview {

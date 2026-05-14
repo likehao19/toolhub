@@ -612,7 +612,7 @@ watch(loading, async (val) => {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 
 /* ===== Header ===== */
@@ -820,8 +820,8 @@ watch(loading, async (val) => {
   backdrop-filter: blur(8px);
 }
 
-.wp-badge-current { color: #fff; background: rgba(64, 158, 255, 0.88); }
-.wp-badge-downloaded { color: #fff; background: rgba(103, 194, 58, 0.88); }
+.wp-badge-current { color: var(--el-color-white); background: rgba(64, 158, 255, 0.88); }
+.wp-badge-downloaded { color: var(--el-color-white); background: rgba(103, 194, 58, 0.88); }
 
 /* Progress overlay */
 .wp-progress-overlay {
@@ -837,7 +837,7 @@ watch(loading, async (val) => {
 }
 
 .wp-progress-overlay :deep(.el-progress) { width: 70%; }
-.wp-progress-overlay :deep(.el-progress__text) { color: #fff; font-weight: 600; }
+.wp-progress-overlay :deep(.el-progress__text) { color: var(--el-color-white); font-weight: 600; }
 .wp-progress-overlay :deep(.el-progress-bar__outer) { background: rgba(255, 255, 255, 0.2); }
 
 /* Hover overlay */
@@ -857,7 +857,7 @@ watch(loading, async (val) => {
 .wp-card:hover .wp-card-overlay { opacity: 1; }
 
 .wp-card-title {
-  font-size: 12px; font-weight: 600; color: #fff;
+  font-size: 12px; font-weight: 600; color: var(--el-color-white);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
@@ -890,7 +890,7 @@ watch(loading, async (val) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #000;
+  background: var(--el-bg-color-page);
 }
 
 .preview-full {

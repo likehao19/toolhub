@@ -2160,7 +2160,7 @@ code {
 .credential-manager .action-icon:hover,
 .todos-page-wrapper .action-icon:hover {
   color: var(--text-primary);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
 }
 
 .bookmarks-page-wrapper .action-icon.del:hover,
@@ -2175,7 +2175,7 @@ code {
 .passwords-page-wrapper .category-favorite .favorite-icon,
 .credential-manager .category-favorite .favorite-icon,
 .todos-page-wrapper .category-item .favorite-icon {
-  color: #f59e0b;
+  color: var(--color-orange);
 }
 
 /* ===== Global visual weight reduction ===== */

@@ -266,7 +266,7 @@ onUnmounted(() => {
   border-radius: 4px;
   padding: 6px 8px;
   font-size: 12px;
-  color: #334155;
+  color: var(--el-text-color-regular);
   background: rgba(255, 255, 255, 0.8);
   transition: all 0.2s;
 }
@@ -278,7 +278,7 @@ onUnmounted(() => {
 }
 
 .input::placeholder {
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
 }
 
 .title-input {
@@ -294,7 +294,7 @@ onUnmounted(() => {
 
 .time-separator {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
   flex-shrink: 0;
 }
 
@@ -304,7 +304,7 @@ onUnmounted(() => {
   height: 24px;
   border: none;
   background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--color-red);
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
@@ -324,7 +324,7 @@ onUnmounted(() => {
   padding: 6px;
   border: 1px dashed rgba(0, 0, 0, 0.2);
   background: transparent;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   border-radius: 4px;
   cursor: pointer;
   font-size: 12px;
@@ -349,16 +349,16 @@ onUnmounted(() => {
 
 .hint {
   font-size: 11px;
-  color: #94a3b8;
+  color: var(--el-text-color-placeholder);
 }
 
 .status {
   font-size: 11px;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   transition: color 0.2s;
 }
 
 .status.unsaved {
-  color: #f59e0b;
+  color: var(--color-orange);
 }
 </style>

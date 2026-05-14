@@ -193,7 +193,7 @@ onMounted(() => { refreshAll() })
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 
 .header {
@@ -278,7 +278,7 @@ onMounted(() => { refreshAll() })
 .menu-badge {
   display: inline-flex; align-items: center; justify-content: center;
   width: 22px; height: 22px; border-radius: 6px;
-  font-size: 11px; font-weight: 700; color: #fff;
+  font-size: 11px; font-weight: 700; color: var(--el-color-white);
   flex-shrink: 0; line-height: 1;
 }
 

@@ -447,7 +447,7 @@ onBeforeUnmount(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 .header {
   display: flex;
@@ -566,7 +566,7 @@ onBeforeUnmount(() => {
 .method-select :deep(.el-select__wrapper) {
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
   padding: 0 10px;
 }
@@ -589,7 +589,7 @@ onBeforeUnmount(() => {
 .path-input :deep(.el-input__wrapper) {
   height: 32px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
   padding: 0 12px;
 }
@@ -714,7 +714,7 @@ onBeforeUnmount(() => {
 .form-row :deep(.el-input__wrapper) {
   height: 30px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.1);
 }
 .form-row :deep(.el-input__wrapper:hover) {
@@ -734,7 +734,7 @@ onBeforeUnmount(() => {
   font-size: 12.5px;
   line-height: 1.65;
   color: var(--text-primary);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   border: 0;
   border-radius: 8px;
   outline: none;
@@ -778,7 +778,7 @@ onBeforeUnmount(() => {
 }
 .expectation-name :deep(.el-input__wrapper:hover),
 .expectation-name :deep(.el-input__wrapper.is-focus) {
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(47, 111, 228, 0.4) !important;
 }
 .expectation-name :deep(.el-input__inner) { font-weight: 600; font-size: 12.5px; }
@@ -810,7 +810,7 @@ onBeforeUnmount(() => {
 .kv-row :deep(.el-select__wrapper) {
   height: 28px;
   border-radius: 6px;
-  background: #fff;
+  background: var(--el-bg-color-overlay);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.1);
   padding: 0 8px;
 }

@@ -370,7 +370,7 @@ onBeforeUnmount(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 
 .header {
@@ -464,14 +464,14 @@ onBeforeUnmount(() => {
 .cover-4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 .cover-5 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
 .cover-ext { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; }
-.cover-title { font-size: 14px; color: #fff; font-weight: 700; text-align: center; line-height: 1.3; word-break: break-word; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+.cover-title { font-size: 14px; color: var(--el-color-white); font-weight: 700; text-align: center; line-height: 1.3; word-break: break-word; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
 
 .format-badge {
   position: absolute;
   top: 8px;
   right: 8px;
   background: rgba(0,0,0,0.55);
-  color: #fff;
+  color: var(--el-color-white);
   font-size: 9px;
   font-weight: 700;
   padding: 2px 6px;
@@ -483,7 +483,7 @@ onBeforeUnmount(() => {
   top: 8px;
   left: 8px;
   background: var(--el-color-success);
-  color: #fff;
+  color: var(--el-color-white);
   font-size: 11px;
   font-weight: 700;
   width: 22px;

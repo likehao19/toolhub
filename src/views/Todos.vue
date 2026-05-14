@@ -406,13 +406,13 @@
               <el-icon style="color: #FF6B9D;"><ShoppingCart /></el-icon> {{ t('todos.iconShopping') }}
             </el-option>
             <el-option value="House" :label="t('todos.iconHome')">
-              <el-icon style="color: #3498DB;"><House /></el-icon> {{ t('todos.iconHome') }}
+              <el-icon style="color: var(--accent-blue);"><House /></el-icon> {{ t('todos.iconHome') }}
             </el-option>
             <el-option value="User" :label="t('todos.iconPersonal')">
-              <el-icon style="color: #95A5A6;"><User /></el-icon> {{ t('todos.iconPersonal') }}
+              <el-icon style="color: var(--el-text-color-secondary);"><User /></el-icon> {{ t('todos.iconPersonal') }}
             </el-option>
             <el-option value="Football" :label="t('todos.iconSports')">
-              <el-icon style="color: #E74C3C;"><Football /></el-icon> {{ t('todos.iconSports') }}
+              <el-icon style="color: var(--color-red);"><Football /></el-icon> {{ t('todos.iconSports') }}
             </el-option>
             <el-option value="Present" :label="t('todos.iconGift')">
               <el-icon style="color: #F39C12;"><Present /></el-icon> {{ t('todos.iconGift') }}
@@ -464,13 +464,13 @@
               <el-icon style="color: #FF6B9D;"><ShoppingCart /></el-icon> {{ t('todos.iconShopping') }}
             </el-option>
             <el-option value="House" :label="t('todos.iconHome')">
-              <el-icon style="color: #3498DB;"><House /></el-icon> {{ t('todos.iconHome') }}
+              <el-icon style="color: var(--accent-blue);"><House /></el-icon> {{ t('todos.iconHome') }}
             </el-option>
             <el-option value="User" :label="t('todos.iconPersonal')">
-              <el-icon style="color: #95A5A6;"><User /></el-icon> {{ t('todos.iconPersonal') }}
+              <el-icon style="color: var(--el-text-color-secondary);"><User /></el-icon> {{ t('todos.iconPersonal') }}
             </el-option>
             <el-option value="Football" :label="t('todos.iconSports')">
-              <el-icon style="color: #E74C3C;"><Football /></el-icon> {{ t('todos.iconSports') }}
+              <el-icon style="color: var(--color-red);"><Football /></el-icon> {{ t('todos.iconSports') }}
             </el-option>
             <el-option value="Present" :label="t('todos.iconGift')">
               <el-icon style="color: #F39C12;"><Present /></el-icon> {{ t('todos.iconGift') }}
@@ -705,9 +705,9 @@ const getIconColor = (iconName) => {
     'Briefcase': 'var(--el-color-warning)',
     'Reading': '#8E44AD',
     'ShoppingCart': '#FF6B9D',
-    'House': '#3498DB',
-    'User': '#95A5A6',
-    'Football': '#E74C3C',
+    'House': 'var(--accent-blue)',
+    'User': 'var(--el-text-color-secondary)',
+    'Football': 'var(--color-red)',
     'Present': '#F39C12',
     'Dish': '#E67E22',
     'Connection': '#9B59B6'
@@ -1175,7 +1175,7 @@ onMounted(async () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 
 .header {

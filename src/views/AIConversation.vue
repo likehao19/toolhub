@@ -1733,7 +1733,7 @@ onMounted(async () => {
 }
 
 .breadcrumb i {
-  color: #3498db;
+  color: var(--accent-blue);
   font-size: 14px;
 }
 
@@ -1841,7 +1841,7 @@ onMounted(async () => {
 }
 
 .sidebar-expand-btn:hover {
-  color: #111827;
+  color: var(--el-text-color-primary);
   background: var(--el-fill-color-light);
 }
 
@@ -1924,7 +1924,7 @@ onMounted(async () => {
 }
 
 .sidebar-action-btn:hover {
-  color: #ef4444;
+  color: var(--color-red);
   background: rgba(239, 68, 68, 0.08);
 }
 
@@ -1990,7 +1990,7 @@ onMounted(async () => {
   font-size: 72px;
   margin-bottom: 20px;
   color: var(--el-border-color);
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--color-green) 0%, #059669 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2048,11 +2048,11 @@ onMounted(async () => {
 }
 
 .message-item.user .message-avatar {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #6366f1 0%, var(--color-purple) 100%);
 }
 
 .message-item.assistant .message-avatar {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, var(--color-green) 0%, #059669 100%);
 }
 
 .message-bubble {
@@ -2111,7 +2111,7 @@ onMounted(async () => {
   display: inline-block;
   width: 7px;
   height: 1.1em;
-  background: #10b981;
+  background: var(--color-green);
   margin-left: 3px;
   border-radius: 1px;
   animation: blink 1s steps(1) infinite;
@@ -2137,7 +2137,7 @@ onMounted(async () => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #10b981;
+  background: var(--color-green);
   animation: bounce 1.4s infinite ease-in-out both;
 }
 
@@ -2378,7 +2378,7 @@ onMounted(async () => {
 }
 
 .message-text :deep(blockquote) {
-  border-left: 3px solid #10b981;
+  border-left: 3px solid var(--color-green);
   padding-left: 16px;
   margin: 16px 0;
   color: var(--el-text-color-regular);
@@ -2415,14 +2415,14 @@ onMounted(async () => {
 }
 
 .message-text :deep(a) {
-  color: #10b981;
+  color: var(--color-green);
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
 
 .message-text :deep(a:hover) {
-  border-bottom-color: #10b981;
+  border-bottom-color: var(--color-green);
 }
 
 .message-text :deep(img) {
@@ -2446,7 +2446,7 @@ onMounted(async () => {
 .message-text :deep(h6) {
   margin: 16px 0 12px 0;
   font-weight: 600;
-  color: #111827;
+  color: var(--el-text-color-primary);
   line-height: 1.3;
 }
 
@@ -2457,7 +2457,7 @@ onMounted(async () => {
 
 .message-text :deep(strong) {
   font-weight: 600;
-  color: #111827;
+  color: var(--el-text-color-primary);
 }
 
 .message-text :deep(em) {

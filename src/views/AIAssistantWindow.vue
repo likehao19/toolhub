@@ -456,7 +456,7 @@ onMounted(() => {
 }
 
 .message-result.success {
-  background: #f0f9ff;
+  background: var(--el-color-primary-light-9);
   color: var(--el-color-success);
   border: 1px solid #d9ecff;
 }

@@ -1014,7 +1014,7 @@ function copyOutput() {
 .io-textarea:focus {
   border-color: var(--accent-blue);
   box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.1);
-  background: #fff;
+  background: var(--el-bg-color-overlay);
 }
 
 .io-textarea[readonly] { background: rgba(60, 40, 20, 0.025); }

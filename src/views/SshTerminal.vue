@@ -406,7 +406,7 @@ async function initTerminal(tabId, conn) {
     fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace",
     theme: {
       background: '#1e1e2e',
-      foreground: '#cdd6f4',
+      foreground: 'var(--el-text-color-regular)',
       cursor: '#f5e0dc',
       selectionBackground: '#585b7066',
       black: '#45475a',
@@ -755,7 +755,7 @@ onBeforeUnmount(() => {
 .header-left { display: flex; align-items: center; flex: 1; }
 .page-title-block { display: flex; flex-direction: column; gap: 2px; }
 .page-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: rgba(205,214,244,0.4); }
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #cdd6f4; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--el-text-color-regular); }
 .breadcrumb .el-icon { font-size: 15px; color: #89b4fa; }
 .breadcrumb-link { cursor: pointer; color: rgba(205,214,244,0.6); transition: color .2s; }
 .breadcrumb-link:hover { color: #89b4fa; }
@@ -833,8 +833,8 @@ onBeforeUnmount(() => {
   transition: background .15s, color .15s;
   user-select: none;
 }
-.tab:hover { background: rgba(137,180,250,0.06); color: #cdd6f4; }
-.tab.active { background: rgba(30,30,46,0.6); color: #cdd6f4; border-bottom: 2px solid #89b4fa; }
+.tab:hover { background: rgba(137,180,250,0.06); color: var(--el-text-color-regular); }
+.tab.active { background: rgba(30,30,46,0.6); color: var(--el-text-color-regular); border-bottom: 2px solid #89b4fa; }
 .tab-close {
   font-size: 14px;
   width: 16px; height: 16px;
@@ -862,7 +862,7 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  color: #cdd6f4;
+  color: var(--el-text-color-regular);
   transition: background .12s;
 }
 .sftp-item:hover { background: rgba(137,180,250,0.08); }
@@ -919,7 +919,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   padding: 7px 14px;
   font-size: 12px;
-  color: #cdd6f4;
+  color: var(--el-text-color-regular);
   cursor: pointer;
   transition: background .12s;
 }
@@ -966,7 +966,7 @@ onBeforeUnmount(() => {
   border-radius: 6px;
   cursor: pointer;
   font-size: 12px;
-  color: #cdd6f4;
+  color: var(--el-text-color-regular);
   transition: background .12s;
 }
 .history-item:hover { background: rgba(137,180,250,0.1); }

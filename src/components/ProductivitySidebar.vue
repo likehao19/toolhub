@@ -538,7 +538,7 @@ const navigateTo = (path) => {
   padding: 10px 16px 5px;
   font-size: 11px;
   font-weight: 600;
-  color: color-mix(in srgb, var(--text-tertiary) 88%, #0f172a 12%);
+  color: color-mix(in srgb, var(--text-tertiary) 88%, var(--el-text-color-primary) 12%);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -648,7 +648,7 @@ const navigateTo = (path) => {
 /* 选中态 */
 .menu-item.active {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 78%, white 22%), color-mix(in srgb, var(--accent-blue-bg) 92%, transparent 8%));
-  color: color-mix(in srgb, var(--accent-blue) 84%, #0f172a 16%);
+  color: color-mix(in srgb, var(--accent-blue) 84%, var(--el-text-color-primary) 16%);
   font-weight: 600;
   border-color: color-mix(in srgb, var(--accent-blue) 32%, transparent 68%);
   box-shadow: 0 8px 14px rgba(194, 65, 12, 0.16);

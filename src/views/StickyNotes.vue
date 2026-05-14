@@ -324,7 +324,7 @@ onUnmounted(() => {
   justify-content: center;
   border-radius: 4px;
   cursor: pointer;
-  color: #64748b;
+  color: var(--el-text-color-secondary);
 }
 
 .tab-item:hover {
@@ -332,7 +332,7 @@ onUnmounted(() => {
 }
 
 .tab-item.active {
-  color: #334155;
+  color: var(--el-text-color-regular);
   background: rgba(255,255,255,0.8) !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
@@ -370,7 +370,7 @@ onUnmounted(() => {
 
 .collapsed-title {
   font-size: 11px;
-  color: #334155;
+  color: var(--el-text-color-regular);
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -393,12 +393,12 @@ onUnmounted(() => {
 }
 
 .control-buttons .icon-btn:hover {
-  color: #111827;
+  color: var(--el-text-color-primary);
   background: rgba(0,0,0,0.06);
 }
 
 .control-buttons .icon-btn:active {
-  color: #111827;
+  color: var(--el-text-color-primary);
   background: rgba(0,0,0,0.12);
   transform: scale(0.95);
 }
@@ -417,7 +417,7 @@ onUnmounted(() => {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
-  color: #334155;
+  color: var(--el-text-color-regular);
 }
 
 .content-area::-webkit-scrollbar {

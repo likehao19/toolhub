@@ -115,7 +115,7 @@ const handleClose = () => {
 .app-title {
   font-size: 12px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--el-text-color-primary);
   letter-spacing: 0.02em;
 }
 
@@ -132,7 +132,7 @@ const handleClose = () => {
   border: 1px solid #dbe5f2;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.72);
-  color: #64748b;
+  color: var(--el-text-color-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -143,7 +143,7 @@ const handleClose = () => {
 
 .title-bar-button:hover {
   background: rgba(255, 255, 255, 0.96);
-  color: #0f172a;
+  color: var(--el-text-color-primary);
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(60, 40, 20, 0.12);
 }
@@ -151,7 +151,7 @@ const handleClose = () => {
 .close-button:hover {
   background-color: #e81123;
   border-color: transparent;
-  color: #fff;
+  color: var(--el-color-white);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -177,7 +177,7 @@ const handleClose = () => {
 
   .close-button:hover {
     background-color: #e81123;
-    color: #fff;
+    color: var(--el-color-white);
     border-color: transparent;
   }
 }

@@ -878,7 +878,7 @@ function getFileName(path) {
   white-space: nowrap;
 }
 .modified-dot {
-  color: #f59e0b;
+  color: var(--color-orange);
   font-size: 12px;
   flex-shrink: 0;
 }
@@ -976,7 +976,7 @@ function getFileName(path) {
 }
 .mg-btn:hover {
   background: var(--accent-blue);
-  color: #fff;
+  color: var(--el-color-white);
   border-color: var(--accent-blue);
 }
 
@@ -989,7 +989,7 @@ function getFileName(path) {
 .merge-btn-pair.t-removed .mg-btn:hover,
 .merge-btn-pair.t-modified .mg-btn:hover {
   background: var(--accent-blue);
-  color: #fff;
+  color: var(--el-color-white);
   border-color: var(--accent-blue);
 }
 

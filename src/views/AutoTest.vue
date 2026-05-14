@@ -241,7 +241,7 @@ onMounted(() => {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
 }
 .header {
   display: flex;
@@ -337,7 +337,7 @@ onMounted(() => {
   border-bottom: 1px solid rgba(60, 40, 20, 0.05);
 }
 .doc-item:hover { background: rgba(255,255,255,0.62); }
-.doc-item.active { background: linear-gradient(135deg, var(--accent-blue), #7c3aed); color: #fff; }
+.doc-item.active { background: linear-gradient(135deg, var(--accent-blue), #7c3aed); color: var(--el-color-white); }
 .doc-item .kv-delete { display: none; }
 .doc-item:hover .kv-delete { display: block; }
 

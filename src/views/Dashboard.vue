@@ -813,9 +813,9 @@ onUnmounted(() => {
 }
 
 .todo-dot  { background: var(--accent-blue); }
-.event-dot { background: #f59e0b; }
-.note-dot  { background: #10b981; }
-.bm-dot    { background: #8b5cf6; }
+.event-dot { background: var(--color-orange); }
+.note-dot  { background: var(--color-green); }
+.bm-dot    { background: var(--color-purple); }
 
 .stat-label {
   font-size: 12px;
@@ -1168,7 +1168,7 @@ onUnmounted(() => {
   justify-content: center;
   border-radius: 6px;
   background: rgba(16, 185, 129, 0.08);
-  color: #10b981;
+  color: var(--color-green);
   flex-shrink: 0;
 }
 
@@ -1262,7 +1262,7 @@ onUnmounted(() => {
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #ef4444;
+  background: var(--color-red);
   flex-shrink: 0;
 }
 
@@ -1346,7 +1346,7 @@ onUnmounted(() => {
 }
 
 .tl-dot-now {
-  background: #f59e0b;
+  background: var(--color-orange);
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08);
 }
 

@@ -413,13 +413,13 @@
               <el-icon class="icon-opt" style="color: #8E44AD;"><House /></el-icon> {{ t('passwords.iconHouse') }}
             </el-option>
             <el-option value="Phone" :label="t('passwords.iconPhone')">
-              <el-icon class="icon-opt" style="color: #3498DB;"><Phone /></el-icon> {{ t('passwords.iconPhone') }}
+              <el-icon class="icon-opt" style="color: var(--accent-blue);"><Phone /></el-icon> {{ t('passwords.iconPhone') }}
             </el-option>
             <el-option value="Camera" :label="t('passwords.iconCamera')">
-              <el-icon class="icon-opt" style="color: #E74C3C;"><Camera /></el-icon> {{ t('passwords.iconCamera') }}
+              <el-icon class="icon-opt" style="color: var(--color-red);"><Camera /></el-icon> {{ t('passwords.iconCamera') }}
             </el-option>
             <el-option value="Printer" :label="t('passwords.iconPrinter')">
-              <el-icon class="icon-opt" style="color: #95A5A6;"><Printer /></el-icon> {{ t('passwords.iconPrinter') }}
+              <el-icon class="icon-opt" style="color: var(--el-text-color-secondary);"><Printer /></el-icon> {{ t('passwords.iconPrinter') }}
             </el-option>
             <el-option value="VideoCamera" :label="t('passwords.iconVideo')">
               <el-icon class="icon-opt" style="color: #E67E22;"><VideoCamera /></el-icon> {{ t('passwords.iconVideo') }}
@@ -437,7 +437,7 @@
               <el-icon class="icon-opt" style="color: #F39C12;"><Present /></el-icon> {{ t('passwords.iconGift') }}
             </el-option>
             <el-option value="Trophy" :label="t('passwords.iconTrophy')">
-              <el-icon class="icon-opt" style="color: #F1C40F;"><Trophy /></el-icon> {{ t('passwords.iconTrophy') }}
+              <el-icon class="icon-opt" style="color: var(--color-yellow);"><Trophy /></el-icon> {{ t('passwords.iconTrophy') }}
             </el-option>
             <el-option value="MessageBox" :label="t('passwords.iconMessage')">
               <el-icon class="icon-opt" style="color: #1ABC9C;"><MessageBox /></el-icon> {{ t('passwords.iconMessage') }}
@@ -1458,15 +1458,15 @@ const getIconColor = (iconName) => {
     'Folder': 'var(--el-text-color-secondary)',
     'ShoppingCart': '#FF6B9D',
     'House': '#8E44AD',
-    'Phone': '#3498DB',
-    'Camera': '#E74C3C',
-    'Printer': '#95A5A6',
+    'Phone': 'var(--accent-blue)',
+    'Camera': 'var(--color-red)',
+    'Printer': 'var(--el-text-color-secondary)',
     'VideoCamera': '#E67E22',
     'Headset': '#9B59B6',
     'Briefcase': '#34495E',
     'Guide': '#16A085',
     'Present': '#F39C12',
-    'Trophy': '#F1C40F',
+    'Trophy': 'var(--color-yellow)',
     'MessageBox': '#1ABC9C',
     'Bell': '#E91E63',
     'User': '#2C3E50',
@@ -2708,7 +2708,7 @@ onMounted(async () => {
   flex-direction: column;
   overflow: hidden;
   color: var(--text-primary);
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%);
   height: 100%;
   width: 100%;
   position: relative;
@@ -3344,7 +3344,7 @@ onMounted(async () => {
 
 .lock-content {
   text-align: center;
-  color: #ffffff;
+  color: var(--el-color-white);
 }
 
 .lock-icon-wrapper {

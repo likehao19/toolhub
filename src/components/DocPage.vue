@@ -239,7 +239,7 @@ defineProps({
   font-family: "PingFang SC";
   min-width: 140px;
   padding: 4px 8px;
-  background: #ecf5ff;
+  background: var(--el-color-primary-light-9);
   border-radius: 4px;
 }
 

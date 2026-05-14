@@ -108,10 +108,10 @@ const isActiveType = (t) => normalizeType(t) === normalizeType(currentType.value
 const isActiveStyle = (v) => Number(v) === Number(currentStyle.value)
 
 const BORDER_STYLES = [
-  { label: '细线', value: 1, previewStyle: { borderBottomStyle: 'solid', borderBottomWidth: '1px', borderBottomColor: '#111827' } },
-  { label: '虚线', value: 4, previewStyle: { borderBottomStyle: 'dashed', borderBottomWidth: '1px', borderBottomColor: '#111827' } },
-  { label: '点线', value: 3, previewStyle: { borderBottomStyle: 'dotted', borderBottomWidth: '1px', borderBottomColor: '#111827' } },
-  { label: '双线', value: 7, previewStyle: { borderBottomStyle: 'double', borderBottomWidth: '3px', borderBottomColor: '#111827' } }
+  { label: '细线', value: 1, previewStyle: { borderBottomStyle: 'solid', borderBottomWidth: '1px', borderBottomColor: 'var(--el-text-color-primary)' } },
+  { label: '虚线', value: 4, previewStyle: { borderBottomStyle: 'dashed', borderBottomWidth: '1px', borderBottomColor: 'var(--el-text-color-primary)' } },
+  { label: '点线', value: 3, previewStyle: { borderBottomStyle: 'dotted', borderBottomWidth: '1px', borderBottomColor: 'var(--el-text-color-primary)' } },
+  { label: '双线', value: 7, previewStyle: { borderBottomStyle: 'double', borderBottomWidth: '3px', borderBottomColor: 'var(--el-text-color-primary)' } }
 ]
 
 const emitSetType = (t) => emit('set-type', t)

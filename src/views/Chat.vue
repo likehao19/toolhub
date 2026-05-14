@@ -1169,7 +1169,7 @@ onUnmounted(async () => {
   background: var(--bg-primary);
 }
 .video-bubble-self { border-radius: 12px 12px 4px 12px; }
-.msg-video { display: block; max-width: 240px; max-height: 200px; background: #000; }
+.msg-video { display: block; max-width: 240px; max-height: 200px; background: var(--el-bg-color-page); }
 
 /* 图片/视频底栏 */
 .media-footer {

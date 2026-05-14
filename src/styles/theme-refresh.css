@@ -52,11 +52,11 @@
   --el-button-hover-border-color: var(--accent-blue-hover);
   --el-button-active-bg-color: var(--accent-blue-active);
   --el-button-active-border-color: var(--accent-blue-active);
-  color: #ffffff !important;
+  color: var(--el-color-white) !important;
 }
 
 .app-content .el-button--primary:hover {
-  color: #ffffff !important;
+  color: var(--el-color-white) !important;
 }
 
 /* link 按钮（"跳转到设置"等）保持 token 色 */

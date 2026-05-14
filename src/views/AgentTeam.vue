@@ -1262,7 +1262,7 @@ onMounted(async () => {
 }
 
 .sidebar-action-btn:hover {
-  color: #ef4444;
+  color: var(--color-red);
   background: rgba(239, 68, 68, 0.08);
 }
 
@@ -1463,7 +1463,7 @@ onMounted(async () => {
   width: 36px;
   height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #6366f1, var(--color-purple));
   color: white;
   display: flex;
   align-items: center;
@@ -1947,7 +1947,7 @@ onMounted(async () => {
 
 .agent-message-content :deep(strong) {
   font-weight: 600;
-  color: var(--text-primary, #111827);
+  color: var(--text-primary, var(--el-text-color-primary));
 }
 
 .agent-message-content :deep(h1),
@@ -1956,7 +1956,7 @@ onMounted(async () => {
 .agent-message-content :deep(h4) {
   margin: 14px 0 8px;
   font-weight: 600;
-  color: var(--text-primary, #111827);
+  color: var(--text-primary, var(--el-text-color-primary));
 }
 
 .agent-message-content :deep(h3) { font-size: 1.1em; }

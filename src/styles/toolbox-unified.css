@@ -8,9 +8,9 @@
   --tb-bg-soft: #f8fbfe;
   --tb-line: #dfe7f1;
   --tb-line-strong: #cfd9e6;
-  --tb-text: #0f172a;
-  --tb-muted: #64748b;
-  --tb-primary: #2f6fe4;
+  --tb-text: var(--el-text-color-primary);
+  --tb-muted: var(--el-text-color-secondary);
+  --tb-primary: var(--accent-blue);
   --tb-hover: rgba(47, 111, 228, 0.05);
 }
 
@@ -880,8 +880,8 @@
 }
 
 .app-content.toolbox-unified-shell .el-button--primary {
-  border-color: #2f6fe4 !important;
-  background: linear-gradient(180deg, #3b7cf0 0%, #2f6fe4 100%) !important;
+  border-color: var(--accent-blue) !important;
+  background: linear-gradient(180deg, #3b7cf0 0%, var(--accent-blue) 100%) !important;
 }
 
 /* Form controls polish (global toolbox pages) */
@@ -906,18 +906,18 @@
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus) {
-  border-color: #2f6fe4 !important;
+  border-color: var(--accent-blue) !important;
   box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.12) !important;
   background: var(--bg-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input__inner {
-  color: #0f172a !important;
+  color: var(--el-text-color-primary) !important;
   font-size: 13px !important;
 }
 
 .app-content.toolbox-unified-shell .el-input__inner::placeholder {
-  color: #94a3b8 !important;
+  color: var(--el-text-color-placeholder) !important;
 }
 
 .app-content.toolbox-unified-shell .el-textarea__inner {
@@ -927,7 +927,7 @@
   padding: 10px 12px !important;
   line-height: 1.6 !important;
   font-size: 13px !important;
-  color: #0f172a !important;
+  color: var(--el-text-color-primary) !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
 }
 
@@ -936,7 +936,7 @@
 }
 
 .app-content.toolbox-unified-shell .el-textarea__inner:focus {
-  border-color: #2f6fe4 !important;
+  border-color: var(--accent-blue) !important;
   box-shadow: 0 0 0 3px rgba(47, 111, 228, 0.12) !important;
   background: var(--bg-primary) !important;
 }
@@ -957,13 +957,13 @@
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  color: #334155 !important;
+  color: var(--el-text-color-regular) !important;
   border-color: #d5e0ec !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 255, 0.92)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default:hover {
-  color: #0f172a !important;
+  color: var(--el-text-color-primary) !important;
   border-color: #b9c9de !important;
   background: var(--bg-primary) !important;
   box-shadow: 0 6px 16px rgba(60, 40, 20, 0.1) !important;
@@ -981,7 +981,7 @@
 }
 
 .app-content.toolbox-unified-shell :is(.network-tool-page, .perf-test-wrapper) :is(.hint, .empty-hint) {
-  color: #64748b !important;
+  color: var(--el-text-color-secondary) !important;
   font-size: 12px !important;
 }
 
@@ -2018,7 +2018,7 @@
 
 .app-content.toolbox-unified-shell .ssh-terminal-wrapper .terminal-area {
   padding: 0 !important;
-  background: #0f172a !important;
+  background: var(--el-text-color-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .ssh-terminal-wrapper .xterm-container {
@@ -3117,7 +3117,7 @@
   --tb-panel-bg-strong: rgba(255, 255, 255, 0.82);
   --tb-panel-line: rgba(60, 40, 20, 0.08);
   --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 10px 24px rgba(60, 40, 20, 0.04);
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%) !important;
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3156,7 +3156,7 @@
   height: 100% !important;
   min-width: 0 !important;
   min-height: 0 !important;
-  background: linear-gradient(180deg, #eef2f6 0%, #e7ecf3 100%) !important;
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%) !important;
   overflow: hidden !important;
 }
 
@@ -3597,8 +3597,8 @@
 }
 
 .app-content.toolbox-unified-shell .el-button--primary {
-  background: #2f6fe4 !important;
-  border-color: #2f6fe4 !important;
+  background: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
   box-shadow: none !important;
 }
 
@@ -4575,7 +4575,7 @@
 }
 
 .app-content.toolbox-unified-shell :is(.label-text, .setting-label, .field-label, .toolbar-label, .param-label, .section-label, .el-form-item__label) {
-  color: #334155 !important;
+  color: var(--el-text-color-regular) !important;
   font-size: 12px !important;
   font-weight: 600 !important;
   letter-spacing: 0 !important;
@@ -4678,7 +4678,7 @@
   right: 1px !important;
   border-color: rgba(100, 116, 139, 0.14) !important;
   background: rgba(248, 251, 255, 0.64) !important;
-  color: #64748b !important;
+  color: var(--el-text-color-secondary) !important;
   line-height: 15px !important;
   box-sizing: border-box !important;
 }
@@ -4905,7 +4905,7 @@
   margin: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
-  color: #64748b !important;
+  color: var(--el-text-color-secondary) !important;
   background: rgba(248, 251, 255, 0.72) !important;
   border-color: rgba(100, 116, 139, 0.14) !important;
 }
@@ -5042,7 +5042,7 @@
   border: 0 !important;
   border-radius: 0 !important;
   background: rgba(241, 246, 252, 0.68) !important;
-  color: #64748b !important;
+  color: var(--el-text-color-secondary) !important;
   box-shadow: none !important;
   transition: background 0.15s ease, color 0.15s ease !important;
 }
@@ -5050,7 +5050,7 @@
 .app-content.toolbox-unified-shell .el-input-number__decrease:hover,
 .app-content.toolbox-unified-shell .el-input-number__increase:hover {
   background: rgba(231, 240, 251, 0.9) !important;
-  color: #2f6fe4 !important;
+  color: var(--accent-blue) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input-number:not(.is-controls-right):not(.is-without-controls) .el-input__wrapper {
@@ -5589,14 +5589,14 @@
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper :is(.el-button--primary, .create-action-btn.el-button--primary) {
-  color: #fff !important;
+  color: var(--el-color-white) !important;
   background: linear-gradient(180deg, #4c82e6 0%, #316bd0 100%) !important;
   border-color: rgba(49, 107, 208, 0.85) !important;
   box-shadow: 0 6px 14px rgba(49, 107, 208, 0.18), inset 0 1px 0 rgba(255,255,255,0.26) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper :is(.el-button--primary, .create-action-btn.el-button--primary):hover {
-  color: #fff !important;
+  color: var(--el-color-white) !important;
   background: linear-gradient(180deg, #5a8dea 0%, #3a72d6 100%) !important;
   border-color: rgba(58, 114, 214, 0.9) !important;
 }

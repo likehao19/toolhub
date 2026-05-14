@@ -780,7 +780,7 @@ async function closeSelf() {
 .size-label {
   position: absolute;
   background: rgba(0,0,0,0.75);
-  color: #fff;
+  color: var(--el-color-white);
   font-size: 11px;
   padding: 2px 8px;
   border-radius: 3px;
@@ -807,8 +807,8 @@ async function closeSelf() {
   cursor: pointer; border-radius: 4px; color: #ccc; font-size: 14px;
   transition: all 0.1s; user-select: none;
 }
-.tool-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
-.tool-btn.active { background: var(--accent-blue); color: #fff; }
+.tool-btn:hover { background: rgba(255,255,255,0.15); color: var(--el-color-white); }
+.tool-btn.active { background: var(--accent-blue); color: var(--el-color-white); }
 .action-btn { width: auto; padding: 0 8px; font-size: 12px; }
 .pin-btn:hover { background: rgba(103,194,58,0.3); }
 .cancel-btn:hover { background: rgba(245,108,108,0.3); }
@@ -818,7 +818,7 @@ async function closeSelf() {
   border: 2px solid transparent; transition: border-color 0.1s;
 }
 .color-dot:hover { border-color: rgba(255,255,255,0.5); }
-.color-dot.active { border-color: #fff; }
+.color-dot.active { border-color: var(--el-bg-color-overlay); }
 .size-btn span { display: block; }
 .magnifier {
   position: absolute; z-index: 15;
@@ -847,7 +847,7 @@ async function closeSelf() {
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0,0,0,0.8);
-  color: #fff;
+  color: var(--el-color-white);
   padding: 8px 20px;
   border-radius: 6px;
   font-size: 14px;
