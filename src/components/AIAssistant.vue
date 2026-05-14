@@ -385,12 +385,12 @@ const formatTime = (date) => {
 
 .message.user .message-avatar {
   background: var(--accent-blue);
-  color: white;
+  color: var(--el-color-white);
 }
 
 .message.assistant .message-avatar {
   background: var(--el-color-success);
-  color: white;
+  color: var(--el-color-white);
 }
 
 .message-content {
@@ -408,7 +408,7 @@ const formatTime = (date) => {
 
 .message.user .message-text {
   background: var(--accent-blue);
-  color: white;
+  color: var(--el-color-white);
 }
 
 .confirmation-box {

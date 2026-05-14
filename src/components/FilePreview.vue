@@ -332,7 +332,7 @@ const resetState = () => {
   max-width: 100%;
   max-height: 600px;
   object-fit: contain;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 8px;
 }
 
@@ -353,7 +353,7 @@ const resetState = () => {
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--el-border-color-light);
   background: var(--el-fill-color-light);
 }
 

@@ -250,14 +250,14 @@ const handleCommand = (cmd) => {
 }
 
 .folder-icon {
-  color: #f39c12;
+  color: var(--color-orange);
   font-size: 16px;
   flex-shrink: 0;
   transition: all 0.2s;
 }
 
 .folder-item.expanded .folder-icon {
-  color: #e67e22;
+  color: var(--color-orange);
 }
 
 .folder-item:hover .folder-icon {

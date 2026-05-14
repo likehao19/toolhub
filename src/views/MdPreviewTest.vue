@@ -72,7 +72,7 @@ const scrollElement = document.documentElement;
   flex: 1;
   display: flex;
   overflow: hidden;
-  border: 1px solid #ddd;
+  border: 1px solid var(--el-border-color-light);
   border-radius: 4px;
   background: var(--bg-primary);
 }

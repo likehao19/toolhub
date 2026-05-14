@@ -155,7 +155,7 @@ watch(() => props.visible, (newVal) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--el-color-white);
 }
 
 .ai-floating-ball:hover {

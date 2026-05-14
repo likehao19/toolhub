@@ -841,7 +841,7 @@
   color: var(--text-tertiary) !important;
 }
 
-/* 默认按钮文本 / 边框（写死 var(--el-text-color-regular) / #475569 / #d8e2ef / #d5e0ec / #b9c9de / #c1d0e2） */
+/* 默认按钮文本 / 边框（写死 var(--el-text-color-regular) / #475569 / var(--el-border-color-light) / #d5e0ec / #b9c9de / #c1d0e2） */
 .app-content.toolbox-unified-shell .el-button--default {
   color: var(--text-secondary) !important;
   border-color: var(--divider) !important;

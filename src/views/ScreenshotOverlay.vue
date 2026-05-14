@@ -804,7 +804,7 @@ async function closeSelf() {
 .tool-btn {
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; border-radius: 4px; color: #ccc; font-size: 14px;
+  cursor: pointer; border-radius: 4px; color: var(--el-border-color); font-size: 14px;
   transition: all 0.1s; user-select: none;
 }
 .tool-btn:hover { background: rgba(255,255,255,0.15); color: var(--el-color-white); }

@@ -415,10 +415,10 @@
               <el-icon style="color: var(--color-red);"><Football /></el-icon> {{ t('todos.iconSports') }}
             </el-option>
             <el-option value="Present" :label="t('todos.iconGift')">
-              <el-icon style="color: #F39C12;"><Present /></el-icon> {{ t('todos.iconGift') }}
+              <el-icon style="color: var(--color-orange);"><Present /></el-icon> {{ t('todos.iconGift') }}
             </el-option>
             <el-option value="Dish" :label="t('todos.iconFood')">
-              <el-icon style="color: #E67E22;"><Dish /></el-icon> {{ t('todos.iconFood') }}
+              <el-icon style="color: var(--color-orange);"><Dish /></el-icon> {{ t('todos.iconFood') }}
             </el-option>
             <el-option value="Connection" :label="t('todos.iconSocial')">
               <el-icon style="color: #9B59B6;"><Connection /></el-icon> {{ t('todos.iconSocial') }}
@@ -473,10 +473,10 @@
               <el-icon style="color: var(--color-red);"><Football /></el-icon> {{ t('todos.iconSports') }}
             </el-option>
             <el-option value="Present" :label="t('todos.iconGift')">
-              <el-icon style="color: #F39C12;"><Present /></el-icon> {{ t('todos.iconGift') }}
+              <el-icon style="color: var(--color-orange);"><Present /></el-icon> {{ t('todos.iconGift') }}
             </el-option>
             <el-option value="Dish" :label="t('todos.iconFood')">
-              <el-icon style="color: #E67E22;"><Dish /></el-icon> {{ t('todos.iconFood') }}
+              <el-icon style="color: var(--color-orange);"><Dish /></el-icon> {{ t('todos.iconFood') }}
             </el-option>
             <el-option value="Connection" :label="t('todos.iconSocial')">
               <el-icon style="color: #9B59B6;"><Connection /></el-icon> {{ t('todos.iconSocial') }}
@@ -708,8 +708,8 @@ const getIconColor = (iconName) => {
     'House': 'var(--accent-blue)',
     'User': 'var(--el-text-color-secondary)',
     'Football': 'var(--color-red)',
-    'Present': '#F39C12',
-    'Dish': '#E67E22',
+    'Present': 'var(--color-orange)',
+    'Dish': 'var(--color-orange)',
     'Connection': '#9B59B6'
   }
   return colorMap[iconName] || 'var(--el-text-color-secondary)'

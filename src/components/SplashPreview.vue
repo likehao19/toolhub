@@ -292,7 +292,7 @@ onUnmounted(() => {
 
 .logo-icon {
   font-size: 48px;
-  color: white;
+  color: var(--el-color-white);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -300,7 +300,7 @@ onUnmounted(() => {
 .app-name {
   font-size: 24px;
   font-weight: bold;
-  color: white;
+  color: var(--el-color-white);
   margin-bottom: 8px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   letter-spacing: 1px;
@@ -323,7 +323,7 @@ onUnmounted(() => {
   height: 40px;
   margin: 0 auto 15px;
   border: 3px solid rgba(255, 255, 255, 0.2);
-  border-top: 3px solid white;
+  border-top: 3px solid var(--el-bg-color-overlay);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -380,7 +380,7 @@ onUnmounted(() => {
 
 /* ignore */
 .animation-minimal {
-  background: #1a1a1a !important;
+  background: var(--text-primary) !important;
 }
 
 .animation-minimal .splash-container {

@@ -288,7 +288,7 @@ const createDynamicMenu = async () => {
   background: #f9f9f9;
   padding: 12px;
   border-radius: 4px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--el-border-color-light);
 }
 
 .log-item {

@@ -171,7 +171,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--el-color-white);
 }
 
 /* ignore */
@@ -210,7 +210,7 @@ onUnmounted(() => {
   top: 50%;
   transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.85);
-  color: white;
+  color: var(--el-color-white);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;

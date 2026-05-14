@@ -554,7 +554,7 @@ onMounted(() => {
 /* ignore */
 @media (prefers-color-scheme: dark) {
   .statistics-page {
-    background: #1a1a1a;
+    background: var(--text-primary);
   }
 
   .page-header {
@@ -563,7 +563,7 @@ onMounted(() => {
   }
 
   .page-header h2 {
-    color: #eee;
+    color: var(--el-border-color-lighter);
   }
 
   .stat-card {
@@ -571,7 +571,7 @@ onMounted(() => {
   }
 
   .stat-overview {
-    background: #1a1a1a;
+    background: var(--text-primary);
   }
 
   .stat-value {

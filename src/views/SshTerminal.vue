@@ -804,7 +804,7 @@ onBeforeUnmount(() => {
 }
 .conn-dot.connected { background: #a6e3a1; box-shadow: 0 0 6px rgba(166,227,161,0.4); }
 .conn-info { min-width: 0; }
-.conn-name { display: block; font-size: 12px; font-weight: 650; color: #172033; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.conn-name { display: block; font-size: 12px; font-weight: 650; color: var(--el-text-color-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .conn-host { display: block; font-size: 11px; font-weight: 500; color: #516174; }
 .conn-empty { padding: 20px 10px; font-size: 12px; color: rgba(205,214,244,0.3); text-align: center; }
 

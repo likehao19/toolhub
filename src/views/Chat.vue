@@ -1101,7 +1101,7 @@ onUnmounted(async () => {
 /* ---- 头像 ---- */
 .avatar {
   width: 32px; height: 32px; border-radius: 50%;
-  background: var(--accent-blue); color: white;
+  background: var(--accent-blue); color: var(--el-color-white);
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: var(--font-weight-semibold);
   flex-shrink: 0; user-select: none;
@@ -1138,7 +1138,7 @@ onUnmounted(async () => {
 }
 .bubble-self {
   background: #07c160; /* 微信绿 */
-  color: white; border: none;
+  color: var(--el-color-white); border: none;
   border-radius: 16px 16px 4px 16px; /* 右下直角 */
   box-shadow: 0 1px 3px rgba(7,193,96,0.3);
 }
@@ -1191,7 +1191,7 @@ onUnmounted(async () => {
   font-size: 12px; padding: 0;
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-.media-dl-btn:hover { background: var(--accent-blue); color: white; }
+.media-dl-btn:hover { background: var(--accent-blue); color: var(--el-color-white); }
 
 /* ---- 文件卡片 ---- */
 .file-card {
@@ -1292,7 +1292,7 @@ onUnmounted(async () => {
 .pending-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: var(--radius-sm); border: 0.5px solid var(--border-color); }
 .pending-file-icon { width: 64px; height: 64px; border-radius: var(--radius-sm); background: var(--bg-tertiary); border: 0.5px solid var(--border-color); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--text-secondary); }
 .pending-name { font-size: 10px; color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 64px; }
-.pending-remove { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-secondary); color: white; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: background var(--transition-fast); }
+.pending-remove { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; border-radius: 50%; background: var(--text-secondary); color: var(--el-color-white); border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: background var(--transition-fast); }
 .pending-remove:hover { background: var(--color-red); }
 
 .input-box {
@@ -1328,7 +1328,7 @@ onUnmounted(async () => {
   font-size: 16px; padding: 0; align-self: flex-end; margin-bottom: 1px;
   transition: all var(--transition-fast);
 }
-.send-btn-round.send-active { background: #07c160; color: white; cursor: pointer; box-shadow: 0 2px 6px rgba(7,193,96,0.35); }
+.send-btn-round.send-active { background: #07c160; color: var(--el-color-white); cursor: pointer; box-shadow: 0 2px 6px rgba(7,193,96,0.35); }
 .send-btn-round.send-active:hover { background: #05a04f; transform: scale(1.06); }
 .send-btn-round.send-active:active { transform: scale(0.94); }
 
@@ -1345,6 +1345,6 @@ onUnmounted(async () => {
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
 .overlay-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); cursor: default; animation: img-in 150ms ease; }
 @keyframes img-in { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.overlay-close { position: fixed; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); color: white; border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background var(--transition-fast); }
+.overlay-close { position: fixed; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); color: var(--el-color-white); border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background var(--transition-fast); }
 .overlay-close:hover { background: rgba(255,255,255,0.25); }
 </style>

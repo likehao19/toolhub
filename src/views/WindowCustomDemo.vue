@@ -35,7 +35,7 @@
             <el-col :span="12">
               <div class="titlebar-example" style="background: #329ea3;">
                 <div class="titlebar-example-content">
-                  <span style="color: white;">示例标题栏 1</span>
+                  <span style="color: var(--el-color-white);">示例标题栏 1</span>
                   <div class="titlebar-example-buttons">
                     <div class="titlebar-example-button">—</div>
                     <div class="titlebar-example-button">□</div>
@@ -47,7 +47,7 @@
             <el-col :span="12">
               <div class="titlebar-example" style="background: #2d2d2d;">
                 <div class="titlebar-example-content">
-                  <span style="color: #e0e0e0;">示例标题栏 2 (深色)</span>
+                  <span style="color: var(--el-border-color-light);">示例标题栏 2 (深色)</span>
                   <div class="titlebar-example-buttons">
                     <div class="titlebar-example-button">—</div>
                     <div class="titlebar-example-button">□</div>
@@ -258,7 +258,7 @@ const createCustomWindow = async () => {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 2px;
   font-size: 12px;
-  color: white;
+  color: var(--el-color-white);
   cursor: pointer;
 }
 

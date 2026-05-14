@@ -95,7 +95,7 @@ const tabs = computed(() => [
 
 const currentTabBg = computed(() => {
   const tab = tabs.value.find(item => item.id === activeTab.value)
-  return tab ? tab.bg : '#fdfbf6'
+  return tab ? tab.bg : 'var(--bg-primary)'
 })
 
 // 计算当前组件

@@ -246,7 +246,7 @@ const highlightedHtml = computed(() => {
     if (m.index < lastEnd) continue
     html += escapeHtml(text.slice(lastEnd, m.index))
     const color = colors[i % colors.length]
-    html += `<mark style="background:${color};color:#1a1a1a;border-radius:2px;">${escapeHtml(m.text)}</mark>`
+    html += `<mark style="background:${color};color:var(--text-primary);border-radius:2px;">${escapeHtml(m.text)}</mark>`
     lastEnd = m.end
   }
   html += escapeHtml(text.slice(lastEnd))

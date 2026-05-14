@@ -203,16 +203,16 @@ const cssVars = {
   '--bg-sidebar': '#fcfcfc',
   '--bg-content': '#ffffff',
   '--border-color': 'var(--el-border-color-light)',
-  '--text-primary': '#2c3e50',
-  '--text-secondary': '#606f7b',
+  '--text-primary': 'var(--el-text-color-primary)',
+  '--text-secondary': 'var(--el-text-color-secondary)',
   '--accent-color': 'var(--accent-blue)',
-  '--hover-bg': '#edf2f7',
+  '--hover-bg': 'var(--el-fill-color-light)',
   '--danger-color': 'var(--color-red)',
   '--success-color': '#2ecc71',
   '--icon-folder': 'var(--color-yellow)',
   '--icon-md': 'var(--accent-blue)',
   '--icon-word': 'var(--accent-blue-hover)',
-  '--icon-excel': '#27ae60',
+  '--icon-excel': 'var(--color-green)',
   '--icon-txt': 'var(--el-text-color-secondary)'
 }
 
@@ -1105,16 +1105,16 @@ const scrollToHeading = (index) => {
   --bg-sidebar: #fcfcfc;
   --bg-content: #ffffff;
   --border-color: var(--el-border-color-light);
-  --text-primary: #2c3e50;
-  --text-secondary: #606f7b;
+  --text-primary: var(--el-text-color-primary);
+  --text-secondary: var(--el-text-color-secondary);
   --accent-color: var(--accent-blue);
-  --hover-bg: #edf2f7;
+  --hover-bg: var(--el-fill-color-light);
   --danger-color: var(--color-red);
   --success-color: #2ecc71;
   --icon-folder: var(--color-yellow);
   --icon-md: var(--accent-blue);
   --icon-word: var(--accent-blue-hover);
-  --icon-excel: #27ae60;
+  --icon-excel: var(--color-green);
   --icon-txt: var(--el-text-color-secondary);
 }
 
@@ -1186,14 +1186,14 @@ const scrollToHeading = (index) => {
 
 .btn-primary {
   background: var(--accent-color);
-  color: white;
+  color: var(--el-color-white);
   border-color: var(--accent-color);
 }
 
 .btn-primary:hover {
   background: var(--accent-blue-hover);
   border-color: var(--accent-blue-hover);
-  color: white;
+  color: var(--el-color-white);
 }
 
 /* ignore */
@@ -1285,7 +1285,7 @@ const scrollToHeading = (index) => {
 
 .arrow {
   font-size: 0.7rem;
-  color: #ccc;
+  color: var(--el-border-color);
   transition: transform 0.2s;
   width: 12px;
   text-align: center;
@@ -1367,7 +1367,7 @@ const scrollToHeading = (index) => {
   display: flex;
   align-items: center;
   gap: 10px;
-  border-right: 1px solid #eee;
+  border-right: 1px solid var(--el-border-color-lighter);
   padding-right: 15px;
 }
 

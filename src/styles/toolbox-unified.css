@@ -893,7 +893,7 @@
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-date-editor.el-input__wrapper) {
   min-height: 36px !important;
-  border: 1px solid #d8e2ef !important;
+  border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
@@ -921,7 +921,7 @@
 }
 
 .app-content.toolbox-unified-shell .el-textarea__inner {
-  border: 1px solid #d8e2ef !important;
+  border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
   padding: 10px 12px !important;
@@ -942,7 +942,7 @@
 }
 
 .app-content.toolbox-unified-shell .el-input-number {
-  border: 1px solid #d8e2ef !important;
+  border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
 }
@@ -2655,7 +2655,7 @@
 /* Palette override at absolute end: this wins over every older toolbox rule above. */
 .app-content.toolbox-unified-shell {
   --tb-bg: #faf7f0 !important;
-  --tb-bg-soft: #fdfbf6 !important;
+  --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(120, 100, 80, 0.13) !important;
   --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
@@ -2666,7 +2666,7 @@
   --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2703,7 +2703,7 @@
 ) {
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2807,7 +2807,7 @@
 /* Actual final palette: keep this block last so page/component styles cannot restore the old gray tone. */
 .app-content.toolbox-unified-shell {
   --tb-bg: #faf7f0 !important;
-  --tb-bg-soft: #fdfbf6 !important;
+  --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(120, 100, 80, 0.13) !important;
   --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
@@ -2818,7 +2818,7 @@
   --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2855,7 +2855,7 @@
 ) {
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2959,7 +2959,7 @@
 /* Final soft palette: lighter toolbox pages with a subtle app-like gradient */
 .app-content.toolbox-unified-shell {
   --tb-bg: #f5f8fb;
-  --tb-bg-soft: #fdfbf6;
+  --tb-bg-soft: var(--bg-primary);
   --tb-line: rgba(112, 130, 153, 0.14);
   --tb-line-strong: rgba(112, 130, 153, 0.18);
   --tb-panel-bg: rgba(255, 255, 255, 0.56);
@@ -2970,7 +2970,7 @@
   --tb-row-hover: rgba(255, 255, 255, 0.42);
   background:
     linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f3f1ea 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, #f3f1ea 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3007,7 +3007,7 @@
 ) {
   background:
     linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f3f1ea 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, #f3f1ea 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3578,7 +3578,7 @@
 .app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus, .el-textarea__inner:focus) {
   border-color: #4a78d9 !important;
   box-shadow: 0 0 0 3px var(--tb-control-focus) !important;
-  background: #fdfbf6 !important;
+  background: var(--bg-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button {
@@ -3966,7 +3966,7 @@
 .app-content.toolbox-unified-shell .git-manager-wrapper :is(.el-input__wrapper, .el-select__wrapper) {
   border-radius: 10px !important;
   background: #f7fafc !important;
-  border: 1px solid #d8e2ef !important;
+  border: 1px solid var(--el-border-color-light) !important;
   box-shadow: none !important;
 }
 
@@ -4291,12 +4291,12 @@
 ) {
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
-    linear-gradient(180deg, #fdfbf6 0%, #f5f1e8 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell {
   --tb-bg: #faf7f0 !important;
-  --tb-bg-soft: #fdfbf6 !important;
+  --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(120, 100, 80, 0.13) !important;
   --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
@@ -4408,7 +4408,7 @@
 /* FINAL TOOLBOX SOFT PALETTE - keep at absolute file end. */
 .app-content.toolbox-unified-shell {
   --tb-bg: #f4f8fc !important;
-  --tb-bg-soft: #fdfbf6 !important;
+  --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(100, 116, 139, 0.11) !important;
   --tb-line-strong: rgba(100, 116, 139, 0.17) !important;
   --tb-panel-bg: rgba(255, 255, 255, 0.48) !important;
@@ -4615,7 +4615,7 @@
   min-height: 0 !important;
   line-height: 30px !important;
   font-size: 13px !important;
-  color: #172033 !important;
+  color: var(--el-text-color-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-select__wrapper {
@@ -5031,7 +5031,7 @@
   height: 100% !important;
   line-height: 1 !important;
   padding: 0 !important;
-  color: #172033 !important;
+  color: var(--el-text-color-primary) !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   text-align: center !important;
@@ -5168,7 +5168,7 @@
 .app-content.toolbox-unified-shell .el-select__selected-item {
   position: relative !important;
   z-index: 2 !important;
-  color: #172033 !important;
+  color: var(--el-text-color-primary) !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;
   display: flex !important;
@@ -5183,7 +5183,7 @@
   width: auto !important;
   max-width: 100% !important;
   display: block !important;
-  color: #172033 !important;
+  color: var(--el-text-color-primary) !important;
   line-height: 30px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -5445,7 +5445,7 @@
 .app-content.toolbox-unified-shell .el-select__placeholder {
   opacity: 1 !important;
   visibility: visible !important;
-  color: #172033 !important;
+  color: var(--el-text-color-primary) !important;
 }
 
 /* FINAL GIT DAILY REPORT PREVIEW LOCK - let the preview editor fill the right workspace. */
@@ -5509,7 +5509,7 @@
 }
 
 .app-content.toolbox-unified-shell .ssh-terminal-wrapper .conn-name {
-  color: #172033 !important;
+  color: var(--el-text-color-primary) !important;
   font-size: 12px !important;
   font-weight: 650 !important;
   letter-spacing: 0 !important;

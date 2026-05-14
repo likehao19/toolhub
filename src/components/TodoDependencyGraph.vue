@@ -100,13 +100,13 @@ const initGraph = () => {
   
   graphData.nodes.forEach(node => {
     node.style = {
-      fill: criticalNodeIds.has(node.id) ? '#ff4d4f' : '#1890ff',
+      fill: criticalNodeIds.has(node.id) ? 'var(--color-red)' : '#1890ff',
       stroke: criticalNodeIds.has(node.id) ? '#cf1322' : '#096dd9',
       lineWidth: criticalNodeIds.has(node.id) ? 3 : 2
     }
     node.labelCfg = {
       style: {
-        fill: criticalNodeIds.has(node.id) ? '#ff4d4f' : '#000'
+        fill: criticalNodeIds.has(node.id) ? 'var(--color-red)' : '#000'
       }
     }
   })
@@ -118,11 +118,11 @@ const initGraph = () => {
     const isCritical = criticalNodeIds.has(sourceId) && criticalNodeIds.has(targetId)
     
     edge.style = {
-      stroke: isCritical ? '#ff4d4f' : '#91d5ff',
+      stroke: isCritical ? 'var(--color-red)' : '#91d5ff',
       lineWidth: isCritical ? 3 : 2,
       endArrow: {
         path: 'M 0,0 L 8,4 L 8,-4 Z',
-        fill: isCritical ? '#ff4d4f' : '#91d5ff'
+        fill: isCritical ? 'var(--color-red)' : '#91d5ff'
       }
     }
   })
@@ -206,7 +206,7 @@ const updateGraph = () => {
   
   graphData.nodes.forEach(node => {
     node.style = {
-      fill: criticalNodeIds.has(node.id) ? '#ff4d4f' : '#1890ff',
+      fill: criticalNodeIds.has(node.id) ? 'var(--color-red)' : '#1890ff',
       stroke: criticalNodeIds.has(node.id) ? '#cf1322' : '#096dd9',
       lineWidth: criticalNodeIds.has(node.id) ? 3 : 2
     }
@@ -218,7 +218,7 @@ const updateGraph = () => {
     const isCritical = criticalNodeIds.has(sourceId) && criticalNodeIds.has(targetId)
     
     edge.style = {
-      stroke: isCritical ? '#ff4d4f' : '#91d5ff',
+      stroke: isCritical ? 'var(--color-red)' : '#91d5ff',
       lineWidth: isCritical ? 3 : 2
     }
   })

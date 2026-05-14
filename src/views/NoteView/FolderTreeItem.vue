@@ -335,7 +335,7 @@ const handleDrop = async (e, targetFolder) => {
 }
 
 .tree-item-wrapper:hover {
-  background: var(--hover-bg, #edf2f7);
+  background: var(--hover-bg, var(--el-fill-color-light));
 }
 
 .tree-item-wrapper.active {

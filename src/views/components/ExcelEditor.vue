@@ -176,7 +176,7 @@ defineExpose({
 }
 
 .btn-small:hover {
-  background: var(--hover-bg, #edf2f7);
+  background: var(--hover-bg, var(--el-fill-color-light));
 }
 
 .excel-table-wrapper {

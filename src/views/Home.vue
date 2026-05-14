@@ -476,7 +476,7 @@ onUnmounted(() => {
 
 .card-badge {
   background: var(--accent-blue);
-  color: white;
+  color: var(--el-color-white);
   padding: 2px 8px;
   border-radius: 10px;
   font-size: 12px;

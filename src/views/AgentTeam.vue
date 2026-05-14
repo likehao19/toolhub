@@ -1061,7 +1061,7 @@ onMounted(async () => {
 
 .breadcrumb {
   font-size: 0.9rem;
-  color: var(--text-secondary, #606f7b);
+  color: var(--text-secondary, var(--el-text-color-secondary));
   background: var(--bg-tertiary, #f0f2f5);
   padding: 6px 12px;
   border-radius: 4px;
@@ -1429,7 +1429,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--el-color-white);
   font-size: 16px;
   flex-shrink: 0;
 }
@@ -1464,7 +1464,7 @@ onMounted(async () => {
   height: 36px;
   border-radius: 10px;
   background: linear-gradient(135deg, #6366f1, var(--color-purple));
-  color: white;
+  color: var(--el-color-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1665,7 +1665,7 @@ onMounted(async () => {
   border-radius: 50%;
   border: none;
   background: var(--accent-blue);
-  color: white;
+  color: var(--el-color-white);
   display: flex;
   align-items: center;
   justify-content: center;

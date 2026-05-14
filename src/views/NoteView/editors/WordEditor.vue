@@ -107,7 +107,7 @@ defineExpose({
 
 .word-editor-content :deep(table td),
 .word-editor-content :deep(table th) {
-  border: 1px solid #ddd;
+  border: 1px solid var(--el-border-color-light);
   padding: 8px;
 }
 

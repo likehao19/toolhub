@@ -422,7 +422,7 @@
               <el-icon class="icon-opt" style="color: var(--el-text-color-secondary);"><Printer /></el-icon> {{ t('passwords.iconPrinter') }}
             </el-option>
             <el-option value="VideoCamera" :label="t('passwords.iconVideo')">
-              <el-icon class="icon-opt" style="color: #E67E22;"><VideoCamera /></el-icon> {{ t('passwords.iconVideo') }}
+              <el-icon class="icon-opt" style="color: var(--color-orange);"><VideoCamera /></el-icon> {{ t('passwords.iconVideo') }}
             </el-option>
             <el-option value="Headset" :label="t('passwords.iconHeadset')">
               <el-icon class="icon-opt" style="color: #9B59B6;"><Headset /></el-icon> {{ t('passwords.iconHeadset') }}
@@ -431,10 +431,10 @@
               <el-icon class="icon-opt" style="color: #34495E;"><Briefcase /></el-icon> {{ t('passwords.iconBriefcase') }}
             </el-option>
             <el-option value="Guide" :label="t('passwords.iconGuide')">
-              <el-icon class="icon-opt" style="color: #16A085;"><Guide /></el-icon> {{ t('passwords.iconGuide') }}
+              <el-icon class="icon-opt" style="color: var(--color-teal);"><Guide /></el-icon> {{ t('passwords.iconGuide') }}
             </el-option>
             <el-option value="Present" :label="t('passwords.iconGift')">
-              <el-icon class="icon-opt" style="color: #F39C12;"><Present /></el-icon> {{ t('passwords.iconGift') }}
+              <el-icon class="icon-opt" style="color: var(--color-orange);"><Present /></el-icon> {{ t('passwords.iconGift') }}
             </el-option>
             <el-option value="Trophy" :label="t('passwords.iconTrophy')">
               <el-icon class="icon-opt" style="color: var(--color-yellow);"><Trophy /></el-icon> {{ t('passwords.iconTrophy') }}
@@ -446,7 +446,7 @@
               <el-icon class="icon-opt" style="color: #E91E63;"><Bell /></el-icon> {{ t('passwords.iconBell') }}
             </el-option>
             <el-option value="User" :label="t('passwords.iconUser')">
-              <el-icon class="icon-opt" style="color: #2C3E50;"><User /></el-icon> {{ t('passwords.iconUser') }}
+              <el-icon class="icon-opt" style="color: var(--el-text-color-primary);"><User /></el-icon> {{ t('passwords.iconUser') }}
             </el-option>
             <el-option value="Lock" :label="t('passwords.iconLock')">
               <el-icon class="icon-opt" style="color: #C0392B;"><Lock /></el-icon> {{ t('passwords.iconLock') }}
@@ -1461,15 +1461,15 @@ const getIconColor = (iconName) => {
     'Phone': 'var(--accent-blue)',
     'Camera': 'var(--color-red)',
     'Printer': 'var(--el-text-color-secondary)',
-    'VideoCamera': '#E67E22',
+    'VideoCamera': 'var(--color-orange)',
     'Headset': '#9B59B6',
     'Briefcase': '#34495E',
-    'Guide': '#16A085',
-    'Present': '#F39C12',
+    'Guide': 'var(--color-teal)',
+    'Present': 'var(--color-orange)',
     'Trophy': 'var(--color-yellow)',
     'MessageBox': '#1ABC9C',
     'Bell': '#E91E63',
-    'User': '#2C3E50',
+    'User': 'var(--el-text-color-primary)',
     'Lock': '#C0392B',
     'ChromeFilled': '#4285F4',
     'ShoppingBag': '#FF9800',

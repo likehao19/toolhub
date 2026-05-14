@@ -990,13 +990,13 @@ onMounted(async () => {
 
 .file-row-type .type-folder {
   background: linear-gradient(135deg, var(--accent-blue), #66b1ff);
-  color: white;
+  color: var(--el-color-white);
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
 }
 
 .file-row-type .type-file {
   background: linear-gradient(135deg, var(--el-color-success), #85ce61);
-  color: white;
+  color: var(--el-color-white);
   box-shadow: 0 2px 6px rgba(103, 194, 58, 0.25);
 }
 
@@ -1077,11 +1077,11 @@ onMounted(async () => {
 
 :deep(.el-tree-node.is-current > .el-tree-node__content) {
   background-color: var(--accent-blue);
-  color: white;
+  color: var(--el-color-white);
 }
 
 :deep(.el-tree-node.is-current > .el-tree-node__content) .node-label {
-  color: white;
+  color: var(--el-color-white);
 }
 
 :deep(.el-tree-node.is-current > .el-tree-node__content) .node-icon {

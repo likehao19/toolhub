@@ -568,7 +568,7 @@ function buildPrintHtml() {
     display: flex;
     justify-content: space-between;
     border-top: 1px solid var(--el-border-color);
-    background: white;
+    background: var(--el-bg-color-overlay);
   }
   .footer .name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; margin-right: 8px; }
 <\/style>
@@ -908,7 +908,7 @@ onBeforeUnmount(() => {
 .page-grid.per-row-6 { grid-template-columns: repeat(6, 1fr); }
 
 .page-thumb {
-  background: white;
+  background: var(--el-bg-color-overlay);
   border: 1px solid rgba(60, 40, 20, 0.1);
   border-radius: 6px;
   overflow: hidden;

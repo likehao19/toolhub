@@ -202,7 +202,7 @@ const predefineColors = ref([
   '#8c8c8c',
   '#595959',
   '#000000',
-  '#ff4d4f',
+  'var(--color-red)',
   '#ff7a45',
   '#ffa940',
   '#ffc53d',
@@ -686,7 +686,7 @@ defineExpose({
 .excel-toolbar {
   background: var(--bg-primary);
   padding: 8px 12px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--el-border-color-light);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -727,7 +727,7 @@ defineExpose({
 }
 
 .excel-editor-wrapper :deep(.handsontable th) {
-  background: #f0f0f0;
+  background: var(--el-fill-color-light);
   color: var(--text-secondary);
   font-weight: 600;
 }

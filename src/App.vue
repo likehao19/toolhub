@@ -1395,7 +1395,7 @@ body {
   background:
     radial-gradient(circle at 12% 0%, var(--accent-warm-soft) 0%, transparent 34%),
     radial-gradient(circle at 88% 8%, rgba(254, 215, 170, 0.32) 0%, transparent 30%),
-    linear-gradient(135deg, #fdfbf6 0%, #fbfaf6 48%, #f5f1e8 100%) !important;
+    linear-gradient(135deg, var(--bg-primary) 0%, var(--surface-page) 48%, var(--bg-secondary) 100%) !important;
 }
 
 /* ===== 页面切换动画 ===== */

@@ -272,7 +272,7 @@ onMounted(() => {
 .window-header {
   height: 40px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  color: var(--el-color-white);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -299,7 +299,7 @@ onMounted(() => {
 }
 
 .header-actions .el-button {
-  color: white;
+  color: var(--el-color-white);
   padding: 4px;
 }
 
@@ -373,7 +373,7 @@ onMounted(() => {
 
 .command-item:hover {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  color: var(--el-color-white);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
@@ -406,7 +406,7 @@ onMounted(() => {
   justify-content: center;
   flex-shrink: 0;
   font-size: 18px;
-  color: white;
+  color: var(--el-color-white);
 }
 
 .message-item.user .message-avatar {
@@ -438,7 +438,7 @@ onMounted(() => {
 
 .message-item.user .message-text {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  color: var(--el-color-white);
   border-radius: 12px 12px 4px 12px;
 }
 

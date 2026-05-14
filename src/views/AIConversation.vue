@@ -1722,7 +1722,7 @@ onMounted(async () => {
 
 .breadcrumb {
   font-size: 0.9rem;
-  color: #606f7b;
+  color: var(--el-text-color-secondary);
   background: #f0f2f5;
   padding: 6px 12px;
   border-radius: 4px;
@@ -2043,7 +2043,7 @@ onMounted(async () => {
   justify-content: center;
   flex-shrink: 0;
   font-size: 16px;
-  color: white;
+  color: var(--el-color-white);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -2226,7 +2226,7 @@ onMounted(async () => {
   border-radius: 50%;
   border: none;
   background: var(--accent-blue);
-  color: white;
+  color: var(--el-color-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2259,7 +2259,7 @@ onMounted(async () => {
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  border-top-color: var(--el-color-white);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
