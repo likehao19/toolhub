@@ -214,14 +214,14 @@ onUnmounted(() => {
   padding: 6px 8px;
   font-size: 12px;
   color: var(--el-text-color-regular);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-panel-soft);
   transition: all 0.2s;
 }
 
 .input:focus {
   outline: none;
   border-color: rgba(194, 65, 12, 0.5);
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-panel);
 }
 
 .input::placeholder {

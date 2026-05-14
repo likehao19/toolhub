@@ -3249,7 +3249,7 @@ const formatFileTime = (time) => {
 /* ignore */
 .header {
   min-height: 58px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
@@ -3272,8 +3272,8 @@ const formatFileTime = (time) => {
 
 .sidebar-toggle-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(242,246,251,0.92));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+  background: linear-gradient(180deg, var(--surface-panel), rgba(242,246,251,0.92));
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .page-title-block {
@@ -3316,7 +3316,7 @@ const formatFileTime = (time) => {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: rgba(255,255,255,0.74);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20,0.06);
   border-radius: 999px;
   margin-right: 12px;
@@ -3390,7 +3390,7 @@ const formatFileTime = (time) => {
   position: relative;
   z-index: 1;
   border-radius: 18px 0 0 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .resize-handle {
@@ -3467,15 +3467,15 @@ const formatFileTime = (time) => {
 }
 
 .tree-item-wrapper:hover {
-  background-color: rgba(255,255,255,0.58);
+  background-color: var(--surface-muted);
 }
 
 .tree-item-wrapper.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
   color: var(--accent-color);
   font-weight: 600;
   border-color: rgba(194, 65, 12,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
 .tree-info {
@@ -3643,7 +3643,7 @@ const formatFileTime = (time) => {
   z-index: 0;
   border: 1px solid var(--divider);
   border-radius: 0 18px 18px 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 
 .main-container.sidebar-hidden .content-area {
@@ -3657,7 +3657,7 @@ const formatFileTime = (time) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-panel);
   display: flex;
   flex-direction: column;
   align-items: center;

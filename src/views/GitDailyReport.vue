@@ -434,7 +434,7 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -512,7 +512,7 @@ onMounted(async () => {
   margin: 18px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.6);
+  background: var(--surface-panel-soft);
 }
 .empty-icon { font-size: 48px; }
 .empty-text { color: var(--text-tertiary); font-size: 14px; }
@@ -548,7 +548,7 @@ onMounted(async () => {
 .stat-card {
   text-align: center;
   padding: 10px 6px;
-  background: rgba(255,255,255,0.68);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 14px;
 }
@@ -579,7 +579,7 @@ onMounted(async () => {
   font-size: 12px;
   border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 12px;
-  background: rgba(255,255,255,0.64);
+  background: var(--surface-panel-soft);
 }
 .commit-repo {
   color: var(--accent-blue);
@@ -607,7 +607,7 @@ onMounted(async () => {
   font-size: 13px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  background: rgba(255,255,255,0.5);
+  background: var(--surface-muted);
 }
 
 .right-panel {
@@ -628,7 +628,7 @@ onMounted(async () => {
   padding: 10px 14px;
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
-  background: rgba(255,255,255,0.64);
+  background: var(--surface-panel-soft);
 }
 .panel-title { font-size: 12px; font-weight: 600; color: var(--text-primary); }
 .panel-actions { display: flex; gap: 2px; }
@@ -679,7 +679,7 @@ onMounted(async () => {
   gap: 16px;
   padding: 0 16px;
   margin: 0 18px 18px;
-  background: rgba(255,255,255,0.72);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px;

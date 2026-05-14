@@ -610,7 +610,7 @@ button:hover,
 .passwords-page-wrapper .category-item.active {
   background: color-mix(in srgb, var(--accent-blue-bg) 72%, transparent 28%);
   border: 1px solid color-mix(in srgb, var(--accent-blue) 30%, transparent 70%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 1px 0 var(--surface-muted);
 }
 
 /* Todos cards */
@@ -1973,7 +1973,7 @@ code {
 .todos-page-wrapper .sidebar-left {
   background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), color-mix(in srgb, var(--surface-panel-soft) 94%, #f8fbff 6%));
   border: 1px solid color-mix(in srgb, var(--divider) 92%, var(--accent-blue-bg) 8%);
-  box-shadow: 0 10px 24px rgba(60, 40, 20, 0.06), inset 0 1px 0 rgba(255,255,255,0.72);
+  box-shadow: 0 10px 24px rgba(60, 40, 20, 0.06), inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .bookmarks-page-wrapper .sidebar-toolbar,
@@ -1981,7 +1981,7 @@ code {
 .credential-manager .sidebar-toolbar,
 .todos-page-wrapper .sidebar-toolbar {
   padding: 12px 12px 10px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(245,249,255,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(245,249,255,0.92));
   border-bottom: 1px solid color-mix(in srgb, var(--divider) 84%, var(--accent-blue-bg) 16%);
 }
 
@@ -2030,7 +2030,7 @@ code {
   border-radius: 14px;
   border: 1px solid transparent;
   background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+  box-shadow: inset 0 1px 0 var(--surface-muted);
 }
 
 .bookmarks-page-wrapper .category-item::before,
@@ -2055,7 +2055,7 @@ code {
 .todos-page-wrapper .category-item:hover {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 44%, #fff 56%), color-mix(in srgb, var(--accent-blue-bg) 22%, transparent 78%));
   border-color: color-mix(in srgb, var(--accent-blue) 18%, transparent 82%);
-  box-shadow: 0 8px 18px rgba(60, 40, 20, 0.07), inset 0 1px 0 rgba(255,255,255,0.72);
+  box-shadow: 0 8px 18px rgba(60, 40, 20, 0.07), inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .bookmarks-page-wrapper .category-item.active,
@@ -2064,7 +2064,7 @@ code {
 .todos-page-wrapper .category-item.active {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 84%, #fff 16%), color-mix(in srgb, var(--accent-blue-bg) 68%, rgba(255,255,255,0.2) 32%));
   border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent 74%);
-  box-shadow: 0 10px 22px rgba(194,65,12,0.12), inset 0 1px 0 rgba(255,255,255,0.78);
+  box-shadow: 0 10px 22px rgba(194,65,12,0.12), inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .bookmarks-page-wrapper .category-item.active::before,
@@ -2112,20 +2112,20 @@ code {
   height: 22px;
   padding: 0 8px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.86);
+  background: var(--surface-panel);
   border: 1px solid rgba(60, 40, 20,0.06);
   color: var(--text-tertiary);
   font-size: 11px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.72);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .bookmarks-page-wrapper .category-item.active .category-count,
 .passwords-page-wrapper .category-item.active .category-count,
 .credential-manager .category-item.active .category-count,
 .todos-page-wrapper .category-item.active .category-count {
-  background: rgba(255,255,255,0.94);
+  background: var(--surface-panel);
   color: var(--accent-blue);
   border-color: color-mix(in srgb, var(--accent-blue) 14%, rgba(60, 40, 20,0.06) 86%);
 }
@@ -2151,7 +2151,7 @@ code {
   justify-content: center;
   border-radius: 999px;
   color: var(--text-quaternary);
-  background: rgba(255,255,255,0.72);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20,0.05);
 }
 
@@ -2263,7 +2263,7 @@ code {
 .passwords-page-wrapper .sidebar-left,
 .credential-manager .sidebar-left,
 .todos-page-wrapper .sidebar-left {
-  box-shadow: 0 6px 16px rgba(60, 40, 20, 0.04), inset 0 1px 0 rgba(255,255,255,0.7) !important;
+  box-shadow: 0 6px 16px rgba(60, 40, 20, 0.04), inset 0 1px 0 var(--surface-panel-soft) !important;
 }
 
 .bookmarks-page-wrapper .sidebar-toolbar,
@@ -2314,14 +2314,14 @@ code {
 .passwords-page-wrapper .category-item:hover,
 .credential-manager .category-item:hover,
 .todos-page-wrapper .category-item:hover {
-  box-shadow: 0 4px 10px rgba(60, 40, 20, 0.05), inset 0 1px 0 rgba(255,255,255,0.65) !important;
+  box-shadow: 0 4px 10px rgba(60, 40, 20, 0.05), inset 0 1px 0 var(--surface-panel-soft) !important;
 }
 
 .bookmarks-page-wrapper .category-item.active,
 .passwords-page-wrapper .category-item.active,
 .credential-manager .category-item.active,
 .todos-page-wrapper .category-item.active {
-  box-shadow: 0 6px 14px rgba(194,65,12,0.08), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+  box-shadow: 0 6px 14px rgba(194,65,12,0.08), inset 0 1px 0 var(--surface-panel-soft) !important;
 }
 
 .bookmarks-page-wrapper .category-icon,

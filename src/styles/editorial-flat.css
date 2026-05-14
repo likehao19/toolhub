@@ -607,7 +607,7 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
   border-bottom: 1px solid var(--divider) !important;
   border-color: var(--divider) !important;
 }
@@ -1397,7 +1397,7 @@
 
 /* 10) 顶部条（header）：暖白渐变 + divider 底线，去 button glow */
 .app-content.toolbox-unified-shell .toolbox-wrapper .header {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
   border-bottom: 1px solid var(--divider) !important;
 }
 
@@ -1438,7 +1438,7 @@
 
 /* 2) header：去半透明冷白渐变 */
 .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper > .header {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
   border-bottom: 1px solid var(--divider) !important;
 }
 
@@ -1806,7 +1806,7 @@
 /* ============================================================
    18. 文档/笔记 左侧文件树节点（NoteView.vue + NoteEditor.vue）
    ----------------------------------------------------------------
-   原页问题：.tree-item-wrapper hover 给整行画了一个半透明白盒子（rgba(255,255,255,0.58)）；
+   原页问题：.tree-item-wrapper hover 给整行画了一个半透明白盒子（var(--surface-muted)）；
    active 又是一块"白渐变 + 1px 暖橙边 + 阴影"的浮起卡片（NoteView）或冷蓝
    #e1f0fa 底色（NoteEditor）。两边都"白方框"，跟编辑式风格不搭。
    重排：hover 暖橙浅底无边、active 暖橙浅底 + 左侧暖橙竖线（无圆角无阴影）。
@@ -1857,7 +1857,7 @@
    ----------------------------------------------------------------
    原页问题：
    - .sidebar-left 用 linear-gradient(rgba(249,252,255,0.58), rgba(239,246,252,0.34)) 冷蓝渐变
-   - .menu-item:hover 用 rgba(255,255,255,0.42) 半透明白底（不显著）
+   - .menu-item:hover 用 var(--surface-muted) 半透明白底（不显著）
    - .menu-item.active 用 linear-gradient(rgba(58,117,216,0.12), rgba(255,255,255,0.26)) 冷蓝渐变 +
      box-shadow inset rgba(58,117,216,0.76) 冷蓝左竖线
    现在统一为：暖奶油底 + 右侧 hairline + hover 暖橙 6% + active 暖橙 11% +
@@ -2033,8 +2033,8 @@
   height: 44px !important;
   padding: 0 18px !important;
   margin: 0 !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
-  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
+  background-image: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
   border: 0 !important;
   border-bottom: 1px solid var(--divider) !important;
   border-radius: 0 !important;

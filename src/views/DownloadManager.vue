@@ -1044,7 +1044,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(247,249,252,0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247,249,252,0.82));
   border-bottom: 1px solid rgba(60, 40, 20,0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1069,9 +1069,9 @@ onBeforeUnmount(() => {
   overflow: hidden;
   margin: 14px 18px 18px;
   background: linear-gradient(180deg, rgba(250, 246, 238,0.72), rgba(240, 233, 220,0.62));
-  border: 1px solid rgba(255,255,255,0.52);
+  border: 1px solid var(--surface-muted);
   border-radius: 22px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 12px 28px rgba(60, 40, 20,0.04);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 12px 28px rgba(60, 40, 20,0.04);
   backdrop-filter: blur(18px);
 }
 .content-inner {
@@ -1092,8 +1092,8 @@ onBeforeUnmount(() => {
   gap: 20px;
   padding: 28px 32px;
   border-radius: 18px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(240, 233, 220,0.6));
-  border: 1px solid rgba(255,255,255,0.6);
+  background: linear-gradient(135deg, var(--surface-panel-soft), rgba(240, 233, 220,0.6));
+  border: 1px solid var(--surface-panel-soft);
   box-shadow: 0 4px 20px rgba(60, 40, 20,0.04);
 }
 .connect-card-icon {
@@ -1121,14 +1121,14 @@ onBeforeUnmount(() => {
   gap: 12px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.55);
-  border: 1px solid rgba(255,255,255,0.5);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  background: var(--surface-muted);
+  border: 1px solid var(--surface-muted);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
   transition: transform .2s, box-shadow .2s;
 }
 .stat-card:hover {
   transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6), 0 6px 16px rgba(60, 40, 20,0.06);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 6px 16px rgba(60, 40, 20,0.06);
 }
 .stat-card-icon {
   width: 40px; height: 40px;
@@ -1169,9 +1169,9 @@ onBeforeUnmount(() => {
   transition: all .2s;
   user-select: none;
 }
-.tab-btn:hover { background: rgba(255,255,255,0.6); }
+.tab-btn:hover { background: var(--surface-panel-soft); }
 .tab-btn.active {
-  background: rgba(255,255,255,0.82);
+  background: var(--surface-panel-soft);
   color: var(--text-primary);
   border-color: rgba(60, 40, 20,0.06);
   box-shadow: 0 1px 3px rgba(60, 40, 20,0.06);
@@ -1213,16 +1213,16 @@ onBeforeUnmount(() => {
   gap: 14px;
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(255,255,255,0.58);
+  background: var(--surface-muted);
   border: 1px solid rgba(60, 40, 20,0.05);
   transition: transform .15s, border-color .2s, box-shadow .2s, background .2s;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  box-shadow: inset 0 1px 0 var(--surface-muted);
 }
 .task-item:hover {
   transform: translateY(-1px);
-  background: rgba(255,255,255,0.78);
+  background: var(--surface-panel-soft);
   border-color: color-mix(in srgb, var(--accent-blue) 22%, transparent 78%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 8px 20px rgba(194,65,12,0.06);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 20px rgba(194,65,12,0.06);
 }
 .task-item.task-error {
   border-color: rgba(239,68,68,0.18);

@@ -2717,7 +2717,7 @@ onMounted(async () => {
 /* ========== Header ========== */
 .header {
   min-height: 58px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
@@ -2740,8 +2740,8 @@ onMounted(async () => {
 
 .sidebar-toggle-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(242, 246, 251, 0.92));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  background: linear-gradient(180deg, var(--surface-panel), rgba(242, 246, 251, 0.92));
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .page-title-block {
@@ -2829,7 +2829,7 @@ onMounted(async () => {
   height: 100%;
   position: relative;
   z-index: 1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .sidebar-toolbar {
@@ -2859,7 +2859,7 @@ onMounted(async () => {
 
 .sidebar-btn:hover {
   color: var(--accent-blue);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-panel-soft);
 }
 
 .category-list {
@@ -2884,15 +2884,15 @@ onMounted(async () => {
 }
 
 .category-item:hover {
-  background-color: rgba(255, 255, 255, 0.58);
+  background-color: var(--surface-muted);
 }
 
 .category-item.active {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240, 245, 251, 0.95));
   color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
   border-color: rgba(194, 65, 12, 0.15);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(60, 40, 20, 0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20, 0.05);
 }
 
 .category-icon {
@@ -2994,7 +2994,7 @@ onMounted(async () => {
   z-index: 0;
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 18px 0;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 
 .main-container.sidebar-hidden .content-area {
@@ -3013,7 +3013,7 @@ onMounted(async () => {
   min-height: 320px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
 }
 
 .password-list::-webkit-scrollbar {
@@ -3036,7 +3036,7 @@ onMounted(async () => {
 .password-cards {
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-panel);
   border-radius: 18px;
   border: 1px solid rgba(60, 40, 20, 0.08);
   overflow: hidden;
@@ -3362,7 +3362,7 @@ onMounted(async () => {
 
 .lock-icon-main {
   font-size: 36px;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--surface-panel);
 }
 
 .lock-title {
@@ -3374,7 +3374,7 @@ onMounted(async () => {
 
 .lock-desc {
   font-size: var(--font-size-callout);
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--surface-muted);
   margin: 0 0 var(--space-2xl);
 }
 

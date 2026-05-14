@@ -285,7 +285,7 @@ function doClear() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -340,7 +340,7 @@ function doClear() {
 .toolbar-group :deep(.el-button),
 .toolbar-group :deep(.el-select) { --el-border-radius-base: 8px; }
 .toolbar-group :deep(.el-select__wrapper) {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
 }
 .toolbar-group :deep(.el-select__wrapper.is-focused) {
@@ -375,7 +375,7 @@ function doClear() {
 .editor-area {
   flex: 1;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--surface-muted);
 }
 
 .editor-area :deep(.cm-editor) {

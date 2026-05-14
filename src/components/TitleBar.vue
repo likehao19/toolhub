@@ -82,7 +82,7 @@ const handleClose = () => {
   left: 0;
   right: 0;
   height: 36px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 251, 255, 0.86) 100%);
+  background: linear-gradient(180deg, var(--surface-panel) 0%, rgba(247, 251, 255, 0.86) 100%);
   border-bottom: 1px solid #dfe8f4;
   backdrop-filter: blur(12px);
   user-select: none;
@@ -131,7 +131,7 @@ const handleClose = () => {
   height: 28px;
   border: 1px solid #dbe5f2;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-panel-soft);
   color: var(--el-text-color-secondary);
   cursor: pointer;
   display: flex;
@@ -142,7 +142,7 @@ const handleClose = () => {
 }
 
 .title-bar-button:hover {
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface-panel);
   color: var(--el-text-color-primary);
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(60, 40, 20, 0.12);

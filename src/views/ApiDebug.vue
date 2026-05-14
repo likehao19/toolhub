@@ -974,7 +974,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1024,12 +1024,12 @@ onMounted(() => {
 }
 .api-debug-wrapper :deep(.el-button--default) {
   color: #314155;
-  background: rgba(255,255,255,0.68);
+  background: var(--surface-panel-soft);
   border-color: rgba(100, 116, 139, 0.16);
 }
 .api-debug-wrapper :deep(.el-button--default:hover) {
   color: #245fca;
-  background: rgba(255,255,255,0.88);
+  background: var(--surface-panel);
   border-color: rgba(74, 120, 217, 0.32);
 }
 .content-area {
@@ -1112,12 +1112,12 @@ onMounted(() => {
   flex: 1; text-align: center; padding: 8px 0; font-size: 12px; color: var(--text-secondary);
   cursor: pointer; user-select: none; border: 1px solid transparent; border-radius: 10px; transition: all 0.15s;
 }
-.sidebar-tab:hover { color: var(--text-primary); background: rgba(255,255,255,0.58); }
+.sidebar-tab:hover { color: var(--text-primary); background: var(--surface-muted); }
 .sidebar-tab.active {
   color: var(--accent-blue); font-weight: 600;
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
   border-color: rgba(194, 65, 12,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 .sidebar-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 4px 8px 8px; }
 .sidebar-toolbar {
@@ -1269,7 +1269,7 @@ onMounted(() => {
   display: flex; align-items: center; gap: 6px; padding: 7px 10px; cursor: pointer; font-size: 12px;
   border-radius: 10px; border: 1px solid transparent; margin-bottom: 2px;
 }
-.history-item:hover { background: rgba(255,255,255,0.56); }
+.history-item:hover { background: var(--surface-muted); }
 .history-item:hover .item-delete,
 .history-item:focus-within .item-delete {
   opacity: 1;
@@ -1285,7 +1285,7 @@ onMounted(() => {
   padding: 24px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  background: rgba(255,255,255,0.52);
+  background: var(--surface-muted);
 }
 .main-panel {
   width: 100%;
@@ -1311,7 +1311,7 @@ onMounted(() => {
   padding: 4px;
   border: 1px solid rgba(100, 116, 139, 0.12);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--surface-muted);
 }
 .url-actions :deep(.el-button) {
   min-width: 74px;
@@ -1408,7 +1408,7 @@ onMounted(() => {
   margin: 0;
   padding: 0 12px;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--surface-muted);
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .compact-tabs :deep(.el-tabs__nav-wrap) {
@@ -1539,7 +1539,7 @@ onMounted(() => {
 .body-textarea {
   width: 100%; min-height: 120px; max-height: 200px; padding: 10px 12px;
   border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 12px;
-  background: rgba(255,255,255,0.92); color: var(--text-primary);
+  background: var(--surface-panel); color: var(--text-primary);
   font-family: 'Consolas', 'Monaco', monospace; font-size: 12px;
   resize: vertical; outline: none; box-sizing: border-box;
 }
@@ -1552,7 +1552,7 @@ onMounted(() => {
   margin: 20px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.42);
+  background: var(--surface-muted);
 }
 .response-empty-icon { font-size: 48px; }
 .response-empty-hint { font-size: 11px; }
@@ -1581,7 +1581,7 @@ onMounted(() => {
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 16px; padding: 0 16px;
   margin: 0;
-  background: rgba(255,255,255,0.72); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
+  background: var(--surface-panel-soft); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
   border-radius: 0;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
 }

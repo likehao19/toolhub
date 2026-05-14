@@ -340,7 +340,7 @@ onUnmounted(() => {
 <style scoped>
 .header-bar {
   height: var(--header-height);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, rgba(248, 251, 255, 0.84) 100%);
+  background: linear-gradient(180deg, var(--surface-panel) 0%, rgba(248, 251, 255, 0.84) 100%);
   border-bottom: 1px solid color-mix(in srgb, var(--border-color) 88%, #dbe7f6 12%);
   backdrop-filter: saturate(165%) blur(16px);
   user-select: none;
@@ -414,7 +414,7 @@ onUnmounted(() => {
   width: 31px;
   height: 31px;
   border: 1px solid color-mix(in srgb, var(--border-color) 86%, #d9e4f2 14%);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-panel-soft);
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
@@ -425,7 +425,7 @@ onUnmounted(() => {
 }
 
 .header-button:hover {
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface-panel);
   color: var(--el-text-color-primary);
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(60, 40, 20, 0.12);
@@ -455,7 +455,7 @@ onUnmounted(() => {
 
 .global-search :deep(.el-input) {
   width: 300px;
-  --el-input-bg-color: rgba(255, 255, 255, 0.72);
+  --el-input-bg-color: var(--surface-panel-soft);
   --el-input-border-color: color-mix(in srgb, var(--border-color) 85%, #dce7f6 15%);
   --el-input-hover-border-color: #b7c8dd;
   --el-input-focus-border-color: var(--accent-blue);
@@ -484,7 +484,7 @@ onUnmounted(() => {
   left: 0;
   right: 0;
   margin-top: 6px;
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--surface-panel);
   border: 1px solid color-mix(in srgb, var(--border-color) 90%, #dce6f4 10%);
   border-radius: 10px;
   box-shadow: 0 12px 32px rgba(60, 40, 20, 0.14);

@@ -732,7 +732,7 @@ function getFileName(path) {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -900,7 +900,7 @@ function getFileName(path) {
 .editor-pane {
   flex: 1;
   overflow: hidden;
-  background: rgba(255,255,255,0.5);
+  background: var(--surface-muted);
 }
 .left-pane { border-right: 1px solid rgba(60, 40, 20, 0.1); }
 .right-pane { border-left: 1px solid rgba(60, 40, 20, 0.1); }
@@ -965,7 +965,7 @@ function getFileName(path) {
   height: 18px;
   border: 1px solid rgba(60, 40, 20, 0.12);
   border-radius: 4px;
-  background: rgba(255,255,255,0.9);
+  background: var(--surface-panel);
   color: var(--text-tertiary);
   font-size: 13px;
   font-weight: 700;

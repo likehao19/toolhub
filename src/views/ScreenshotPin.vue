@@ -576,7 +576,7 @@ function redo() {
 .text-input-overlay {
   position: absolute;
   z-index: 25;
-  background: rgba(255,255,255,0.9);
+  background: var(--surface-panel);
   border: 2px solid var(--accent-blue);
   border-radius: 4px;
   padding: 4px 8px;

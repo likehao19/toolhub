@@ -223,7 +223,7 @@ onMounted(async () => {
   gap: 16px;
   min-height: 62px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-panel);
   border: none;
   border-bottom: 1px solid var(--divider);
   border-radius: 0;
@@ -296,7 +296,7 @@ onMounted(async () => {
 
 .save-status.idle {
   color: var(--text-quaternary);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface-muted);
 }
 
 .save-status.saved {

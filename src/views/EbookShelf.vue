@@ -379,7 +379,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -423,12 +423,12 @@ onBeforeUnmount(() => {
 .book-card {
   cursor: pointer;
   border-radius: 18px;
-  background: rgba(255,255,255,0.78);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   user-select: none;
   padding: 12px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 .book-card:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(60, 40, 20,0.08); border-color: rgba(64,158,255,0.28); }
 
@@ -463,7 +463,7 @@ onBeforeUnmount(() => {
 .cover-3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 .cover-4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 .cover-5 { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
-.cover-ext { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 600; text-transform: uppercase; }
+.cover-ext { font-size: 11px; color: var(--surface-panel-soft); font-weight: 600; text-transform: uppercase; }
 .cover-title { font-size: 14px; color: var(--el-color-white); font-weight: 700; text-align: center; line-height: 1.3; word-break: break-word; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
 
 .format-badge {
@@ -539,7 +539,7 @@ onBeforeUnmount(() => {
   border-radius: 18px;
   min-height: 240px;
   transition: border-color 0.2s, background 0.2s;
-  background: rgba(255,255,255,0.42);
+  background: var(--surface-muted);
 }
 .import-card:hover {
   border-color: var(--accent-blue);
@@ -559,7 +559,7 @@ onBeforeUnmount(() => {
   margin: 14px 18px 0;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.5);
+  background: var(--surface-muted);
 }
 .empty-icon { font-size: 64px; }
 .empty-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); }
@@ -571,7 +571,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255,255,255,0.82);
+  background: var(--surface-panel-soft);
   border-top: 1px solid rgba(60, 40, 20, 0.08);
   font-size: 11px;
   color: var(--text-tertiary);
@@ -584,7 +584,7 @@ onBeforeUnmount(() => {
 .context-menu {
   position: fixed;
   z-index: 9999;
-  background: rgba(255,255,255,0.96);
+  background: var(--surface-panel);
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 14px;
   box-shadow: 0 16px 32px rgba(60, 40, 20,0.14);

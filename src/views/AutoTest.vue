@@ -249,7 +249,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -308,11 +308,11 @@ onMounted(() => {
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 18px 0;
   background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 .suite-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 12px 16px;
-  border-bottom: 1px solid rgba(60, 40, 20, 0.08); background: rgba(255,255,255,0.6); flex-shrink: 0;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08); background: var(--surface-panel-soft); flex-shrink: 0;
 }
 .auto-steps { padding: 16px; flex: 1; overflow-y: auto; }
 .auto-step-card {
@@ -321,7 +321,7 @@ onMounted(() => {
   padding: 12px;
   margin-bottom: 10px;
   transition: border-color 0.2s;
-  background: rgba(255,255,255,0.68);
+  background: var(--surface-panel-soft);
 }
 .auto-step-card.step-passed { border-color: rgba(103,194,58,0.45); background: rgba(103,194,58,0.06); }
 .auto-step-card.step-failed { border-color: rgba(245,108,108,0.45); background: rgba(245,108,108,0.06); }
@@ -336,7 +336,7 @@ onMounted(() => {
   display: flex; align-items: center; gap: 6px; padding: 10px 12px; cursor: pointer; font-size: 12px;
   border-bottom: 1px solid rgba(60, 40, 20, 0.05);
 }
-.doc-item:hover { background: rgba(255,255,255,0.62); }
+.doc-item:hover { background: var(--surface-panel-soft); }
 .doc-item.active { background: linear-gradient(135deg, var(--accent-blue), #7c3aed); color: var(--el-color-white); }
 .doc-item .kv-delete { display: none; }
 .doc-item:hover .kv-delete { display: block; }
@@ -344,7 +344,7 @@ onMounted(() => {
 .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-secondary); }
 .empty-hint {
   text-align: center; color: var(--text-quaternary); font-size: 12px; padding: 24px;
-  border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 14px; background: rgba(255,255,255,0.5);
+  border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 14px; background: var(--surface-muted);
 }
 .kv-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
 .kv-delete { flex-shrink: 0; font-size: 14px; color: var(--text-quaternary); cursor: pointer; }
@@ -356,7 +356,7 @@ onMounted(() => {
   border-radius: 14px;
   padding: 10px;
   text-align: center;
-  background: rgba(255,255,255,0.68);
+  background: var(--surface-panel-soft);
 }
 .bench-stat-card.ok { border-color: rgba(103,194,58,0.3); }
 .bench-stat-card.err { border-color: rgba(245,108,108,0.3); }

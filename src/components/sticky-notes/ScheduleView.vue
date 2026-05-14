@@ -244,7 +244,7 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 4px;
   padding: 8px;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--surface-muted);
   border-radius: 6px;
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
@@ -267,14 +267,14 @@ onUnmounted(() => {
   padding: 6px 8px;
   font-size: 12px;
   color: var(--el-text-color-regular);
-  background: rgba(255, 255, 255, 0.8);
+  background: var(--surface-panel-soft);
   transition: all 0.2s;
 }
 
 .input:focus {
   outline: none;
   border-color: rgba(194, 65, 12, 0.5);
-  background: rgba(255, 255, 255, 1);
+  background: var(--surface-panel);
 }
 
 .input::placeholder {

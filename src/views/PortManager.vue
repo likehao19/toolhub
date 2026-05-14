@@ -287,7 +287,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -383,7 +383,7 @@ onMounted(() => {
   gap: 12px;
   padding: 0 16px;
   margin: 0 18px 18px;
-  background: rgba(255,255,255,0.72);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px;

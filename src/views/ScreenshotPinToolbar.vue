@@ -145,7 +145,7 @@ async function doClose() {
   width: 16px; height: 16px; border-radius: 50%; cursor: pointer;
   border: 2px solid transparent; transition: border-color 0.1s;
 }
-.color-dot:hover { border-color: rgba(255,255,255,0.5); }
+.color-dot:hover { border-color: var(--surface-muted); }
 .color-dot.active { border-color: var(--el-bg-color-overlay); }
 .size-btn span { display: block; }
 </style>

@@ -526,7 +526,7 @@ function formatBytes(bytes) {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -616,7 +616,7 @@ function formatBytes(bytes) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--surface-muted);
 }
 .drop-zone:hover,
 .drop-zone.drop-active { border-color: var(--accent-blue); background: rgba(238, 246, 255, 0.7); }
@@ -678,7 +678,7 @@ function formatBytes(bytes) {
 .settings :deep(.el-select__wrapper),
 .settings :deep(.el-input-number__wrapper) {
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
 }
 .settings :deep(.el-input__wrapper.is-focus),
@@ -803,7 +803,7 @@ function formatBytes(bytes) {
   width: 100%;
   text-align: center;
 }
-.preview-img { max-width: 100%; max-height: 240px; object-fit: contain; border-radius: 8px; border: 1px solid rgba(60, 40, 20, 0.08); background: rgba(255,255,255,0.5); }
+.preview-img { max-width: 100%; max-height: 240px; object-fit: contain; border-radius: 8px; border: 1px solid rgba(60, 40, 20, 0.08); background: var(--surface-muted); }
 .preview-meta { font-size: 11px; color: var(--text-tertiary); line-height: 1.5; }
 .preview-placeholder {
   color: var(--text-quaternary);
@@ -841,7 +841,7 @@ function formatBytes(bytes) {
   border: 1px solid rgba(60, 40, 20, 0.1);
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-panel-soft);
 }
 .batch-table :deep(.el-table th.el-table__cell) {
   background: rgba(60, 40, 20, 0.04);

@@ -205,7 +205,7 @@ function doStopBench() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -349,7 +349,7 @@ function doStopBench() {
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 8px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--surface-muted);
 }
 .bench-stat-card {
   border: 0;

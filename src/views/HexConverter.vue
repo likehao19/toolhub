@@ -261,7 +261,7 @@ function swapBases() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -346,7 +346,7 @@ function swapBases() {
 .toolbar :deep(.el-button),
 .toolbar :deep(.el-select) { --el-border-radius-base: 8px; }
 .toolbar :deep(.el-select__wrapper) {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
 }
 .toolbar :deep(.el-select__wrapper.is-focused) {
@@ -479,7 +479,7 @@ function swapBases() {
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   font-size: 13px;
   line-height: 1.7;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.12);
   border-radius: 8px;
   box-shadow: none;

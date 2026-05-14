@@ -623,7 +623,7 @@ watch(loading, async (val) => {
   gap: 16px;
   padding: 0 18px;
   min-height: 58px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
   box-sizing: border-box;
@@ -697,10 +697,10 @@ watch(loading, async (val) => {
   display: flex;
   gap: 6px;
   padding: 6px;
-  background: rgba(255,255,255,0.7);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .source-tab {
@@ -721,13 +721,13 @@ watch(loading, async (val) => {
 
 .source-tab:hover {
   color: var(--text-primary);
-  background: rgba(255,255,255,0.8);
+  background: var(--surface-panel-soft);
 }
 
 .source-tab.active {
   color: var(--accent-blue);
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
 .source-count {
@@ -756,7 +756,7 @@ watch(loading, async (val) => {
   color: var(--text-tertiary);
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.54);
+  background: var(--surface-muted);
 }
 
 .wp-empty {
@@ -769,7 +769,7 @@ watch(loading, async (val) => {
   gap: 12px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.6);
+  background: var(--surface-panel-soft);
 }
 
 .wp-empty p { font-size: 13px; color: var(--text-tertiary); margin: 0; }
@@ -787,7 +787,7 @@ watch(loading, async (val) => {
   overflow: hidden;
   cursor: pointer;
   aspect-ratio: 16/10;
-  background: rgba(255,255,255,0.78);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   box-shadow: 0 8px 24px rgba(60, 40, 20, 0.05);
@@ -861,7 +861,7 @@ watch(loading, async (val) => {
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 
-.wp-card-meta { font-size: 10px; color: rgba(255, 255, 255, 0.7); margin-top: 2px; }
+.wp-card-meta { font-size: 10px; color: var(--surface-panel-soft); margin-top: 2px; }
 
 .wp-card-actions {
   display: flex;

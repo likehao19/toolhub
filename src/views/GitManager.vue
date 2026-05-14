@@ -669,7 +669,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -719,7 +719,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px;
-  background: rgba(255,255,255,0.42);
+  background: var(--surface-muted);
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
 }
@@ -789,7 +789,7 @@ onMounted(() => {
   background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px 18px 0 0;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 
 
@@ -891,7 +891,7 @@ onMounted(() => {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.78), transparent);
+  background: linear-gradient(90deg, transparent, var(--surface-panel-soft), transparent);
   animation: git-list-skeleton 1.15s ease-in-out infinite;
 }
 
@@ -946,7 +946,7 @@ onMounted(() => {
   font-weight: 600;
   color: var(--text-tertiary);
   padding: 8px 12px 4px;
-  background: rgba(255,255,255,0.92);
+  background: var(--surface-panel);
   letter-spacing: 0.3px;
 }
 
@@ -962,11 +962,11 @@ onMounted(() => {
   margin: 0 6px 4px;
   border: 1px solid transparent;
 }
-.file-item:hover { background: rgba(255,255,255,0.58); }
+.file-item:hover { background: var(--surface-muted); }
 .file-item.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
   border-color: rgba(194, 65, 12,0.15);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
 .dir-item {
@@ -983,7 +983,7 @@ onMounted(() => {
   border-radius: 10px;
   margin: 0 6px 4px;
 }
-.dir-item:hover { background: rgba(255,255,255,0.58); }
+.dir-item:hover { background: var(--surface-muted); }
 
 .dir-arrow {
   width: 14px;
@@ -1110,7 +1110,7 @@ onMounted(() => {
   border: 1px dashed rgba(148, 163, 184, 0.34);
   border-radius: 18px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--bg-primary) 88%, var(--accent-warm-soft) 12%), color-mix(in srgb, var(--bg-secondary) 76%, transparent 24%));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .diff-empty-icon {
@@ -1151,7 +1151,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px;
-  background: rgba(255,255,255,0.42);
+  background: var(--surface-muted);
   border-top: 1px solid rgba(60, 40, 20, 0.08);
   gap: 12px;
   flex-shrink: 0;

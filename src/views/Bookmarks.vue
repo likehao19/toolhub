@@ -1266,7 +1266,7 @@ onUnmounted(() => {
 /* 顶部导航 */
 .header {
   min-height: 58px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
@@ -1289,8 +1289,8 @@ onUnmounted(() => {
 
 .sidebar-toggle-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(242, 246, 251, 0.92));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  background: linear-gradient(180deg, var(--surface-panel), rgba(242, 246, 251, 0.92));
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .page-title-block {
@@ -1359,7 +1359,7 @@ onUnmounted(() => {
   height: 100%;
   position: relative;
   z-index: 1;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 .sidebar-toolbar {
@@ -1389,7 +1389,7 @@ onUnmounted(() => {
 
 .sidebar-btn:hover {
   color: var(--accent-blue);
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--surface-panel-soft);
 }
 
 .category-list {
@@ -1414,15 +1414,15 @@ onUnmounted(() => {
 }
 
 .category-item:hover {
-  background-color: rgba(255, 255, 255, 0.58);
+  background-color: var(--surface-muted);
 }
 
 .category-item.active {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 245, 251, 0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240, 245, 251, 0.95));
   color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
   border-color: rgba(194, 65, 12, 0.15);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.82), 0 6px 14px rgba(60, 40, 20, 0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20, 0.05);
 }
 
 .category-icon {
@@ -1492,7 +1492,7 @@ onUnmounted(() => {
   min-height: 0;
   border: 1px solid var(--divider);
   border-radius: 0 18px 18px 0;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 
 .main-container.sidebar-hidden .content-area {
@@ -1511,13 +1511,13 @@ onUnmounted(() => {
   min-height: 320px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
 }
 
 .bookmark-cards {
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-panel);
   border-radius: 18px;
   border: 1px solid rgba(60, 40, 20, 0.08);
   overflow: hidden;
@@ -1528,7 +1528,7 @@ onUnmounted(() => {
   content: '';
   display: block;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.88), rgba(255,255,255,0.24));
+  background: linear-gradient(90deg, var(--surface-panel), rgba(255,255,255,0.24));
 }
 
 .bookmark-list::-webkit-scrollbar {

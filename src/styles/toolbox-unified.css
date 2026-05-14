@@ -856,7 +856,7 @@
 /* Shared controls style for all toolbox pages */
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-textarea__inner, .el-select__wrapper) {
   border: 1px solid var(--tb-line) !important;
-  background: rgba(255, 255, 255, 0.7) !important;
+  background: var(--surface-panel-soft) !important;
   box-shadow: none !important;
 }
 
@@ -876,7 +876,7 @@
 
 .app-content.toolbox-unified-shell .el-button--default {
   border-color: var(--tb-line) !important;
-  background: rgba(255, 255, 255, 0.75) !important;
+  background: var(--surface-panel-soft) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--primary {
@@ -895,8 +895,8 @@
   min-height: 36px !important;
   border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 251, 255, 0.9)) !important;
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft) !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
 }
 
@@ -923,7 +923,7 @@
 .app-content.toolbox-unified-shell .el-textarea__inner {
   border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 251, 255, 0.9)) !important;
   padding: 10px 12px !important;
   line-height: 1.6 !important;
   font-size: 13px !important;
@@ -944,7 +944,7 @@
 .app-content.toolbox-unified-shell .el-input-number {
   border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 251, 255, 0.9)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 251, 255, 0.9)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button {
@@ -959,7 +959,7 @@
 .app-content.toolbox-unified-shell .el-button--default {
   color: var(--el-text-color-regular) !important;
   border-color: #d5e0ec !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 255, 0.92)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(246, 250, 255, 0.92)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default:hover {
@@ -2356,7 +2356,7 @@
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-textarea__inner, .el-select__wrapper) {
-  background: rgba(255, 255, 255, 0.82) !important;
+  background: var(--surface-panel-soft) !important;
   border: 1px solid rgba(60, 60, 67, 0.16) !important;
 }
 
@@ -2658,12 +2658,12 @@
   --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(120, 100, 80, 0.13) !important;
   --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
-  --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
-  --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
+  --tb-panel-bg: var(--surface-muted) !important;
+  --tb-panel-bg-strong: var(--surface-panel-soft) !important;
   --tb-panel-line: rgba(120, 100, 80, 0.13) !important;
-  --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
+  --tb-control-bg: var(--surface-panel-soft) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
+  --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
@@ -2738,7 +2738,7 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -2790,17 +2790,17 @@
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(250, 253, 255, 0.46)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.46)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.56)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
@@ -2810,12 +2810,12 @@
   --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(120, 100, 80, 0.13) !important;
   --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
-  --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
-  --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
+  --tb-panel-bg: var(--surface-muted) !important;
+  --tb-panel-bg-strong: var(--surface-panel-soft) !important;
   --tb-panel-line: rgba(120, 100, 80, 0.13) !important;
-  --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
+  --tb-control-bg: var(--surface-panel-soft) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
+  --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
     linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
@@ -2890,7 +2890,7 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -2942,17 +2942,17 @@
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(250, 253, 255, 0.46)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.46)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.56)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
@@ -2962,12 +2962,12 @@
   --tb-bg-soft: var(--bg-primary);
   --tb-line: rgba(112, 130, 153, 0.14);
   --tb-line-strong: rgba(112, 130, 153, 0.18);
-  --tb-panel-bg: rgba(255, 255, 255, 0.56);
-  --tb-panel-bg-strong: rgba(255, 255, 255, 0.68);
+  --tb-panel-bg: var(--surface-muted);
+  --tb-panel-bg-strong: var(--surface-panel-soft);
   --tb-panel-line: rgba(112, 130, 153, 0.14);
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76), 0 8px 22px rgba(60, 40, 20, 0.04);
-  --tb-control-bg: rgba(255, 255, 255, 0.62);
-  --tb-row-hover: rgba(255, 255, 255, 0.42);
+  --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 22px rgba(60, 40, 20, 0.04);
+  --tb-control-bg: var(--surface-panel-soft);
+  --tb-row-hover: var(--surface-muted);
   background:
     linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, #f3f1ea 100%) !important;
@@ -3042,7 +3042,7 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.62)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.62)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -3095,17 +3095,17 @@
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(250, 253, 255, 0.48)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.48)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
   border-color: rgba(112, 130, 153, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
   border-color: rgba(112, 130, 153, 0.16) !important;
 }
 
@@ -3113,10 +3113,10 @@
 .app-content.toolbox-unified-shell {
   --tb-layout-pad-x: 18px;
   --tb-layout-pad-y: 14px;
-  --tb-panel-bg: rgba(255, 255, 255, 0.72);
-  --tb-panel-bg-strong: rgba(255, 255, 255, 0.82);
+  --tb-panel-bg: var(--surface-panel-soft);
+  --tb-panel-bg-strong: var(--surface-panel-soft);
   --tb-panel-line: rgba(60, 40, 20, 0.08);
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.84), 0 10px 24px rgba(60, 40, 20, 0.04);
+  --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 10px 24px rgba(60, 40, 20, 0.04);
   background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--el-fill-color-light) 100%) !important;
 }
 
@@ -3194,7 +3194,7 @@
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   min-height: 58px !important;
   padding: 0 18px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82)) !important;
   border-bottom: 1px solid var(--tb-panel-line) !important;
   backdrop-filter: blur(18px) !important;
 }
@@ -4299,12 +4299,12 @@
   --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(120, 100, 80, 0.13) !important;
   --tb-line-strong: rgba(120, 100, 80, 0.18) !important;
-  --tb-panel-bg: rgba(255, 255, 255, 0.52) !important;
-  --tb-panel-bg-strong: rgba(255, 255, 255, 0.64) !important;
+  --tb-panel-bg: var(--surface-muted) !important;
+  --tb-panel-bg-strong: var(--surface-panel-soft) !important;
   --tb-panel-line: rgba(120, 100, 80, 0.13) !important;
-  --tb-control-bg: rgba(255, 255, 255, 0.62) !important;
+  --tb-control-bg: var(--surface-panel-soft) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
+  --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -4339,7 +4339,7 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -4391,17 +4391,17 @@
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(250, 253, 255, 0.46)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.46)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(249, 252, 255, 0.56)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.56)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
@@ -4411,13 +4411,13 @@
   --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(100, 116, 139, 0.11) !important;
   --tb-line-strong: rgba(100, 116, 139, 0.17) !important;
-  --tb-panel-bg: rgba(255, 255, 255, 0.48) !important;
-  --tb-panel-bg-strong: rgba(255, 255, 255, 0.62) !important;
+  --tb-panel-bg: var(--surface-muted) !important;
+  --tb-panel-bg-strong: var(--surface-panel-soft) !important;
   --tb-panel-line: rgba(100, 116, 139, 0.12) !important;
-  --tb-control-bg: rgba(255, 255, 255, 0.64) !important;
+  --tb-control-bg: var(--surface-panel-soft) !important;
   --tb-hover: rgba(255, 255, 255, 0.34) !important;
   --tb-row-hover: rgba(255, 255, 255, 0.34) !important;
-  --tb-panel-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66), 0 10px 24px rgba(60, 40, 20, 0.04) !important;
+  --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 10px 24px rgba(60, 40, 20, 0.04) !important;
 }
 
 .app-content.toolbox-unified-shell,
@@ -4490,9 +4490,9 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 252, 255, 0.5)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.5)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68) !important;
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -4543,17 +4543,17 @@
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(248, 252, 255, 0.36)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), rgba(248, 252, 255, 0.36)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 252, 255, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.52)) !important;
   border-color: rgba(100, 116, 139, 0.15) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(247, 251, 255, 0.5)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.5)) !important;
   border-color: rgba(100, 116, 139, 0.15) !important;
 }
 
@@ -4653,7 +4653,7 @@
   width: 100% !important;
   border: 1px solid rgba(100, 116, 139, 0.15) !important;
   border-radius: 8px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 252, 255, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.52)) !important;
   box-shadow: none !important;
 }
 
@@ -4720,7 +4720,7 @@
 }
 
 .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .setting-row:hover {
-  background: rgba(255, 255, 255, 0.42) !important;
+  background: var(--surface-muted) !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper .label-text {
@@ -4862,7 +4862,7 @@
   border: 0 !important;
   border-radius: 8px !important;
   box-shadow: 0 0 0 1px rgba(100, 116, 139, 0.15) inset !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 252, 255, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.52)) !important;
   box-sizing: border-box !important;
 }
 
@@ -4984,8 +4984,8 @@
   line-height: 32px !important;
   border: 1px solid rgba(100, 116, 139, 0.16) !important;
   border-radius: 8px !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 252, 255, 0.58)) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.58)) !important;
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft) !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
   display: inline-flex !important;
@@ -5001,12 +5001,12 @@
 
 .app-content.toolbox-unified-shell .el-input-number:hover {
   border-color: rgba(100, 116, 139, 0.24) !important;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(248, 252, 255, 0.68)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 252, 255, 0.68)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input-number:focus-within {
   border-color: #4a78d9 !important;
-  box-shadow: 0 0 0 3px rgba(74, 120, 217, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 0 0 3px rgba(74, 120, 217, 0.12), inset 0 1px 0 var(--surface-panel-soft) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input-number .el-input,
@@ -5363,7 +5363,7 @@
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .env-path {
   border-radius: 8px !important;
   border: 1px solid rgba(100, 116, 139, 0.12) !important;
-  background: rgba(255, 255, 255, 0.42) !important;
+  background: var(--surface-muted) !important;
 }
 
 @media (max-width: 1100px) {
@@ -5570,7 +5570,7 @@
 .app-content.toolbox-unified-shell .api-debug-wrapper .url-bar {
   gap: 10px !important;
   padding: 12px 14px !important;
-  background: rgba(255,255,255,0.58) !important;
+  background: var(--surface-muted) !important;
   border-bottom: 1px solid rgba(100, 116, 139, 0.12) !important;
 }
 
@@ -5579,7 +5579,7 @@
   padding: 4px !important;
   border: 1px solid rgba(100, 116, 139, 0.12) !important;
   border-radius: 12px !important;
-  background: rgba(255, 255, 255, 0.5) !important;
+  background: var(--surface-muted) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper :is(.url-actions, .sidebar-toolbar-create) .el-button {

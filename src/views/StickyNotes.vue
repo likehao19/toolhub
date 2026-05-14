@@ -333,7 +333,7 @@ onUnmounted(() => {
 
 .tab-item.active {
   color: var(--el-text-color-regular);
-  background: rgba(255,255,255,0.8) !important;
+  background: var(--surface-panel-soft) !important;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 

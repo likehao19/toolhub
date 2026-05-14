@@ -227,7 +227,7 @@ const goToSettings = () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-panel);
   border-bottom: 1px solid var(--divider);
   min-height: 62px;
   box-sizing: border-box;

@@ -439,7 +439,7 @@ onBeforeUnmount(async () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   height: 58px;
   flex-shrink: 0;
@@ -499,12 +499,12 @@ onBeforeUnmount(async () => {
   cursor: pointer; font-size: 12px; border-radius: 12px; margin: 0 8px 4px;
   transition: all var(--transition-fast); border: 1px solid transparent;
 }
-.history-item:hover { background: rgba(255,255,255,0.58); }
+.history-item:hover { background: var(--surface-muted); }
 .history-item.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
   border-color: rgba(194, 65, 12,0.14);
   color: var(--accent-blue);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 .history-item.active .history-name { color: var(--accent-blue); }
 .history-item.active .history-path { color: var(--text-tertiary); }
@@ -526,12 +526,12 @@ onBeforeUnmount(async () => {
   cursor: pointer; font-size: 12px; border-radius: 12px; margin-bottom: 4px;
   transition: all var(--transition-fast); border: 1px solid transparent;
 }
-.table-item:hover { background: rgba(255,255,255,0.58); }
+.table-item:hover { background: var(--surface-muted); }
 .table-item.active {
-  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
   border-color: rgba(194, 65, 12,0.14);
   color: var(--accent-blue);
-  box-shadow: 0 1px 0 rgba(255,255,255,0.82), 0 6px 14px rgba(60, 40, 20,0.05);
+  box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 .table-icon { font-size: 12px; flex-shrink: 0; }
 .table-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -546,7 +546,7 @@ onBeforeUnmount(async () => {
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 0 18px 0 0;
   background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 .empty-state {
   flex: 1; display: flex; flex-direction: column; align-items: center;
@@ -554,7 +554,7 @@ onBeforeUnmount(async () => {
   margin: 18px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.5);
+  background: var(--surface-muted);
 }
 .empty-state.small { font-size: 12px; margin: 14px; }
 .empty-state :deep(.el-button) { --el-button-border-radius: 10px; }
@@ -566,13 +566,13 @@ onBeforeUnmount(async () => {
   margin: 8px 10px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  background: rgba(255,255,255,0.52);
+  background: var(--surface-muted);
 }
 
 /* Tab Bar */
 .tab-bar {
   display: flex; align-items: center; border-bottom: 1px solid rgba(60, 40, 20, 0.08);
-  background: rgba(255,255,255,0.66); flex-shrink: 0; padding: 0 14px;
+  background: var(--surface-panel-soft); flex-shrink: 0; padding: 0 14px;
 }
 .tab {
   padding: 11px 14px 9px; font-size: 12px; color: var(--text-secondary);
@@ -598,7 +598,7 @@ onBeforeUnmount(async () => {
 .null-val { color: var(--text-quaternary); font-style: italic; }
 .pagination-bar {
   display: flex; justify-content: center; padding: 10px;
-  border-top: 1px solid rgba(60, 40, 20, 0.08); flex-shrink: 0; background: rgba(255,255,255,0.62);
+  border-top: 1px solid rgba(60, 40, 20, 0.08); flex-shrink: 0; background: var(--surface-panel-soft);
 }
 
 /* Structure Tab */
@@ -614,14 +614,14 @@ onBeforeUnmount(async () => {
 .sql-editor-area { flex: 0 0 auto; display: flex; flex-direction: column; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .sql-toolbar {
   display: flex; align-items: center; gap: 8px; padding: 8px 12px;
-  border-bottom: 1px solid rgba(60, 40, 20, 0.08); background: rgba(255,255,255,0.62);
+  border-bottom: 1px solid rgba(60, 40, 20, 0.08); background: var(--surface-panel-soft);
 }
 .sql-toolbar :deep(.el-button) { --el-button-border-radius: 10px; }
 .sql-hint { font-size: 10px; color: var(--text-quaternary); margin-left: auto; }
 .sql-textarea {
   width: 100%; min-height: 120px; max-height: 200px; padding: 12px 14px;
   border: none; outline: none; resize: vertical; box-sizing: border-box;
-  background: rgba(255,255,255,0.4); color: var(--text-primary);
+  background: var(--surface-muted); color: var(--text-primary);
   font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.6;
 }
 .sql-result-area { flex: 1; overflow: auto; }
@@ -632,7 +632,7 @@ onBeforeUnmount(async () => {
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 8px; padding: 0 16px;
   margin: 0 18px 18px 268px;
-  background: rgba(255,255,255,0.72); border: 1px solid rgba(60, 40, 20, 0.08);
+  background: var(--surface-panel-soft); border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
   border-radius: 0 0 18px 18px;

@@ -411,7 +411,7 @@ const navigateTo = (path) => {
   flex-direction: column;
   transition: width var(--transition-smooth), background var(--transition-smooth);
   flex-shrink: 0;
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.46);
+  box-shadow: inset -1px 0 0 var(--surface-muted);
 }
 
 .productivity-sidebar.collapsed {

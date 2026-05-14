@@ -817,7 +817,7 @@ async function closeSelf() {
   width: 16px; height: 16px; border-radius: 50%; cursor: pointer;
   border: 2px solid transparent; transition: border-color 0.1s;
 }
-.color-dot:hover { border-color: rgba(255,255,255,0.5); }
+.color-dot:hover { border-color: var(--surface-muted); }
 .color-dot.active { border-color: var(--el-bg-color-overlay); }
 .size-btn span { display: block; }
 .magnifier {
@@ -833,7 +833,7 @@ async function closeSelf() {
 .text-input-overlay {
   position: absolute;
   z-index: 25;
-  background: rgba(255,255,255,0.9);
+  background: var(--surface-panel);
   border: 2px solid var(--accent-blue);
   border-radius: 4px;
   padding: 4px 8px;

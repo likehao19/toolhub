@@ -780,7 +780,7 @@ function copyOutput() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   height: 52px;
   box-sizing: border-box;
@@ -1003,7 +1003,7 @@ function copyOutput() {
   font-family: 'Cascadia Code', 'Fira Code', monospace;
   font-size: 13px;
   line-height: 1.5;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   color: var(--text-primary);
   resize: none;
   outline: none;

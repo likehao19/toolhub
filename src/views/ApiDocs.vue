@@ -545,7 +545,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1147,8 +1147,8 @@ onMounted(() => {
   border-radius: 14px;
   padding: 14px 16px;
   margin-bottom: 12px;
-  background: rgba(255,255,255,0.7);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+  background: var(--surface-panel-soft);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .doc-preview-card:hover {
@@ -1219,14 +1219,14 @@ onMounted(() => {
 .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .empty-hint {
   text-align: center; color: var(--text-quaternary); font-size: 12px; padding: 24px;
-  border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 14px; background: rgba(255,255,255,0.5);
+  border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 14px; background: var(--surface-muted);
   margin: 12px;
 }
 .response-body {
   margin: 0; padding: 10px 12px; font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 12px;
   line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; word-break: break-all; overflow-y: auto;
   max-height: 240px;
-  border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 8px; background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 8px; background: var(--surface-panel);
 }
 
 @media (max-width: 960px) {

@@ -322,7 +322,7 @@ statusText.value = t('imageToBase64.ready')
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -445,7 +445,7 @@ statusText.value = t('imageToBase64.ready')
   transition: padding 0.2s ease, min-height 0.2s ease,
               background 0.2s ease, border-color 0.15s ease;
   min-height: 140px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--surface-muted);
   /* 关键：防止内部文字撑破容器 */
   min-width: 0;
   overflow: hidden;
@@ -461,7 +461,7 @@ statusText.value = t('imageToBase64.ready')
   border-color: rgba(60, 40, 20, 0.12);
   padding: 12px;
   min-height: 140px;
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--surface-panel-soft);
 }
 .drop-icon {
   font-size: 36px;
@@ -509,7 +509,7 @@ statusText.value = t('imageToBase64.ready')
   justify-content: center;
   padding: 0;
   border: 1px solid rgba(60, 40, 20, 0.12);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-panel);
   color: var(--text-secondary);
   border-radius: 8px;
   cursor: pointer;
@@ -536,7 +536,7 @@ statusText.value = t('imageToBase64.ready')
 .url-row :deep(.el-input) { min-width: 0; }
 .url-row :deep(.el-input__wrapper) {
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.12);
 }
 .url-row :deep(.el-input__wrapper.is-focus) {
@@ -592,7 +592,7 @@ statusText.value = t('imageToBase64.ready')
   font-family: var(--font-mono, 'Consolas', monospace);
   line-height: 1.65;
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   border-radius: 8px;
   word-break: break-all;
   box-sizing: border-box;

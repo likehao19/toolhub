@@ -327,7 +327,7 @@ function formatTime(ts) {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   flex-shrink: 0;
@@ -359,8 +359,8 @@ function formatTime(ts) {
   padding: 16px 18px 18px;
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.72);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(60, 40, 20,0.04);
+  background: var(--surface-panel-soft);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 10px 24px rgba(60, 40, 20,0.04);
 }
 .section-title {
   font-size: 14px; font-weight: 600; color: var(--text-primary);
@@ -370,7 +370,7 @@ function formatTime(ts) {
 .action-card {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 20px 12px; border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 16px;
-  cursor: pointer; background: rgba(255,255,255,0.68); transition: all 0.15s;
+  cursor: pointer; background: var(--surface-panel-soft); transition: all 0.15s;
 }
 .action-card:hover { border-color: var(--accent-blue); background: rgba(64,158,255,0.04); transform: translateY(-2px); }
 .action-icon { font-size: 32px; margin-bottom: 8px; }
@@ -379,7 +379,7 @@ function formatTime(ts) {
 .history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 .history-card {
   border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 12px;
-  overflow: hidden; background: rgba(255,255,255,0.78); cursor: pointer;
+  overflow: hidden; background: var(--surface-panel-soft); cursor: pointer;
   transition: border-color 0.15s; position: relative;
 }
 .history-card:hover { border-color: var(--accent-blue); }
@@ -395,7 +395,7 @@ function formatTime(ts) {
   display: flex; align-items: center; gap: 6px; padding: 6px 10px;
   border: 1px solid rgba(60, 40, 20, 0.08); border-radius: 10px;
   cursor: pointer; font-size: 11px; font-family: monospace;
-  background: rgba(255,255,255,0.78);
+  background: var(--surface-panel-soft);
 }
 .color-card:hover { border-color: var(--accent-blue); }
 .color-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,0.1); }
@@ -404,7 +404,7 @@ function formatTime(ts) {
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
   padding: 16px;
-  background: rgba(255,255,255,0.78);
+  background: var(--surface-panel-soft);
 }
 .empty-hint {
   text-align: center;
@@ -413,12 +413,12 @@ function formatTime(ts) {
   padding: 24px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  background: rgba(255,255,255,0.5);
+  background: var(--surface-muted);
 }
 .status-bar {
   height: 30px; display: flex; align-items: center; gap: 16px; padding: 0 16px;
   margin: 0 18px 18px;
-  background: rgba(255,255,255,0.72); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
+  background: var(--surface-panel-soft); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
   border-radius: 0 0 18px 18px;
 }

@@ -995,7 +995,7 @@ watch(showRenameDialog, (v) => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   height: 52px;
   flex-shrink: 0;
@@ -1074,7 +1074,7 @@ watch(showRenameDialog, (v) => {
   color: var(--text-quaternary);
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  background: rgba(255,255,255,0.52);
+  background: var(--surface-muted);
 }
 
 .db-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 12px 12px; }
@@ -1156,7 +1156,7 @@ watch(showRenameDialog, (v) => {
 .key-tree-wrapper { flex: 1; overflow-y: auto; padding: 0 6px 8px; }
 .key-tree-wrapper :deep(.el-tree) { background: transparent; }
 .key-tree-wrapper :deep(.el-tree-node__content) { height: 32px; border-radius: 10px; margin: 1px 4px; }
-.key-tree-wrapper :deep(.el-tree-node__content:hover) { background: rgba(255,255,255,0.7); }
+.key-tree-wrapper :deep(.el-tree-node__content:hover) { background: var(--surface-panel-soft); }
 .key-tree-node { display: flex; align-items: center; gap: 4px; font-size: 12px; min-width: 0; }
 .key-type-icon { font-size: 12px; }
 .key-folder-icon { font-size: 12px; }
@@ -1173,7 +1173,7 @@ watch(showRenameDialog, (v) => {
   padding: 20px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 14px;
-  background: rgba(255,255,255,0.56);
+  background: var(--surface-muted);
 }
 
 .key-list-footer {
@@ -1184,7 +1184,7 @@ watch(showRenameDialog, (v) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255,255,255,0.62);
+  background: var(--surface-panel-soft);
 }
 
 /* Key detail */
@@ -1196,14 +1196,14 @@ watch(showRenameDialog, (v) => {
   background: transparent;
   min-height: 0;
 }
-.key-detail-empty { align-items: center; justify-content: center; gap: 12px; color: var(--text-quaternary); margin: 18px; border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 18px; background: rgba(255,255,255,0.48); }
+.key-detail-empty { align-items: center; justify-content: center; gap: 12px; color: var(--text-quaternary); margin: 18px; border: 1px dashed rgba(60, 40, 20, 0.08); border-radius: 18px; background: var(--surface-muted); }
 .key-detail-empty p { margin: 0; }
 
 .detail-header {
   padding: 14px 18px;
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
-  background: rgba(255,255,255,0.62);
+  background: var(--surface-panel-soft);
 }
 .detail-key-name {
   font-size: 14px;
@@ -1294,7 +1294,7 @@ watch(showRenameDialog, (v) => {
 .info-card {
   padding: 16px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.7);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   box-shadow: 0 8px 24px rgba(60, 40, 20,0.04);
 }
@@ -1314,7 +1314,7 @@ watch(showRenameDialog, (v) => {
   margin: 12px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: rgba(255,255,255,0.56);
+  background: var(--surface-muted);
 }
 
 /* Status bar */
@@ -1324,7 +1324,7 @@ watch(showRenameDialog, (v) => {
   gap: 16px;
   padding: 0 16px;
   margin: 0 18px 18px 254px;
-  background: rgba(255,255,255,0.72);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11px;
@@ -1341,7 +1341,7 @@ watch(showRenameDialog, (v) => {
 .context-menu {
   position: fixed;
   z-index: 9999;
-  background: rgba(255,255,255,0.96);
+  background: var(--surface-panel);
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 12px;
   box-shadow: 0 10px 28px rgba(60, 40, 20,0.14);

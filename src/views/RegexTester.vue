@@ -309,7 +309,7 @@ const doClear = () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--surface-panel);
   border-bottom: 1px solid rgba(60, 40, 20, 0.1);
   min-height: 52px;
   box-sizing: border-box;
@@ -379,7 +379,7 @@ const doClear = () => {
   padding: 4px 10px;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 12px;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   border-color: rgba(60, 40, 20, 0.12);
 }
 .flags-group :deep(.el-checkbox-button.is-checked .el-checkbox-button__inner) {
@@ -409,7 +409,7 @@ const doClear = () => {
   display: flex;
   align-items: center;
   gap: 0;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.12);
   border-radius: 8px;
   padding: 0 12px;
@@ -450,7 +450,7 @@ const doClear = () => {
   border: 1px solid rgba(60, 40, 20, 0.12);
   border-radius: 8px;
   outline: none;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-panel-soft);
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 13px;
   color: var(--text-primary);

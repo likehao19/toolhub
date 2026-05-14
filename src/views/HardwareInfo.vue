@@ -285,7 +285,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -359,8 +359,8 @@ onMounted(() => {
   padding: 16px 18px 18px;
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.72);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.84), 0 10px 24px rgba(60, 40, 20,0.04);
+  background: var(--surface-panel-soft);
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 10px 24px rgba(60, 40, 20,0.04);
 }
 
 .section-title {
@@ -417,7 +417,7 @@ onMounted(() => {
   margin-top: 12px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: rgba(255,255,255,0.68);
+  background: var(--surface-panel-soft);
 }
 
 @media (max-width: 900px) {

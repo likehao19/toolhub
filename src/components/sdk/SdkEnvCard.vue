@@ -71,7 +71,7 @@ defineProps({
   font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
   font-size: 13px;
   color: var(--text-primary);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(247, 251, 255, 0.44));
+  background: linear-gradient(180deg, var(--surface-muted), rgba(247, 251, 255, 0.44));
   border: 1px solid rgba(100, 116, 139, 0.12);
   padding: 6px 10px;
   border-radius: 8px;
@@ -100,7 +100,7 @@ defineProps({
   color: var(--text-secondary);
   padding: 3px 10px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--surface-muted);
 }
 
 .status-chip.ok .chip-dot {

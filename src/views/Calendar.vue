@@ -1186,7 +1186,7 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1260,8 +1260,8 @@ onMounted(async () => {
 
 .toolbar-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 251, 0.95));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: linear-gradient(180deg, var(--surface-panel), rgba(244, 247, 251, 0.95));
+  box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
 /* 新增(Plus)按钮 type="primary" 默认白图标,但 .toolbar-btn 把背景洗成白渐变 → 看不见。
@@ -1281,7 +1281,7 @@ onMounted(async () => {
   background: linear-gradient(180deg, var(--bg-primary), color-mix(in srgb, var(--bg-primary) 92%, var(--bg-secondary) 8%));
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 1px 0 var(--surface-panel);
 }
 
 .calendar-workspace {
@@ -1316,7 +1316,7 @@ onMounted(async () => {
 
 /* ===== 月视图 - el-calendar 覆写 ===== */
 .calendar-container {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--surface-panel);
   border-radius: 18px;
   padding: 16px;
   box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
@@ -1506,7 +1506,7 @@ onMounted(async () => {
 
 /* ===== 周视图 ===== */
 .week-view {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--surface-panel);
   border-radius: 18px;
   padding: 16px;
   box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
@@ -1618,7 +1618,7 @@ onMounted(async () => {
 
 /* ===== 日视图 ===== */
 .day-view {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--surface-panel);
   border-radius: 18px;
   padding: 16px;
   box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
@@ -1694,7 +1694,7 @@ onMounted(async () => {
 
 /* ===== 列表视图 ===== */
 .list-view {
-  background: rgba(255, 255, 255, 0.94);
+  background: var(--surface-panel);
   border-radius: 18px;
   padding: 16px;
   box-shadow: 0 10px 30px rgba(60, 40, 20, 0.05);
