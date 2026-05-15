@@ -1410,12 +1410,22 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 /* ===== 页面切换动画 ===== */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 150ms ease;
+/* 苹果式平滑切换: 旧页面短淡出, 新页面稍慢淡入 + 轻微上滑.
+   原 150ms opacity + mode=out-in 中间会留 50ms 空白看到底层背景 = 闪烁,
+   现在让淡入时间略长, 淡出快, 配 cubic-bezier 缓动. */
+.fade-enter-active {
+  transition: opacity 260ms cubic-bezier(0.2, 0, 0, 1),
+              transform 260ms cubic-bezier(0.2, 0, 0, 1);
+  will-change: opacity, transform;
 }
-
-.fade-enter-from,
+.fade-leave-active {
+  transition: opacity 140ms cubic-bezier(0.4, 0, 1, 1);
+  will-change: opacity;
+}
+.fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
 .fade-leave-to {
   opacity: 0;
 }
