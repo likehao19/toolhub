@@ -1398,6 +1398,17 @@ body {
     linear-gradient(135deg, var(--bg-primary) 0%, var(--surface-page) 48%, var(--bg-secondary) 100%) !important;
 }
 
+/* 暗色覆盖: 切换页面瞬间也走深色,避免白闪。
+   --accent-warm-soft (#fff1e6 浅奶油) 和 rgba(254,215,170,0.32) 浅橙在暗色下显白。
+   双选择器命中: 项目 [data-theme=dark] + Element Plus html.dark */
+[data-theme="dark"] .app-content.toolbox-unified-shell,
+html.dark .app-content.toolbox-unified-shell {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(251, 146, 60, 0.10) 0%, transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(194, 65, 12, 0.08) 0%, transparent 30%),
+    linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
+}
+
 /* ===== 页面切换动画 ===== */
 .fade-enter-active,
 .fade-leave-active {
@@ -1516,6 +1527,9 @@ body {
   --accent-blue: #fb923c;
   --accent-blue-hover: #fdba74;
   --accent-blue-bg: rgba(251,146,60,0.18);
+  --accent-warm: #fb923c;
+  --accent-warm-hover: #fdba74;
+  --accent-warm-soft: rgba(251, 146, 60, 0.14);
   --border-color: rgba(255,235,210,0.18);
   --border-color-strong: rgba(255,235,210,0.26);
   --divider: rgba(255,235,210,0.12);

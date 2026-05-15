@@ -14,6 +14,18 @@
   --tb-hover: rgba(47, 111, 228, 0.05);
 }
 
+/* 暗色覆盖: 项目用 [data-theme="dark"], Element Plus 用 html.dark, 双命中 */
+[data-theme="dark"] .app-content.toolbox-unified-shell,
+html.dark .app-content.toolbox-unified-shell {
+  --tb-bg: #1a1714;
+  --tb-bg-soft: #221d18;
+  --tb-line: rgba(255, 235, 210, 0.12);
+  --tb-line-strong: rgba(255, 235, 210, 0.18);
+  --tb-hover: rgba(251, 146, 60, 0.10);
+  --tb-glow-1: rgba(251, 146, 60, 0.08);
+  --tb-glow-2: rgba(194, 65, 12, 0.06);
+}
+
 .app-content.toolbox-unified-shell :is(
   .toolbox-wrapper,
   .sdk-manager-wrapper,
@@ -50,8 +62,8 @@
   display: flex;
   flex-direction: column;
   background:
-    radial-gradient(circle at 0% -10%, #eef5ff 0%, transparent 42%),
-    radial-gradient(circle at 100% 0%, #f1f7ff 0%, transparent 36%),
+    radial-gradient(circle at 0% -10%, var(--tb-glow-1, #eef5ff) 0%, transparent 42%),
+    radial-gradient(circle at 100% 0%, var(--tb-glow-2, #f1f7ff) 0%, transparent 36%),
     linear-gradient(180deg, var(--tb-bg-soft) 0%, var(--tb-bg) 100%) !important;
   color: var(--tb-text);
   overflow: hidden;
