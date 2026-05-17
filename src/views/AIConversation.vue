@@ -1707,7 +1707,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background-color: var(--bg-primary, #ffffff);
+  background-color: var(--bg-primary, var(--surface-panel-soft));
   border-bottom: 1px solid var(--border-color, var(--el-border-color-light));
   height: 50px;
   box-sizing: border-box;
@@ -1723,7 +1723,7 @@ onMounted(async () => {
 .breadcrumb {
   font-size: 0.9rem;
   color: var(--el-text-color-secondary);
-  background: #f0f2f5;
+  background: var(--el-fill-color-light);
   padding: 6px 12px;
   border-radius: 4px;
   font-weight: 500;
@@ -1875,7 +1875,7 @@ onMounted(async () => {
 }
 
 .sidebar-item:hover {
-  background: #eeeff1;
+  background: var(--surface-panel-soft);
 }
 
 .sidebar-item.active {
@@ -2083,7 +2083,7 @@ onMounted(async () => {
 }
 
 .assistant-message {
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   color: var(--el-text-color-primary);
   border-radius: 18px 18px 18px 4px;
   border: 1px solid var(--border-color, var(--el-border-color-light));
@@ -2162,7 +2162,7 @@ onMounted(async () => {
 
 .input-area {
   padding: 20px;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border-top: 1px solid var(--border-color, var(--el-border-color-light));
 }
 
@@ -2170,7 +2170,7 @@ onMounted(async () => {
   position: relative;
   max-width: 800px;
   margin: 0 auto;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border: 1.5px solid var(--border-color, var(--el-border-color));
   border-radius: 24px;
   transition: all 0.2s;
@@ -2297,7 +2297,7 @@ onMounted(async () => {
 }
 
 .user-message :deep(code) {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-panel-soft);
 }
 
 .message-text :deep(.hljs-code-block) {

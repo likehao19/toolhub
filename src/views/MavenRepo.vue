@@ -641,7 +641,7 @@ function formatDate(ts) {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -684,7 +684,7 @@ function formatDate(ts) {
   font-weight: 600;
 }
 .toolbar-secondary-btn:not(.is-disabled) {
-  background: rgba(248, 244, 232,0.9);
+  background: var(--surface-panel-soft);
   border-color: rgba(60, 40, 20, 0.08);
   color: var(--text-primary);
 }
@@ -694,7 +694,7 @@ function formatDate(ts) {
   padding: 0;
   border-radius: 10px;
   color: var(--text-secondary);
-  background: rgba(248, 244, 232,0.9);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.06);
 }
 .toolbar-icon-btn:hover:not(.is-disabled) {
@@ -721,7 +721,7 @@ function formatDate(ts) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  background: rgba(248, 244, 232,0.9);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 10px;
 }
@@ -732,7 +732,7 @@ function formatDate(ts) {
   gap: 12px;
   margin: 14px 18px 0;
   padding: 10px 12px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.9));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
   flex-wrap: wrap;
@@ -744,7 +744,7 @@ function formatDate(ts) {
   gap: 4px;
   min-height: 28px;
   padding: 6px 10px;
-  background: rgba(248, 244, 232,0.94);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 999px;
 }
@@ -773,7 +773,7 @@ function formatDate(ts) {
 }
 .search-box { padding: 10px; border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .search-box :deep(.el-input__wrapper) {
-  background: rgba(248, 244, 232,0.92);
+  background: var(--surface-panel-soft);
   box-shadow: inset 0 0 0 1px rgba(60, 40, 20, 0.08);
   border-radius: 10px;
 }
@@ -790,14 +790,14 @@ function formatDate(ts) {
   font-size: 13px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.9));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
 }
 
 .project-modules-section {
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   max-height: 200px;
   overflow-y: auto;
-  background: linear-gradient(180deg, var(--surface-muted), rgba(248, 244, 232,0.3));
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface-panel-soft));
 }
 .section-head {
   display: flex;
@@ -811,7 +811,7 @@ function formatDate(ts) {
 .section-count {
   font-size: 10px;
   color: var(--text-tertiary);
-  background: rgba(248, 244, 232,0.94);
+  background: var(--surface-panel-soft);
   padding: 1px 6px;
   border-radius: 999px;
   border: 1px solid rgba(60, 40, 20, 0.06);
@@ -858,7 +858,7 @@ function formatDate(ts) {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255,255,255,0.3);
+  background: var(--surface-panel-soft);
 }
 .tree-group-label:hover { background: var(--surface-muted); }
 .tree-arrow { font-size: 10px; width: 12px; color: var(--text-quaternary); flex-shrink: 0; }
@@ -867,7 +867,7 @@ function formatDate(ts) {
   margin-left: auto;
   font-size: 10px;
   color: var(--text-quaternary);
-  background: rgba(248, 244, 232,0.94);
+  background: var(--surface-panel-soft);
   padding: 1px 6px;
   border-radius: 999px;
   border: 1px solid rgba(60, 40, 20, 0.06);
@@ -909,7 +909,7 @@ function formatDate(ts) {
   color: var(--text-quaternary);
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.9));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
 }
 .empty-icon { font-size: 64px; margin-bottom: 16px; }
 .project-overview-panel { padding: 18px; }
@@ -923,12 +923,12 @@ function formatDate(ts) {
   border-radius: 16px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 .module-card:hover { border-color: rgba(64, 158, 255, 0.28); box-shadow: 0 10px 24px rgba(60, 40, 20,0.06); transform: translateY(-1px); }
 .module-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.module-card-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 999px; color: var(--text-tertiary); background: rgba(248, 244, 232,0.94); border: 1px solid rgba(60, 40, 20, 0.06); }
+.module-card-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 999px; color: var(--text-tertiary); background: var(--surface-panel-soft); border: 1px solid rgba(60, 40, 20, 0.06); }
 .module-card-badge.is-root { color: var(--accent-blue); background: var(--accent-blue-bg); border-color: rgba(64, 158, 255, 0.16); }
 .module-card-packaging { font-size: 10px; color: var(--text-quaternary); }
 .module-card-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
@@ -936,13 +936,13 @@ function formatDate(ts) {
 .module-card-meta { display: flex; gap: 10px; font-size: 10px; color: var(--text-quaternary); flex-wrap: wrap; }
 .detail-panel { padding: 0; height: 100%; display: flex; flex-direction: column; }
 .detail-tabs { height: 100%; display: flex; flex-direction: column; }
-.detail-tabs :deep(.el-tabs__content) { flex: 1; overflow-y: auto; padding: 16px; background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(248, 244, 232,0.18)); }
+.detail-tabs :deep(.el-tabs__content) { flex: 1; overflow-y: auto; padding: 16px; background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)); }
 .detail-tabs :deep(.el-tabs__header) { padding: 0 16px; margin: 0; background: var(--surface-muted); border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
 .detail-tabs :deep(.el-tabs__nav-wrap::after) { background-color: rgba(60, 40, 20, 0.08); }
 .tab-surface {
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
   padding: 14px;
 }
@@ -953,7 +953,7 @@ function formatDate(ts) {
   background: var(--surface-panel-soft);
 }
 .files-table :deep(.el-table th.el-table__cell) {
-  background: rgba(248, 244, 232,0.94);
+  background: var(--surface-panel-soft);
   color: var(--text-secondary);
   font-weight: 700;
 }
@@ -969,7 +969,7 @@ function formatDate(ts) {
   padding: 20px 22px;
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 .dep-hint-title {
@@ -984,7 +984,7 @@ function formatDate(ts) {
   color: var(--text-tertiary);
 }
 .gav-card {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   border-radius: 16px;
   padding: 14px;
   margin-bottom: 16px;
@@ -1022,7 +1022,7 @@ function formatDate(ts) {
   white-space: pre-wrap;
   word-break: break-all;
   color: var(--text-primary);
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   padding: 16px;
   border-radius: 14px;
   border: 1px solid rgba(60, 40, 20, 0.08);
@@ -1073,7 +1073,7 @@ function formatDate(ts) {
   color: var(--text-secondary);
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 16px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.9));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
 }
 .check-summary {
   display: flex;
@@ -1090,7 +1090,7 @@ function formatDate(ts) {
   font-size: 13px;
   font-weight: 700;
   color: var(--text-secondary);
-  background: rgba(248, 244, 232,0.94);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.06);
 }
 .check-stat.is-error { color: var(--color-red); }
@@ -1101,7 +1101,7 @@ function formatDate(ts) {
   overflow: hidden;
 }
 .check-table :deep(.el-table th.el-table__cell) {
-  background: rgba(248, 244, 232,0.94);
+  background: var(--surface-panel-soft);
   color: var(--text-secondary);
   font-weight: 700;
 }
@@ -1112,7 +1112,7 @@ function formatDate(ts) {
   gap: 10px;
   padding: 0 16px;
   margin: 0 18px 18px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247,249,252,0.9));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   border: 1px solid rgba(60, 40, 20, 0.08);
   border-top: none;
   font-size: 11.5px;

@@ -1,24 +1,49 @@
 /**
  * API Workbench - cURL parser + code generator
  */
+import { buildAuthHeader, buildUrl } from './shared'
+
+function escapeShellSingle(s) {
+  return String(s == null ? '' : s).replace(/'/g, `'\\''`)
+}
 
 function tokenizeCommand(input) {
   const tokens = []
   let current = ''
   let quote = null
-  let escaping = false
 
   for (let i = 0; i < input.length; i++) {
     const ch = input[i]
+    const next = input[i + 1]
 
-    if (escaping) {
+    // 反斜杠处理：
+    // - 在双引号内：仅 \" \\ \$ \` 解释为字面字符，其他 \X 保持字面 \X
+    // - 在单引号内：完全字面（bash 单引号语义）
+    // - 在引号外：仅 \<whitespace> 和 \\ 解释，其他 \X 保持字面 \X
+    //   （这样 Windows 路径 C:\Users\file 不会被吃掉）
+    if (ch === '\\' && next != null) {
+      if (quote === "'") {
+        // 单引号内反斜杠字面
+        current += ch
+        continue
+      }
+      if (quote === '"') {
+        if (next === '"' || next === '\\' || next === '$' || next === '`') {
+          current += next
+          i += 1
+          continue
+        }
+        current += ch
+        continue
+      }
+      // unquoted
+      if (next === '\\' || /\s/.test(next) || next === '"' || next === "'") {
+        current += next
+        i += 1
+        continue
+      }
+      // 不识别的 \X 字面保留（Windows 路径友好）
       current += ch
-      escaping = false
-      continue
-    }
-
-    if (ch === '\\') {
-      escaping = true
       continue
     }
 
@@ -72,6 +97,7 @@ export function parseCurl(curlStr) {
   let url = ''
   const headers = []
   let bodyContent = ''
+  const multipartFields = []
   let auth = { type: 'none' }
 
   for (let i = 1; i < tokens.length; i++) {
@@ -98,7 +124,21 @@ export function parseCurl(curlStr) {
     }
 
     if ((token === '-d' || token === '--data' || token === '--data-raw' || token === '--data-binary' || token === '--data-ascii') && next) {
-      bodyContent = next
+      bodyContent = bodyContent ? `${bodyContent}&${next}` : next
+      if (method === 'GET') method = 'POST'
+      i += 1
+      continue
+    }
+
+    if ((token === '-F' || token === '--form') && next) {
+      const idx = next.indexOf('=')
+      if (idx > -1) {
+        multipartFields.push({
+          key: next.slice(0, idx).trim(),
+          value: next.slice(idx + 1),
+          enabled: true,
+        })
+      }
       if (method === 'GET') method = 'POST'
       i += 1
       continue
@@ -131,7 +171,11 @@ export function parseCurl(curlStr) {
   url = normalizeCurlUrl(url)
 
   let bodyType = 'none'
-  if (bodyContent) {
+  let formData = []
+  if (multipartFields.length) {
+    bodyType = 'multipart'
+    formData = multipartFields
+  } else if (bodyContent) {
     const contentTypeHeader = headers.find(h => h.key.toLowerCase() === 'content-type')?.value?.toLowerCase() || ''
     if (contentTypeHeader.includes('application/x-www-form-urlencoded')) {
       bodyType = 'form'
@@ -150,23 +194,61 @@ export function parseCurl(curlStr) {
     url,
     headers,
     params: [],
-    body: { type: bodyType, content: bodyContent },
+    body: { type: bodyType, content: bodyContent, formData },
     auth,
   }
 }
 
 export function generateCode(config, language = 'curl') {
-  const { method, url, headers = [], body } = config
+  const { method, url, headers = [], body, params = [], auth } = config
 
   if (language === 'curl') {
-    let cmd = `curl -X ${method} '${url}'`
-    headers.filter(h => h.enabled).forEach(h => {
-      cmd += ` \\\n  -H '${h.key}: ${h.value}'`
-    })
-    if (body?.content && method !== 'GET') {
-      cmd += ` \\\n  -d '${body.content}'`
+    let fullUrl = buildUrl(url, params)
+    if (auth?.type === 'apikey' && auth.position === 'query' && auth.key) {
+      const extra = `${encodeURIComponent(auth.key)}=${encodeURIComponent(auth.value || '')}`
+      fullUrl += (fullUrl.includes('?') ? '&' : '?') + extra
     }
-    return cmd
+    const lines = [`curl -X ${method} '${escapeShellSingle(fullUrl)}'`]
+
+    const headerMap = {}
+    headers.filter(h => h.enabled && h.key).forEach(h => {
+      headerMap[h.key] = h.value
+    })
+
+    const authHeader = buildAuthHeader(auth)
+    if (authHeader) headerMap[authHeader.key] = authHeader.value
+
+    const hasBody = body && body.type && body.type !== 'none' && method !== 'GET' && method !== 'HEAD'
+    if (hasBody && body.type === 'multipart') {
+      // multipart 由 -F 给出，让 curl 自己生成 Content-Type/boundary
+      delete headerMap['Content-Type']
+      delete headerMap['content-type']
+    } else if (hasBody && body.type === 'form') {
+      headerMap['Content-Type'] = headerMap['Content-Type'] || 'application/x-www-form-urlencoded'
+    } else if (hasBody && body.type === 'json') {
+      headerMap['Content-Type'] = headerMap['Content-Type'] || 'application/json'
+    }
+
+    Object.entries(headerMap).forEach(([k, v]) => {
+      lines.push(`-H '${escapeShellSingle(k)}: ${escapeShellSingle(v)}'`)
+    })
+
+    if (hasBody) {
+      if (body.type === 'json' || body.type === 'raw') {
+        if (body.content) lines.push(`-d '${escapeShellSingle(body.content)}'`)
+      } else if (body.type === 'form') {
+        const formStr = (body.formData || []).filter(f => f.enabled && f.key)
+          .map(f => `${encodeURIComponent(f.key)}=${encodeURIComponent(f.value || '')}`)
+          .join('&')
+        if (formStr) lines.push(`-d '${formStr}'`)
+      } else if (body.type === 'multipart') {
+        ;(body.formData || []).filter(f => f.enabled && f.key).forEach(f => {
+          lines.push(`-F '${escapeShellSingle(f.key)}=${escapeShellSingle(f.value || '')}'`)
+        })
+      }
+    }
+
+    return lines.join(' \\\n  ')
   }
 
   if (language === 'javascript') {

@@ -379,7 +379,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -513,7 +513,7 @@ onBeforeUnmount(() => {
 }
 .book-progress-bar {
   height: 4px;
-  background: rgba(226,232,240,0.9);
+  background: var(--surface-panel-soft);
   border-radius: 999px;
   margin-top: 8px;
   overflow: hidden;
@@ -598,7 +598,7 @@ onBeforeUnmount(() => {
   color: var(--text-primary);
   cursor: pointer;
 }
-.ctx-item:hover { background: rgba(240, 233, 220,0.9); }
+.ctx-item:hover { background: var(--surface-panel-soft); }
 .ctx-danger { color: var(--el-color-danger); }
 .ctx-sep { height: 1px; background: rgba(60, 40, 20, 0.08); margin: 4px 0; }
 

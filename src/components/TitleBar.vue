@@ -82,8 +82,8 @@ const handleClose = () => {
   left: 0;
   right: 0;
   height: 36px;
-  background: linear-gradient(180deg, var(--surface-panel) 0%, rgba(247, 251, 255, 0.86) 100%);
-  border-bottom: 1px solid #dfe8f4;
+  background: linear-gradient(180deg, var(--surface-panel) 0%, var(--surface-panel-soft) 100%);
+  border-bottom: 1px solid var(--divider);
   backdrop-filter: blur(12px);
   user-select: none;
   display: flex;
@@ -129,7 +129,7 @@ const handleClose = () => {
 .title-bar-button {
   width: 28px;
   height: 28px;
-  border: 1px solid #dbe5f2;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   background: var(--surface-panel-soft);
   color: var(--el-text-color-secondary);

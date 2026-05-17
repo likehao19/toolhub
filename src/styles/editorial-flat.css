@@ -506,7 +506,7 @@
    13. 工具箱子页（.toolbox-unified-shell）—— 把冷蓝调换成暖奶油 + hairline
    ----------------------------------------------------------------
    背景：toolbox-unified.css 给 30+ 个工具页（CryptoTool / RegexTester /
-   HexConverter / RedisClient …）建了一套独立的"冷蓝"主题（--tb-bg: #f4f8fc,
+   HexConverter / RedisClient …）建了一套独立的"冷蓝"主题（--tb-bg: var(--bg-secondary),
    --tb-primary: var(--accent-blue), 蓝色 radial-gradient 背景）。这一节把它整套换成
    暖奶油 + 暖橙 + divider hairline，让所有工具子页和资源收藏页风格一致。
    ============================================================ */
@@ -607,7 +607,7 @@
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   border-bottom: 1px solid var(--divider) !important;
   border-color: var(--divider) !important;
 }
@@ -841,7 +841,7 @@
   color: var(--text-tertiary) !important;
 }
 
-/* 默认按钮文本 / 边框（写死 var(--el-text-color-regular) / #475569 / var(--el-border-color-light) / #d5e0ec / #b9c9de / #c1d0e2） */
+/* 默认按钮文本 / 边框（写死 var(--el-text-color-regular) / #475569 / var(--el-border-color-light) / var(--border-color) / var(--border-color-strong) / var(--border-color-strong)） */
 .app-content.toolbox-unified-shell .el-button--default {
   color: var(--text-secondary) !important;
   border-color: var(--divider) !important;
@@ -1092,7 +1092,7 @@
   padding-top: 0 !important;
 }
 
-/* 创建按钮：写死的蓝色 (#245fca + rgba(74,120,217,0.1)) → 暖橙 hairline 风格 */
+/* 创建按钮：写死的蓝色 (var(--accent-blue) + rgba(74,120,217,0.1)) → 暖橙 hairline 风格 */
 .app-content.toolbox-unified-shell .api-debug-wrapper .create-actions-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fit, minmax(0, 1fr)) !important;
@@ -1241,9 +1241,9 @@
 .app-content.toolbox-unified-shell .toolbox-wrapper .tool-card {
   position: relative !important;
   display: grid !important;
-  grid-template-columns: 28px minmax(0, 1fr) 22px !important;
+  grid-template-columns: 18px minmax(0, 1fr) 22px !important;
   align-items: center !important;
-  gap: 10px !important;
+  gap: 8px !important;
   min-height: 40px !important;
   padding: 0 10px !important;
   background: transparent !important;
@@ -1280,15 +1280,15 @@
   outline-offset: -2px !important;
 }
 
-/* 8) 图标：保留 emoji 默认彩色！强制覆盖 toolbox-unified 的 grayscale 滤镜 */
+/* 8) 工具图标:纯线性 SVG,无背景无边框,按分类色着色;水平布局中跟文字垂直居中对齐 */
 .app-content.toolbox-unified-shell .toolbox-wrapper .tool-icon,
 .app-content.toolbox-unified-shell .tool-icon {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 28px !important;
-  height: 28px !important;
-  font-size: 18px !important;
+  width: 16px !important;
+  height: 16px !important;
+  font-size: 16px !important;
   margin: 0 !important;
   line-height: 1 !important;
   background: transparent !important;
@@ -1296,11 +1296,10 @@
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  /* 关键：去掉 toolbox-unified.css 第 2358 行的灰度滤镜 */
   filter: none !important;
   -webkit-filter: none !important;
   opacity: 1 !important;
-  transition: filter 0.12s ease !important;
+  transition: transform var(--transition-normal) !important;
 }
 
 /* 工具名：左对齐、单行省略 */
@@ -1397,7 +1396,7 @@
 
 /* 10) 顶部条（header）：暖白渐变 + divider 底线，去 button glow */
 .app-content.toolbox-unified-shell .toolbox-wrapper .header {
-  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   border-bottom: 1px solid var(--divider) !important;
 }
 
@@ -1438,7 +1437,7 @@
 
 /* 2) header：去半透明冷白渐变 */
 .app-content.toolbox-unified-shell .toolbox-sticky-notes-wrapper > .header {
-  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   border-bottom: 1px solid var(--divider) !important;
 }
 
@@ -1856,7 +1855,7 @@
    18b. SDK 版本管理（SdkManager.vue）左侧菜单 —— 对齐其它页的"左竖线 + 暖橙浅底"
    ----------------------------------------------------------------
    原页问题：
-   - .sidebar-left 用 linear-gradient(rgba(249,252,255,0.58), rgba(239,246,252,0.34)) 冷蓝渐变
+   - .sidebar-left 用 linear-gradient(var(--surface-panel-soft), var(--surface-panel-soft)) 冷蓝渐变
    - .menu-item:hover 用 var(--surface-muted) 半透明白底（不显著）
    - .menu-item.active 用 linear-gradient(rgba(58,117,216,0.12), rgba(255,255,255,0.26)) 冷蓝渐变 +
      box-shadow inset rgba(58,117,216,0.76) 冷蓝左竖线
@@ -2033,8 +2032,8 @@
   height: 44px !important;
   padding: 0 18px !important;
   margin: 0 !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
-  background-image: linear-gradient(180deg, var(--surface-panel), rgba(253, 251, 246, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
+  background-image: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   border: 0 !important;
   border-bottom: 1px solid var(--divider) !important;
   border-radius: 0 !important;

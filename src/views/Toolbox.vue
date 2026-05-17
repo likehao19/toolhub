@@ -16,10 +16,6 @@
           <el-icon style="color: var(--color-orange)"><StarFilled /></el-icon>
           {{ t('toolbox.favHint') }}
         </span>
-        <el-button type="primary" size="small" @click="goToSettings">
-          <el-icon><Setting /></el-icon>
-          {{ t('toolbox.customizeToolbox') }}
-        </el-button>
       </div>
     </div>
 
@@ -31,6 +27,7 @@
         :key="category.name"
       >
         <div class="category-header">
+          <ToolIcon class="category-icon" :id="category.name" type="category" />
           <span>{{ category.label }}</span>
           <span class="category-count">{{ category.tools.length }}</span>
         </div>
@@ -41,7 +38,7 @@
             class="tool-card"
             @click="openTool(tool)"
           >
-            <div class="tool-icon">{{ tool.icon }}</div>
+            <div class="tool-icon"><ToolIcon :id="tool.id" :fallback="tool.icon" /></div>
             <div class="tool-name">{{ tool.name }}</div>
             <div
               class="favorite-btn"
@@ -68,6 +65,7 @@ import { useRouter } from 'vue-router'
 import { Briefcase, Setting, Star, StarFilled } from '@element-plus/icons-vue'
 import { useFavoriteTools } from '@/composables/useFavoriteTools'
 import { t } from '@/i18n'
+import ToolIcon from '@/components/ToolIcon.vue'
 
 const router = useRouter()
 const { toggleFavorite, isFavorite } = useFavoriteTools()
@@ -293,7 +291,7 @@ const goToSettings = () => {
   overflow: hidden;
   margin: 14px 16px 16px;
   background: var(--bg-secondary);
-  border: 1px solid #e6ecf3;
+  border: 1px solid var(--border-color);
   border-radius: 18px;
   box-shadow: 0 8px 22px rgba(60, 40, 20, 0.05);
 }
@@ -340,8 +338,7 @@ const goToSettings = () => {
 .category-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   padding: 0 2px 10px;
   font-size: 13px;
   font-weight: 700;
@@ -361,10 +358,18 @@ const goToSettings = () => {
   border-radius: 999px;
   font-size: 10px;
   font-weight: 700;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
-  border: 1px solid var(--divider);
+  color: var(--text-primary);
+  background: var(--surface-panel-soft);
+  border: 1px solid var(--border-color);
   font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+.category-icon {
+  font-size: 16px;
+  color: var(--accent-warm);
+  flex-shrink: 0;
+  display: flex;
 }
 
 .tool-grid {
@@ -376,44 +381,53 @@ const goToSettings = () => {
 .tool-card {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  min-height: 98px;
-  padding: 16px 10px 14px;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px;
   background: var(--bg-primary);
   border: 1px solid var(--divider);
-  border-radius: 12px;
+  border-radius: 8px;
   cursor: pointer;
   transition: transform var(--transition-normal), border-color var(--transition-normal), background var(--transition-normal), box-shadow var(--transition-normal);
   user-select: none;
-  box-shadow: 0 2px 7px rgba(60, 40, 20, 0.04);
+  box-shadow: 0 1px 3px rgba(60, 40, 20, 0.04);
 }
 
 .tool-card:hover {
-  transform: translateY(-2px);
   background: var(--accent-warm-soft);
   border-color: color-mix(in srgb, var(--accent-blue) 28%, var(--divider) 72%);
-  box-shadow: 0 10px 18px rgba(194, 65, 12, 0.10);
+  box-shadow: 0 4px 10px rgba(194, 65, 12, 0.08);
 }
 
 .tool-icon {
-  font-size: 28px;
-  margin-bottom: 9px;
-  transition: transform var(--transition-normal), filter var(--transition-normal);
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform var(--transition-normal);
 }
 
 .tool-card:hover .tool-icon {
-  transform: translateY(-1px) scale(1.03);
-  filter: saturate(1.08);
+  transform: scale(1.06);
 }
 
 .tool-name {
-  font-size: 12px;
-  color: var(--text-secondary);
-  text-align: center;
-  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-primary);
+  text-align: left;
+  font-weight: 500;
   line-height: 1.3;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color var(--transition-fast);
 }
 
@@ -499,9 +513,8 @@ const goToSettings = () => {
 
 /* 收藏按钮 */
 .favorite-btn {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,12 +525,11 @@ const goToSettings = () => {
   opacity: 0.22;
   transition: opacity var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
   color: var(--text-quaternary);
-  z-index: 1;
 }
 
 .tool-card:hover .favorite-btn {
   opacity: 0.78;
-  background: var(--bg-secondary);
+  background: var(--surface-hover);
 }
 
 .favorite-btn.starred {

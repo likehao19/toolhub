@@ -412,7 +412,7 @@ const formatTime = (date) => {
 }
 
 .confirmation-box {
-  background: #fff9e6;
+  background: var(--surface-panel-soft);
   border: 1px solid var(--el-color-warning);
   border-radius: 8px;
   padding: 12px;
@@ -461,7 +461,7 @@ const formatTime = (date) => {
 }
 
 .result-box.error {
-  background: #fef0f0;
+  background: var(--surface-panel-soft);
   color: var(--el-color-danger);
 }
 

@@ -102,7 +102,7 @@ function createAdvancedParticles() {
     particle.style.position = 'absolute'
     particle.style.width = Math.random() * 3 + 2 + 'px'
     particle.style.height = particle.style.width
-    particle.style.background = 'rgba(255, 255, 255, 0.8)'
+    particle.style.background = 'var(--surface-panel-soft)'
     particle.style.borderRadius = '50%'
     particle.style.left = Math.random() * 100 + '%'
     particle.style.top = Math.random() * 100 + '%'
@@ -337,7 +337,7 @@ onUnmounted(() => {
 .progress-bar {
   width: 240px;
   height: 3px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-panel-soft);
   border-radius: 2px;
   overflow: hidden;
   margin: 0 auto 15px;
@@ -345,7 +345,7 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.8));
+  background: linear-gradient(90deg, var(--surface-panel-soft), var(--surface-panel-soft));
   border-radius: 2px;
   width: 0%;
   animation: progress 2.5s ease-in-out infinite;

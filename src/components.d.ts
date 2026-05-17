@@ -96,6 +96,7 @@ declare module 'vue' {
     ThemeSettingCard: typeof import('./components/ThemeSettingCard.vue')['default']
     TitleBar: typeof import('./components/TitleBar.vue')['default']
     TodoDependencyGraph: typeof import('./components/TodoDependencyGraph.vue')['default']
+    ToolIcon: typeof import('./components/ToolIcon.vue')['default']
     TraySettingCard: typeof import('./components/TraySettingCard.vue')['default']
     WindowManagementCard: typeof import('./components/WindowManagementCard.vue')['default']
   }

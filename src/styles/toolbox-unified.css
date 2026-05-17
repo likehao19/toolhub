@@ -13,7 +13,7 @@
   --tb-muted: var(--el-text-color-secondary);
   --tb-primary: var(--accent-blue);
   --tb-hover: rgba(194, 65, 12, 0.06);
-  --tb-glow-1: rgba(254, 215, 170, 0.28);
+  --tb-glow-1: var(--accent-warm-soft);
   --tb-glow-2: rgba(251, 146, 60, 0.16);
 }
 
@@ -113,7 +113,7 @@ html.dark .app-content.toolbox-unified-shell {
   border-bottom: 1px solid var(--tb-line-strong) !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  background: rgba(248, 251, 255, 0.88) !important;
+  background: var(--surface-panel-soft) !important;
   backdrop-filter: blur(18px);
   display: flex;
   align-items: center;
@@ -896,7 +896,7 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell .el-button--primary {
   border-color: var(--accent-blue) !important;
-  background: linear-gradient(180deg, #3b7cf0 0%, var(--accent-blue) 100%) !important;
+  background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-blue) 100%) !important;
 }
 
 /* Form controls polish (global toolbox pages) */
@@ -910,14 +910,14 @@ html.dark .app-content.toolbox-unified-shell {
   min-height: 36px !important;
   border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 251, 255, 0.9)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   box-shadow: inset 0 1px 0 var(--surface-panel-soft) !important;
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper:hover, .el-select__wrapper:hover, .el-date-editor.el-input__wrapper:hover) {
-  border-color: #c1d0e2 !important;
-  background: linear-gradient(180deg, #ffffff, #f7fbff) !important;
+  border-color: var(--border-color-strong) !important;
+  background: linear-gradient(180deg, var(--surface-hover), var(--surface-panel-soft)) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus) {
@@ -938,7 +938,7 @@ html.dark .app-content.toolbox-unified-shell {
 .app-content.toolbox-unified-shell .el-textarea__inner {
   border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 251, 255, 0.9)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   padding: 10px 12px !important;
   line-height: 1.6 !important;
   font-size: 13px !important;
@@ -947,7 +947,7 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .el-textarea__inner:hover {
-  border-color: #c1d0e2 !important;
+  border-color: var(--border-color-strong) !important;
 }
 
 .app-content.toolbox-unified-shell .el-textarea__inner:focus {
@@ -959,7 +959,7 @@ html.dark .app-content.toolbox-unified-shell {
 .app-content.toolbox-unified-shell .el-input-number {
   border: 1px solid var(--el-border-color-light) !important;
   border-radius: 10px !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 251, 255, 0.9)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button {
@@ -973,13 +973,13 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell .el-button--default {
   color: var(--el-text-color-regular) !important;
-  border-color: #d5e0ec !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(246, 250, 255, 0.92)) !important;
+  border-color: var(--border-color) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default:hover {
   color: var(--el-text-color-primary) !important;
-  border-color: #b9c9de !important;
+  border-color: var(--border-color-strong) !important;
   background: var(--bg-primary) !important;
   box-shadow: 0 6px 16px rgba(60, 40, 20, 0.1) !important;
 }
@@ -1362,7 +1362,7 @@ html.dark .app-content.toolbox-unified-shell {
   border: 0 !important;
   border-radius: 0 !important;
   box-shadow: none !important;
-  background: rgba(248, 251, 255, 0.45) !important;
+  background: var(--surface-panel-soft) !important;
   border-bottom: var(--tb-divider) !important;
   padding-left: var(--tb-layout-pad-x) !important;
   padding-right: var(--tb-layout-pad-x) !important;
@@ -1374,7 +1374,7 @@ html.dark .app-content.toolbox-unified-shell {
   border: 0 !important;
   border-radius: 0 !important;
   border-top: var(--tb-divider-strong) !important;
-  background: rgba(246, 250, 255, 0.7) !important;
+  background: var(--surface-panel-soft) !important;
   padding: 8px var(--tb-layout-pad-x) !important;
   min-height: 42px !important;
 }
@@ -1922,7 +1922,7 @@ html.dark .app-content.toolbox-unified-shell {
   border: 0 !important;
   border-top: var(--tb-divider) !important;
   border-radius: 0 !important;
-  background: rgba(248, 251, 255, 0.66) !important;
+  background: var(--surface-panel-soft) !important;
 }
 
 .app-content.toolbox-unified-shell .sqlite-mgr .main-body {
@@ -1948,7 +1948,7 @@ html.dark .app-content.toolbox-unified-shell {
   border: 0 !important;
   border-top: var(--tb-divider) !important;
   border-radius: 0 !important;
-  background: rgba(248, 251, 255, 0.66) !important;
+  background: var(--surface-panel-soft) !important;
 }
 
 .app-content.toolbox-unified-shell .api-docs-wrapper .content-area {
@@ -2084,20 +2084,21 @@ html.dark .app-content.toolbox-unified-shell {
   }
 }
 
-/* Final pass: calm mac-style toolbox surface across every toolbox route. */
+/* Final pass: calm mac-style toolbox surface across every toolbox route.
+   暖奶油基调,避免与全站不一致;暗色由 [data-theme="dark"]/html.dark 块覆盖。 */
 .app-content.toolbox-unified-shell {
-  --tb-bg: #f5f5f7;
-  --tb-surface: #fbfbfd;
-  --tb-surface-muted: #f0f1f4;
-  --tb-line: #d8dce3;
-  --tb-line-strong: #c7ccd5;
-  --tb-text: #1d1d1f;
-  --tb-muted: #6e6e73;
-  --tb-muted-2: #8a8d93;
+  --tb-bg: #fdfbf6;
+  --tb-surface: #fbfaf6;
+  --tb-surface-muted: #f5f1e8;
+  --tb-line: rgba(60, 40, 20, 0.12);
+  --tb-line-strong: rgba(60, 40, 20, 0.18);
+  --tb-text: var(--el-text-color-primary);
+  --tb-muted: var(--el-text-color-secondary);
+  --tb-muted-2: var(--el-text-color-regular);
   --tb-primary: #c2410c;
   --tb-hover: rgba(194, 65, 12, 0.08);
   --tb-divider: 1px solid var(--tb-line);
-  background: #f5f5f7 !important;
+  background: var(--tb-bg) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -2132,7 +2133,7 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) {
-  background: #f5f5f7 !important;
+  background: var(--tb-bg) !important;
   color: var(--tb-text) !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif !important;
 }
@@ -2171,7 +2172,7 @@ html.dark .app-content.toolbox-unified-shell {
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   min-height: 52px !important;
   padding: 0 18px !important;
-  background: rgba(245, 245, 247, 0.86) !important;
+  background: var(--tb-bg) !important;
   border-bottom: 1px solid rgba(60, 60, 67, 0.18) !important;
   box-shadow: none !important;
   backdrop-filter: saturate(180%) blur(20px) !important;
@@ -2250,7 +2251,7 @@ html.dark .app-content.toolbox-unified-shell {
   .key-search,
   .sftp-toolbar
 ) {
-  background: rgba(251, 251, 253, 0.72) !important;
+  background: var(--surface-panel-soft) !important;
   border-radius: 0 !important;
   border-left: 0 !important;
   border-right: 0 !important;
@@ -2381,8 +2382,8 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .el-button--primary {
-  background: #007aff !important;
-  border-color: #007aff !important;
+  background: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.tab, .tab-btn, .menu-item, .conn-item, .db-item, .table-item, .doc-item, .category-item, .compact-file-row) {
@@ -2457,13 +2458,9 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .tool-icon {
-  width: 22px !important;
-  height: 22px !important;
-  display: grid !important;
+  /* Sizing/bg 由 editorial-flat.css + Toolbox.vue 的 .tool-icon-bg-{cat} 接管 */
+  display: flex !important;
   place-items: center !important;
-  font-size: 14px !important;
-  background: rgba(60, 60, 67, 0.08) !important;
-  border-radius: 6px !important;
 }
 
 .app-content.toolbox-unified-shell .toolbox-wrapper .tool-name {
@@ -2680,7 +2677,7 @@ html.dark .app-content.toolbox-unified-shell {
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
   --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
-    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 46%, var(--surface-panel-soft) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
@@ -2717,7 +2714,7 @@ html.dark .app-content.toolbox-unified-shell {
   .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 46%, var(--surface-panel-soft) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
@@ -2753,7 +2750,7 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -2805,17 +2802,17 @@ html.dark .app-content.toolbox-unified-shell {
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.46)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface-panel-soft)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.56)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
@@ -2832,7 +2829,7 @@ html.dark .app-content.toolbox-unified-shell {
   --tb-row-hover: rgba(255, 255, 255, 0.38) !important;
   --tb-panel-shadow: inset 0 1px 0 var(--surface-panel-soft), 0 8px 22px rgba(60, 40, 20, 0.04) !important;
   background:
-    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 46%, var(--surface-panel-soft) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
@@ -2869,7 +2866,7 @@ html.dark .app-content.toolbox-unified-shell {
   .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 46%, var(--surface-panel-soft) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
@@ -2905,7 +2902,7 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -2957,23 +2954,23 @@ html.dark .app-content.toolbox-unified-shell {
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.46)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface-panel-soft)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.56)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 /* Final soft palette: lighter toolbox pages with a subtle app-like gradient */
 .app-content.toolbox-unified-shell {
-  --tb-bg: #f5f8fb;
+  --tb-bg: var(--surface-panel-soft);
   --tb-bg-soft: var(--bg-primary);
   --tb-line: rgba(112, 130, 153, 0.14);
   --tb-line-strong: rgba(112, 130, 153, 0.18);
@@ -2984,8 +2981,7 @@ html.dark .app-content.toolbox-unified-shell {
   --tb-control-bg: var(--surface-panel-soft);
   --tb-row-hover: var(--surface-muted);
   background:
-    linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
-    linear-gradient(180deg, var(--bg-primary) 0%, #f3f1ea 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3021,8 +3017,7 @@ html.dark .app-content.toolbox-unified-shell {
   .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(244, 249, 255, 0.96) 0%, rgba(250, 253, 255, 0.9) 42%, rgba(242, 248, 246, 0.92) 100%),
-    linear-gradient(180deg, var(--bg-primary) 0%, #f3f1ea 100%) !important;
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3057,7 +3052,7 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.62)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -3110,17 +3105,17 @@ html.dark .app-content.toolbox-unified-shell {
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.48)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface-panel-soft)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(112, 130, 153, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(112, 130, 153, 0.16) !important;
 }
 
@@ -3209,7 +3204,7 @@ html.dark .app-content.toolbox-unified-shell {
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
   min-height: 58px !important;
   padding: 0 18px !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
   border-bottom: 1px solid var(--tb-panel-line) !important;
   backdrop-filter: blur(18px) !important;
 }
@@ -3543,9 +3538,9 @@ html.dark .app-content.toolbox-unified-shell {
 
 /* Visual polish v2: typography, control rhythm, interaction feedback */
 .app-content.toolbox-unified-shell {
-  --tb-control-bg: #f6f9fd;
-  --tb-control-border: #d7e1ee;
-  --tb-control-border-hover: #c4d3e5;
+  --tb-control-bg: var(--surface-panel-soft);
+  --tb-control-border: var(--border-color);
+  --tb-control-border-hover: var(--border-color-strong);
   --tb-control-focus: rgba(47, 111, 228, 0.14);
   --tb-row-hover: rgba(47, 111, 228, 0.06);
 }
@@ -3558,11 +3553,11 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell :is(.breadcrumb-link, .wp-breadcrumb-link) {
-  color: #2d5fc9 !important;
+  color: var(--accent-blue) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.breadcrumb-link, .wp-breadcrumb-link):hover {
-  color: #234ea8 !important;
+  color: var(--accent-blue-active) !important;
   text-decoration: none !important;
 }
 
@@ -3587,11 +3582,11 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper:hover, .el-select__wrapper:hover, .el-date-editor.el-input__wrapper:hover, .el-textarea__inner:hover) {
   border-color: var(--tb-control-border-hover) !important;
-  background: #f8fbff !important;
+  background: var(--surface-panel-soft) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper.is-focus, .el-select__wrapper.is-focused, .el-date-editor.el-input__wrapper.is-focus, .el-textarea__inner:focus) {
-  border-color: #4a78d9 !important;
+  border-color: var(--accent-blue) !important;
   box-shadow: 0 0 0 3px var(--tb-control-focus) !important;
   background: var(--bg-primary) !important;
 }
@@ -3601,14 +3596,14 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: #f4f8fc !important;
-  border: 1px solid #d6e0ec !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
   color: var(--el-text-color-primary) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default:hover {
-  background: #edf4fb !important;
-  border-color: #c8d8ea !important;
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color-strong) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--primary {
@@ -3618,8 +3613,8 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .el-button--primary:hover {
-  background: #275fcc !important;
-  border-color: #275fcc !important;
+  background: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -3980,7 +3975,7 @@ html.dark .app-content.toolbox-unified-shell {
 .app-content.toolbox-unified-shell .code-fmt-wrapper :is(.el-select__wrapper),
 .app-content.toolbox-unified-shell .git-manager-wrapper :is(.el-input__wrapper, .el-select__wrapper) {
   border-radius: 10px !important;
-  background: #f7fafc !important;
+  background: var(--surface-panel-soft) !important;
   border: 1px solid var(--el-border-color-light) !important;
   box-shadow: none !important;
 }
@@ -4305,7 +4300,7 @@ html.dark .app-content.toolbox-unified-shell {
   .multi-print-wrapper
 ) {
   background:
-    linear-gradient(135deg, rgba(253, 251, 246, 0.98) 0%, rgba(251, 248, 240, 0.9) 46%, rgba(248, 243, 233, 0.94) 100%),
+    linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 46%, var(--surface-panel-soft) 100%),
     linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
@@ -4354,7 +4349,7 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
 }
 
@@ -4406,23 +4401,23 @@ html.dark .app-content.toolbox-unified-shell {
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, var(--surface-muted), rgba(250, 253, 255, 0.46)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface-panel-soft)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(249, 252, 255, 0.56)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.54)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(120, 100, 80, 0.16) !important;
 }
 
 /* FINAL TOOLBOX SOFT PALETTE - keep at absolute file end. */
 .app-content.toolbox-unified-shell {
-  --tb-bg: #f4f8fc !important;
+  --tb-bg: var(--bg-secondary) !important;
   --tb-bg-soft: var(--bg-primary) !important;
   --tb-line: rgba(100, 116, 139, 0.11) !important;
   --tb-line-strong: rgba(100, 116, 139, 0.17) !important;
@@ -4468,9 +4463,9 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper
 ) {
   background:
-    radial-gradient(circle at 10% 0%, rgba(219, 234, 254, 0.42) 0%, transparent 34%),
-    radial-gradient(circle at 94% 4%, rgba(220, 252, 231, 0.34) 0%, transparent 30%),
-    linear-gradient(135deg, rgba(243, 248, 255, 0.98) 0%, rgba(251, 253, 255, 0.92) 48%, rgba(243, 250, 247, 0.95) 100%) !important;
+    radial-gradient(circle at 10% 0%, var(--accent-warm-soft) 0%, transparent 34%),
+    radial-gradient(circle at 94% 4%, var(--accent-warm-soft) 0%, transparent 30%),
+    linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%) !important;
 }
 
 .app-content.toolbox-unified-shell :is(
@@ -4505,7 +4500,7 @@ html.dark .app-content.toolbox-unified-shell {
   .ssh-terminal-wrapper,
   .multi-print-wrapper
 ) > :is(.header, .page-header, .wp-header, .reader-header) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.5)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-bottom-color: var(--tb-line-strong) !important;
   box-shadow: inset 0 1px 0 var(--surface-panel-soft) !important;
 }
@@ -4558,17 +4553,17 @@ html.dark .app-content.toolbox-unified-shell {
   .sub-card
 ) {
   border-color: var(--tb-panel-line) !important;
-  background: linear-gradient(180deg, var(--surface-muted), rgba(248, 252, 255, 0.36)) !important;
+  background: linear-gradient(180deg, var(--surface-muted), var(--surface-panel-soft)) !important;
   box-shadow: var(--tb-panel-shadow) !important;
 }
 
 .app-content.toolbox-unified-shell :is(.el-input__wrapper, .el-select__wrapper, .el-textarea__inner, .el-date-editor.el-input__wrapper) {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(100, 116, 139, 0.15) !important;
 }
 
 .app-content.toolbox-unified-shell .el-button--default {
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(247, 251, 255, 0.5)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   border-color: rgba(100, 116, 139, 0.15) !important;
 }
 
@@ -4668,7 +4663,7 @@ html.dark .app-content.toolbox-unified-shell {
   width: 100% !important;
   border: 1px solid rgba(100, 116, 139, 0.15) !important;
   border-radius: 8px !important;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   box-shadow: none !important;
 }
 
@@ -4692,7 +4687,7 @@ html.dark .app-content.toolbox-unified-shell {
   min-height: 0 !important;
   right: 1px !important;
   border-color: rgba(100, 116, 139, 0.14) !important;
-  background: rgba(248, 251, 255, 0.64) !important;
+  background: var(--surface-panel-soft) !important;
   color: var(--el-text-color-secondary) !important;
   line-height: 15px !important;
   box-sizing: border-box !important;
@@ -4877,7 +4872,7 @@ html.dark .app-content.toolbox-unified-shell {
   border: 0 !important;
   border-radius: 8px !important;
   box-shadow: 0 0 0 1px rgba(100, 116, 139, 0.15) inset !important;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   box-sizing: border-box !important;
 }
 
@@ -4921,7 +4916,7 @@ html.dark .app-content.toolbox-unified-shell {
   padding: 0 !important;
   box-sizing: border-box !important;
   color: var(--el-text-color-secondary) !important;
-  background: rgba(248, 251, 255, 0.72) !important;
+  background: var(--surface-panel-soft) !important;
   border-color: rgba(100, 116, 139, 0.14) !important;
 }
 
@@ -4999,7 +4994,7 @@ html.dark .app-content.toolbox-unified-shell {
   line-height: 32px !important;
   border: 1px solid rgba(100, 116, 139, 0.16) !important;
   border-radius: 8px !important;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 252, 255, 0.58)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   box-shadow: inset 0 1px 0 var(--surface-panel-soft) !important;
   box-sizing: border-box !important;
   overflow: hidden !important;
@@ -5016,11 +5011,11 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell .el-input-number:hover {
   border-color: rgba(100, 116, 139, 0.24) !important;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(248, 252, 255, 0.68)) !important;
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft)) !important;
 }
 
 .app-content.toolbox-unified-shell .el-input-number:focus-within {
-  border-color: #4a78d9 !important;
+  border-color: var(--accent-blue) !important;
   box-shadow: 0 0 0 3px rgba(74, 120, 217, 0.12), inset 0 1px 0 var(--surface-panel-soft) !important;
 }
 
@@ -5056,7 +5051,7 @@ html.dark .app-content.toolbox-unified-shell {
 .app-content.toolbox-unified-shell .el-input-number__increase {
   border: 0 !important;
   border-radius: 0 !important;
-  background: rgba(241, 246, 252, 0.68) !important;
+  background: var(--surface-panel-soft) !important;
   color: var(--el-text-color-secondary) !important;
   box-shadow: none !important;
   transition: background 0.15s ease, color 0.15s ease !important;
@@ -5064,7 +5059,7 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell .el-input-number__decrease:hover,
 .app-content.toolbox-unified-shell .el-input-number__increase:hover {
-  background: rgba(231, 240, 251, 0.9) !important;
+  background: var(--surface-panel-soft) !important;
   color: var(--accent-blue) !important;
 }
 
@@ -5249,7 +5244,7 @@ html.dark .app-content.toolbox-unified-shell {
   border: 0 !important;
   border-right: 1px solid var(--tb-line-strong) !important;
   border-radius: 0 !important;
-  background: linear-gradient(180deg, rgba(248, 252, 255, 0.42), rgba(241, 247, 252, 0.28)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
   box-shadow: none !important;
 }
 
@@ -5272,13 +5267,13 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item:hover {
-  background: rgba(255, 255, 255, 0.34) !important;
+  background: var(--surface-hover) !important;
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-item.active {
-  color: #245fca !important;
-  background: linear-gradient(90deg, rgba(47, 111, 228, 0.12), rgba(255, 255, 255, 0.24)) !important;
-  box-shadow: inset 3px 0 0 rgba(47, 111, 228, 0.76) !important;
+  color: var(--accent-blue) !important;
+  background: linear-gradient(90deg, var(--surface-accent), var(--surface-hover)) !important;
+  box-shadow: inset 3px 0 0 var(--accent-blue) !important;
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .menu-badge {
@@ -5368,7 +5363,7 @@ html.dark .app-content.toolbox-unified-shell {
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .version-row:hover {
-  background: rgba(255, 255, 255, 0.28) !important;
+  background: var(--surface-hover) !important;
 }
 
 .app-content.toolbox-unified-shell .sdk-manager-wrapper .version-row.active {
@@ -5571,7 +5566,7 @@ html.dark .app-content.toolbox-unified-shell {
   width: 260px !important;
   min-width: 260px !important;
   max-width: 260px !important;
-  background: linear-gradient(180deg, rgba(248, 252, 255, 0.72), rgba(241, 247, 252, 0.52)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .main-panel {
@@ -5579,7 +5574,7 @@ html.dark .app-content.toolbox-unified-shell {
   min-width: 0 !important;
   max-width: none !important;
   flex: 1 1 auto !important;
-  background: linear-gradient(180deg, rgba(252,253,255,0.7), rgba(246,249,252,0.5)) !important;
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft)) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .url-bar {
@@ -5605,14 +5600,14 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell .api-debug-wrapper :is(.el-button--primary, .create-action-btn.el-button--primary) {
   color: var(--el-color-white) !important;
-  background: linear-gradient(180deg, #4c82e6 0%, #316bd0 100%) !important;
+  background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-blue) 100%) !important;
   border-color: rgba(49, 107, 208, 0.85) !important;
   box-shadow: 0 6px 14px rgba(49, 107, 208, 0.18), inset 0 1px 0 rgba(255,255,255,0.26) !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper :is(.el-button--primary, .create-action-btn.el-button--primary):hover {
   color: var(--el-color-white) !important;
-  background: linear-gradient(180deg, #5a8dea 0%, #3a72d6 100%) !important;
+  background: linear-gradient(180deg, var(--accent-blue-hover) 0%, var(--accent-blue) 100%) !important;
   border-color: rgba(58, 114, 214, 0.9) !important;
 }
 
@@ -5643,12 +5638,12 @@ html.dark .app-content.toolbox-unified-shell {
   border: 1px solid rgba(49, 107, 208, 0.2) !important;
   border-radius: 10px !important;
   background: rgba(74, 120, 217, 0.1) !important;
-  color: #245fca !important;
+  color: var(--accent-blue) !important;
   box-shadow: none !important;
 }
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .create-action-btn:hover {
-  color: #245fca !important;
+  color: var(--accent-blue) !important;
   border-color: rgba(49, 107, 208, 0.28) !important;
   background: rgba(74, 120, 217, 0.15) !important;
 }
@@ -5691,7 +5686,7 @@ html.dark .app-content.toolbox-unified-shell {
 
 .app-content.toolbox-unified-shell .api-debug-wrapper .response-empty {
   margin: 18px !important;
-  background: rgba(255,255,255,0.36) !important;
+  background: var(--surface-panel-soft) !important;
   border: 1px dashed rgba(100, 116, 139, 0.16) !important;
 }
 

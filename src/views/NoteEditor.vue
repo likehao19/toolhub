@@ -1160,7 +1160,7 @@ const scrollToHeading = (index) => {
 .breadcrumb {
   font-size: 0.85rem;
   color: var(--text-secondary);
-  background: #f0f2f5;
+  background: var(--el-fill-color-light);
   padding: 4px 10px;
   border-radius: 4px;
 }
@@ -1264,7 +1264,7 @@ const scrollToHeading = (index) => {
 }
 
 .tree-item-wrapper.active {
-  background-color: #e1f0fa;
+  background-color: var(--surface-panel-soft);
   color: var(--accent-color);
   border-left-color: var(--accent-color);
 }
@@ -1426,7 +1426,7 @@ const scrollToHeading = (index) => {
 }
 
 .file-card.active {
-  background-color: #e1f0fa;
+  background-color: var(--surface-panel-soft);
   border-color: var(--accent-color);
 }
 
@@ -1470,7 +1470,7 @@ const scrollToHeading = (index) => {
 }
 
 .card-menu-btn:hover {
-  background: #dcdcdc;
+  background: var(--surface-panel-soft);
   color: var(--text-primary);
 }
 
@@ -1579,7 +1579,7 @@ const scrollToHeading = (index) => {
 
 .markdown-preview :deep(h1),
 .markdown-preview :deep(h2) {
-  border-bottom: 1px solid #eaecef;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
 }
 

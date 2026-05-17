@@ -75,6 +75,53 @@ export function isJson(str) {
   try { JSON.parse(str); return true } catch { return false }
 }
 
+/* 轻量 XML/HTML pretty：基于 tag 流的缩进；不解析也不验证，畸形输入原样返回。
+   适合调试用，不替代真正的解析器。 */
+export function tryFormatXml(str) {
+  if (typeof str !== 'string' || !str.includes('<')) return str
+  try {
+    const indent = '  '
+    let depth = 0
+    const out = []
+    // 把标签和文本拆开
+    const tokens = str.match(/<[^>]+>|[^<]+/g) || []
+    for (let raw of tokens) {
+      const piece = raw
+      if (piece.startsWith('<')) {
+        const isComment = piece.startsWith('<!--')
+        const isCData = piece.startsWith('<![CDATA[')
+        const isProcessing = piece.startsWith('<?')
+        const isDoctype = piece.startsWith('<!') && !isComment && !isCData
+        const isClose = /^<\/[^>]+>$/.test(piece)
+        const isSelfClose = /\/\s*>$/.test(piece)
+        if (isClose) depth = Math.max(0, depth - 1)
+        out.push(indent.repeat(depth) + piece.trim())
+        if (!isClose && !isSelfClose && !isComment && !isCData && !isProcessing && !isDoctype) {
+          depth += 1
+        }
+      } else {
+        const text = piece.replace(/^\s+|\s+$/g, '')
+        if (text) out.push(indent.repeat(depth) + text)
+      }
+    }
+    return out.join('\n')
+  } catch {
+    return str
+  }
+}
+
+export function detectBodyFormat(contentType, body) {
+  const ct = String(contentType || '').toLowerCase()
+  if (ct.includes('json')) return 'json'
+  if (ct.includes('xml') || ct.includes('html')) return 'xml'
+  if (ct.includes('text')) return 'text'
+  // 内容嗅探
+  const head = String(body || '').trim().slice(0, 64)
+  if (head.startsWith('{') || head.startsWith('[')) return 'json'
+  if (head.startsWith('<')) return 'xml'
+  return 'text'
+}
+
 export function buildUrl(baseUrl, params = []) {
   const activeParams = params.filter(p => p.enabled && p.key)
   if (!activeParams.length) return baseUrl

@@ -545,7 +545,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1213,7 +1213,7 @@ onMounted(() => {
 }
 .doc-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
 .doc-table th, .doc-table td { padding: 7px 8px; border: 1px solid rgba(60, 40, 20, 0.08); text-align: left; }
-.doc-table th { background: rgba(240, 233, 220,0.9); font-weight: 600; }
+.doc-table th { background: var(--surface-panel-soft); font-weight: 600; }
 
 .method-tag { font-size: 10px; font-weight: 700; flex-shrink: 0; width: 40px; }
 .item-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

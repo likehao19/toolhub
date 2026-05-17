@@ -245,7 +245,7 @@ function clearResult() {
 }
 
 .result-panel :deep(.el-table th.el-table__cell) {
-  background: rgba(248, 251, 255, 0.8);
+  background: var(--surface-panel-soft);
 }
 
 .hint {

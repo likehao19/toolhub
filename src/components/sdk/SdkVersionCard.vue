@@ -115,7 +115,7 @@ function isActive(item) {
   transition: background var(--transition-fast);
 }
 .version-row:last-child { border-bottom: none; }
-.version-row:hover { background-color: rgba(255, 255, 255, 0.32); }
+.version-row:hover { background-color: var(--surface-panel-soft); }
 .version-row.active {
   background: linear-gradient(90deg, rgba(47, 111, 228, 0.08), transparent);
 }

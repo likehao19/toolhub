@@ -201,7 +201,7 @@ defineProps({
   color: var(--el-text-color-primary);
   margin: 0 0 12px 0;
   font-family: "PingFang SC";
-  background: linear-gradient(135deg, var(--accent-blue) 0%, #66b1ff 100%);
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--el-color-primary-light-3) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -226,7 +226,7 @@ defineProps({
   gap: 16px;
   padding: 12px 0;
   font-size: 14px;
-  border-bottom: 1px solid #f0f2f5;
+  border-bottom: 1px solid var(--el-fill-color-light);
 }
 
 .param-item:last-child {

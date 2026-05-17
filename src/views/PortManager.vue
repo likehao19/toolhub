@@ -287,7 +287,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -374,7 +374,7 @@ onMounted(() => {
 .state-badge.established { background: rgba(64, 158, 255, 0.12); color: var(--accent-blue); }
 .state-badge.time-wait { background: rgba(230, 162, 60, 0.12); color: var(--el-color-warning); }
 .state-badge.close-wait { background: rgba(245, 108, 108, 0.12); color: var(--el-color-danger); }
-.state-badge.other { background: rgba(248, 244, 232,0.9); color: var(--text-tertiary); }
+.state-badge.other { background: var(--surface-panel-soft); color: var(--text-tertiary); }
 .system-tag { font-size: 11px; color: var(--text-quaternary); }
 
 .status-bar {

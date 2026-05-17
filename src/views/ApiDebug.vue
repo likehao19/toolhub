@@ -43,6 +43,10 @@
                     <el-icon><CollectionTag /></el-icon>
                     <span>{{ t('apiDebug.newCollection') }}</span>
                   </el-button>
+                  <el-button size="small" class="toolbar-btn" @click="onImportPostman" :title="t('apiDebug.importPostman')">
+                    <el-icon><Upload /></el-icon>
+                    <span>Postman</span>
+                  </el-button>
                 </div>
                 <el-tree
                   v-if="collectionTree.length"
@@ -84,7 +88,10 @@
                             <el-dropdown-item v-if="data.type !== 'api'" command="newInterface">
                               <el-icon><DocumentAdd /></el-icon>{{ t('apiDebug.newInterface') }}
                             </el-dropdown-item>
-                            <el-dropdown-item command="rename" :divided="data.type !== 'api'">
+                            <el-dropdown-item v-if="data.type === 'collection'" command="exportPostman" divided>
+                              <el-icon><Download /></el-icon>{{ t('apiDebug.exportPostman') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item command="rename" :divided="data.type !== 'api' && data.type !== 'collection'">
                               <el-icon><Edit /></el-icon>{{ t('common.edit') }}
                             </el-dropdown-item>
                             <el-dropdown-item command="delete" divided>
@@ -100,7 +107,10 @@
               </div>
 
               <div v-if="sidebarTab === 'history'" class="sidebar-list">
-                <div class="sidebar-toolbar">
+                <div class="sidebar-toolbar history-toolbar">
+                  <el-input v-model="historySearch" size="small" clearable :placeholder="t('apiDebug.searchHistory')" class="history-search">
+                    <template #prefix><el-icon><Search /></el-icon></template>
+                  </el-input>
                   <el-button size="small" text type="danger" @click="onClearHistory" :title="t('apiDebug.clearHistory')">
                     <el-icon><Delete /></el-icon>
                   </el-button>
@@ -162,7 +172,12 @@
             <div class="request-panel">
               <el-tabs v-model="reqTab" class="compact-tabs">
                 <el-tab-pane :label="`Params${activeParamsCount ? ' (' + activeParamsCount + ')' : ''}`" name="params">
-                  <div class="kv-editor">
+                  <div class="kv-toolbar">
+                    <el-button size="small" text @click="paramsBulkMode = !paramsBulkMode">
+                      {{ paramsBulkMode ? t('apiDebug.tableEdit') : t('apiDebug.bulkEdit') }}
+                    </el-button>
+                  </div>
+                  <div v-if="!paramsBulkMode" class="kv-editor">
                     <div v-for="(p, i) in reqParams" :key="i" class="kv-row">
                       <el-checkbox v-model="p.enabled" size="small" />
                       <el-input v-model="p.key" size="small" placeholder="Key" />
@@ -171,10 +186,26 @@
                     </div>
                     <el-button size="small" text type="primary" @click="reqParams.push({ key: '', value: '', enabled: true })">+ {{ t('apiDebug.addParam') }}</el-button>
                   </div>
+                  <textarea v-else v-model="paramsBulkText" class="bulk-textarea"
+                    :placeholder="t('apiDebug.bulkPlaceholder')" spellcheck="false" />
+                  <div v-if="reqPathVars.length" class="path-vars-section">
+                    <div class="path-vars-title">{{ t('apiDebug.pathVariables') }}</div>
+                    <div class="kv-editor">
+                      <div v-for="pv in reqPathVars" :key="pv.key" class="kv-row">
+                        <span class="path-var-key">:{{ pv.key }}</span>
+                        <el-input v-model="pv.value" size="small" :placeholder="t('apiDebug.pathVarValue')" />
+                      </div>
+                    </div>
+                  </div>
                 </el-tab-pane>
 
                 <el-tab-pane :label="`Headers${activeHeadersCount ? ' (' + activeHeadersCount + ')' : ''}`" name="headers">
-                  <div class="kv-editor">
+                  <div class="kv-toolbar">
+                    <el-button size="small" text @click="headersBulkMode = !headersBulkMode">
+                      {{ headersBulkMode ? t('apiDebug.tableEdit') : t('apiDebug.bulkEdit') }}
+                    </el-button>
+                  </div>
+                  <div v-if="!headersBulkMode" class="kv-editor">
                     <div v-for="(h, i) in reqHeaders" :key="i" class="kv-row">
                       <el-checkbox v-model="h.enabled" size="small" />
                       <el-autocomplete v-model="h.key" size="small" placeholder="Key" :fetch-suggestions="queryHeaders" />
@@ -183,6 +214,8 @@
                     </div>
                     <el-button size="small" text type="primary" @click="reqHeaders.push({ key: '', value: '', enabled: true })">+ {{ t('apiDebug.addHeader') }}</el-button>
                   </div>
+                  <textarea v-else v-model="headersBulkText" class="bulk-textarea"
+                    :placeholder="t('apiDebug.bulkPlaceholder')" spellcheck="false" />
                 </el-tab-pane>
 
                 <el-tab-pane label="Body" name="body">
@@ -194,6 +227,7 @@
                         <el-radio-button value="form">x-www-form</el-radio-button>
                         <el-radio-button value="multipart">multipart</el-radio-button>
                         <el-radio-button value="raw">raw</el-radio-button>
+                        <el-radio-button value="binary">binary</el-radio-button>
                       </el-radio-group>
                       <el-button v-if="reqBody.type === 'json'" size="small" text @click="formatBodyJson">
                         <el-icon style="margin-right: 4px;"><Brush /></el-icon>{{ t('apiDebug.formatJson') }}
@@ -204,12 +238,21 @@
                       <div v-for="(f, i) in reqBody.formData" :key="i" class="kv-row">
                         <el-checkbox v-model="f.enabled" size="small" />
                         <el-input v-model="f.key" size="small" placeholder="Key" />
-                        <el-input v-model="f.value" size="small" :placeholder="reqBody.type === 'multipart' ? 'Value / file path' : 'Value'" />
+                        <el-input v-model="f.value" size="small" :placeholder="reqBody.type === 'multipart' ? 'Value or @C:/path/to/file' : 'Value'" />
                         <el-icon class="kv-delete" @click="reqBody.formData.splice(i, 1)"><Close /></el-icon>
                       </div>
                       <el-button size="small" text type="primary" @click="reqBody.formData.push({ key: '', value: '', enabled: true })">+ {{ t('apiDebug.addParam') }}</el-button>
                     </div>
                     <div v-if="reqBody.type === 'none'" class="empty-hint" style="padding:20px">{{ t('apiDebug.noBody') }}</div>
+                    <div v-if="reqBody.type === 'binary'" class="binary-body">
+                      <el-button size="small" @click="onPickBinaryFile">
+                        <el-icon style="margin-right:4px"><Upload /></el-icon>{{ t('apiDebug.chooseFile') }}
+                      </el-button>
+                      <span class="binary-path" :title="reqBody.binaryPath">
+                        {{ reqBody.binaryPath || t('apiDebug.noFileChosen') }}
+                      </span>
+                      <el-icon v-if="reqBody.binaryPath" class="binary-clear" @click="reqBody.binaryPath = ''"><Close /></el-icon>
+                    </div>
                   </div>
                 </el-tab-pane>
 
@@ -239,6 +282,45 @@
                     <div v-if="reqAuth.type === 'none'" class="empty-hint" style="padding:12px">No authentication</div>
                   </div>
                 </el-tab-pane>
+
+                <el-tab-pane label="Pre-Script" name="prescript">
+                  <div class="prescript-editor">
+                    <div class="prescript-hint">
+                      {{ t('apiDebug.preScriptHint') }}
+                    </div>
+                    <textarea v-model="reqPreScript" class="body-textarea" style="min-height:180px"
+                      placeholder="// pm.environment.set('token', 'xxx')&#10;// const sig = await crypto.subtle.digest(...)&#10;// pm.variables.set('signature', sig)"
+                      spellcheck="false" />
+                  </div>
+                </el-tab-pane>
+
+                <el-tab-pane label="Settings" name="settings">
+                  <div class="settings-editor">
+                    <div class="setting-row">
+                      <span class="setting-label">{{ t('apiDebug.settingTimeout') }}</span>
+                      <el-input-number v-model="reqSettings.timeout" :min="1000" :max="600000" :step="1000" size="small" controls-position="right" />
+                      <span class="setting-suffix">ms</span>
+                    </div>
+                    <div class="setting-row">
+                      <span class="setting-label">{{ t('apiDebug.settingSslVerify') }}</span>
+                      <el-switch v-model="reqSettings.sslVerify" />
+                    </div>
+                    <div class="setting-row">
+                      <span class="setting-label">{{ t('apiDebug.settingFollowRedirects') }}</span>
+                      <el-switch v-model="reqSettings.followRedirects" />
+                    </div>
+                    <div class="setting-row" v-if="reqSettings.followRedirects">
+                      <span class="setting-label">{{ t('apiDebug.settingMaxRedirects') }}</span>
+                      <el-input-number v-model="reqSettings.maxRedirects" :min="0" :max="50" size="small" controls-position="right" />
+                    </div>
+                    <div class="setting-row">
+                      <span class="setting-label">{{ t('apiDebug.cookieJarEnabled') }}</span>
+                      <el-switch v-model="cookieJarEnabled" @change="onToggleCookieJar" />
+                      <el-button size="small" text type="primary" @click="openCookieJar">{{ t('apiDebug.cookieJarManage') }}</el-button>
+                    </div>
+                    <el-button size="small" text type="primary" @click="resetSettings">{{ t('apiDebug.resetSettings') }}</el-button>
+                  </div>
+                </el-tab-pane>
               </el-tabs>
             </div>
 
@@ -266,11 +348,41 @@
                         <el-radio-button value="pretty">Pretty</el-radio-button>
                         <el-radio-button value="raw">Raw</el-radio-button>
                       </el-radio-group>
-                      <el-button size="small" text @click="copyResponse" :title="t('common.copy')">
-                        <el-icon><CopyDocument /></el-icon>
-                      </el-button>
+                      <div class="response-toolbar-actions">
+                        <el-button size="small" text @click="onSaveResponse" :title="t('apiDebug.saveResponse')">
+                          <el-icon><Download /></el-icon>
+                        </el-button>
+                        <el-button size="small" text @click="copyResponse" :title="t('common.copy')">
+                          <el-icon><CopyDocument /></el-icon>
+                        </el-button>
+                      </div>
                     </div>
                     <pre class="response-body" :class="resBodyMode">{{ resBodyMode === 'pretty' ? prettyBody : response?.body }}</pre>
+                  </el-tab-pane>
+                  <el-tab-pane :label="`${t('apiDebug.cookies')} (${parsedCookies.length})`" name="cookies">
+                    <div v-if="!parsedCookies.length" class="empty-hint" style="padding:20px">No cookies</div>
+                    <div v-else class="cookies-table">
+                      <div class="cookie-row cookie-row-header">
+                        <span>{{ t('apiDebug.cookieName') }}</span>
+                        <span>{{ t('apiDebug.cookieValue') }}</span>
+                        <span>{{ t('apiDebug.cookieDomain') }}</span>
+                        <span>{{ t('apiDebug.cookiePath') }}</span>
+                        <span>{{ t('apiDebug.cookieExpires') }}</span>
+                        <span>Flags</span>
+                      </div>
+                      <div v-for="(c, i) in parsedCookies" :key="i" class="cookie-row">
+                        <span class="ck-name">{{ c.name }}</span>
+                        <span class="ck-val" :title="c.value">{{ c.value }}</span>
+                        <span>{{ c.domain || '-' }}</span>
+                        <span>{{ c.path || '-' }}</span>
+                        <span>{{ c.expires || c['max-age'] || '-' }}</span>
+                        <span class="ck-flags">
+                          <span v-if="c.httpOnly" class="ck-flag">HttpOnly</span>
+                          <span v-if="c.secure" class="ck-flag">Secure</span>
+                          <span v-if="c.samesite" class="ck-flag">SameSite={{ c.samesite }}</span>
+                        </span>
+                      </div>
+                    </div>
                   </el-tab-pane>
                   <el-tab-pane :label="`Headers (${Object.keys(response?.headers || {}).length})`" name="headers">
                     <div class="response-headers-table">
@@ -369,21 +481,51 @@
         <el-button size="small" type="primary" :disabled="!editingEnv" @click="doSaveEnv">{{ t('common.save') }}</el-button>
       </template>
     </el-dialog>
+    <el-dialog v-model="showCookieJar" :title="t('apiDebug.cookieJar')" width="720px" append-to-body>
+      <div v-if="!cookieList.length" class="empty-hint" style="padding:30px">{{ t('apiDebug.cookieJarEmpty') }}</div>
+      <div v-else class="cookies-table">
+        <div class="cookie-row cookie-row-header">
+          <span>{{ t('apiDebug.cookieJarHost') }}</span>
+          <span>{{ t('apiDebug.cookieName') }}</span>
+          <span>{{ t('apiDebug.cookieValue') }}</span>
+          <span>{{ t('apiDebug.cookiePath') }}</span>
+          <span>{{ t('apiDebug.cookieExpires') }}</span>
+          <span></span>
+        </div>
+        <div v-for="(c, i) in cookieList" :key="i" class="cookie-row">
+          <span class="ck-name">{{ c.host }}</span>
+          <span>{{ c.name }}</span>
+          <span class="ck-val" :title="c.value">{{ c.value }}</span>
+          <span>{{ c.path }}</span>
+          <span>{{ c.expires ? new Date(c.expires * 1000).toLocaleString() : 'session' }}</span>
+          <el-icon class="kv-delete" @click="onDeleteCookie(c)"><Close /></el-icon>
+        </div>
+      </div>
+      <template #footer>
+        <el-button size="small" type="danger" plain :disabled="!cookieList.length" @click="onClearCookieJar">
+          {{ t('apiDebug.cookieJarClear') }}
+        </el-button>
+        <el-button size="small" @click="showCookieJar = false">{{ t('common.close') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading, CollectionTag, Folder, FolderOpened, FolderAdd, DocumentAdd, Edit, Delete, Document, CaretRight, CopyDocument, Plus, Promotion, Brush } from '@element-plus/icons-vue'
+import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading, CollectionTag, Folder, FolderOpened, FolderAdd, DocumentAdd, Edit, Delete, Document, CaretRight, CopyDocument, Plus, Promotion, Brush, Download, Upload, Search } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
-import { sendRequest, cancelRequest } from '@/utils/apiWorkbench/httpEngine'
-import { formatSize, METHOD_COLORS, COMMON_HEADERS, tryFormatJson, isJson, buildUrl, buildAuthHeader } from '@/utils/apiWorkbench/shared'
+import { sendRequest, cancelRequest, buildMultipartBody } from '@/utils/apiWorkbench/httpEngine'
+import { formatSize, METHOD_COLORS, COMMON_HEADERS, tryFormatJson, isJson, tryFormatXml, detectBodyFormat, buildUrl, buildAuthHeader } from '@/utils/apiWorkbench/shared'
 import { resolveVariables, getActiveVariables, loadEnvironments, getCurrentEnvId, setCurrentEnvId, createEnvironment, deleteEnvironment, updateEnvironment } from '@/utils/apiWorkbench/environment'
+import { isCookieJarEnabled, setCookieJarEnabled, buildCookieHeader, ingestSetCookies, listCookies, clearJar, deleteCookie } from '@/utils/apiWorkbench/cookieJar'
+import { runPreRequestScript } from '@/utils/apiWorkbench/preRequestRunner'
 import {
   loadCollections,
   createCollection,
+  importCollection,
   deleteCollection,
   renameCollection,
   saveRequestToCollection,
@@ -398,6 +540,8 @@ import {
   getCollectionNodeById,
 } from '@/utils/apiWorkbench/collections'
 import { parseCurl, generateCode } from '@/utils/apiWorkbench/curlParser'
+import { parsePostmanCollection, countCollectionApis } from '@/utils/apiWorkbench/postmanImport'
+import { buildPostmanCollection } from '@/utils/apiWorkbench/postmanExport'
 
 const router = useRouter()
 const collectionTreeRef = ref(null)
@@ -419,11 +563,56 @@ const reqUrl = ref('')
 const reqTab = ref('params')
 const reqParams = ref([{ key: '', value: '', enabled: true }])
 const reqHeaders = ref([{ key: '', value: '', enabled: true }])
-const reqBody = ref({ type: 'none', content: '', formData: [{ key: '', value: '', enabled: true }] })
+const reqBody = ref({ type: 'none', content: '', formData: [{ key: '', value: '', enabled: true }], binaryPath: '' })
 const reqAuth = ref({ type: 'none', token: '', username: '', password: '', key: '', value: '', position: 'header' })
+const reqPathVars = ref([])  // [{ key, value }] —— 由 URL 中 :name 自动同步
+const reqSettings = ref({ timeout: 30000, sslVerify: true, followRedirects: true, maxRedirects: 10 })
+const reqPreScript = ref('')
+const cookieJarEnabled = ref(false)
+const showCookieJar = ref(false)
+const cookieList = ref([])
+const historySearch = ref('')
+const paramsBulkMode = ref(false)
+const headersBulkMode = ref(false)
 
 const activeParamsCount = computed(() => reqParams.value.filter(p => p.enabled && p.key).length)
 const activeHeadersCount = computed(() => reqHeaders.value.filter(h => h.enabled && h.key).length)
+
+/* Bulk Edit 文本格式：
+   key: value              启用
+   # key: value            禁用（行首 # 或 //）
+   行内 # 不当注释看，只看行首 */
+function kvListToBulkText(list) {
+  return (list || [])
+    .filter(kv => kv && (kv.key || kv.value))
+    .map(kv => `${kv.enabled === false ? '# ' : ''}${kv.key || ''}: ${kv.value || ''}`)
+    .join('\n')
+}
+function bulkTextToKvList(text) {
+  const out = []
+  for (const raw of String(text).split('\n')) {
+    const line = raw.trimEnd()
+    const trimmed = line.trim()
+    if (!trimmed) continue
+    let enabled = true
+    let body = trimmed
+    if (body.startsWith('//')) { enabled = false; body = body.slice(2).trim() }
+    else if (body.startsWith('#')) { enabled = false; body = body.replace(/^#+\s*/, '') }
+    const idx = body.indexOf(':')
+    if (idx === -1) out.push({ key: body, value: '', enabled })
+    else out.push({ key: body.slice(0, idx).trim(), value: body.slice(idx + 1).trim(), enabled })
+  }
+  return out.length ? out : [{ key: '', value: '', enabled: true }]
+}
+
+const paramsBulkText = computed({
+  get: () => kvListToBulkText(reqParams.value),
+  set: (val) => { reqParams.value = bulkTextToKvList(val) },
+})
+const headersBulkText = computed({
+  get: () => kvListToBulkText(reqHeaders.value),
+  set: (val) => { reqHeaders.value = bulkTextToKvList(val) },
+})
 
 const sending = ref(false)
 const response = ref(null)
@@ -434,8 +623,82 @@ const resBodyMode = ref('pretty')
 
 const prettyBody = computed(() => {
   if (!response.value?.body) return ''
-  return isJson(response.value.body) ? tryFormatJson(response.value.body) : response.value.body
+  const ct = response.value.headers?.['content-type'] || response.value.headers?.['Content-Type']
+  const fmt = detectBodyFormat(ct, response.value.body)
+  if (fmt === 'json') return tryFormatJson(response.value.body)
+  if (fmt === 'xml') return tryFormatXml(response.value.body)
+  return response.value.body
 })
+
+const parsedCookies = computed(() => {
+  if (!response.value?.setCookies?.length) return []
+  return response.value.setCookies.map(parseSetCookie)
+})
+
+/* URL 路径变量解析与同步：扫描 :name，保留已填值，新增空值，删除已不存在的。
+   用 flush:'sync' 让 loadHistoryItem / loadCollectionItem 可以在设置 reqUrl 后立刻覆盖 path 值。
+   只扫 path/query 段，避开 scheme(:) 和 userinfo(user:pass@) */
+watch(reqUrl, (val) => {
+  let scanTarget = String(val || '')
+  // 剥掉 scheme 部分：`https://` 之后再开始扫
+  const schemeIdx = scanTarget.indexOf('://')
+  if (schemeIdx > -1) scanTarget = scanTarget.slice(schemeIdx + 3)
+  // 剥掉 userinfo（host 前的 user:pass@）
+  const atIdx = scanTarget.indexOf('@')
+  const slashIdx = scanTarget.indexOf('/')
+  if (atIdx > -1 && (slashIdx === -1 || atIdx < slashIdx)) {
+    scanTarget = scanTarget.slice(atIdx + 1)
+  }
+  const matches = scanTarget.match(/:([A-Za-z_][\w-]*)/g) || []
+  const names = Array.from(new Set(matches.map(m => m.slice(1))))
+  const existing = Object.fromEntries(reqPathVars.value.map(v => [v.key, v.value]))
+  reqPathVars.value = names.map(n => ({ key: n, value: existing[n] || '' }))
+}, { immediate: false, flush: 'sync' })
+
+function applyPathVars(url, vars) {
+  if (!vars.length) return url
+  // 同样的 scope 限制：只替换 scheme + userinfo 之后的部分
+  const schemeIdx = url.indexOf('://')
+  let prefix = ''
+  let rest = url
+  if (schemeIdx > -1) {
+    prefix = url.slice(0, schemeIdx + 3)
+    rest = url.slice(schemeIdx + 3)
+    const atIdx = rest.indexOf('@')
+    const slashIdx = rest.indexOf('/')
+    if (atIdx > -1 && (slashIdx === -1 || atIdx < slashIdx)) {
+      prefix += rest.slice(0, atIdx + 1)
+      rest = rest.slice(atIdx + 1)
+    }
+  }
+  const replaced = rest.replace(/:([A-Za-z_][\w-]*)/g, (_, name) => {
+    const v = vars.find(x => x.key === name)
+    return v && v.value !== '' ? encodeURIComponent(v.value) : `:${name}`
+  })
+  return prefix + replaced
+}
+
+function parseSetCookie(str) {
+  const parts = String(str).split(';').map(s => s.trim()).filter(Boolean)
+  const head = parts[0] || ''
+  const eq = head.indexOf('=')
+  const cookie = {
+    name: eq > -1 ? head.slice(0, eq) : head,
+    value: eq > -1 ? head.slice(eq + 1) : '',
+    httpOnly: false,
+    secure: false,
+  }
+  for (let i = 1; i < parts.length; i++) {
+    const a = parts[i]
+    const k = a.indexOf('=')
+    const name = (k > -1 ? a.slice(0, k) : a).toLowerCase()
+    const val = k > -1 ? a.slice(k + 1) : ''
+    if (name === 'httponly') cookie.httpOnly = true
+    else if (name === 'secure') cookie.secure = true
+    else cookie[name] = val
+  }
+  return cookie
+}
 
 const environments = ref([])
 const currentEnvId = ref(null)
@@ -468,11 +731,17 @@ const queryHeaders = (queryString, cb) => {
 }
 
 const groupedHistory = computed(() => {
+  const q = historySearch.value.trim().toLowerCase()
+  const source = q
+    ? history.value.filter(item =>
+        (item.url || '').toLowerCase().includes(q) ||
+        (item.method || '').toLowerCase().includes(q))
+    : history.value
   const now = new Date()
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
   const yesterday = today - 86400000
   const groups = { today: [], yesterday: [], earlier: [] }
-  history.value.forEach(item => {
+  source.forEach(item => {
     if (item.timestamp >= today) groups.today.push(item)
     else if (item.timestamp >= yesterday) groups.yesterday.push(item)
     else groups.earlier.push(item)
@@ -486,8 +755,30 @@ const groupedHistory = computed(() => {
 
 async function doSend() {
   if (!reqUrl.value.trim() || sending.value) return
-  const vars = getActiveVariables()
+  let vars = getActiveVariables()
+
+  // Pre-request Script：把变量产出合并到 vars，所有后续 resolveVariables 都吃这份新的
+  if (reqPreScript.value.trim()) {
+    const scriptCtx = {
+      variables: vars,
+      environment: vars,  // 简化：vars 就是当前生效的环境变量集
+      request: {
+        method: reqMethod.value,
+        url: reqUrl.value,
+        headers: reqHeaders.value,
+        body: reqBody.value,
+      },
+    }
+    const result = await runPreRequestScript(reqPreScript.value, scriptCtx)
+    if (result.error) {
+      ElMessage.error(`${t('apiDebug.preScriptError')}: ${result.error}`)
+      return
+    }
+    vars = result.variables
+  }
+
   let finalUrl = resolveVariables(reqUrl.value, vars)
+  finalUrl = applyPathVars(finalUrl, reqPathVars.value)
   finalUrl = normalizeRequestUrl(finalUrl)
   finalUrl = buildUrl(finalUrl, reqParams.value)
 
@@ -497,8 +788,9 @@ async function doSend() {
   })
 
   const authResolved = { ...reqAuth.value }
-  if (authResolved.token) authResolved.token = resolveVariables(authResolved.token, vars)
-  if (authResolved.value) authResolved.value = resolveVariables(authResolved.value, vars)
+  ;['token', 'username', 'password', 'key', 'value'].forEach(f => {
+    if (authResolved[f]) authResolved[f] = resolveVariables(authResolved[f], vars)
+  })
   const authHeader = buildAuthHeader(authResolved)
   if (authHeader) headerMap[authHeader.key] = authHeader.value
 
@@ -527,12 +819,38 @@ async function doSend() {
       bodyPayload = formPairs.join('&')
     }
   } else if (reqBody.value.type === 'multipart') {
-    bodyPayload = reqBody.value.formData
+    const resolvedFields = reqBody.value.formData
       .filter(f => f.enabled && f.key)
       .map(f => ({
         key: resolveVariables(f.key, vars),
         value: resolveVariables(f.value, vars),
       }))
+    if (resolvedFields.length) {
+      try {
+        const built = await buildMultipartBody(resolvedFields)
+        // 必须用 buildMultipartBody 返回的 boundary，用户手填的 Content-Type 会失效
+        headerMap['Content-Type'] = built.contentType
+        bodyPayload = built.body
+      } catch (err) {
+        ElMessage.error(err?.message || 'multipart build failed')
+        return
+      }
+    }
+  } else if (reqBody.value.type === 'binary') {
+    const filePath = (reqBody.value.binaryPath || '').trim()
+    if (filePath) {
+      try {
+        const { readFile } = await import('@tauri-apps/plugin-fs')
+        const bytes = await readFile(filePath)
+        bodyPayload = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
+        if (!headerMap['Content-Type']) {
+          headerMap['Content-Type'] = guessBinaryContentType(filePath)
+        }
+      } catch (err) {
+        ElMessage.error(`${t('apiDebug.saveResponseFailed')}: ${err?.message || err}`)
+        return
+      }
+    }
   }
 
   sending.value = true
@@ -541,9 +859,32 @@ async function doSend() {
   requestCanceled.value = false
   resTab.value = 'body'
 
+  // Cookie Jar 注入：合并已有 Cookie header（用户手填的优先级低于 jar，便于 override）
+  if (cookieJarEnabled.value) {
+    const jarCookie = buildCookieHeader(finalUrl)
+    if (jarCookie) {
+      headerMap['Cookie'] = headerMap['Cookie']
+        ? `${headerMap['Cookie']}; ${jarCookie}`
+        : jarCookie
+    }
+  }
+
   try {
-    const res = await sendRequest({ method: reqMethod.value, url: finalUrl, headers: headerMap, body: bodyPayload })
+    const res = await sendRequest({
+      method: reqMethod.value,
+      url: finalUrl,
+      headers: headerMap,
+      body: bodyPayload,
+      timeout: reqSettings.value.timeout,
+      sslVerify: reqSettings.value.sslVerify,
+      followRedirects: reqSettings.value.followRedirects,
+      maxRedirects: reqSettings.value.maxRedirects,
+    })
     response.value = res
+    // Cookie Jar 摄入：把响应的 Set-Cookie 写入 jar
+    if (cookieJarEnabled.value && res.setCookies?.length) {
+      ingestSetCookies(res.setCookies, finalUrl)
+    }
     saveToHistory({
       method: reqMethod.value,
       url: reqUrl.value,
@@ -551,6 +892,7 @@ async function doSend() {
       time: res.time,
       params: reqParams.value,
       headers: reqHeaders.value,
+      pathVars: reqPathVars.value,
       body: { ...reqBody.value },
       auth: { ...reqAuth.value },
     })
@@ -558,12 +900,6 @@ async function doSend() {
   } catch (err) {
     if (err.message === 'REQUEST_CANCELED') {
       responseError.value = t('apiDebug.cancel')
-    } else if (err.name === 'AbortError') {
-      if (requestCanceled.value) {
-        responseError.value = t('apiDebug.cancel')
-      } else {
-        responseError.value = t('apiDebug.timeoutError')
-      }
     } else if (err.message === 'REQUEST_TIMEOUT') {
       responseError.value = t('apiDebug.timeoutError')
     } else if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError') || err.message?.includes('network')) {
@@ -662,6 +998,10 @@ function onTreeNodeCmd(cmd, data) {
     onCreateInterfaceAtSelection()
     return
   }
+  if (cmd === 'exportPostman') {
+    onExportPostman(data.rawId)
+    return
+  }
   if (cmd === 'rename') {
     const currentName = data.name
     const title = data.type === 'collection' ? t('apiDebug.collectionName') : (data.type === 'folder' ? t('apiDebug.folderName') : t('apiDebug.reqName'))
@@ -749,12 +1089,20 @@ async function expandNodeById(treeNodeId) {
 function loadCollectionItem(item) {
   activeItemId.value = item.id
   reqMethod.value = item.method
-  reqUrl.value = item.url
+  reqUrl.value = item.url  // sync watcher 立刻重建 reqPathVars，下面再覆盖填值
+  if (Array.isArray(item.pathVars) && item.pathVars.length) {
+    const saved = Object.fromEntries(item.pathVars.map(v => [v.key, v.value]))
+    reqPathVars.value.forEach(pv => { if (saved[pv.key] != null) pv.value = saved[pv.key] })
+  }
   reqParams.value = item.params?.length ? JSON.parse(JSON.stringify(item.params)) : [{ key: '', value: '', enabled: true }]
   reqHeaders.value = item.headers?.length ? JSON.parse(JSON.stringify(item.headers)) : [{ key: '', value: '', enabled: true }]
   reqBody.value = item.body ? JSON.parse(JSON.stringify(item.body)) : { type: 'none', content: '', formData: [] }
   if (!reqBody.value.formData) reqBody.value.formData = [{ key: '', value: '', enabled: true }]
   reqAuth.value = item.auth ? JSON.parse(JSON.stringify(item.auth)) : { type: 'none' }
+  reqSettings.value = item.settings
+    ? { timeout: 30000, sslVerify: true, followRedirects: true, maxRedirects: 10, ...item.settings }
+    : { timeout: 30000, sslVerify: true, followRedirects: true, maxRedirects: 10 }
+  reqPreScript.value = item.preScript || ''
   response.value = null
   responseError.value = null
 }
@@ -770,8 +1118,11 @@ function doSaveToCollection() {
     url: reqUrl.value,
     params: reqParams.value,
     headers: reqHeaders.value,
+    pathVars: reqPathVars.value,
     body: reqBody.value,
     auth: reqAuth.value,
+    settings: reqSettings.value,
+    preScript: reqPreScript.value,
   }, saveParentNodeId.value)
   refreshCollectionsState()
   // 自动展开保存目标父节点（folder 或 collection 根）
@@ -786,6 +1137,10 @@ function doSaveToCollection() {
 function loadHistoryItem(item) {
   reqMethod.value = item.method
   reqUrl.value = item.url
+  if (Array.isArray(item.pathVars) && item.pathVars.length) {
+    const saved = Object.fromEntries(item.pathVars.map(v => [v.key, v.value]))
+    reqPathVars.value.forEach(pv => { if (saved[pv.key] != null) pv.value = saved[pv.key] })
+  }
   reqParams.value = item.params?.length ? JSON.parse(JSON.stringify(item.params)) : [{ key: '', value: '', enabled: true }]
   reqHeaders.value = item.headers?.length ? JSON.parse(JSON.stringify(item.headers)) : [{ key: '', value: '', enabled: true }]
   reqBody.value = item.body ? JSON.parse(JSON.stringify(item.body)) : { type: 'none', content: '', formData: [] }
@@ -813,7 +1168,14 @@ function onUrlMenuCmd(cmd) {
     saveParentNodeId.value = selectedFolderId.value || null
     showSaveDialog.value = true
   } else if (cmd === 'curl') {
-    const curl = generateCode({ method: reqMethod.value, url: reqUrl.value, headers: reqHeaders.value, body: reqBody.value }, 'curl')
+    const curl = generateCode({
+      method: reqMethod.value,
+      url: reqUrl.value,
+      params: reqParams.value,
+      headers: reqHeaders.value,
+      body: reqBody.value,
+      auth: reqAuth.value,
+    }, 'curl')
     navigator.clipboard.writeText(curl)
     ElMessage.success(t('apiDebug.copied'))
   } else if (cmd === 'importCurl') {
@@ -831,10 +1193,167 @@ function doImportCurl() {
   reqMethod.value = parsed.method
   reqUrl.value = parsed.url
   reqHeaders.value = parsed.headers.length ? parsed.headers : [{ key: '', value: '', enabled: true }]
-  reqBody.value = { type: parsed.body.type, content: parsed.body.content, formData: [{ key: '', value: '', enabled: true }] }
+  const importedFormData = parsed.body.formData && parsed.body.formData.length
+    ? parsed.body.formData
+    : [{ key: '', value: '', enabled: true }]
+  reqBody.value = { type: parsed.body.type, content: parsed.body.content, formData: importedFormData }
   reqAuth.value = parsed.auth
   showCurlDialog.value = false
   ElMessage.success(t('apiDebug.importSuccess'))
+}
+
+function resetSettings() {
+  reqSettings.value = { timeout: 30000, sslVerify: true, followRedirects: true, maxRedirects: 10 }
+}
+
+function onToggleCookieJar(v) {
+  setCookieJarEnabled(v)
+}
+function openCookieJar() {
+  cookieList.value = listCookies()
+  showCookieJar.value = true
+}
+function onDeleteCookie(c) {
+  deleteCookie(c.host, c.name, c.path)
+  cookieList.value = listCookies()
+}
+function onClearCookieJar() {
+  clearJar()
+  cookieList.value = []
+}
+
+async function onPickBinaryFile() {
+  try {
+    const { open } = await import('@tauri-apps/plugin-dialog')
+    const filePath = await open({ multiple: false })
+    if (!filePath) return
+    reqBody.value.binaryPath = filePath
+  } catch (err) {
+    ElMessage.error(err?.message || String(err))
+  }
+}
+
+function guessBinaryContentType(filePath) {
+  const ext = (filePath.match(/\.([A-Za-z0-9]+)$/) || [])[1]?.toLowerCase() || ''
+  const map = {
+    json: 'application/json', xml: 'application/xml', txt: 'text/plain', csv: 'text/csv',
+    html: 'text/html', pdf: 'application/pdf', zip: 'application/zip', gz: 'application/gzip',
+    png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp',
+    svg: 'image/svg+xml', mp3: 'audio/mpeg', mp4: 'video/mp4', wav: 'audio/wav',
+  }
+  return map[ext] || 'application/octet-stream'
+}
+
+async function onExportPostman(collectionId) {
+  try {
+    const col = collections.value.find(c => c.id === collectionId)
+    if (!col) return
+    const { save } = await import('@tauri-apps/plugin-dialog')
+    const { writeTextFile } = await import('@tauri-apps/plugin-fs')
+    const defaultName = sanitizeFilename(`${col.name || 'collection'}.postman_collection.json`)
+    const filePath = await save({
+      defaultPath: defaultName,
+      filters: [{ name: 'Postman Collection', extensions: ['json'] }],
+    })
+    if (!filePath) return
+    const payload = buildPostmanCollection(col)
+    await writeTextFile(filePath, JSON.stringify(payload, null, 2))
+    ElMessage.success(t('apiDebug.exportSuccess'))
+  } catch (err) {
+    ElMessage.error(`${t('apiDebug.saveResponseFailed')}: ${err?.message || err}`)
+  }
+}
+
+async function onSaveResponse() {
+  if (!response.value) return
+  try {
+    const { save } = await import('@tauri-apps/plugin-dialog')
+    const { writeFile, writeTextFile } = await import('@tauri-apps/plugin-fs')
+
+    const defaultName = suggestResponseFilename(response.value)
+    const filePath = await save({ defaultPath: defaultName })
+    if (!filePath) return
+
+    if (response.value.bytes && response.value.bytes.byteLength > 0) {
+      await writeFile(filePath, response.value.bytes)
+    } else {
+      await writeTextFile(filePath, response.value.body || '')
+    }
+    ElMessage.success(t('apiDebug.saveResponseSuccess'))
+  } catch (err) {
+    ElMessage.error(`${t('apiDebug.saveResponseFailed')}: ${err?.message || err}`)
+  }
+}
+
+function suggestResponseFilename(res) {
+  // 优先 Content-Disposition: attachment; filename="xxx"
+  const cd = res.headers?.['content-disposition'] || res.headers?.['Content-Disposition']
+  if (cd) {
+    const m = cd.match(/filename\*?=(?:UTF-8'')?["']?([^"';]+)/i)
+    if (m && m[1]) return sanitizeFilename(decodeURIComponent(m[1]))
+  }
+  // 退化：URL 路径末段 + 推断扩展名
+  let base = 'response'
+  try {
+    const u = new URL(reqUrl.value)
+    const seg = u.pathname.split('/').filter(Boolean).pop()
+    if (seg) base = seg.replace(/\?.*$/, '')
+  } catch { /* ignore */ }
+  if (/\.[A-Za-z0-9]{1,8}$/.test(base)) return sanitizeFilename(base)
+  const ct = (res.headers?.['content-type'] || res.headers?.['Content-Type'] || '').split(';')[0].trim().toLowerCase()
+  const extMap = {
+    'application/json': '.json', 'application/xml': '.xml', 'text/xml': '.xml',
+    'text/html': '.html', 'text/plain': '.txt', 'text/csv': '.csv',
+    'application/pdf': '.pdf', 'application/zip': '.zip',
+    'image/png': '.png', 'image/jpeg': '.jpg', 'image/gif': '.gif', 'image/svg+xml': '.svg',
+    'application/octet-stream': '.bin',
+  }
+  return sanitizeFilename(base + (extMap[ct] || '.txt'))
+}
+
+/* 跨平台文件名清理：去掉 Windows 非法字符 + 控制字符；截断时保留扩展名；空字符串回退 */
+function sanitizeFilename(name) {
+  let cleaned = String(name || '').replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim()
+  cleaned = cleaned.replace(/^\.+/, '').replace(/[. ]+$/, '')
+  if (!cleaned) return 'response'
+  // Windows 保留名（CON / PRN / AUX / NUL / COM1-9 / LPT1-9）
+  if (/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)/i.test(cleaned)) cleaned = '_' + cleaned
+  if (cleaned.length > 200) {
+    const dotIdx = cleaned.lastIndexOf('.')
+    if (dotIdx > 0 && cleaned.length - dotIdx <= 10) {
+      const ext = cleaned.slice(dotIdx)
+      cleaned = cleaned.slice(0, 200 - ext.length) + ext
+    } else {
+      cleaned = cleaned.slice(0, 200)
+    }
+  }
+  return cleaned
+}
+
+async function onImportPostman() {
+  try {
+    const { open } = await import('@tauri-apps/plugin-dialog')
+    const { readTextFile } = await import('@tauri-apps/plugin-fs')
+    const filePath = await open({
+      multiple: false,
+      filters: [{ name: 'Postman Collection', extensions: ['json'] }],
+    })
+    if (!filePath) return
+    const text = await readTextFile(filePath)
+    let parsed
+    try {
+      parsed = parsePostmanCollection(text)
+    } catch (err) {
+      ElMessage.error(t('apiDebug.importPostmanInvalid'))
+      return
+    }
+    const created = importCollection(parsed)
+    refreshCollectionsState()
+    expandNodeById(`collection:${created.id}`)
+    ElMessage.success(t('apiDebug.importPostmanSuccess', { count: countCollectionApis(parsed) }))
+  } catch (err) {
+    ElMessage.error(t('apiDebug.importPostmanFailed', { msg: err?.message || err }))
+  }
 }
 
 function normalizeRequestUrl(url) {
@@ -956,6 +1475,7 @@ onMounted(() => {
   history.value = loadHistory()
   environments.value = loadEnvironments()
   currentEnvId.value = getCurrentEnvId()
+  cookieJarEnabled.value = isCookieJarEnabled()
 })
 </script>
 
@@ -974,7 +1494,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1013,13 +1533,13 @@ onMounted(() => {
 }
 .api-debug-wrapper :deep(.el-button--primary) {
   color: var(--el-color-white);
-  background: linear-gradient(180deg, #4c82e6 0%, #316bd0 100%);
+  background: linear-gradient(180deg, var(--accent-blue) 0%, var(--accent-blue) 100%);
   border-color: rgba(49, 107, 208, 0.85);
   box-shadow: 0 6px 14px rgba(49, 107, 208, 0.18), inset 0 1px 0 rgba(255,255,255,0.26);
 }
 .api-debug-wrapper :deep(.el-button--primary:hover) {
   color: var(--el-color-white);
-  background: linear-gradient(180deg, #5a8dea 0%, #3a72d6 100%);
+  background: linear-gradient(180deg, var(--accent-blue-hover) 0%, var(--accent-blue) 100%);
   border-color: rgba(58, 114, 214, 0.9);
 }
 .api-debug-wrapper :deep(.el-button--default) {
@@ -1028,7 +1548,7 @@ onMounted(() => {
   border-color: rgba(100, 116, 139, 0.16);
 }
 .api-debug-wrapper :deep(.el-button--default:hover) {
-  color: #245fca;
+  color: var(--accent-blue);
   background: var(--surface-panel);
   border-color: rgba(74, 120, 217, 0.32);
 }
@@ -1115,7 +1635,7 @@ onMounted(() => {
 .sidebar-tab:hover { color: var(--text-primary); background: var(--surface-muted); }
 .sidebar-tab.active {
   color: var(--accent-blue); font-weight: 600;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-color: rgba(194, 65, 12,0.15);
   box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
@@ -1408,7 +1928,7 @@ onMounted(() => {
   margin: 0;
   padding: 0 12px;
   flex-shrink: 0;
-  background: var(--surface-muted);
+  background: transparent;
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
 }
 .compact-tabs :deep(.el-tabs__nav-wrap) {
@@ -1544,8 +2064,64 @@ onMounted(() => {
   resize: vertical; outline: none; box-sizing: border-box;
 }
 .body-textarea:focus { border-color: var(--accent-blue); }
+.binary-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px dashed rgba(60, 40, 20, 0.18);
+  border-radius: 10px;
+  background: var(--surface-muted);
+}
+.binary-path {
+  flex: 1;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.binary-clear {
+  cursor: pointer;
+  color: var(--text-quaternary);
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+.binary-clear:hover {
+  color: var(--el-color-danger);
+  background: rgba(229, 57, 53, 0.08);
+}
 .auth-editor { padding: 6px 0; }
 .auth-fields { display: flex; flex-direction: column; gap: 8px; }
+.settings-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 0;
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.setting-label {
+  flex: 0 0 160px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.setting-suffix {
+  color: var(--text-tertiary);
+  font-size: 11px;
+}
+.prescript-editor { display: flex; flex-direction: column; gap: 8px; }
+.prescript-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
 .response-empty {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
   color: var(--text-quaternary); gap: 8px;
@@ -1584,6 +2160,102 @@ onMounted(() => {
   background: var(--surface-panel-soft); border: 1px solid rgba(60, 40, 20, 0.08); border-top: none;
   border-radius: 0;
   font-size: 11px; color: var(--text-tertiary); flex-shrink: 0;
+}
+.path-vars-section {
+  margin-top: 14px;
+  border-top: 1px dashed rgba(60, 40, 20, 0.12);
+  padding-top: 10px;
+}
+.kv-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 6px;
+}
+.bulk-textarea {
+  width: 100%;
+  min-height: 160px;
+  max-height: 320px;
+  padding: 10px 12px;
+  border: 1px solid rgba(60, 40, 20, 0.1);
+  border-radius: 8px;
+  background: var(--el-bg-color-overlay);
+  color: var(--text-primary);
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+.bulk-textarea:focus { border-color: var(--accent-blue); }
+.path-vars-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.path-var-key {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  min-width: 80px;
+  flex-shrink: 0;
+  padding-left: 4px;
+}
+.history-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px 10px;
+}
+.history-search {
+  flex: 1;
+}
+.history-search :deep(.el-input__wrapper) {
+  height: 28px;
+  border-radius: 8px;
+}
+.response-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.cookies-table {
+  font-size: 12px;
+  border: 1px solid rgba(60, 40, 20, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.cookie-row {
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 1.2fr 0.8fr 1fr 1.2fr;
+  gap: 8px;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(60, 40, 20, 0.06);
+  align-items: center;
+  word-break: break-all;
+}
+.cookie-row:last-child { border-bottom: 0; }
+.cookie-row-header {
+  background: rgba(60, 40, 20, 0.03);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+.ck-name { font-weight: 600; color: var(--text-primary); }
+.ck-val { color: var(--text-secondary); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ck-flags { display: flex; flex-wrap: wrap; gap: 4px; }
+.ck-flag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(47, 111, 228, 0.1);
+  color: var(--accent-blue);
 }
 .sidebar-list::-webkit-scrollbar, .response-body::-webkit-scrollbar,
 .request-panel::-webkit-scrollbar, .response-panel::-webkit-scrollbar { width: 5px; }

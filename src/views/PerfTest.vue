@@ -22,6 +22,11 @@
         <div class="bench-config">
           <div class="config-title">{{ t('perfTest.benchConfig') }}</div>
           <el-form size="small" label-position="top" class="config-form">
+            <el-form-item v-if="collectionApis.length" :label="t('perfTest.importFromCollection')">
+              <el-select v-model="importApiId" filterable clearable :placeholder="t('perfTest.selectApi')" @change="onImportApi">
+                <el-option v-for="api in collectionApis" :key="api.id" :label="`[${api.method}] ${api.label}`" :value="api.id" />
+              </el-select>
+            </el-form-item>
             <el-form-item label="URL">
               <el-input v-model="benchUrl" placeholder="https://api.example.com/users" />
             </el-form-item>
@@ -35,6 +40,7 @@
                 <el-radio-group v-model="benchMode" size="small" class="mode-group">
                   <el-radio-button value="fixed">{{ t('perfTest.fixedMode') }}</el-radio-button>
                   <el-radio-button value="ramp">{{ t('perfTest.rampMode') }}</el-radio-button>
+                  <el-radio-button value="count">{{ t('perfTest.countMode') }}</el-radio-button>
                 </el-radio-group>
               </el-form-item>
             </div>
@@ -54,8 +60,11 @@
               <el-form-item :label="t('perfTest.concurrency')">
                 <el-input-number v-model="benchConcurrency" :min="1" :max="200" controls-position="right" class="num-input" />
               </el-form-item>
-              <el-form-item :label="t('perfTest.duration')">
+              <el-form-item v-if="benchMode !== 'count'" :label="t('perfTest.duration')">
                 <el-input-number v-model="benchDuration" :min="1" :max="300" controls-position="right" class="num-input" />
+              </el-form-item>
+              <el-form-item v-else :label="t('perfTest.maxRequests')">
+                <el-input-number v-model="benchMaxRequests" :min="1" :max="100000" controls-position="right" class="num-input" />
               </el-form-item>
             </div>
             <el-form-item v-if="benchMode === 'ramp'" :label="t('perfTest.rampEnd')">
@@ -109,22 +118,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Odometer, VideoPlay, VideoPause } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
-import { METHOD_COLORS } from '@/utils/apiWorkbench/shared'
+import { METHOD_COLORS, buildUrl, buildAuthHeader } from '@/utils/apiWorkbench/shared'
 import { runBenchmark } from '@/utils/apiWorkbench/benchEngine'
+import { loadCollections, flattenCollectionApis } from '@/utils/apiWorkbench/collections'
+import { getActiveVariables, resolveVariables } from '@/utils/apiWorkbench/environment'
 
 const router = useRouter()
 const methods = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS']
 
 const benchUrl = ref('')
 const benchMethod = ref('GET')
-const benchMode = ref('fixed')
+const benchMode = ref('fixed')  // fixed | ramp | count
 const benchConcurrency = ref(10)
 const benchDuration = ref(10)
+const benchMaxRequests = ref(1000)
 const benchRampEnd = ref(50)
 const benchHeaders = ref('')
 const benchBody = ref('')
@@ -133,14 +145,61 @@ const benchStats = ref(null)
 const benchSnapshots = ref([])
 let benchAbort = null
 
+const importApiId = ref('')
+const collectionApis = ref([])  // [{ id, label, method, url, headers, body, auth, params, pathVars }]
+
 function parseBenchHeaders() {
   const map = {}
   if (!benchHeaders.value.trim()) return map
   benchHeaders.value.split('\n').forEach(line => {
-    const idx = line.indexOf(':')
-    if (idx > 0) map[line.slice(0, idx).trim()] = line.slice(idx + 1).trim()
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) return
+    const idx = trimmed.indexOf(':')
+    if (idx > 0) map[trimmed.slice(0, idx).trim()] = trimmed.slice(idx + 1).trim()
   })
   return map
+}
+
+function onImportApi(apiId) {
+  if (!apiId) return
+  const api = collectionApis.value.find(a => a.id === apiId)
+  if (!api) return
+  const vars = getActiveVariables()
+  // URL + 现有 params 全部拼到 URL 里（压测时是死的）
+  let url = resolveVariables(api.url || '', vars)
+  url = buildUrl(url, api.params || [])
+  benchUrl.value = url
+  benchMethod.value = api.method || 'GET'
+
+  // headers + auth → 转 textarea 文本
+  const map = {}
+  ;(api.headers || []).filter(h => h.enabled && h.key).forEach(h => {
+    map[resolveVariables(h.key, vars)] = resolveVariables(h.value, vars)
+  })
+  const authResolved = { ...(api.auth || {}) }
+  ;['token', 'username', 'password', 'key', 'value'].forEach(f => {
+    if (authResolved[f]) authResolved[f] = resolveVariables(authResolved[f], vars)
+  })
+  const authH = buildAuthHeader(authResolved)
+  if (authH) map[authH.key] = authH.value
+  benchHeaders.value = Object.entries(map).map(([k, v]) => `${k}: ${v}`).join('\n')
+
+  // body：只接 raw / json（压测对 multipart 不友好，跳过）
+  if (api.body?.type === 'json' || api.body?.type === 'raw') {
+    benchBody.value = resolveVariables(api.body.content || '', vars)
+  } else if (api.body?.type === 'form') {
+    const pairs = (api.body.formData || []).filter(f => f.enabled && f.key)
+      .map(f => `${encodeURIComponent(resolveVariables(f.key, vars))}=${encodeURIComponent(resolveVariables(f.value, vars))}`)
+    benchBody.value = pairs.join('&')
+    if (pairs.length && !map['Content-Type']) {
+      benchHeaders.value = benchHeaders.value
+        + (benchHeaders.value ? '\n' : '')
+        + 'Content-Type: application/x-www-form-urlencoded'
+    }
+  } else {
+    benchBody.value = ''
+  }
+  ElMessage.success(t('perfTest.importedFromCollection'))
 }
 
 async function doStartBench() {
@@ -167,6 +226,17 @@ async function doStartBench() {
           benchSnapshots.value = snaps
         }, benchAbort.signal)
       }
+    } else if (benchMode.value === 'count') {
+      const result = await runBenchmark({
+        url: benchUrl.value, method: benchMethod.value, headers, body,
+        concurrency: benchConcurrency.value,
+        duration: 0,                            // 不按时长截止
+        maxRequests: benchMaxRequests.value,    // 按数量截止
+      }, (snap, snaps) => {
+        benchStats.value = snap
+        benchSnapshots.value = snaps
+      }, benchAbort.signal)
+      benchStats.value = result
     } else {
       const result = await runBenchmark({
         url: benchUrl.value, method: benchMethod.value, headers, body,
@@ -188,6 +258,28 @@ function doStopBench() {
   if (benchAbort) benchAbort.abort()
   benchRunning.value = false
 }
+
+onMounted(() => {
+  const cols = loadCollections()
+  const flat = flattenCollectionApis(cols)
+  const list = []
+  for (const col of flat) {
+    for (const api of (col.apis || [])) {
+      list.push({
+        id: api.id,
+        label: api.folderPath ? `${col.name} / ${api.folderPath} / ${api.name}` : `${col.name} / ${api.name}`,
+        method: api.method,
+        url: api.url,
+        headers: api.headers,
+        body: api.body,
+        auth: api.auth,
+        params: api.params,
+        pathVars: api.pathVars,
+      })
+    }
+  }
+  collectionApis.value = list
+})
 </script>
 
 <style scoped>

@@ -1346,5 +1346,5 @@ onUnmounted(async () => {
 .overlay-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); cursor: default; animation: img-in 150ms ease; }
 @keyframes img-in { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .overlay-close { position: fixed; top: 20px; right: 20px; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); color: var(--el-color-white); border: none; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background var(--transition-fast); }
-.overlay-close:hover { background: rgba(255,255,255,0.25); }
+.overlay-close:hover { background: var(--surface-panel-soft); }
 </style>

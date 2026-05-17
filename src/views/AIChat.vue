@@ -342,7 +342,7 @@ onMounted(initDatabase)
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background: var(--bg-secondary, #f7f8fa);
+  background: var(--bg-secondary, var(--surface-panel-soft));
 }
 
 /* ── Header ── */

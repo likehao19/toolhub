@@ -339,14 +339,14 @@ const handleDrop = async (e, targetFolder) => {
 }
 
 .tree-item-wrapper.active {
-  background: var(--active-bg, #e6f4ff) !important;
+  background: var(--active-bg, var(--accent-warm-soft)) !important;
   color: var(--accent-color, var(--accent-blue));
   font-weight: 600;
 }
 
 .tree-item-wrapper.drop-target {
-  background: #e8f5e9 !important;
-  border: 2px dashed #4caf50;
+  background: var(--surface-accent) !important;
+  border: 2px dashed var(--color-green);
   box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
   border-radius: 6px;
 }
@@ -476,7 +476,7 @@ const handleDrop = async (e, targetFolder) => {
 
 /* ignore */
 .file-node .tree-item-wrapper.active {
-  background: var(--active-bg, #e6f4ff) !important;
+  background: var(--active-bg, var(--accent-warm-soft)) !important;
   color: var(--accent-color, var(--accent-blue));
   font-weight: 500;
 }

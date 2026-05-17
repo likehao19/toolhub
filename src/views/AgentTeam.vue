@@ -1047,7 +1047,7 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 12px 20px;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border-bottom: 1px solid var(--border-color, var(--el-border-color-light));
   height: 50px;
   box-sizing: border-box;
@@ -1062,7 +1062,7 @@ onMounted(async () => {
 .breadcrumb {
   font-size: 0.9rem;
   color: var(--text-secondary, var(--el-text-color-secondary));
-  background: var(--bg-tertiary, #f0f2f5);
+  background: var(--bg-tertiary, var(--el-fill-color-light));
   padding: 6px 12px;
   border-radius: 4px;
   font-weight: 500;
@@ -1150,7 +1150,7 @@ onMounted(async () => {
   transition: background 0.15s, border-color 0.15s;
   user-select: none;
   white-space: nowrap;
-  background: var(--bg-primary, #fff);
+  background: var(--bg-primary, var(--surface-panel-soft));
 }
 
 .sidebar-new-btn:hover {
@@ -1219,7 +1219,7 @@ onMounted(async () => {
   position: relative;
 }
 
-.sidebar-item:hover { background: #eeeff1; }
+.sidebar-item:hover { background: var(--surface-panel-soft); }
 .sidebar-item.active { background: var(--el-border-color-light); }
 
 .sidebar-item-icon {
@@ -1342,7 +1342,7 @@ onMounted(async () => {
   line-height: 1.6;
   resize: none;
   outline: none;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   color: var(--text-primary, var(--el-text-color-primary));
   font-family: inherit;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -1380,7 +1380,7 @@ onMounted(async () => {
   cursor: pointer;
   transition: all 0.2s;
   user-select: none;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
 }
 
 .agent-chip:hover { border-color: var(--el-text-color-placeholder); }
@@ -1415,7 +1415,7 @@ onMounted(async () => {
   max-width: 800px;
   margin: 0 auto 28px;
   padding: 16px 20px;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border-radius: 12px;
   border: 1px solid var(--border-color, var(--el-border-color-light));
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -1481,7 +1481,7 @@ onMounted(async () => {
 
 .user-message-content {
   padding: 10px 14px;
-  background: #e0f3ff;
+  background: var(--surface-panel-soft);
   color: var(--el-text-color-primary);
   border-radius: 16px 4px 16px 16px;
   font-size: 14px;
@@ -1548,7 +1548,7 @@ onMounted(async () => {
 
 .agent-message-content {
   padding: 14px 18px;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border-radius: 4px 16px 16px 16px;
   border: 1px solid var(--border-color, var(--el-border-color-light));
   border-left: 3px solid var(--agent-color, var(--accent-blue));
@@ -1627,7 +1627,7 @@ onMounted(async () => {
 
 .followup-input-wrapper {
   position: relative;
-  background: var(--bg-primary, #ffffff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border: 1.5px solid var(--border-color, var(--el-border-color));
   border-radius: 16px;
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -1694,7 +1694,7 @@ onMounted(async () => {
   right: 12px;
   max-height: 240px;
   overflow-y: auto;
-  background: var(--bg-primary, #fff);
+  background: var(--bg-primary, var(--surface-panel-soft));
   border: 1px solid var(--border-color, var(--el-border-color-light));
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);

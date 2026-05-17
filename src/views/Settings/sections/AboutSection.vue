@@ -55,12 +55,6 @@
             {{ updateInfo }}
           </span>
         </el-form-item>
-        <el-divider />
-        <el-form-item class="danger-action-row">
-          <el-button type="danger" @click="handleReset">
-            {{ t('settings.resetAppSettings') }}
-          </el-button>
-        </el-form-item>
       </el-form>
     </el-card>
   </div>

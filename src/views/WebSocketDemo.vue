@@ -274,7 +274,7 @@ const goBack = () => {
 }
 
 .message-item.sent {
-  background: #e1f3ff;
+  background: var(--surface-panel-soft);
 }
 
 .message-item.received {
@@ -287,7 +287,7 @@ const goBack = () => {
 }
 
 .message-item.error {
-  background: #fee;
+  background: var(--surface-panel-soft);
   color: #c33;
 }
 

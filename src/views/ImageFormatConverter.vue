@@ -619,12 +619,12 @@ function formatBytes(bytes) {
   background: var(--surface-muted);
 }
 .drop-zone:hover,
-.drop-zone.drop-active { border-color: var(--accent-blue); background: rgba(238, 246, 255, 0.7); }
+.drop-zone.drop-active { border-color: var(--accent-blue); background: var(--surface-panel-soft); }
 .drop-zone.has-file { border-style: solid; border-color: rgba(60, 40, 20, 0.12); }
 .drop-icon { font-size: 36px; color: var(--text-quaternary); margin-bottom: 8px; }
 .drop-text { font-size: 13px; color: var(--text-secondary); margin: 0; font-weight: 600; }
 .drop-sub { font-size: 11px; color: var(--text-quaternary); margin: 4px 0 0; }
-.preview-thumb { max-width: 200px; max-height: 100px; border-radius: 8px; margin-bottom: 8px; object-fit: contain; border: 1px solid rgba(60, 40, 20, 0.08); background: rgba(248, 244, 232, 0.5); }
+.preview-thumb { max-width: 200px; max-height: 100px; border-radius: 8px; margin-bottom: 8px; object-fit: contain; border: 1px solid rgba(60, 40, 20, 0.08); background: var(--surface-panel-soft); }
 .file-name {
   font-size: 13px;
   color: var(--text-primary);

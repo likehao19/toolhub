@@ -531,7 +531,7 @@ button:hover,
   padding: 10px 14px;
   border: 1px solid var(--divider);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 94%, #fff 6%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 94%, var(--surface-panel-soft) 6%), var(--surface-panel-soft));
   box-shadow: var(--shadow-sm);
 }
 
@@ -558,7 +558,7 @@ button:hover,
   padding: 6px 8px;
   border: 1px solid var(--divider);
   border-radius: calc(var(--radius-md) - 2px);
-  background: color-mix(in srgb, var(--surface-panel) 92%, #fff 8%);
+  background: color-mix(in srgb, var(--surface-panel) 92%, var(--surface-panel-soft) 8%);
 }
 
 .todos-page-wrapper .main-container,
@@ -567,7 +567,7 @@ button:hover,
   padding: 8px;
   border: 1px solid var(--divider);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, var(--surface-panel-soft) 8%), var(--surface-panel));
   box-shadow: var(--shadow-sm);
 }
 
@@ -625,7 +625,7 @@ button:hover,
 .todos-page-wrapper .todo-card {
   border: 1px solid var(--divider);
   border-radius: var(--radius-md);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, #fff 5%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, var(--surface-panel-soft) 5%), var(--surface-panel-soft));
   box-shadow: var(--shadow-sm);
 }
 
@@ -667,7 +667,7 @@ button:hover,
 .notes-page-wrapper .action-card {
   border: 1px solid var(--divider);
   border-radius: 12px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 92%, #fff 8%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 92%, var(--surface-panel-soft) 8%), var(--surface-panel-soft));
 }
 
 .notes-page-wrapper .action-card:hover {
@@ -684,7 +684,7 @@ button:hover,
 .passwords-page-wrapper .password-row {
   border: 1px solid var(--divider);
   border-radius: 12px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, var(--surface-panel-soft) 4%), var(--surface-panel-soft));
 }
 
 .passwords-page-wrapper .password-row:hover {
@@ -709,7 +709,7 @@ button:hover,
   padding: 10px;
   border: 1px solid var(--divider);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, var(--surface-panel-soft) 8%), var(--surface-panel));
   box-shadow: var(--shadow-sm);
 }
 
@@ -733,7 +733,7 @@ button:hover,
 .calendar-wrapper .day-event-item {
   border: 1px solid var(--divider);
   border-radius: 12px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, #fff 5%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, var(--surface-panel-soft) 5%), var(--surface-panel-soft));
 }
 
 .calendar-wrapper .event-card:hover,
@@ -747,7 +747,7 @@ button:hover,
 .toolbox-wrapper .content-area {
   border: 1px solid var(--divider);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, var(--surface-panel-soft) 8%), var(--surface-panel));
   box-shadow: var(--shadow-sm);
 }
 
@@ -773,7 +773,7 @@ button:hover,
 .toolbox-wrapper .tool-card {
   border: 1px solid var(--divider);
   border-radius: 12px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, #fff 5%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 95%, var(--surface-panel-soft) 5%), var(--surface-panel-soft));
 }
 
 .toolbox-wrapper .tool-card:hover {
@@ -850,7 +850,7 @@ button:hover,
   padding: 12px 14px;
   border: 1px solid var(--divider);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), color-mix(in srgb, var(--surface-panel-soft) 90%, #fff 10%));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, var(--surface-panel-soft) 4%), color-mix(in srgb, var(--surface-panel-soft) 90%, var(--surface-panel-soft) 10%));
   box-shadow: var(--shadow-sm);
 }
 
@@ -939,7 +939,7 @@ button:hover,
 .toolbox-sticky-notes-wrapper .content-area {
   border: 1px solid var(--divider);
   border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, #fff 8%), var(--surface-panel));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel-soft) 92%, var(--surface-panel-soft) 8%), var(--surface-panel));
   box-shadow: var(--shadow-sm);
 }
 
@@ -961,7 +961,7 @@ button:hover,
   padding: 10px 12px;
   border: 1px solid var(--divider);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--surface-panel-soft) 90%, #fff 10%);
+  background: color-mix(in srgb, var(--surface-panel-soft) 90%, var(--surface-panel-soft) 10%);
   box-shadow: var(--shadow-sm);
 }
 
@@ -986,7 +986,7 @@ button:hover,
 .app-content .week-header,
 .app-content .day-header {
   border: 1px solid var(--divider);
-  background: color-mix(in srgb, var(--surface-panel-soft) 88%, #fff 12%);
+  background: color-mix(in srgb, var(--surface-panel-soft) 88%, var(--surface-panel-soft) 12%);
   box-shadow: var(--shadow-xs);
 }
 
@@ -1020,7 +1020,7 @@ button:hover,
 .stat-card,
 .summary-card {
   border: 1px solid var(--divider);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), var(--surface-panel-soft));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, var(--surface-panel-soft) 4%), var(--surface-panel-soft));
   box-shadow: var(--shadow-sm);
 }
 
@@ -1365,7 +1365,7 @@ code {
 .statistics-page .section-header,
 .doc-page .section-header {
   border: 1px solid var(--divider);
-  background: color-mix(in srgb, var(--surface-panel-soft) 88%, #fff 12%);
+  background: color-mix(in srgb, var(--surface-panel-soft) 88%, var(--surface-panel-soft) 12%);
   box-shadow: var(--shadow-xs);
 }
 
@@ -1971,7 +1971,7 @@ code {
 .passwords-page-wrapper .sidebar-left,
 .credential-manager .sidebar-left,
 .todos-page-wrapper .sidebar-left {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, #fff 4%), color-mix(in srgb, var(--surface-panel-soft) 94%, #f8fbff 6%));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface-panel) 96%, var(--surface-panel-soft) 4%), color-mix(in srgb, var(--surface-panel-soft) 94%, var(--surface-panel-soft) 6%));
   border: 1px solid color-mix(in srgb, var(--divider) 92%, var(--accent-blue-bg) 8%);
   box-shadow: 0 10px 24px rgba(60, 40, 20, 0.06), inset 0 1px 0 var(--surface-panel-soft);
 }
@@ -1981,7 +1981,7 @@ code {
 .credential-manager .sidebar-toolbar,
 .todos-page-wrapper .sidebar-toolbar {
   padding: 12px 12px 10px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(245,249,255,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
   border-bottom: 1px solid color-mix(in srgb, var(--divider) 84%, var(--accent-blue-bg) 16%);
 }
 
@@ -2053,7 +2053,7 @@ code {
 .passwords-page-wrapper .category-item:hover,
 .credential-manager .category-item:hover,
 .todos-page-wrapper .category-item:hover {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 44%, #fff 56%), color-mix(in srgb, var(--accent-blue-bg) 22%, transparent 78%));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 44%, var(--surface-panel-soft) 56%), color-mix(in srgb, var(--accent-blue-bg) 22%, transparent 78%));
   border-color: color-mix(in srgb, var(--accent-blue) 18%, transparent 82%);
   box-shadow: 0 8px 18px rgba(60, 40, 20, 0.07), inset 0 1px 0 var(--surface-panel-soft);
 }
@@ -2062,7 +2062,7 @@ code {
 .passwords-page-wrapper .category-item.active,
 .credential-manager .category-item.active,
 .todos-page-wrapper .category-item.active {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 84%, #fff 16%), color-mix(in srgb, var(--accent-blue-bg) 68%, rgba(255,255,255,0.2) 32%));
+  background: linear-gradient(180deg, var(--surface-accent), var(--surface-hover));
   border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent 74%);
   box-shadow: 0 10px 22px rgba(194,65,12,0.12), inset 0 1px 0 var(--surface-panel-soft);
 }

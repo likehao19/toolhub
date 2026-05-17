@@ -83,6 +83,38 @@
                   <span v-if="suiteResults[si].reason" style="font-size:11px;color:var(--el-color-warning)">{{ suiteResults[si].reason }}</span>
                 </div>
 
+                <!-- Path Vars Override -->
+                <div v-if="getStepPathVars(step).length" class="step-section">
+                  <div style="font-size:11px;font-weight:600;margin-bottom:4px">{{ t('autoTest.pathVarsOverride') }}</div>
+                  <div v-for="pv in getStepPathVars(step)" :key="pv.key" class="kv-row">
+                    <span class="step-path-var">:{{ pv.key }}</span>
+                    <el-input :model-value="getPathVarValue(step, pv.key)"
+                      @update:model-value="val => setPathVarValue(step, pv.key, val)"
+                      size="small" :placeholder="pv.value || t('autoTest.useDefault')" style="flex:1" />
+                  </div>
+                </div>
+
+                <!-- Body Override -->
+                <div class="step-section">
+                  <div class="step-section-header">
+                    <span style="font-size:11px;font-weight:600">{{ t('autoTest.bodyOverride') }}</span>
+                    <el-checkbox :model-value="!!step.overrides?.body"
+                      @update:model-value="val => toggleBodyOverride(step, val)" size="small">
+                      {{ t('autoTest.enableOverride') }}
+                    </el-checkbox>
+                  </div>
+                  <div v-if="step.overrides?.body" class="body-override-editor">
+                    <el-radio-group :model-value="step.overrides.body.type || 'raw'"
+                      @update:model-value="val => step.overrides.body.type = val" size="small">
+                      <el-radio-button value="raw">raw</el-radio-button>
+                      <el-radio-button value="json">JSON</el-radio-button>
+                      <el-radio-button value="form">form</el-radio-button>
+                    </el-radio-group>
+                    <textarea v-model="step.overrides.body.content" class="step-body-textarea"
+                      :placeholder="step.overrides.body.type === 'json' ? '{}' : 'key=value&...'" spellcheck="false" />
+                  </div>
+                </div>
+
                 <!-- Assertions -->
                 <div class="step-section">
                   <div style="font-size:11px;font-weight:600;margin-bottom:4px">{{ t('autoTest.assertions') }}</div>
@@ -159,6 +191,7 @@ import { METHOD_COLORS, uuid } from '@/utils/apiWorkbench/shared'
 import { loadCollections, flattenCollectionApis } from '@/utils/apiWorkbench/collections'
 import { getActiveVariables, loadEnvironments, getCurrentEnvId, setCurrentEnvId } from '@/utils/apiWorkbench/environment'
 import { loadTestSuites, saveTestSuites, runTestSuite } from '@/utils/apiWorkbench/testRunner'
+import { findApiById } from '@/utils/apiWorkbench/collections'
 
 const router = useRouter()
 const assertionOps = ['==', '!=', '>', '<', '>=', '<=', 'contains', 'notEmpty', 'regex']
@@ -174,6 +207,29 @@ const suiteReport = ref(null)
 
 const editingSuite = computed(() => testSuites.value.find(s => s.id === editSuiteId.value) || null)
 const collectionApiGroups = computed(() => flattenCollectionApis(collections.value))
+
+/* 引用接口的 pathVars 列表 */
+function getStepPathVars(step) {
+  if (!step.apiRef) return []
+  const api = findApiById(collections.value, step.apiRef)
+  return Array.isArray(api?.pathVars) ? api.pathVars : []
+}
+function getPathVarValue(step, key) {
+  const ov = step.overrides?.pathVars?.find(v => v.key === key)
+  return ov ? ov.value : ''
+}
+function setPathVarValue(step, key, value) {
+  if (!step.overrides) step.overrides = {}
+  if (!Array.isArray(step.overrides.pathVars)) step.overrides.pathVars = []
+  const found = step.overrides.pathVars.find(v => v.key === key)
+  if (found) found.value = value
+  else step.overrides.pathVars.push({ key, value })
+}
+function toggleBodyOverride(step, on) {
+  if (!step.overrides) step.overrides = {}
+  if (on) step.overrides.body = step.overrides.body || { type: 'raw', content: '' }
+  else delete step.overrides.body
+}
 
 function onEnvChange(val) { setCurrentEnvId(val) }
 
@@ -249,7 +305,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -330,6 +386,40 @@ onMounted(() => {
 .step-num { font-size: 12px; font-weight: 700; color: var(--text-tertiary); width: 24px; flex-shrink: 0; }
 .step-result-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 .step-section { margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(60, 40, 20, 0.1); }
+.step-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.step-path-var {
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+.body-override-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.step-body-textarea {
+  width: 100%;
+  min-height: 80px;
+  max-height: 200px;
+  padding: 8px 10px;
+  border: 1px solid rgba(60, 40, 20, 0.1);
+  border-radius: 6px;
+  background: var(--el-bg-color-overlay);
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+  resize: vertical;
+}
+.step-body-textarea:focus { border-color: var(--accent-blue); }
 .suite-report { padding: 0 16px 16px; }
 
 .doc-item {

@@ -267,7 +267,7 @@
           <el-input v-model="categoryForm.name" :placeholder="t('bookmarks.categoryName')" />
         </el-form-item>
         <el-form-item :label="t('bookmarks.selectIcon')">
-          <el-select v-model="categoryForm.icon" :placeholder="t('bookmarks.selectIcon')">
+          <el-select v-model="categoryForm.icon" :placeholder="t('bookmarks.selectIcon')" style="width: 100%;">
             <el-option
               v-for="icon in availableIcons"
               :key="icon.value"
@@ -483,6 +483,17 @@ const bookmarkForm = ref({
   category_id: null,
   tagsArray: []
 })
+
+// URL 合法性: 空值视为合法(可选场景); 否则必须能被 URL 构造且协议为 http/https。
+const isValidUrl = (url) => {
+  if (!url) return true
+  try {
+    const u = new URL(url)
+    return ['http:', 'https:'].includes(u.protocol) && !!u.hostname
+  } catch {
+    return false
+  }
+}
 
 const categoryForm = ref({
   name: '',
@@ -889,6 +900,11 @@ const saveBookmark = async () => {
     return
   }
 
+  if (!isValidUrl(bookmarkForm.value.url.trim())) {
+    ElMessage.warning('请输入合法的网站地址（以 http:// 或 https:// 开头）')
+    return
+  }
+
   try {
     const db = await getDatabase()
     const now = new Date().toISOString()
@@ -1266,7 +1282,7 @@ onUnmounted(() => {
 /* 顶部导航 */
 .header {
   min-height: 58px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
@@ -1289,7 +1305,7 @@ onUnmounted(() => {
 
 .sidebar-toggle-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, var(--surface-panel), rgba(242, 246, 251, 0.92));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
@@ -1418,7 +1434,7 @@ onUnmounted(() => {
 }
 
 .category-item.active {
-  background: linear-gradient(180deg, var(--surface-panel), rgba(240, 245, 251, 0.95));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
   border-color: rgba(194, 65, 12, 0.15);
@@ -1511,7 +1527,7 @@ onUnmounted(() => {
   min-height: 320px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
 }
 
 .bookmark-cards {
@@ -1528,7 +1544,7 @@ onUnmounted(() => {
   content: '';
   display: block;
   height: 1px;
-  background: linear-gradient(90deg, var(--surface-panel), rgba(255,255,255,0.24));
+  background: linear-gradient(90deg, var(--surface-panel), var(--surface-panel-soft));
 }
 
 .bookmark-list::-webkit-scrollbar {
@@ -1564,7 +1580,7 @@ onUnmounted(() => {
 }
 
 .bookmark-row:hover {
-  background: rgba(239, 246, 255, 0.72);
+  background: var(--surface-panel-soft);
 }
 
 .row-left {
@@ -1645,12 +1661,16 @@ onUnmounted(() => {
 
 /* 操作按钮 — 默认隐藏，hover 时显示 */
 .row-actions {
-  display: none;
+  display: flex;
   gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
 }
 
 .bookmark-row:hover .row-actions {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .row-actions .el-button {

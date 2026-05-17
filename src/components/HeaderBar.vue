@@ -1,6 +1,25 @@
 ﻿<template>
-  <div class="header-bar" data-tauri-drag-region>
+  <div class="header-bar" :class="`header-bar--${headerStyle}`" data-tauri-drag-region>
     <div class="header-content" data-tauri-drag-region>
+      <!-- macOS 风格: 左侧 traffic light 三按钮 -->
+      <div v-if="headerStyle === 'mac'" class="mac-controls" @click.stop>
+        <button class="mac-btn mac-btn--close" @click="handleClose" :title="t('header.close')">
+          <svg viewBox="0 0 12 12" class="mac-btn-icon" aria-hidden="true">
+            <path d="M3.5 3.5 L8.5 8.5 M8.5 3.5 L3.5 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+        </button>
+        <button class="mac-btn mac-btn--minimize" @click="handleMinimize" :title="t('header.minimize')">
+          <svg viewBox="0 0 12 12" class="mac-btn-icon" aria-hidden="true">
+            <path d="M3 6 L9 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+          </svg>
+        </button>
+        <button class="mac-btn mac-btn--maximize" @click="handleToggleMaximize" :title="isMaximized ? t('header.restore') : t('header.maximize')">
+          <svg viewBox="0 0 12 12" class="mac-btn-icon" aria-hidden="true">
+            <path d="M4 4 L4 7 L7 4 Z M8 8 L8 5 L5 8 Z" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+
       <div class="header-left" data-tauri-drag-region>
         <div class="app-logo" data-tauri-drag-region>
           <img src="/logo.png" alt="logo" />
@@ -53,7 +72,7 @@
                       @click="handleSearchItemClick(result)"
                     >
                       <div class="item-row">
-                        <span v-if="module === 'tools'" class="item-emoji">{{ result.item.icon }}</span>
+                        <ToolIcon v-if="module === 'tools'" class="item-emoji" :id="result.item.id" :fallback="result.item.icon" />
                         <div class="item-text">
                           <div class="item-title" v-html="highlightText(getDisplayTitle(result), searchQuery)"></div>
                         </div>
@@ -81,27 +100,44 @@
           </div>
         </div>
       </div>
-      <div class="header-right">
+
+      <!-- Windows 风格: 右侧 4 按钮(钉住/最小化/最大化/关闭) -->
+      <div v-if="headerStyle === 'windows'" class="header-right">
         <button
           class="header-button pin-button"
           :class="{ active: isPinned }"
           @click="handlePin"
           :title="t('header.pinTop')"
         >
-          <el-icon><Top /></el-icon>
+          <svg class="hb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="17" x2="12" y2="22" />
+            <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"
+              :fill="isPinned ? 'currentColor' : 'none'" />
+          </svg>
         </button>
         <button class="header-button minimize-button" @click="handleMinimize" :title="t('header.minimize')">
-          <el-icon><Minus /></el-icon>
+          <svg class="hb-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <line x1="3" y1="8" x2="13" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
         </button>
         <button
           class="header-button maximize-button"
           @click="handleToggleMaximize"
           :title="isMaximized ? t('header.restore') : t('header.maximize')"
         >
-          <el-icon><FullScreen v-if="!isMaximized" /><CopyDocument v-else /></el-icon>
+          <svg v-if="!isMaximized" class="hb-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="3" y="3" width="10" height="10" rx="1.4" stroke="currentColor" stroke-width="1.3" />
+          </svg>
+          <svg v-else class="hb-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <rect x="5" y="2.5" width="8.5" height="8.5" rx="1.2" stroke="currentColor" stroke-width="1.3" />
+            <rect x="2.5" y="5" width="8.5" height="8.5" rx="1.2" stroke="currentColor" stroke-width="1.3" fill="var(--surface-panel)" />
+          </svg>
         </button>
         <button class="header-button close-button" @click="handleClose" :title="t('header.close')">
-          <el-icon><Close /></el-icon>
+          <svg class="hb-icon" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+            <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
         </button>
       </div>
     </div>
@@ -110,12 +146,14 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { Top, Minus, FullScreen, CopyDocument, Close, Search, Document, List, Link, Lock, Calendar, Loading, Clock, Tools } from '@element-plus/icons-vue'
+import { Search, Document, List, Link, Lock, Calendar, Loading, Clock, Tools } from '@element-plus/icons-vue'
+import ToolIcon from '@/components/ToolIcon.vue'
 import { TauriWindow } from '@/utils/tauri'
 import { useRouter } from 'vue-router'
 import * as searchAPI from '@/utils/search'
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
+import { headerStyle } from '@/composables/useHeaderStyle'
 
 const router = useRouter()
 const isPinned = ref(false)
@@ -340,8 +378,8 @@ onUnmounted(() => {
 <style scoped>
 .header-bar {
   height: var(--header-height);
-  background: linear-gradient(180deg, var(--surface-panel) 0%, rgba(248, 251, 255, 0.84) 100%);
-  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 88%, #dbe7f6 12%);
+  background: linear-gradient(180deg, var(--surface-panel) 0%, var(--surface-panel-soft) 100%);
+  border-bottom: 1px solid var(--border-color);
   backdrop-filter: saturate(165%) blur(16px);
   user-select: none;
   -webkit-app-region: drag;
@@ -411,40 +449,43 @@ onUnmounted(() => {
 }
 
 .header-button {
-  width: 31px;
-  height: 31px;
-  border: 1px solid color-mix(in srgb, var(--border-color) 86%, #d9e4f2 14%);
-  background: var(--surface-panel-soft);
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
   border-radius: var(--radius-sm);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-fast), transform var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast);
-  color: #475569;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  color: var(--text-secondary);
 }
 
 .header-button:hover {
-  background: var(--surface-panel);
-  color: var(--el-text-color-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(60, 40, 20, 0.12);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+  transform: none;
 }
 
 .header-button.close-button:hover {
   background: var(--color-red);
   color: var(--el-color-white);
-  border-color: transparent;
 }
 
 .header-button.pin-button.active {
   color: var(--accent-blue);
-  border-color: rgba(47, 111, 228, 0.38);
-  background: rgba(47, 111, 228, 0.12);
+  background: var(--accent-blue-bg);
 }
 
-.header-button .el-icon {
-  font-size: 14px;
+.header-button .hb-icon {
+  width: 13px;
+  height: 13px;
+  display: block;
+}
+
+.header-button.pin-button .hb-icon {
+  transform: rotate(40deg);
 }
 
 .global-search {
@@ -456,26 +497,26 @@ onUnmounted(() => {
 .global-search :deep(.el-input) {
   width: 300px;
   --el-input-bg-color: var(--surface-panel-soft);
-  --el-input-border-color: color-mix(in srgb, var(--border-color) 85%, #dce7f6 15%);
-  --el-input-hover-border-color: #b7c8dd;
+  --el-input-border-color: var(--border-color);
+  --el-input-hover-border-color: var(--border-color-strong);
   --el-input-focus-border-color: var(--accent-blue);
 }
 
 .global-search :deep(.el-input__wrapper) {
   box-shadow: none !important;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, var(--border-color) 85%, #dce7f6 15%);
+  border: 1px solid var(--border-color);
   min-height: 34px;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
 .global-search :deep(.el-input__wrapper:hover) {
-  border-color: #b7c8dd;
+  border-color: var(--border-color-strong);
 }
 
 .global-search :deep(.el-input__wrapper.is-focus) {
   border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px rgba(47, 111, 228, 0.14) !important;
+  box-shadow: 0 0 0 2px var(--accent-blue-bg) !important;
 }
 
 .search-results {
@@ -485,7 +526,7 @@ onUnmounted(() => {
   right: 0;
   margin-top: 6px;
   background: var(--surface-panel);
-  border: 1px solid color-mix(in srgb, var(--border-color) 90%, #dce6f4 10%);
+  border: 1px solid var(--border-color);
   border-radius: 10px;
   box-shadow: 0 12px 32px rgba(60, 40, 20, 0.14);
   backdrop-filter: blur(12px);
@@ -522,7 +563,7 @@ onUnmounted(() => {
   font-weight: var(--font-weight-semibold);
   font-size: 11px;
   color: var(--text-tertiary);
-  background: rgba(248, 250, 253, 0.55);
+  background: var(--surface-panel-soft);
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -575,7 +616,7 @@ onUnmounted(() => {
 }
 
 .search-item:hover {
-  background: rgba(47, 111, 228, 0.06) !important;
+  background: var(--accent-blue-bg) !important;
   transform: none !important;
   box-shadow: none !important;
   border-color: transparent !important;
@@ -631,7 +672,7 @@ onUnmounted(() => {
 }
 
 .more-results:hover {
-  background: rgba(47, 111, 228, 0.06);
+  background: var(--accent-blue-bg);
 }
 
 .search-history {
@@ -645,7 +686,7 @@ onUnmounted(() => {
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  background: rgba(248, 250, 253, 0.55);
+  background: var(--surface-panel-soft);
 }
 
 .history-item {
@@ -664,7 +705,7 @@ onUnmounted(() => {
 }
 
 .history-item:hover {
-  background: rgba(47, 111, 228, 0.06) !important;
+  background: var(--accent-blue-bg) !important;
   transform: none !important;
   box-shadow: none !important;
   border-color: transparent !important;
@@ -690,6 +731,71 @@ onUnmounted(() => {
     width: 200px;
   }
 }
+
+/* ===== macOS 风格头部 (traffic light) ===== */
+.mac-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 12px;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+
+.mac-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: filter var(--transition-fast);
+}
+
+.mac-btn:focus {
+  outline: none;
+}
+
+.mac-btn--close { background: #ff5f57; }
+.mac-btn--minimize { background: #ffbd2e; }
+.mac-btn--maximize { background: #28c940; }
+
+.mac-btn-icon {
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  color: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+/* 鼠标进入 mac-controls 任一按钮区域时,三个按钮的图标都显示 (macOS 原生行为) */
+.mac-controls:hover .mac-btn-icon {
+  opacity: 1;
+}
+
+.mac-btn:active {
+  filter: brightness(0.92);
+}
+
+.mac-btn:hover {
+  transform: none;
+}
+
+/* 暗色模式: 圆形边框颜色更亮一点 */
+[data-theme="dark"] .mac-btn {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* mac 模式下: header-bar 的 padding/布局微调,让 search 不被 traffic light 挤压 */
+.header-bar--mac .header-content {
+  padding: 0 14px 0 0;
+}
+
 </style>
 
 

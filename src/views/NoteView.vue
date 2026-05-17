@@ -3249,7 +3249,7 @@ const formatFileTime = (time) => {
 /* ignore */
 .header {
   min-height: 58px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
@@ -3272,7 +3272,7 @@ const formatFileTime = (time) => {
 
 .sidebar-toggle-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, var(--surface-panel), rgba(242,246,251,0.92));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
@@ -3471,7 +3471,7 @@ const formatFileTime = (time) => {
 }
 
 .tree-item-wrapper.active {
-  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   color: var(--accent-color);
   font-weight: 600;
   border-color: rgba(194, 65, 12,0.15);
@@ -3810,7 +3810,7 @@ const formatFileTime = (time) => {
 
 .preview-content :deep(h1),
 .preview-content :deep(h2) {
-  border-bottom: 1px solid #eaecef;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
   margin-top: 24px;
   margin-bottom: 16px;
@@ -3825,7 +3825,7 @@ const formatFileTime = (time) => {
 }
 
 .preview-content :deep(pre) {
-  background: #f6f8fa;
+  background: var(--surface-panel-soft);
   border-radius: 6px;
   padding: 16px;
   overflow: auto;
@@ -3903,7 +3903,7 @@ const formatFileTime = (time) => {
   justify-content: center;
   gap: 8px;
   padding: 24px 40px;
-  background: #e8e8e8;
+  background: var(--surface-panel-soft);
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -3911,7 +3911,7 @@ const formatFileTime = (time) => {
 }
 
 .action-card:hover {
-  background-color: #d8d8d8;
+  background-color: var(--surface-panel-soft);
 }
 
 .action-card span {
@@ -3970,7 +3970,7 @@ const formatFileTime = (time) => {
 
 .file-name {
   font-size: 13px;
-  color: #007aff;
+  color: var(--accent-blue);
   font-weight: 400;
   flex-shrink: 0;
 }

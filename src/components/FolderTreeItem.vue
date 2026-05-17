@@ -214,7 +214,7 @@ const handleCommand = (cmd) => {
 }
 
 .folder-item.active {
-  background: linear-gradient(135deg, var(--el-color-primary-light-9) 0%, #e1f0ff 100%);
+  background: linear-gradient(135deg, var(--el-color-primary-light-9) 0%, var(--surface-panel-soft) 100%);
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.12);
 }
 
@@ -287,7 +287,7 @@ const handleCommand = (cmd) => {
 .folder-count {
   font-size: 11px;
   color: var(--el-text-color-secondary);
-  background: #f4f4f5;
+  background: var(--surface-panel-soft);
   padding: 2px 6px;
   border-radius: 10px;
   font-weight: 500;
@@ -297,7 +297,7 @@ const handleCommand = (cmd) => {
 }
 
 .folder-item:hover .folder-count {
-  background: #e1f0ff;
+  background: var(--surface-panel-soft);
   color: var(--accent-blue);
 }
 

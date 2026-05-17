@@ -623,7 +623,7 @@ watch(loading, async (val) => {
   gap: 16px;
   padding: 0 18px;
   min-height: 58px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   flex-shrink: 0;
   box-sizing: border-box;
@@ -726,7 +726,7 @@ watch(loading, async (val) => {
 
 .source-tab.active {
   color: var(--accent-blue);
-  background: linear-gradient(180deg, var(--surface-panel), rgba(240,245,251,0.95));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   box-shadow: 0 1px 0 var(--surface-panel-soft), 0 6px 14px rgba(60, 40, 20,0.05);
 }
 
@@ -838,7 +838,7 @@ watch(loading, async (val) => {
 
 .wp-progress-overlay :deep(.el-progress) { width: 70%; }
 .wp-progress-overlay :deep(.el-progress__text) { color: var(--el-color-white); font-weight: 600; }
-.wp-progress-overlay :deep(.el-progress-bar__outer) { background: rgba(255, 255, 255, 0.2); }
+.wp-progress-overlay :deep(.el-progress-bar__outer) { background: var(--surface-panel-soft); }
 
 /* Hover overlay */
 .wp-card-overlay {

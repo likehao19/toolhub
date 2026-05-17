@@ -285,7 +285,7 @@ const createDynamicMenu = async () => {
 .log-container {
   max-height: 300px;
   overflow-y: auto;
-  background: #f9f9f9;
+  background: var(--surface-panel-soft);
   padding: 12px;
   border-radius: 4px;
   border: 1px solid var(--el-border-color-light);

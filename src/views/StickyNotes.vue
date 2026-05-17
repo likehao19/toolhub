@@ -87,10 +87,10 @@ const currentContent = ref('') // 当前页面内容
 
 // 页签配置 - 不同颜色
 const tabs = computed(() => [
-  { id: 'documents', label: t('stickyNotes.notes'), icon: Document, color: '#E0E7FF', bg: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)', component: DocumentPreview },
-  { id: 'bookmarks', label: t('stickyNotes.bookmarks'), icon: Star, color: '#FCE7F3', bg: 'linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)', component: BookmarkGrid },
-  { id: 'schedule', label: t('stickyNotes.schedule'), icon: Calendar, color: '#D1FAE5', bg: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)', component: ScheduleView },
-  { id: 'tasks', label: t('stickyNotes.tasks'), icon: CircleCheck, color: '#FEF3C7', bg: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)', component: TaskList }
+  { id: 'documents', label: t('stickyNotes.notes'), icon: Document, color: 'var(--surface-panel-soft)', bg: 'linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 100%)', component: DocumentPreview },
+  { id: 'bookmarks', label: t('stickyNotes.bookmarks'), icon: Star, color: 'var(--surface-panel-soft)', bg: 'linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 100%)', component: BookmarkGrid },
+  { id: 'schedule', label: t('stickyNotes.schedule'), icon: Calendar, color: 'var(--surface-panel-soft)', bg: 'linear-gradient(135deg, var(--surface-panel-soft) 0%, var(--surface-panel-soft) 100%)', component: ScheduleView },
+  { id: 'tasks', label: t('stickyNotes.tasks'), icon: CircleCheck, color: '#FEF3C7', bg: 'linear-gradient(135deg, var(--surface-panel-soft) 0%, #FEF3C7 100%)', component: TaskList }
 ])
 
 const currentTabBg = computed(() => {

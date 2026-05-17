@@ -333,7 +333,7 @@ onMounted(async () => {
   min-height: 0;
   margin: 14px 16px 16px;
   background: var(--bg-secondary);
-  border: 1px solid #e6ecf3;
+  border: 1px solid var(--border-color);
   border-radius: 18px;
   box-shadow: 0 8px 22px rgba(60, 40, 20, 0.05);
   overflow: hidden;
@@ -687,7 +687,7 @@ onMounted(async () => {
 .settings-page-wrapper .settings-section :deep(.el-textarea__inner) {
   border-radius: 6px;
   border: none !important;
-  background: #f7f8fa !important;
+  background: var(--surface-panel-soft) !important;
   box-shadow: 0 0 0 1px var(--divider, var(--el-border-color)) inset !important;
   transition: box-shadow var(--transition-fast);
 }
@@ -873,12 +873,12 @@ onMounted(async () => {
   padding: 2px 8px;
   border-radius: 0;
   border: none;
-  border-bottom: 1px solid #eef0f3;
+  border-bottom: 1px solid var(--divider);
   transition: background var(--transition-fast);
 }
 
 .settings-section :deep(.stats-row:hover) {
-  background: #f7f8fa;
+  background: var(--surface-hover);
 }
 
 .settings-section :deep(.stats-row:last-child) {

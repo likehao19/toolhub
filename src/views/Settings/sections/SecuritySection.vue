@@ -173,5 +173,38 @@ const {
 </script>
 
 <style scoped>
-/* 共享样式由 Settings.vue 主壳通过 :deep(...) 穿透至本 section；本组件无私有样式 */
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 8px;
+  border: none;
+  border-bottom: 1px solid var(--divider);
+  transition: background var(--transition-fast);
+}
+.stats-row:hover {
+  background: var(--surface-hover);
+}
+.stats-row:last-child {
+  border-bottom: none;
+}
+.stats-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  line-height: 1.3;
+}
+.stats-value {
+  font-size: 11px;
+  color: var(--text-primary);
+  font-weight: 500;
+  text-align: right;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+}
 </style>

@@ -723,7 +723,7 @@ defineExpose({
 
 .excel-editor-wrapper :deep(.handsontable td),
 .excel-editor-wrapper :deep(.handsontable th) {
-  border-color: #d0d0d0;
+  border-color: var(--border-color);
 }
 
 .excel-editor-wrapper :deep(.handsontable th) {

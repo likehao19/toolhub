@@ -285,7 +285,7 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -389,7 +389,7 @@ onMounted(() => {
   padding: 14px;
   border: 1px solid rgba(60, 40, 20, 0.06);
   border-radius: 14px;
-  background: rgba(248, 244, 232,0.78);
+  background: var(--surface-panel-soft);
 }
 
 .sub-card:last-child {

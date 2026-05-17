@@ -361,7 +361,7 @@ const resetState = () => {
   flex: 1;
   margin: 0;
   padding: 20px;
-  background: #f8f8f8;
+  background: var(--surface-panel-soft);
   border: none;
   font-family: "PingFang SC";
   font-size: 14px;
@@ -382,6 +382,6 @@ const resetState = () => {
   font-family: "PingFang SC";
   font-size: 14px;
   line-height: 1.6;
-  background: #f8f8f8;
+  background: var(--surface-panel-soft);
 }
 </style>

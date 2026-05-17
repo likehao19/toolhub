@@ -87,7 +87,7 @@ const copyCode = async () => {
   align-items: center;
   justify-content: space-between;
   padding: 18px 24px;
-  background: linear-gradient(135deg, var(--el-fill-color-light) 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--el-fill-color-light) 0%, var(--surface-panel-soft) 100%);
   border-bottom: 1px solid var(--el-border-color-light);
 }
 

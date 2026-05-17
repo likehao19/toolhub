@@ -65,6 +65,25 @@
       </el-form>
     </el-card>
 
+    <!-- 头部样式预览(仅开发模式可见,打包后自动隐藏) -->
+    <el-card v-if="isDev" shadow="never" style="margin-bottom: 20px;">
+      <template #header>
+        <div class="card-header">头部样式预览 (仅开发)</div>
+      </template>
+      <el-form label-width="140px" label-position="left">
+        <el-form-item label="头部样式">
+          <el-radio-group v-model="headerStyleOverride">
+            <el-radio value="auto">自动 (按系统)</el-radio>
+            <el-radio value="windows">Windows</el-radio>
+            <el-radio value="mac">macOS</el-radio>
+          </el-radio-group>
+          <div class="control-hint">
+            仅用于在 Windows 上预览 macOS 头部样式; 打包发布后此项不会显示。
+          </div>
+        </el-form-item>
+      </el-form>
+    </el-card>
+
     <!-- 语言与区域 -->
     <el-card shadow="never" style="margin-bottom: 20px;">
       <template #header>
@@ -184,6 +203,7 @@ import { t } from '@/i18n'
 import { useSettingsCore } from '@/composables/settings/useSettingsCore'
 import { useReminderSettings } from '@/composables/settings/useReminderSettings'
 import { useAiAssistant } from '@/composables/settings/useAiAssistant'
+import { headerStyleOverride, isDev } from '@/composables/useHeaderStyle'
 
 defineProps({
   active: { type: Boolean, default: true },

@@ -255,7 +255,7 @@ const createCustomWindow = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-panel-soft);
   border-radius: 2px;
   font-size: 12px;
   color: var(--el-color-white);
@@ -263,7 +263,7 @@ const createCustomWindow = async () => {
 }
 
 .titlebar-example-button:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--surface-panel-soft);
 }
 
 pre {

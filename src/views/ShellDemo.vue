@@ -257,7 +257,7 @@ const goBack = () => {
 }
 
 .output-pre.error {
-  background: #fef0f0;
+  background: var(--surface-panel-soft);
   color: var(--el-color-danger);
 }
 

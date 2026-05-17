@@ -477,7 +477,7 @@ const openStickyNotes = async () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -594,7 +594,7 @@ const openStickyNotes = async () => {
   transition: background 0.15s;
 }
 .setting-row:not(:last-child) { border-bottom: 1px solid rgba(60, 40, 20, 0.08); }
-.setting-row:hover { background: rgba(255,255,255,0.34); }
+.setting-row:hover { background: var(--surface-panel-soft); }
 .setting-label {
   display: flex;
   flex-direction: column;
@@ -646,14 +646,14 @@ const openStickyNotes = async () => {
   font-family: "PingFang SC";
   font-weight: 500;
   color: var(--el-text-color-primary);
-  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, #e8eaed 100%);
+  background: linear-gradient(180deg, var(--el-fill-color-light) 0%, var(--surface-panel-soft) 100%);
   border: 1px solid var(--el-text-color-placeholder);
   border-bottom-width: 2px;
   border-radius: 4px;
   line-height: 1;
   white-space: nowrap;
 }
-.keycap.active { color: var(--accent-blue); border-color: #a0cfff; background: linear-gradient(180deg, var(--el-color-primary-light-9) 0%, #d9ecff 100%); }
+.keycap.active { color: var(--accent-blue); border-color: #a0cfff; background: linear-gradient(180deg, var(--el-color-primary-light-9) 0%, var(--el-color-primary-light-9) 100%); }
 .keycap-sep { font-size: 11px; color: var(--el-text-color-placeholder); margin: 0 1px; }
 .shortcut-clear { font-size: 16px; color: var(--el-text-color-placeholder); cursor: pointer; line-height: 1; transition: color 0.2s; }
 .shortcut-clear:hover { color: var(--el-color-danger); }

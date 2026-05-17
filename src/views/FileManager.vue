@@ -858,11 +858,11 @@ onMounted(async () => {
 }
 
 .file-item-row.folder-row {
-  background: linear-gradient(90deg, var(--el-color-primary-light-9) 0%, #ffffff 100%);
+  background: linear-gradient(90deg, var(--el-color-primary-light-9) 0%, var(--surface-panel-soft) 100%);
 }
 
 .file-item-row.folder-row:nth-child(even) {
-  background: linear-gradient(90deg, #e0f2fe 0%, var(--el-fill-color-lighter) 100%);
+  background: linear-gradient(90deg, var(--surface-panel-soft) 0%, var(--el-fill-color-lighter) 100%);
 }
 
 .file-item-row::before {
@@ -883,7 +883,7 @@ onMounted(async () => {
 }
 
 .file-item-row.folder-row:hover {
-  background: linear-gradient(90deg, #d9ecff 0%, var(--el-color-primary-light-9) 100%) !important;
+  background: linear-gradient(90deg, var(--el-color-primary-light-9) 0%, var(--el-color-primary-light-9) 100%) !important;
 }
 
 .file-item-row:hover::before {
@@ -892,7 +892,7 @@ onMounted(async () => {
 
 .file-item-row:active {
   transform: scale(0.995);
-  background: #d9ecff !important;
+  background: var(--el-color-primary-light-9) !important;
 }
 
 .file-row-icon {
@@ -956,7 +956,7 @@ onMounted(async () => {
 }
 
 .file-item-row:hover .file-row-name.folder-name {
-  color: #66b1ff;
+  color: var(--el-color-primary-light-3);
 }
 
 .file-row-type {
@@ -989,7 +989,7 @@ onMounted(async () => {
 }
 
 .file-row-type .type-folder {
-  background: linear-gradient(135deg, var(--accent-blue), #66b1ff);
+  background: linear-gradient(135deg, var(--accent-blue), var(--el-color-primary-light-3));
   color: var(--el-color-white);
   box-shadow: 0 2px 8px rgba(64, 158, 255, 0.3);
 }
@@ -1055,7 +1055,7 @@ onMounted(async () => {
 }
 
 :deep(.el-breadcrumb__inner:hover) {
-  color: #66b1ff;
+  color: var(--el-color-primary-light-3);
 }
 
 :deep(.el-tag) {

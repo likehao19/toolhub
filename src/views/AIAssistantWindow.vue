@@ -304,7 +304,7 @@ onMounted(() => {
 }
 
 .header-actions .el-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--surface-panel-soft);
 }
 
 /* ignore */
@@ -458,13 +458,13 @@ onMounted(() => {
 .message-result.success {
   background: var(--el-color-primary-light-9);
   color: var(--el-color-success);
-  border: 1px solid #d9ecff;
+  border: 1px solid var(--el-color-primary-light-9);
 }
 
 .message-result.error {
-  background: #fef0f0;
+  background: var(--surface-panel-soft);
   color: var(--el-color-danger);
-  border: 1px solid #fde2e2;
+  border: 1px solid var(--border-color);
 }
 
 /* ignore */

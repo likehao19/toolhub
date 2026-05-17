@@ -4,7 +4,7 @@
       <div class="univer-flex univer-items-center univer-gap-2">
         <span
           class="univer-inline-flex univer-h-5 univer-w-5 univer-rounded univer-border univer-border-solid univer-border-gray-200 dark:!univer-border-gray-700"
-          :style="{ backgroundColor: normalized || '#FFFFFF' }"
+          :style="{ backgroundColor: normalized || 'var(--surface-panel-soft)' }"
         />
         <span class="univer-text-xs univer-text-gray-600 dark:!univer-text-gray-300">
           {{ normalized || '无' }}

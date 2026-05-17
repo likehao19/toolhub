@@ -13,8 +13,11 @@ function ensureApiNodeShape(node) {
     url: node.url || '',
     params: Array.isArray(node.params) ? node.params : [],
     headers: Array.isArray(node.headers) ? node.headers : [],
+    pathVars: Array.isArray(node.pathVars) ? node.pathVars : [],
     body: node.body || { type: 'none', content: '', formData: [] },
     auth: node.auth || { type: 'none' },
+    settings: node.settings || { timeout: 30000, sslVerify: true, followRedirects: true, maxRedirects: 10 },
+    preScript: typeof node.preScript === 'string' ? node.preScript : '',
   }
 }
 
@@ -61,6 +64,18 @@ export function saveCollections(collections) {
 export function createCollection(name) {
   const collections = loadCollections()
   const col = { id: uuid(), name, items: [] }
+  collections.push(col)
+  saveCollections(collections)
+  return col
+}
+
+export function importCollection(payload) {
+  const collections = loadCollections()
+  const col = normalizeCollection({
+    id: uuid(),
+    name: payload?.name || 'Imported',
+    items: payload?.items || [],
+  })
   collections.push(col)
   saveCollections(collections)
   return col
@@ -137,8 +152,11 @@ export function createApiNode(collectionId, parentId, request) {
     url: request.url,
     params: request.params || [],
     headers: request.headers || [],
+    pathVars: request.pathVars || [],
     body: request.body || { type: 'none', content: '' },
     auth: request.auth || { type: 'none' },
+    settings: request.settings,
+    preScript: request.preScript,
   })
   if (!parentId) {
     col.items.push(item)
@@ -271,6 +289,7 @@ export function saveToHistory(record) {
     timestamp: Date.now(),
     params: record.params || [],
     headers: record.headers || [],
+    pathVars: record.pathVars || [],
     body: record.body || { type: 'none', content: '' },
     auth: record.auth || { type: 'none' },
   }

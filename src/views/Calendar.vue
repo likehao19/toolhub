@@ -1186,7 +1186,7 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1260,7 +1260,7 @@ onMounted(async () => {
 
 .toolbar-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, var(--surface-panel), rgba(244, 247, 251, 0.95));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 

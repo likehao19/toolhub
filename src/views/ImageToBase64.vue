@@ -454,7 +454,7 @@ statusText.value = t('imageToBase64.ready')
 .drop-zone:hover,
 .drop-zone.dragging {
   border-color: var(--accent-blue);
-  background: rgba(238, 246, 255, 0.7);
+  background: var(--surface-panel-soft);
 }
 .drop-zone.has-preview {
   border-style: solid;
@@ -494,7 +494,7 @@ statusText.value = t('imageToBase64.ready')
   max-height: 200px;
   object-fit: contain;
   border-radius: 8px;
-  background: rgba(248, 244, 232, 0.6);
+  background: var(--surface-panel-soft);
   border: 1px solid rgba(60, 40, 20, 0.06);
 }
 /* 浮层清除按钮 */

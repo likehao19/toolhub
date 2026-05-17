@@ -953,7 +953,7 @@ async function clearAll() {
   align-items: center;
   gap: 16px;
   padding: 0 18px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   min-height: 58px;
   box-sizing: border-box;
@@ -1159,7 +1159,7 @@ async function clearAll() {
 .hero-card-text { margin-top: 8px; line-height: 1.5; }
 .hero-card-actions { margin-top: 8px; }
 .analysis-columns { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 14px; margin-top: 12px; }
-.analysis-section { border: 1px solid rgba(60, 40, 20, 0.06); border-radius: 14px; background: rgba(248, 244, 232, 0.7); padding: 14px; min-width: 0; }
+.analysis-section { border: 1px solid rgba(60, 40, 20, 0.06); border-radius: 14px; background: var(--surface-panel-soft); padding: 14px; min-width: 0; }
 .subsection-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .block-query-toolbar,

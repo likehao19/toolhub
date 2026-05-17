@@ -359,7 +359,7 @@
           </div>
         </el-form-item>
         
-        <el-form-item :label="t('passwords.websiteLabel')">
+        <el-form-item v-if="isWebsiteCategory" :label="t('passwords.websiteLabel')">
           <el-input v-model="passwordForm.website" placeholder="https://example.com" />
         </el-form-item>
         
@@ -390,7 +390,7 @@
         </el-form-item>
         
         <el-form-item :label="t('passwords.iconLabel')">
-          <el-select v-model="categoryForm.icon" :placeholder="t('passwords.selectIcon')">
+          <el-select v-model="categoryForm.icon" :placeholder="t('passwords.selectIcon')" class="full-width">
             <el-option value="Monitor" :label="t('passwords.iconWebsite')">
               <el-icon class="icon-opt" style="color: var(--accent-blue);"><Monitor /></el-icon> {{ t('passwords.iconWebsite') }}
             </el-option>
@@ -1255,6 +1255,24 @@ const passwordForm = ref({
   notes: ''
 })
 
+// 当前选中分类是否为"网站"类（默认网站分类 icon = 'Monitor'）。
+// 用 icon 判断而非 name,避免用户重命名分类后失效;同时允许用户自建 icon='Monitor' 的分类也视为网站类。
+const isWebsiteCategory = computed(() => {
+  const cat = categories.value.find(c => c.id === passwordForm.value.category_id)
+  return cat?.icon === 'Monitor'
+})
+
+// URL 合法性: 空值视为合法(可选字段); 否则必须能被 URL 构造且协议为 http/https。
+const isValidUrl = (url) => {
+  if (!url) return true
+  try {
+    const u = new URL(url)
+    return ['http:', 'https:'].includes(u.protocol) && !!u.hostname
+  } catch {
+    return false
+  }
+}
+
 const categoryForm = ref({
   name: '',
   icon: 'Folder'
@@ -1520,8 +1538,11 @@ const getCategoryName = (categoryId) => {
 // 显示创建对话框
 const showCreateDialog = () => {
   editingPassword.value = null
+  // 默认分类: 若左侧选中的是某个具体分类(数字 id)则沿用,否则用"网站"(icon=Monitor),再降级到列表首项
+  const numericSelected = typeof selectedCategory.value === 'number' ? selectedCategory.value : null
+  const websiteCategory = categories.value.find(c => c.icon === 'Monitor')
   passwordForm.value = {
-    category_id: selectedCategory.value || (categories.value[0]?.id || null),
+    category_id: numericSelected || websiteCategory?.id || categories.value[0]?.id || null,
     title: '',
     username: '',
     password: '',
@@ -1561,9 +1582,16 @@ const savePassword = async () => {
     ElMessage.warning(t('passwords.fillTitleAndPassword'))
     return
   }
-  
+
   if (!passwordForm.value.category_id) {
     ElMessage.warning(t('passwords.selectCategoryWarning'))
+    return
+  }
+
+  // 非网站类分类时清空 website,避免编辑时残留旧值;网站类时校验 URL 格式
+  const finalWebsite = isWebsiteCategory.value ? (passwordForm.value.website || '').trim() : ''
+  if (finalWebsite && !isValidUrl(finalWebsite)) {
+    ElMessage.warning('请输入合法的网站地址（以 http:// 或 https:// 开头）')
     return
   }
 
@@ -1572,14 +1600,14 @@ const savePassword = async () => {
     const now = new Date().toISOString()
     const encryptedPassword = encryptPassword(passwordForm.value.password)
     const strength = analyzePasswordStrength(passwordForm.value.password)
-    
+
     if (editingPassword.value) {
       // 更新前先保存旧版本到历史记录
       const oldPassword = await db.select('SELECT * FROM passwords WHERE id = ?', [editingPassword.value.id])
       if (oldPassword && oldPassword.length > 0) {
         await saveToHistory(editingPassword.value.id, oldPassword[0])
       }
-      
+
       await db.execute(
         'UPDATE passwords SET category_id = ?, title = ?, username = ?, password = ?, website = ?, notes = ?, password_strength = ?, updated_at = ? WHERE id = ?',
         [
@@ -1587,7 +1615,7 @@ const savePassword = async () => {
           passwordForm.value.title,
           passwordForm.value.username,
           encryptedPassword,
-          passwordForm.value.website,
+          finalWebsite,
           passwordForm.value.notes,
           strength.strength,
           now,
@@ -1603,7 +1631,7 @@ const savePassword = async () => {
           passwordForm.value.title,
           passwordForm.value.username,
           encryptedPassword,
-          passwordForm.value.website,
+          finalWebsite,
           passwordForm.value.notes,
           strength.strength,
           now,
@@ -2717,7 +2745,7 @@ onMounted(async () => {
 /* ========== Header ========== */
 .header {
   min-height: 58px;
-  background: linear-gradient(180deg, var(--surface-panel), rgba(247, 249, 252, 0.82));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   border-bottom: 1px solid rgba(60, 40, 20, 0.08);
   display: flex;
   align-items: center;
@@ -2740,7 +2768,7 @@ onMounted(async () => {
 
 .sidebar-toggle-btn {
   border: 1px solid rgba(60, 40, 20, 0.08);
-  background: linear-gradient(180deg, var(--surface-panel), rgba(242, 246, 251, 0.92));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   box-shadow: inset 0 1px 0 var(--surface-panel-soft);
 }
 
@@ -2888,7 +2916,7 @@ onMounted(async () => {
 }
 
 .category-item.active {
-  background: linear-gradient(180deg, var(--surface-panel), rgba(240, 245, 251, 0.95));
+  background: linear-gradient(180deg, var(--surface-panel), var(--surface-panel-soft));
   color: var(--accent-blue);
   font-weight: var(--font-weight-semibold);
   border-color: rgba(194, 65, 12, 0.15);
@@ -3013,7 +3041,7 @@ onMounted(async () => {
   min-height: 320px;
   border: 1px dashed rgba(60, 40, 20, 0.08);
   border-radius: 18px;
-  background: linear-gradient(180deg, var(--surface-panel-soft), rgba(248, 244, 232,0.92));
+  background: linear-gradient(180deg, var(--surface-panel-soft), var(--surface-panel-soft));
 }
 
 .password-list::-webkit-scrollbar {
@@ -3059,7 +3087,7 @@ onMounted(async () => {
 }
 
 .password-row:hover {
-  background: rgba(239, 246, 255, 0.72);
+  background: var(--surface-panel-soft);
 }
 
 .row-left {
@@ -3126,12 +3154,16 @@ onMounted(async () => {
 
 /* 操作按钮 — 默认隐藏，hover 时显示 */
 .row-actions {
-  display: none;
+  display: flex;
   gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
 }
 
 .password-row:hover .row-actions {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .row-actions .el-button {

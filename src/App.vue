@@ -1085,6 +1085,27 @@ const handleCloseConfirm = async ({ action, remember }) => {
   --focus-ring:        0 0 0 3px rgba(194,65,12,0.22);
   --interactive-lift:  translateY(-1px);
 
+  /* —— 工具分类色 (light) —— */
+  --tool-color-note:         #f59e0b;
+  --tool-color-dev:          #3b82f6;
+  --tool-color-git:          #f97316;
+  --tool-color-network:      #14b8a6;
+  --tool-color-test:         #10b981;
+  --tool-color-database:     #6366f1;
+  --tool-color-dataAnalysis: #8b5cf6;
+  --tool-color-image:        #ec4899;
+  --tool-color-system:       #64748b;
+
+  --tool-bg-note:         rgba(245, 158, 11, 0.12);
+  --tool-bg-dev:          rgba(59, 130, 246, 0.12);
+  --tool-bg-git:          rgba(249, 115, 22, 0.12);
+  --tool-bg-network:      rgba(20, 184, 166, 0.12);
+  --tool-bg-test:         rgba(16, 185, 129, 0.12);
+  --tool-bg-database:     rgba(99, 102, 241, 0.12);
+  --tool-bg-dataAnalysis: rgba(139, 92, 246, 0.12);
+  --tool-bg-image:        rgba(236, 72, 153, 0.12);
+  --tool-bg-system:       rgba(100, 116, 139, 0.14);
+
   /* —— Element Plus 覆盖 —— */
   --el-color-primary: var(--accent-blue);
   --el-color-success: var(--color-green);
@@ -1171,6 +1192,27 @@ const handleCloseConfirm = async ({ action, remember }) => {
     --shadow-md:         0 2px 8px rgba(0,0,0,0.4);
     --shadow-lg:         0 8px 24px rgba(0,0,0,0.5);
     --shadow-popover:    0 4px 16px rgba(0,0,0,0.5), 0 0 1px rgba(0,0,0,0.3);
+
+    /* —— 工具分类色 (dark) —— */
+    --tool-color-note:         #fbbf24;
+    --tool-color-dev:          #60a5fa;
+    --tool-color-git:          #fb923c;
+    --tool-color-network:      #2dd4bf;
+    --tool-color-test:         #34d399;
+    --tool-color-database:     #818cf8;
+    --tool-color-dataAnalysis: #a78bfa;
+    --tool-color-image:        #f472b6;
+    --tool-color-system:       #94a3b8;
+
+    --tool-bg-note:         rgba(251, 191, 36, 0.16);
+    --tool-bg-dev:          rgba(96, 165, 250, 0.16);
+    --tool-bg-git:          rgba(251, 146, 60, 0.16);
+    --tool-bg-network:      rgba(45, 212, 191, 0.16);
+    --tool-bg-test:         rgba(52, 211, 153, 0.16);
+    --tool-bg-database:     rgba(129, 140, 248, 0.16);
+    --tool-bg-dataAnalysis: rgba(167, 139, 250, 0.16);
+    --tool-bg-image:        rgba(244, 114, 182, 0.16);
+    --tool-bg-system:       rgba(148, 163, 184, 0.18);
 }
 
 /* ===== 全局重置 ===== */
@@ -1250,7 +1292,7 @@ body {
   height: 72px;
   margin: 0 auto var(--space-lg);
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--surface-panel);
   box-shadow: 0 14px 34px rgba(194, 65, 12, 0.12);
   animation: splash-pulse 1.8s ease-in-out infinite;
 }
@@ -1543,6 +1585,26 @@ html.dark .app-content.toolbox-unified-shell {
   --border-color: rgba(255,235,210,0.18);
   --border-color-strong: rgba(255,235,210,0.26);
   --divider: rgba(255,235,210,0.12);
+
+  /* 工具分类色 (dark) */
+  --tool-color-note:         #fbbf24;
+  --tool-color-dev:          #60a5fa;
+  --tool-color-git:          #fb923c;
+  --tool-color-network:      #2dd4bf;
+  --tool-color-test:         #34d399;
+  --tool-color-database:     #818cf8;
+  --tool-color-dataAnalysis: #a78bfa;
+  --tool-color-image:        #f472b6;
+  --tool-color-system:       #94a3b8;
+  --tool-bg-note:         rgba(251, 191, 36, 0.16);
+  --tool-bg-dev:          rgba(96, 165, 250, 0.16);
+  --tool-bg-git:          rgba(251, 146, 60, 0.16);
+  --tool-bg-network:      rgba(45, 212, 191, 0.16);
+  --tool-bg-test:         rgba(52, 211, 153, 0.16);
+  --tool-bg-database:     rgba(129, 140, 248, 0.16);
+  --tool-bg-dataAnalysis: rgba(167, 139, 250, 0.16);
+  --tool-bg-image:        rgba(244, 114, 182, 0.16);
+  --tool-bg-system:       rgba(148, 163, 184, 0.18);
 }
 
 body {
@@ -1560,10 +1622,6 @@ select {
   border-radius: var(--radius-sm);
   font-weight: var(--font-weight-medium);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
-}
-
-.el-button:hover {
-  transform: var(--interactive-lift);
 }
 
 .el-button:focus-visible,
@@ -1650,5 +1708,16 @@ select {
   border: 1px solid var(--border-color) !important;
   box-shadow: var(--shadow-popover) !important;
   backdrop-filter: blur(16px);
+}
+
+/* 弹窗内表单项统一撑满父容器,避免 select/input/textarea 宽度不一致。
+   用 `>` 限定直接子元素,这样 Bookmarks 那种 <div><el-input/><el-button/></div> 的 flex 组合不受影响。 */
+.el-dialog__body .el-form-item__content > .el-select,
+.el-dialog__body .el-form-item__content > .el-input,
+.el-dialog__body .el-form-item__content > .el-textarea,
+.el-dialog__body .el-form-item__content > .el-input-number,
+.el-dialog__body .el-form-item__content > .el-cascader,
+.el-dialog__body .el-form-item__content > .el-date-editor {
+  width: 100%;
 }
 </style>

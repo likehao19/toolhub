@@ -82,7 +82,7 @@
                 @keydown.space.prevent="openFavoriteTool(tool)"
               >
                 <span class="menu-icon-shell menu-icon-shell-emoji">
-                  <span class="tool-emoji-icon">{{ tool.icon }}</span>
+                  <ToolIcon class="tool-emoji-icon" :id="tool.id" :fallback="tool.icon" />
                 </span>
                 <span v-show="!isCollapsed" class="menu-label">{{ getToolName(tool) }}</span>
               </div>
@@ -233,6 +233,7 @@ import {
 import { ElMessage } from 'element-plus'
 import { t } from '@/i18n'
 import { useFavoriteTools, getToolName } from '@/composables/useFavoriteTools'
+import ToolIcon from '@/components/ToolIcon.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -467,8 +468,8 @@ const navigateTo = (path) => {
 .collapse-btn:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
-  transform: var(--interactive-lift);
   box-shadow: var(--shadow-sm);
+  transform: none;
 }
 
 /* 顶部固定区域 — 不参与滚动 */
@@ -548,15 +549,12 @@ const navigateTo = (path) => {
 .section-header .el-icon {
   font-size: 11px;
   color: var(--text-quaternary);
-  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
+/* 覆盖全局 design-refresh.css 中 [role="button"]:hover 的 translateY(-1px) 上抬。
+   .section-header 模板用 role="button" 来满足 a11y,代价是命中那条全局动画,这里关掉。 */
 .section-header:hover {
-  color: var(--text-secondary);
-}
-
-.section-header:hover .el-icon {
-  color: var(--text-secondary);
+  transform: none;
 }
 
 .section-header.section-header-static {
@@ -590,8 +588,7 @@ const navigateTo = (path) => {
   color: color-mix(in srgb, var(--text-primary) 88%, transparent 12%);
   border-radius: 11px;
   cursor: pointer;
-  border: 1px solid transparent;
-  transition: background var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast);
   position: relative;
 }
 
@@ -626,15 +623,12 @@ const navigateTo = (path) => {
   font-size: 15px;
   color: rgba(71, 85, 105, 0.9);
   flex-shrink: 0;
-  transition: color var(--transition-fast), transform var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
 /* Hover 态 */
 .menu-item:hover {
   background: color-mix(in srgb, var(--accent-blue-bg) 46%, transparent 54%);
-  border-color: color-mix(in srgb, var(--accent-blue) 26%, transparent 74%);
-  box-shadow: var(--shadow-sm);
-  transform: var(--interactive-lift);
 }
 
 .menu-item:hover .el-icon {
@@ -650,8 +644,6 @@ const navigateTo = (path) => {
   background: linear-gradient(180deg, color-mix(in srgb, var(--accent-blue-bg) 78%, white 22%), color-mix(in srgb, var(--accent-blue-bg) 92%, transparent 8%));
   color: color-mix(in srgb, var(--accent-blue) 84%, var(--el-text-color-primary) 16%);
   font-weight: 600;
-  border-color: color-mix(in srgb, var(--accent-blue) 32%, transparent 68%);
-  box-shadow: 0 8px 14px rgba(194, 65, 12, 0.16);
 }
 
 .menu-item.active::before {
@@ -774,9 +766,9 @@ const navigateTo = (path) => {
 }
 
 .tools-badge :deep(.el-badge__content) {
-  background: rgba(100, 116, 139, 0.12);
-  color: rgba(71, 85, 105, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: var(--surface-panel-soft);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   font-size: 10px;
   font-weight: 600;
   height: 18px;
