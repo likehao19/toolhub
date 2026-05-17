@@ -339,9 +339,37 @@ pub async fn install_update(app: AppHandle, installer_path: String) -> Result<()
 
     #[cfg(target_os = "windows")]
     {
-        std::process::Command::new(&path)
-            .spawn()
-            .map_err(|e| format!("Launch installer: {}", e))?;
+        use std::os::windows::ffi::OsStrExt;
+        use windows::core::PCWSTR;
+        use windows::Win32::UI::Shell::ShellExecuteW;
+        use windows::Win32::UI::WindowsAndMessaging::SW_SHOWNORMAL;
+
+        // NSIS 安装器 manifest 中要求 requireAdministrator，直接 CreateProcess
+        // 会返回 ERROR_ELEVATION_REQUIRED (740)。必须走 ShellExecuteW 的 "runas"
+        // verb 让 Windows 弹 UAC 提升。
+        let path_wide: Vec<u16> = path
+            .as_os_str()
+            .encode_wide()
+            .chain(std::iter::once(0))
+            .collect();
+        let verb_wide: Vec<u16> = "runas\0".encode_utf16().collect();
+
+        let hinst = unsafe {
+            ShellExecuteW(
+                None,
+                PCWSTR(verb_wide.as_ptr()),
+                PCWSTR(path_wide.as_ptr()),
+                PCWSTR::null(),
+                PCWSTR::null(),
+                SW_SHOWNORMAL,
+            )
+        };
+        // ShellExecuteW: 返回值 > 32 表示成功，否则为错误码（其中 SE_ERR_ACCESSDENIED=5
+        // 通常对应用户在 UAC 弹窗点了"否"）。
+        let code = hinst.0 as isize;
+        if code <= 32 {
+            return Err(format!("Launch installer failed (ShellExecute code {})", code));
+        }
     }
     #[cfg(target_os = "macos")]
     {

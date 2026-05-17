@@ -57,8 +57,6 @@
         </el-form-item>
       </el-form>
     </el-card>
-
-    <UpdateDialog v-model="updateDialogVisible" :info="updateDialogInfo" />
   </div>
 </template>
 
@@ -69,7 +67,6 @@ import { getVersion } from '@tauri-apps/api/app'
 import { t } from '@/i18n'
 import { useSettingsCore } from '@/composables/settings/useSettingsCore'
 import { useFeedbackAndUpdate } from '@/composables/settings/useFeedbackAndUpdate'
-import UpdateDialog from '@/components/UpdateDialog.vue'
 
 defineProps({
   active: { type: Boolean, default: true },
@@ -93,8 +90,6 @@ const {
   submittingFeedback,
   checkingUpdate,
   updateInfo,
-  updateDialogVisible,
-  updateDialogInfo,
   submitFeedback,
   clearFeedback,
   checkUpdate,

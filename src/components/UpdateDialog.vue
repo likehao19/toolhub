@@ -114,6 +114,8 @@ import {
   installUpdate,
   formatBytes,
   formatSpeed,
+  getCachedInstaller,
+  setCachedInstaller,
 } from '@/utils/updater'
 
 const props = defineProps({
@@ -171,9 +173,21 @@ const renderedNotes = computed(() => {
   }
 })
 
-// 重置状态：每次重新打开 dialog
+// 重置状态：每次重新打开 dialog。如果本会话已下载过同名安装包，直接跳到 ready。
 watch(() => props.modelValue, (v) => {
-  if (v) {
+  if (!v) return
+  const cachedPath = getCachedInstaller(props.info?.asset?.name)
+  if (cachedPath) {
+    installerPath.value = cachedPath
+    progress.value = {
+      downloaded: props.info?.asset?.size || 0,
+      total: props.info?.asset?.size || 0,
+      percent: 100,
+      speed_bps: 0,
+    }
+    errorMsg.value = ''
+    phase.value = 'ready'
+  } else {
     phase.value = 'available'
     progress.value = { downloaded: 0, total: 0, percent: 0, speed_bps: 0 }
     errorMsg.value = ''
@@ -191,6 +205,7 @@ async function startDownload() {
       progress.value = p
     })
     installerPath.value = path
+    setCachedInstaller(props.info.asset.name, path)
     phase.value = 'ready'
   } catch (e) {
     const msg = String(e)

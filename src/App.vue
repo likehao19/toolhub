@@ -65,6 +65,9 @@
           :size="floatingBallConfig.size"
           @click="openAIAssistantWindow"
         />
+
+        <!-- 全局更新对话框（启动自动检查 + 设置页"检查更新"复用同一实例） -->
+        <UpdateDialog v-model="updateDialogVisible" :info="updateDialogInfo" />
       </div>
     </template>
   </div>
@@ -83,6 +86,8 @@ import ProductivitySidebar from '@/components/ProductivitySidebar.vue'
 import ContextMenu from '@/components/ContextMenu.vue'
 import AIAssistant from '@/components/AIAssistant.vue'
 import AIFloatingBall from '@/components/AIFloatingBall.vue'
+import UpdateDialog from '@/components/UpdateDialog.vue'
+import { useFeedbackAndUpdate } from '@/composables/settings/useFeedbackAndUpdate'
 import { loadConfig } from '@/utils/tauri/store'
 import { applyAppearance, applyThemeMode, syncSystemThemePreference } from '@/utils/appearance'
 import { setLocale, t } from '@/i18n'
@@ -118,6 +123,10 @@ const contextMenuPosition = ref({ x: 0, y: 0 })
 const isLoading = ref(true)
 const loadingStatus = ref(t('common.starting'))
 const showAIAssistant = ref(false)
+
+// 全局更新对话框（由 useFeedbackAndUpdate module-level singleton 控制；
+// 设置页"检查更新"和启动自动检查共享同一实例，避免双实例 race。）
+const { updateDialogVisible, updateDialogInfo, checkUpdate } = useFeedbackAndUpdate()
 let cleanupAppearanceSync = null
 const tauriUnlisteners = []
 let removeUnhandledRejectionListener = null
@@ -872,6 +881,14 @@ onMounted(async () => {
       } catch (error) {
         // 静默处理错误
       }
+    }
+
+    // 启动 2 秒后静默检查更新（非 dev）：有新版本就弹 UpdateDialog；
+    // 无新版/网络失败完全静默，不打扰用户。
+    if (!isDev) {
+      setTimeout(() => {
+        checkUpdate({ silent: true }).catch(() => {})
+      }, 2000)
     }
   } catch (error) {
     handleError(error, '应用启动')

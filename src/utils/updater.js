@@ -86,3 +86,29 @@ export function formatBytes(bytes) {
 export function formatSpeed(bps) {
   return `${formatBytes(bps)}/s`
 }
+
+/**
+ * 已下载安装包缓存（module-level，单会话内有效）。
+ *
+ * 用途：用户点击下载后关闭对话框，再次打开时若 asset 名一致就直接进入
+ * "安装"阶段，省去重复下载。文件实际是否还在由后端 install_update 兜底
+ * 校验——这里只记 path/name。
+ */
+const _installerCache = { assetName: null, path: null }
+
+export function setCachedInstaller(assetName, path) {
+  if (!assetName || !path) return
+  _installerCache.assetName = assetName
+  _installerCache.path = path
+}
+
+export function getCachedInstaller(assetName) {
+  if (!assetName) return null
+  if (_installerCache.assetName !== assetName) return null
+  return _installerCache.path
+}
+
+export function clearCachedInstaller() {
+  _installerCache.assetName = null
+  _installerCache.path = null
+}
