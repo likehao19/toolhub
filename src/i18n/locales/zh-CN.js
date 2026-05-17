@@ -234,8 +234,14 @@ export default {
     fillFeedback: '请填写反馈内容',
     feedbackSuccess: '感谢您的反馈！我们会认真处理',
     feedbackFailed: '提交失败: {msg}',
-    latestVersion: '当前已是最新版本 v1.0.0',
+    latestVersion: '当前已是最新版本 v{v}',
+    alreadyLatest: '当前已是最新版本 v{v}',
     checkUpdateFailed: '检查更新失败',
+    changelog: '更新日志',
+    changelogDesc: '当前及历史版本变更（本地，不联网）',
+    appLog: '运行日志',
+    devTools: '开发',
+    devToolsDesc: 'DEV 模式独占工具，打包后自动移除',
     selectPathFailed: '选择路径失败',
     migrateModeTitle: '选择迁移方式',
     migrateModeMsg: '请选择迁移方式：\n\n【移动】将文件从旧位置转移到新位置（删除源文件）\n【复制】将文件复制到新位置（保留源文件作为备份）\n【仅更改路径】不迁移文件，手动操作\n\n旧位置：{oldPath}\n新位置：{newPath}',
@@ -3699,5 +3705,61 @@ export default {
   // ===== Ribbon (Univer 电子表格工具栏) =====
   ribbon: {
     menu: '功能区菜单',
+  },
+
+  // ===== 软件更新对话框 =====
+  update: {
+    newVersionAvailable: '发现新版本 v{v}',
+    currentVersion: '当前版本',
+    latestVersion: '最新版本',
+    releaseNotes: '更新内容',
+    downloadSize: '下载大小',
+    publishedAt: '发布时间',
+    updateNow: '立即更新',
+    later: '稍后再说',
+    downloading: '下载中…',
+    cancel: '取消下载',
+    downloadComplete: '下载完成',
+    installAndExit: '安装并退出',
+    downloadFailed: '下载失败：{msg}',
+    downloadFailedShort: '下载失败',
+    cancelled: '已取消下载',
+    noAssetForPlatform: '当前平台暂未提供更新包',
+    retry: '重试',
+    macosHint: 'macOS 用户：点击「安装并退出」会打开 .dmg，请将应用图标拖到「应用程序」文件夹完成安装。',
+  },
+
+  // ===== 更新日志 / 发布历史 =====
+  changelog: {
+    currentlyOn: '当前',
+    empty: '暂无更新日志',
+  },
+
+  // ===== 运行日志 =====
+  appLog: {
+    loading: '正在读取日志…',
+    empty: '日志文件为空',
+    emptyFiltered: '没有匹配该级别的日志条目',
+    emptySearch: '没有匹配的日志行',
+    truncated: '已截断',
+    lines: '行',
+    levelAll: '全部级别',
+    openDir: '打开目录',
+    clear: '清空',
+    clearConfirm: '确定清空当前活动日志文件吗？历史轮转文件不受影响。',
+    cleared: '日志已清空',
+    copied: '已复制 {n} 行到剪贴板',
+    history: '历史日志',
+    searchPlaceholder: '搜索日志…',
+    jumpBottom: '跳到底部',
+  },
+
+  // ===== 开发工具（仅 dev 模式可见） =====
+  devTools: {
+    intro: 'DEV 模式独占工具，发布构建中本菜单不会出现。',
+    headerPreview: '头部样式预览',
+    headerStyle: '头部样式',
+    headerAuto: '自动（按系统）',
+    headerHint: '仅用于在 Windows 上预览 macOS 头部样式；打包发布后此项不会显示。',
   },
 }

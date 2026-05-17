@@ -234,8 +234,14 @@ export default {
     fillFeedback: 'Please enter feedback content',
     feedbackSuccess: 'Thank you for your feedback!',
     feedbackFailed: 'Submit failed: {msg}',
-    latestVersion: 'Already up to date v1.0.0',
+    latestVersion: 'Already up to date v{v}',
+    alreadyLatest: 'Already up to date v{v}',
     checkUpdateFailed: 'Failed to check for updates',
+    changelog: 'Changelog',
+    changelogDesc: 'Version history (local, offline)',
+    appLog: 'Runtime Log',
+    devTools: 'Developer',
+    devToolsDesc: 'DEV-only tools, removed in production builds',
     selectPathFailed: 'Failed to select path',
     migrateModeTitle: 'Choose Migration Mode',
     migrateModeMsg: 'Choose migration mode:\n\n[Move] Transfer files to new location (delete source)\n[Copy] Copy files to new location (keep source as backup)\n[Change Path Only] No migration, manual operation\n\nOld: {oldPath}\nNew: {newPath}',
@@ -3635,5 +3641,61 @@ export default {
   // ===== Ribbon (Univer spreadsheet toolbar) =====
   ribbon: {
     menu: 'Ribbon menu',
+  },
+
+  // ===== Software update dialog =====
+  update: {
+    newVersionAvailable: 'New version available v{v}',
+    currentVersion: 'Current version',
+    latestVersion: 'Latest version',
+    releaseNotes: 'Release notes',
+    downloadSize: 'Download size',
+    publishedAt: 'Published',
+    updateNow: 'Update now',
+    later: 'Later',
+    downloading: 'Downloading…',
+    cancel: 'Cancel',
+    downloadComplete: 'Download complete',
+    installAndExit: 'Install and exit',
+    downloadFailed: 'Download failed: {msg}',
+    downloadFailedShort: 'Download failed',
+    cancelled: 'Download cancelled',
+    noAssetForPlatform: 'No update package available for your platform',
+    retry: 'Retry',
+    macosHint: 'macOS: clicking "Install and exit" opens the .dmg — drag the app icon into Applications to finish.',
+  },
+
+  // ===== Changelog / Release history =====
+  changelog: {
+    currentlyOn: 'On',
+    empty: 'No changelog yet',
+  },
+
+  // ===== Runtime log =====
+  appLog: {
+    loading: 'Reading log…',
+    empty: 'Log file is empty',
+    emptyFiltered: 'No entries match this level',
+    emptySearch: 'No lines match your search',
+    truncated: 'truncated',
+    lines: 'lines',
+    levelAll: 'All levels',
+    openDir: 'Open folder',
+    clear: 'Clear',
+    clearConfirm: 'Clear the active log file? Rotated history files are kept.',
+    cleared: 'Log cleared',
+    copied: 'Copied {n} lines to clipboard',
+    history: 'History',
+    searchPlaceholder: 'Search logs…',
+    jumpBottom: 'Jump to bottom',
+  },
+
+  // ===== Developer tools (DEV-only) =====
+  devTools: {
+    intro: 'DEV-only tools — this menu is removed in production builds.',
+    headerPreview: 'Header Style Preview',
+    headerStyle: 'Header style',
+    headerAuto: 'Auto (system)',
+    headerHint: 'Preview the macOS-style header on Windows. Hidden in production builds.',
   },
 }

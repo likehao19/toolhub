@@ -57,21 +57,34 @@
         </el-form-item>
       </el-form>
     </el-card>
+
+    <UpdateDialog v-model="updateDialogVisible" :info="updateDialogInfo" />
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
 import { Refresh } from '@element-plus/icons-vue'
+import { getVersion } from '@tauri-apps/api/app'
 import { t } from '@/i18n'
 import { useSettingsCore } from '@/composables/settings/useSettingsCore'
 import { useFeedbackAndUpdate } from '@/composables/settings/useFeedbackAndUpdate'
+import UpdateDialog from '@/components/UpdateDialog.vue'
 
 defineProps({
   active: { type: Boolean, default: true },
 })
 
-const appVersion = import.meta.env.VITE_APP_VERSION || '1.0.0'
+const appVersion = ref(import.meta.env.VITE_APP_VERSION || '')
 const buildTime = import.meta.env.VITE_BUILD_TIME || ''
+
+onMounted(async () => {
+  try {
+    appVersion.value = await getVersion()
+  } catch {
+    // 非 Tauri 环境（如纯浏览器预览）保留 fallback
+  }
+})
 
 const { handleReset } = useSettingsCore()
 const {
@@ -80,6 +93,8 @@ const {
   submittingFeedback,
   checkingUpdate,
   updateInfo,
+  updateDialogVisible,
+  updateDialogInfo,
   submitFeedback,
   clearFeedback,
   checkUpdate,

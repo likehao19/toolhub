@@ -57,7 +57,18 @@ pub fn run() {
         .plugin(tauri_plugin_positioner::init())
         .plugin(
             tauri_plugin_log::Builder::default()
+                .targets([
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Stdout),
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Folder {
+                        path: commands::app_log::resolve_log_dir(),
+                        file_name: Some("app".to_string()),
+                    }),
+                    tauri_plugin_log::Target::new(tauri_plugin_log::TargetKind::Webview),
+                ])
                 .level(LevelFilter::Info)
+                .max_file_size(5_000_000)
+                .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepAll)
+                .timezone_strategy(tauri_plugin_log::TimezoneStrategy::UseLocal)
                 .build(),
         )
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -210,6 +221,16 @@ pub fn run() {
             commands::ssh::sftp_mkdir,
             commands::ssh::sftp_remove,
             commands::ssh::sftp_rename,
+            commands::updater::check_for_updates,
+            commands::updater::download_update,
+            commands::updater::cancel_update_download,
+            commands::updater::install_update,
+            commands::app_log::get_log_file_path,
+            commands::app_log::get_log_dir,
+            commands::app_log::read_recent_log,
+            commands::app_log::clear_log_file,
+            commands::app_log::list_log_files,
+            commands::app_log::open_log_dir,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")

@@ -25,3 +25,5 @@ pub mod dev_server;
 pub mod downloader;
 pub mod ssh;
 pub mod crypto;
+pub mod updater;
+pub mod app_log;

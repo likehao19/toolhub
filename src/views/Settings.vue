@@ -61,6 +61,8 @@
         <GeneralSection :active="activeTab === 'general'" />
         <WorkspaceSection :active="activeTab === 'workspace'" />
         <SecuritySection :active="activeTab === 'security'" />
+        <ChangelogSection :active="activeTab === 'changelog'" />
+        <component v-if="DevToolsSection" :is="DevToolsSection" :active="activeTab === 'dev'" />
         <AboutSection :active="activeTab === 'about'" />
       </main>
     </div>
@@ -130,9 +132,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, defineAsyncComponent } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Check, Refresh, Setting, Folder, Lock, Bell } from '@element-plus/icons-vue'
+import { Check, Refresh, Setting, Folder, Lock, Bell, Document, Tools } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 
 import { useSettingsCore } from '@/composables/settings/useSettingsCore'
@@ -142,7 +144,14 @@ import { usePasswordSettings } from '@/composables/settings/usePasswordSettings'
 import GeneralSection from './Settings/sections/GeneralSection.vue'
 import WorkspaceSection from './Settings/sections/WorkspaceSection.vue'
 import SecuritySection from './Settings/sections/SecuritySection.vue'
+import ChangelogSection from './Settings/sections/ChangelogSection.vue'
 import AboutSection from './Settings/sections/AboutSection.vue'
+
+// DEV-only 菜单：异步 import + DEV gate，生产构建中 import.meta.env.DEV=false 时整块被 tree-shake
+const isDev = import.meta.env.DEV
+const DevToolsSection = isDev
+  ? defineAsyncComponent(() => import('./Settings/sections/DevToolsSection.vue'))
+  : null
 
 const route = useRoute()
 const router = useRouter()
@@ -177,12 +186,19 @@ const {
 // ---- 菜单 / 当前 tab ----
 const activeTab = ref('general')
 
-const menuItems = computed(() => [
-  { key: 'general', label: t('settings.general'), description: '窗口、外观、语言与通知', icon: Setting },
-  { key: 'workspace', label: t('settings.workspace'), description: '笔记目录、Markdown 与 AI 配置', icon: Folder },
-  { key: 'security', label: t('settings.security'), description: '系统权限、主密码与保护策略', icon: Lock },
-  { key: 'about', label: t('settings.help'), description: '应用信息、反馈与更新支持', icon: Bell },
-])
+const menuItems = computed(() => {
+  const items = [
+    { key: 'general', label: t('settings.general'), description: '窗口、外观、语言与通知', icon: Setting },
+    { key: 'workspace', label: t('settings.workspace'), description: '笔记目录、Markdown 与 AI 配置', icon: Folder },
+    { key: 'security', label: t('settings.security'), description: '系统权限、主密码与保护策略', icon: Lock },
+    { key: 'changelog', label: t('settings.changelog'), description: t('settings.changelogDesc'), icon: Document },
+  ]
+  if (isDev) {
+    items.push({ key: 'dev', label: t('settings.devTools'), description: t('settings.devToolsDesc'), icon: Tools })
+  }
+  items.push({ key: 'about', label: t('settings.help'), description: '应用信息、反馈与更新支持', icon: Bell })
+  return items
+})
 
 const currentMenuName = computed(() => {
   const menu = menuItems.value.find((m) => m.key === activeTab.value)

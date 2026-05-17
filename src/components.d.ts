@@ -98,6 +98,7 @@ declare module 'vue' {
     TodoDependencyGraph: typeof import('./components/TodoDependencyGraph.vue')['default']
     ToolIcon: typeof import('./components/ToolIcon.vue')['default']
     TraySettingCard: typeof import('./components/TraySettingCard.vue')['default']
+    UpdateDialog: typeof import('./components/UpdateDialog.vue')['default']
     WindowManagementCard: typeof import('./components/WindowManagementCard.vue')['default']
   }
   export interface GlobalDirectives {
