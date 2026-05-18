@@ -473,6 +473,17 @@
   border-radius: 0 !important;
 }
 
+/* —— .el-select__wrapper 行为复位 ——
+   Element Plus 默认 .el-select__wrapper 是 width:100% 撑满 .el-select 容器。
+   toolbox-unified.css 把它改成 inline-flex 后变成由内容决定宽度，导致
+   用 inline style 或 class 设了 .el-select 自身宽度（如 .header-actions
+   的环境选择、.method-select 的 GET/POST 等）时，wrapper 只占内容那一段，
+   外层容器空了一大片。这里把 width:100% 复位回来，所有工具箱页共享。 */
+.app-content .el-select__wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* ============================================================
    12. 浮层例外（保险栓）—— 即使将来某些 popper 没 teleport，也保住浮层视觉
    ============================================================ */

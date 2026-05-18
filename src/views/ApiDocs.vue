@@ -29,7 +29,7 @@
     <div class="content-area">
       <!-- Edit Mode -->
       <div v-if="docsViewMode === 'edit'" class="docs-edit">
-        <div class="docs-list-panel" :class="{ collapsed: sidebarCollapsed }">
+        <div class="docs-list-panel">
           <div class="list-inner">
             <!-- 顶部新建栏 -->
             <div class="list-toolbar">
@@ -100,16 +100,6 @@
             <div v-else class="empty-hint">{{ t('apiDocs.noApiDocs') }}</div>
           </div>
           </div>
-        </div>
-
-        <!-- 折叠/展开吸附按钮（独立浮动在 docs-edit 内，跟随 panel 边缘） -->
-        <div class="sidebar-toggle" :class="{ collapsed: sidebarCollapsed }"
-          @click="sidebarCollapsed = !sidebarCollapsed"
-          :title="sidebarCollapsed ? t('common.showSidebar') : t('common.hideSidebar')">
-          <el-icon>
-            <ArrowLeft v-if="!sidebarCollapsed" />
-            <ArrowRight v-else />
-          </el-icon>
         </div>
 
         <div class="docs-form-panel" v-if="editingDoc">
@@ -276,7 +266,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Document, Close, Folder, FolderOpened, FolderAdd, DocumentAdd, MoreFilled, Edit, Delete, ArrowLeft, ArrowRight, CaretRight, Check, DataAnalysis, View } from '@element-plus/icons-vue'
+import { Document, Close, Folder, FolderOpened, FolderAdd, DocumentAdd, MoreFilled, Edit, Delete, CaretRight, Check, DataAnalysis, View } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { METHOD_COLORS, tryFormatJson, uuid } from '@/utils/apiWorkbench/shared'
 import {
@@ -296,7 +286,6 @@ const showModelDialog = ref(false)
 const dataModels = ref([])
 const treeRef = ref(null)
 const expandedKeys = ref([])
-const sidebarCollapsed = ref(false)
 
 const treeProps = {
   children: 'children',
@@ -593,11 +582,6 @@ onMounted(() => {
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  transition: width 0.22s ease, min-width 0.22s ease;
-}
-.docs-list-panel.collapsed {
-  width: 0;
-  min-width: 0;
 }
 .docs-list-panel .list-inner {
   flex: 1;
@@ -607,39 +591,6 @@ onMounted(() => {
   min-height: 0;
   width: 260px;
   background: transparent;
-  transition: opacity 0.18s;
-}
-.docs-list-panel.collapsed .list-inner {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 折叠按钮：浮动在 docs-edit 内，按钮中心始终落在 panel 右边缘 */
-.sidebar-toggle {
-  position: absolute;
-  left: 260px;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 22px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: var(--el-bg-color-overlay);
-  border: 1px solid rgba(60, 40, 20, 0.14);
-  border-radius: 11px;
-  z-index: 20;
-  color: var(--text-tertiary);
-  font-size: 12px;
-  box-shadow: 0 2px 6px rgba(60, 40, 20, 0.06);
-  transition: left 0.22s ease, color 0.15s, background 0.15s, box-shadow 0.15s;
-}
-.sidebar-toggle.collapsed { left: 0; }
-.sidebar-toggle:hover {
-  color: var(--accent-blue);
-  background: var(--el-bg-color-overlay);
-  box-shadow: 0 3px 10px rgba(47, 111, 228, 0.18);
 }
 
 .list-toolbar {

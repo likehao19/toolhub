@@ -311,7 +311,7 @@
   <div class="wrap">
     <div class="eyebrow">
       <span class="pip"></span>
-      <span data-version-label>v1.0.10</span> · 现已支持 Windows 与 macOS
+      <span data-version-label>v1.0.11</span> · 现已支持 Windows 与 macOS
     </div>
     <h1 class="headline">
       一个安静的<br/>
@@ -323,7 +323,7 @@
       不做花哨的事情，只做你每天都需要的事情。
     </p>
     <div class="cta-row">
-      <a href="https://github.com/likehao19/toolhub/releases/latest" class="btn btn-primary" data-dl="win-msi" target="_blank" rel="noopener">
+      <a href="https://github.com/likehao19/toolhub/releases/download/v1.0.11/ToolHub_1.0.11_x64_zh-CN.msi" class="btn btn-primary" data-dl="win-msi" target="_blank" rel="noopener">
         下载 Windows 版
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
       </a>
@@ -668,30 +668,30 @@
   <div class="wrap">
     <div class="rv">
       <h2>开始用<em>，</em>不需要理由。</h2>
-      <p class="subtitle">完全免费，永久无广告。当前版本 <span data-version-label>v1.0.10</span>，支持 Windows 与 macOS（按 Mac 架构选择对应安装包）。</p>
+      <p class="subtitle">完全免费，永久无广告。当前版本 <span data-version-label>v1.0.11</span>，支持 Windows 与 macOS（按 Mac 架构选择对应安装包）。</p>
       <div class="platforms">
-        <a href="https://github.com/likehao19/toolhub/releases/latest" class="pf" data-dl="win-msi" target="_blank" rel="noopener">
+        <a href="https://github.com/likehao19/toolhub/releases/download/v1.0.11/ToolHub_1.0.11_x64_zh-CN.msi" class="pf" data-dl="win-msi" target="_blank" rel="noopener">
           <svg class="pf-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5.5 11 4v8H3zM13 4l8-1.5V12h-8zM3 13h8v7l-8-1.5zM13 13h8v9.5L13 21z"/></svg>
           <div>
             <div class="pf-t">Windows · MSI</div>
             <div class="pf-s">推荐 · 64 位 · <span data-size="win-msi">~ 22 MB</span></div>
           </div>
         </a>
-        <a href="https://github.com/likehao19/toolhub/releases/latest" class="pf" data-dl="win-exe" target="_blank" rel="noopener">
+        <a href="https://github.com/likehao19/toolhub/releases/download/v1.0.11/ToolHub_1.0.11_x64-setup.exe" class="pf" data-dl="win-exe" target="_blank" rel="noopener">
           <svg class="pf-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>
           <div>
             <div class="pf-t">Windows · NSIS</div>
             <div class="pf-s">便携安装包 · <span data-size="win-exe">~ 18 MB</span></div>
           </div>
         </a>
-        <a href="https://github.com/likehao19/toolhub/releases/latest" class="pf" data-dl="mac-arm" target="_blank" rel="noopener">
+        <a href="https://github.com/likehao19/toolhub/releases/download/v1.0.11/ToolHub_1.0.11_aarch64.dmg" class="pf" data-dl="mac-arm" target="_blank" rel="noopener">
           <svg class="pf-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2c0 2-2 3-3 3-1 0-3-1-3-3"/><path d="M12 6c-3 0-6 2-6 7 0 5 3 9 6 9s6-4 6-9c0-5-3-7-6-7z"/></svg>
           <div>
             <div class="pf-t">macOS · Apple Silicon</div>
             <div class="pf-s">M1 / M2 / M3 · <span data-size="mac-arm">~ 22 MB</span></div>
           </div>
         </a>
-        <a href="https://github.com/likehao19/toolhub/releases/latest" class="pf" data-dl="mac-intel" target="_blank" rel="noopener">
+        <a href="https://github.com/likehao19/toolhub/releases/download/v1.0.11/ToolHub_1.0.11_x64.dmg" class="pf" data-dl="mac-intel" target="_blank" rel="noopener">
           <svg class="pf-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 2c0 2-2 3-3 3-1 0-3-1-3-3"/><path d="M12 6c-3 0-6 2-6 7 0 5 3 9 6 9s6-4 6-9c0-5-3-7-6-7z"/></svg>
           <div>
             <div class="pf-t">macOS · Intel</div>
@@ -774,7 +774,8 @@
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
   // Auto-bind latest release assets (Windows MSI/NSIS, macOS DMG)
-  // 失败时按钮的 href 默认指向 releases/latest 页面，不会变死链
+  // 静态 href 已经指向当前版本的具体安装包，这里只是把它升级到 GitHub 上的最新版
+  // （如果 GitHub 比页面新）；fetch 失败也无所谓，静态 href 仍然可下载
   (async function loadRelease() {
     try {
       const r = await fetch('https://api.github.com/repos/likehao19/toolhub/releases/latest', { cache: 'no-store' });
@@ -810,7 +811,7 @@
         });
       }
     } catch (e) {
-      // 静默失败 — 链接的默认 href 已经指向 releases/latest 页面
+      // 静默失败 — 静态 href 已经指向当前版本的具体安装包
     }
   })();
 </script>

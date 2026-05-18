@@ -23,10 +23,10 @@
     </div>
 
     <div class="content-area">
-      <div class="debug-layout" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
-        <div class="sidebar-area" :class="{ collapsed: sidebarCollapsed }">
-          <div class="left-sidebar" :class="{ collapsed: sidebarCollapsed }">
-            <div v-if="!sidebarCollapsed" class="sidebar-content">
+      <div class="debug-layout">
+        <div class="sidebar-area">
+          <div class="left-sidebar">
+            <div class="sidebar-content">
               <div class="sidebar-tabs">
                 <div class="sidebar-tab" :class="{ active: sidebarTab === 'collections' }" @click="sidebarTab = 'collections'">
                   {{ t('apiDebug.collections') }}
@@ -128,16 +128,6 @@
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- 折叠/展开按钮：浮动在 debug-layout 内，按钮中心始终落在 panel 右边缘 -->
-        <div class="sidebar-toggle" :class="{ collapsed: sidebarCollapsed }"
-          @click="sidebarCollapsed = !sidebarCollapsed"
-          :title="sidebarCollapsed ? t('common.showSidebar') : t('common.hideSidebar')">
-          <el-icon>
-            <ArrowLeft v-if="!sidebarCollapsed" />
-            <ArrowRight v-else />
-          </el-icon>
         </div>
 
         <div class="main-panel">
@@ -515,7 +505,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Briefcase, Setting, Close, MoreFilled, ArrowLeft, ArrowRight, ArrowDown, Loading, CollectionTag, Folder, FolderOpened, FolderAdd, DocumentAdd, Edit, Delete, Document, CaretRight, CopyDocument, Plus, Promotion, Brush, Download, Upload, Search } from '@element-plus/icons-vue'
+import { Briefcase, Setting, Close, MoreFilled, ArrowDown, Loading, CollectionTag, Folder, FolderOpened, FolderAdd, DocumentAdd, Edit, Delete, Document, CaretRight, CopyDocument, Plus, Promotion, Brush, Download, Upload, Search } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
 import { sendRequest, cancelRequest, buildMultipartBody } from '@/utils/apiWorkbench/httpEngine'
 import { formatSize, METHOD_COLORS, COMMON_HEADERS, tryFormatJson, isJson, tryFormatXml, detectBodyFormat, buildUrl, buildAuthHeader } from '@/utils/apiWorkbench/shared'
@@ -547,7 +537,6 @@ const router = useRouter()
 const collectionTreeRef = ref(null)
 const treeProps = { children: 'children', label: 'name' }
 
-const sidebarCollapsed = ref(false)
 const sidebarTab = ref('collections')
 const collections = ref([])
 const history = ref([])
@@ -1574,59 +1563,22 @@ onMounted(() => {
   padding: 0;
   gap: 0;
   position: relative;
-  transition: grid-template-columns 0.22s ease;
-}
-.debug-layout.sidebar-collapsed {
-  grid-template-columns: 0 minmax(0, 1fr) !important;
-}
-.sidebar-area.collapsed {
-  width: 0;
-  overflow: hidden;
 }
 .sidebar-area {
   position: relative;
   display: flex;
   min-height: 0;
-  transition: width 0.22s ease;
 }
 .left-sidebar {
   width: 260px; min-width: 260px;
   background: transparent;
   display: flex; flex-direction: column; position: relative;
-  transition: width 0.2s, min-width 0.2s;
   border: 0;
   border-radius: 0;
   box-shadow: none;
   overflow: hidden;
 }
-.left-sidebar.collapsed { width: 0; min-width: 0; overflow: hidden; border-width: 0; }
 .sidebar-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-.sidebar-toggle {
-  position: absolute;
-  left: 260px;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 22px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  background: var(--el-bg-color-overlay);
-  border: 1px solid rgba(60, 40, 20, 0.14);
-  border-radius: 11px;
-  z-index: 20;
-  color: var(--text-tertiary);
-  font-size: 12px;
-  box-shadow: 0 2px 6px rgba(60, 40, 20, 0.06);
-  transition: left 0.22s ease, color 0.15s, background 0.15s, box-shadow 0.15s;
-}
-.sidebar-toggle.collapsed { left: 0; }
-.sidebar-toggle:hover {
-  color: var(--accent-blue);
-  background: var(--el-bg-color-overlay);
-  box-shadow: 0 3px 10px rgba(47, 111, 228, 0.18);
-}
 .sidebar-tabs { display: flex; padding: 10px 10px 8px; gap: 6px; }
 .sidebar-tab {
   flex: 1; text-align: center; padding: 8px 0; font-size: 12px; color: var(--text-secondary);
@@ -1851,6 +1803,8 @@ onMounted(() => {
 }
 .method-select { width: 110px; flex-shrink: 0; }
 .method-select :deep(.el-select__wrapper) {
+  width: 100%;
+  box-sizing: border-box;
   height: 32px;
   border-radius: 8px;
   background: var(--el-bg-color-overlay);
@@ -1942,22 +1896,26 @@ onMounted(() => {
   line-height: 36px;
   font-size: 12px;
   font-weight: 500;
-  padding: 0 14px;
+  padding: 0 12px;
+  min-width: 88px;
+  text-align: center;
   color: var(--text-tertiary);
   transition: color 0.15s;
   border-bottom: 2px solid transparent;
+  background: transparent !important;
 }
 .compact-tabs :deep(.el-tabs__item):hover {
   color: var(--text-primary);
+  background: transparent !important;
 }
 .compact-tabs :deep(.el-tabs__item.is-active) {
   color: var(--accent-blue);
   font-weight: 600;
+  border-bottom-color: var(--accent-blue);
 }
+/* 隐藏原生 active-bar，改用 .el-tabs__item 自带 border-bottom 实现等长下划线 */
 .compact-tabs :deep(.el-tabs__active-bar) {
-  height: 2px;
-  background: var(--accent-blue);
-  border-radius: 2px;
+  display: none;
 }
 .compact-tabs :deep(.el-tabs__content) {
   flex: 1;
@@ -2273,6 +2231,19 @@ onMounted(() => {
   .header { padding: 0 14px; }
   .breadcrumb { font-size: 14px; }
   .left-sidebar { width: 220px; min-width: 220px; }
+}
+
+/* —— 顶部"选环境"select 宽度矫正 ——
+   design-refresh.css 给 .header-actions .el-select 设了 min-width:160px，
+   导致 inline style width:140px 被撑大；同时 .el-select__wrapper 默认是
+   inline-flex 由内容决定宽度，于是出现 ".el-select 容器宽 / wrapper 窄"
+   的视觉错位。此处把 min-width 拆除，并让 wrapper 撑满 .el-select。 */
+.header-actions :deep(.el-select) {
+  min-width: 0 !important;
+}
+.header-actions :deep(.el-select__wrapper) {
+  width: 100%;
+  box-sizing: border-box;
 }
 </style>
 
